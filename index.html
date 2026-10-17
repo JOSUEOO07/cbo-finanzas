@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <title>CBO Finanzas</title>
 <meta name="theme-color" content="#0D5C46">
 <meta name="description" content="Finanzas de Casa Bonita Oregón S.A.C.">
@@ -1099,6 +1099,12 @@ function openF(op){
   $("ov").hidden=false; irPaso(op.r?4:1);
 }
 function closeF(){$("ov").hidden=true;ocultarSug()}
+/* Teclado del celular: las hojas (formulario, menús) se ajustan al espacio visible y el campo activo queda a la vista */
+if(window.visualViewport){
+  const ajustarHojas=()=>{const vv=visualViewport;document.querySelectorAll(".overlay").forEach(o=>{o.style.top=vv.offsetTop+"px";o.style.height=vv.height+"px";o.style.bottom="auto"})};
+  visualViewport.addEventListener("resize",ajustarHojas);visualViewport.addEventListener("scroll",ajustarHojas);ajustarHojas();
+}
+document.addEventListener("focusin",e=>{const t=e.target;if(t.closest&&t.closest(".sheet")&&/INPUT|SELECT|TEXTAREA/.test(t.tagName))setTimeout(()=>t.scrollIntoView({block:"center",behavior:"smooth"}),320)});
 $("fab").onclick=()=>openF(); $("close").onclick=closeF;
 $("ov").addEventListener("click",e=>{if(e.target===$("ov"))closeF()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("escaner").hidden)cerrarEscaner();else if(!$("ov").hidden)closeF();["ovMas","ovMov"].forEach(cerrarOv);$("app").classList.remove("abierto")}});
