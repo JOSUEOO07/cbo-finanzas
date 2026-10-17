@@ -107,7 +107,8 @@ body.menu .fab{display:none}
 .mini-l{display:grid;gap:2px}
 .mini-l .tl{padding:6px 0;border-bottom:1px dashed var(--line)}
 .mini-l .tl:last-child{border-bottom:0}
-.mini-l .tl b{font-family:var(--mono);font-weight:700;font-variant-numeric:tabular-nums}
+.mini-l .tl b{font-family:var(--mono);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;flex-shrink:0}
+.mini-l .tl>span:first-child{min-width:0}
 .delta{font-weight:700}
 .delta.up{color:var(--in)} .delta.down{color:var(--out)}
 .recent .item{cursor:pointer}
@@ -303,6 +304,35 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
 .swipe .acc [data-a="repetir"]{background:var(--brand)}
 .swipe .acc [data-a="borrar"]{background:var(--out)}
 @media (hover:hover) and (pointer:fine){.swipe .acc{display:none}}
+.obrasgrid{display:grid;gap:16px;align-items:start}
+.obras-col{display:grid;gap:16px;min-width:0}
+.obra[aria-current="true"]{border-color:var(--brand);box-shadow:0 0 0 2px var(--brand) inset}
+.asig-barra{display:flex;gap:8px}.asig-barra input{flex:1;min-width:0}
+.asig-list{display:grid;max-height:420px;overflow:auto}
+.asig-it{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 2px;border-bottom:1px solid var(--line);cursor:pointer}
+.asig-it:last-child{border-bottom:0}
+.asig-it input{width:20px;height:20px;accent-color:var(--brand)}
+.asig-it b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.asig-it small{color:var(--muted);font-size:.78rem}
+.obra-det h2{font-size:1.35rem}
+.obra-det .kp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
+.obra-det .kp div{background:var(--bg);border-radius:12px;padding:10px 12px;display:grid;gap:2px}
+.obra-det .kp small{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.obra-det .kp b{font-family:var(--mono);font-size:clamp(.92rem,1.1vw,1.1rem);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.obra-det .kp .grande{grid-column:1/-1;background:var(--brand);color:var(--brand-ink)}
+.obra-det .kp .grande small{color:inherit;opacity:.85}.obra-det .kp .grande b{font-size:1.8rem}
+.obra-det h3{font-size:.95rem;margin:16px 0 8px}
+.volver{margin-bottom:8px}
+@media (min-width:1100px){
+  .obrasgrid{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}
+  .obras{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+  .obra-det{position:sticky;top:96px}
+}
+@media (min-width:1500px){
+  .obra-det .kp{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .volver{display:none}
+}
+@media (max-width:1099px){.obrasgrid.ver-det .obras-col{display:none}}
 /* Pago a SUNAT */
 @media (max-width:520px){#f [data-paso="4"] .row2{grid-template-columns:minmax(0,1fr)}}
 .pagosun-link{justify-self:stretch;margin-top:2px;text-align:left;white-space:normal;line-height:1.35;padding:10px 12px;background:var(--warn-bg);color:var(--warn);border-color:transparent}
@@ -614,13 +644,25 @@ button.big{border:0}
       <!-- OBRAS -->
       <section data-sec="obras" hidden>
         <div class="ph"><div class="filters" role="group" aria-label="Periodo">
-          <button class="chip perO" data-p="mes" aria-pressed="false">Este mes</button>
-          <button class="chip perO" data-p="anio" aria-pressed="true">Todo el año</button>
-          <button class="chip perO" data-p="todo" aria-pressed="false">Desde el inicio</button>
+          <button class="chip perO" data-p="desde" aria-pressed="true">Desde oct 2026</button>
+          <button class="chip perO" data-p="mes" aria-pressed="false">Solo este mes</button>
+          <button class="chip perO" data-p="todo" aria-pressed="false">Todo</button>
         </div><span class="hint" id="obrasTot"></span></div>
         <p class="aviso-g" id="obrasAviso" hidden></p>
-        <div class="obras" id="obrasList"></div>
-        <p class="note">Utilidad de cada obra = ingresos − gastos − IGV que le toca (IGV de ventas − IGV de compras con factura) − renta 1%. Es referencial: los impuestos se declaran por mes, no por obra.</p>
+        <div class="obrasgrid">
+          <div class="obras-col">
+            <div class="obras" id="obrasList"></div>
+            <section class="panel" id="asigPanel">
+              <div class="ph"><h2>Comprobantes sin obra</h2><span class="hint" id="asigCount"></span></div>
+              <p class="hint" style="margin:0 0 10px">Marca los comprobantes, escribe la obra y toca <b>Asignar</b>. Es solo para ti: no cambia nada para SUNAT.</p>
+              <div class="asig-barra"><input id="asigObra" type="text" list="obrasDL" maxlength="60" placeholder="Nombre de la obra, ej. Obra Miraflores" autocomplete="off"><button class="btn" type="button" id="asigBtn">Asignar</button></div>
+              <div class="line" style="display:flex;gap:8px;margin:10px 0 4px;flex-wrap:wrap"><button class="btnlink" type="button" id="asigTodos">Marcar todos</button><button class="btnlink" type="button" id="asigNinguno">Quitar marcas</button><span class="hint" id="asigMsg"></span></div>
+              <div id="asigList" class="asig-list"></div>
+            </section>
+          </div>
+          <section class="panel obra-det" id="obraDet" hidden></section>
+        </div>
+        <p class="note">Utilidad neta de cada obra = ingresos − gastos (materiales, planilla, etc.) − IGV que le toca (IGV de ventas − IGV de compras con factura) − renta 1%. Es referencial: los impuestos se declaran por mes, no por obra.</p>
       </section>
 
       <section data-sec="anual" hidden>
@@ -1048,7 +1090,9 @@ function render(){
     +(S.sI&&cc.ninguno[1]?`<p class="note">${Math.round(cc.ninguno[1]/S.sI*100)} % de tus ventas del mes no tiene comprobante.</p>`:"");
   const rec=[...lista].sort((a,b)=>b.fecha.localeCompare(a.fecha)||b.creado-a.creado).slice(0,6);
   $("recList").innerHTML=rec.length?rec.map(filaMov).join(""):`<div class="empty">Sin movimientos en ${lblMes(mes)}.</div>`;
-  renderSunat(t); renderMov(); renderTerceros(); renderPlanilla(S); renderAnual(t); renderObras(); renderAnualGraf();
+  renderSunat(t); renderMov(); renderTerceros(); renderPlanilla(S); renderAnual(t);
+  // Paneles nuevos: si uno falla, no detiene al resto de la app
+  [renderObras,renderAnualGraf].forEach(f=>{try{f()}catch(e){console.error(e)}});
 }
 function renderSunat(t){
   $("declara").textContent=`Pagas el ${fechaCorta(vencInfo(mes).fecha)}`+(VENCE[mes]?` · límite SUNAT ${fechaCorta(VENCE[mes])}`:"");
@@ -1161,6 +1205,7 @@ function ir(s){
   document.querySelectorAll("#tabbar [data-tab]").forEach(b=>b.setAttribute("aria-current",(b.dataset.tab===s||(b.dataset.tab==="mas"&&enMas))?"page":"false"));
   $("titulo").textContent=TITULOS[s]; $("monthsel").hidden=s==="config";
   $("app").classList.remove("abierto");document.body.classList.remove("menu"); try{history.replaceState(null,"","#"+s)}catch{}
+  if(s==="obras") try{renderObras()}catch(e){console.error(e)}
   if(cambio) animar(document.querySelector(`[data-sec="${s}"]`),"entra");
   window.scrollTo(0,0);
 }
@@ -1220,7 +1265,7 @@ function abrirMov(id){
 }
 $("verTodos").onclick=()=>verMov("todos");
 document.querySelectorAll("[data-irsec]").forEach(b=>b.onclick=()=>ir(b.dataset.irsec));
-matchMedia("(min-width:1100px)").addEventListener("change",()=>chart());
+matchMedia("(min-width:1100px)").addEventListener("change",()=>{chart();renderObras()});
 ["list","plaList","recList"].forEach(id=>{
   $(id).addEventListener("click",e=>{const it=e.target.closest(".item.tap");if(it)abrirMov(it.dataset.id)});
   $(id).addEventListener("keydown",e=>{const it=e.target.closest(".item.tap");if(it&&(e.key==="Enter"||e.key===" ")){e.preventDefault();abrirMov(it.dataset.id)}});
@@ -1749,7 +1794,7 @@ bloquearSiHayPin();
 })();
 /* ===== Obra y foto del comprobante (necesitan el Apps Script versión 2; en modo de prueba funcionan siempre) ===== */
 function soportaExtra(){return esDemo()||versionServidor>=2}
-var fotoData=null, perObras="anio";
+var fotoData=null, perObras="desde";
 function quitarFoto(){fotoData=null;$("fotoIn").value="";$("fotoPrev").hidden=true;$("fotoQuitar").hidden=true;$("btnFoto").textContent="📷 Foto del comprobante"}
 $("btnFoto").onclick=()=>$("fotoIn").click();
 $("fotoQuitar").onclick=quitarFoto;
@@ -1811,38 +1856,99 @@ $("movRep").onclick=()=>{const r=movSel;cerrarOv("ovMov");repetirMov(r)};
   },true);
 })();
 
-/* ===== Ganancia por obra ===== */
-function renderObras(){
-  const anio=mes.slice(0,4);
-  const lista=perObras==="mes"?delMes(mes):perObras==="anio"?rows.filter(r=>r.fecha.startsWith(anio)):rows;
+/* ===== Ganancia por obra =====
+   La obra es una etiqueta interna del comprobante (no va a SUNAT). Por defecto se cuenta desde octubre 2026. */
+var OBRAS_DESDE="2026-10", SIN_OBRA="Sin obra asignada";
+var obraSel=null, asigMarcados=new Set();
+function listaObras(){
+  const base=rows.filter(r=>!esPagoSun(r));
+  return perObras==="mes"?base.filter(r=>r.fecha.startsWith(mes)):perObras==="todo"?base:base.filter(r=>r.fecha.slice(0,7)>=OBRAS_DESDE);
+}
+function calcObras(lista){
   const g={};
-  lista.filter(r=>!esPagoSun(r)).forEach(r=>{const k=(r.obra||"").trim()||"Sin obra asignada";const x=g[k]||(g[k]={n:k,i:0,g:0,deb:0,cred:0,base:0,c:0,ult:""});
-    const p=partes(r); x.c++; if(r.fecha>x.ult)x.ult=r.fecha;
+  lista.forEach(r=>{const k=(r.obra||"").trim()||SIN_OBRA;const x=g[k]||(g[k]={n:k,i:0,g:0,deb:0,cred:0,base:0,c:0,ult:"",ini:"9999",regs:[]});
+    const p=partes(r); x.c++; x.regs.push(r); if(r.fecha>x.ult)x.ult=r.fecha; if(r.fecha<x.ini)x.ini=r.fecha;
     if(r.tipo==="ingreso"){x.i+=r.monto;if((r.comprobante||"ninguno")!=="ninguno"){x.deb+=p.igv;x.base+=p.base+p.noG}}
     else{x.g+=r.monto;if(r.comprobante==="factura")x.cred+=p.igv}});
-  const obras=Object.values(g).map(x=>{const igv=x.deb-x.cred,renta=Math.round(x.base*0.01);return Object.assign(x,{sun:igv+renta,ut:x.i-x.g-igv-renta})})
-    .sort((a,b)=>(a.n==="Sin obra asignada")-(b.n==="Sin obra asignada")||b.ut-a.ut);
-  const conObra=obras.filter(x=>x.n!=="Sin obra asignada");
-  $("obrasTot").textContent=`${conObra.length} obra${conObra.length===1?"":"s"} · ${perObras==="mes"?lblMes(mes):perObras==="anio"?"año "+anio:"desde el inicio"}`;
-  $("obrasAviso").hidden=soportaExtra()&&conObra.length>0;
-  $("obrasAviso").innerHTML=!soportaExtra()?"Para separar por obra falta actualizar tu archivo de Google (te guío, 5 minutos). Mientras tanto todo aparece en “Sin obra asignada”."
-    :"Aún no tienes obras. Al registrar un ingreso o gasto, en el último paso escribe el nombre de la obra en <b>Obra</b>.";
-  $("obrasList").innerHTML=obras.length?obras.map(x=>{const mg=x.i?Math.round(x.ut/x.i*100):0;
-    return `<button type="button" class="obra" data-obra="${esc(x.n)}"><h3>${esc(x.n)}</h3>
-      <span class="hint">Te quedó</span><span class="ut ${x.ut<0?"out":"in"}">${fmt(x.ut)}</span>
+  return Object.values(g).map(x=>{const igv=x.deb-x.cred,renta=Math.round(x.base*0.01);return Object.assign(x,{igv,renta,sun:igv+renta,ut:x.i-x.g-igv-renta})})
+    .sort((a,b)=>(a.n===SIN_OBRA)-(b.n===SIN_OBRA)||b.ult.localeCompare(a.ult));
+}
+function renderObras(){
+  if(!asigMarcados) asigMarcados=new Set();
+  const obras=calcObras(listaObras()), con=obras.filter(x=>x.n!==SIN_OBRA), sin=obras.find(x=>x.n===SIN_OBRA);
+  const per=perObras==="mes"?lblMes(mes):perObras==="todo"?"todo el historial":"desde octubre 2026";
+  $("obrasTot").textContent=`${con.length} obra${con.length===1?"":"s"} · ${per}`;
+  $("obrasAviso").hidden=soportaExtra();
+  $("obrasAviso").innerHTML="Para guardar la obra de cada comprobante falta actualizar tu archivo de Google (te guío, 5 minutos). Mientras tanto puedes ver cómo funcionará.";
+  $("obrasList").innerHTML=con.length?con.map(x=>{const mg=x.i?Math.round(x.ut/x.i*100):0;
+    return `<button type="button" class="obra" data-obra="${esc(x.n)}" aria-current="${x.n===obraSel}"><h3>${esc(x.n)}</h3>
+      <span class="hint">Utilidad neta</span><span class="ut ${x.ut<0?"out":"in"}">${fmt(x.ut)}</span>
       <div class="barra"><i style="width:${Math.max(0,Math.min(100,mg))}%"></i></div>
-      <div class="tl"><span>Ingresos</span><b class="num in">${fmt(x.i)}</b></div>
-      <div class="tl"><span>Gastos y planilla</span><b class="num out">${fmt(x.g)}</b></div>
-      <div class="tl"><span>SUNAT de esta obra</span><b class="num">${fmt(x.sun)}</b></div>
-      <span class="hint">Margen ${mg} % · ${x.c} registro${x.c===1?"":"s"} · último ${fechaCorta(x.ult)} · Ver movimientos ›</span></button>`}).join("")
-    :`<div class="empty">Sin registros en este periodo.</div>`;
-  // Sugerencias del campo Obra en el formulario
+      <div class="tl"><span>Ventas</span><b class="num in">${fmt(x.i)}</b></div>
+      <div class="tl"><span>Gastos</span><b class="num out">${fmt(x.g)}</b></div>
+      <span class="hint">Margen ${mg} % · ${x.c} comprobante${x.c===1?"":"s"} · Ver detalle ›</span></button>`}).join("")
+    :`<div class="panel empty">Aún no hay obras ${per}.<br>Asigna una obra a tus comprobantes aquí abajo, o al registrar uno nuevo (último paso → <b>Obra</b>).</div>`;
+  // Comprobantes sin obra
+  const sinRegs=(sin?sin.regs:[]).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  [...asigMarcados].forEach(id=>{if(!sinRegs.some(r=>String(r.id)===id))asigMarcados.delete(id)});
+  $("asigCount").textContent=`${sinRegs.length} · ${per}`;
+  $("asigPanel").hidden=!sinRegs.length;
+  $("asigList").innerHTML=sinRegs.map(r=>{const c=r.tipo==="ingreso"?"in":"out";
+    return `<label class="asig-it"><input type="checkbox" value="${esc(r.id)}" ${asigMarcados.has(String(r.id))?"checked":""}><span style="min-width:0"><b>${esc(r.desc||r.categoria)}</b><small>${fechaCorta(r.fecha)} · ${esc(r.categoria)}${r.serie?" · "+esc(r.serie)+"-"+esc(r.numero):""}</small></span><span class="num ${c}">${c==="in"?"+":"−"} ${fmt(r.monto)}</span></label>`}).join("");
+  // Detalle: en computadora siempre se ve una obra; en celular solo al tocarla
+  const ancho=matchMedia("(min-width:1100px)").matches;
+  if(ancho&&(!obraSel||!con.some(x=>x.n===obraSel))) obraSel=con[0]?con[0].n:null;
+  if(obraSel&&!con.some(x=>x.n===obraSel)) obraSel=null;
+  pintarObraDet(con.find(x=>x.n===obraSel));
+  // Sugerencias del campo Obra
   const nombres=[...new Set(rows.map(r=>(r.obra||"").trim()).filter(Boolean))];
   $("obrasDL").innerHTML=nombres.map(n=>`<option value="${esc(n)}">`).join("");
 }
+function pintarObraDet(x){
+  const det=$("obraDet"); det.hidden=!x; document.querySelector(".obrasgrid").classList.toggle("ver-det",!!x);
+  if(!x){det.innerHTML="";return}
+  const mg=x.i?Math.round(x.ut/x.i*100):0;
+  const cat={}; x.regs.filter(r=>r.tipo==="gasto").forEach(r=>cat[r.categoria]=(cat[r.categoria]||0)+r.monto);
+  const lc=Object.entries(cat).sort((a,b)=>b[1]-a[1]), mx=lc.length?lc[0][1]:1;
+  const regs=[...x.regs].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  det.innerHTML=`<button type="button" class="btnlink volver" id="obraVolver">‹ Todas las obras</button>
+    <div class="ph" style="margin:0"><h2>${esc(x.n)}</h2><span class="hint">${fechaCorta(x.ini)} – ${fechaCorta(x.ult)}</span></div>
+    <div class="kp">
+      <div class="grande"><small>Utilidad neta de la obra</small><b>${fmt(x.ut)}</b><small>Margen ${mg} % · de cada S/ 100 cobrados te quedan S/ ${Math.max(0,mg)}</small></div>
+      <div><small>Ventas</small><b class="in">${fmt(x.i)}</b></div>
+      <div><small>Gastos</small><b class="out">${fmt(x.g)}</b></div>
+      <div><small>IGV de la obra</small><b>${fmt(x.igv)}</b></div>
+      <div><small>Renta 1%</small><b>${fmt(x.renta)}</b></div>
+    </div>
+    <div class="mini-l">
+      <div class="tl"><span>Ventas cobradas</span><b class="in">${fmt(x.i)}</b></div>
+      <div class="tl"><span>− Gastos (materiales, planilla, etc.)</span><b class="out">${fmt(x.g)}</b></div>
+      <div class="tl"><span>− IGV (ventas ${fmt0(x.deb)} − compras con factura ${fmt0(x.cred)})</span><b>${fmt(x.igv)}</b></div>
+      <div class="tl"><span>− Renta 1%</span><b>${fmt(x.renta)}</b></div>
+      <div class="tl" style="font-weight:700"><span style="color:var(--ink)">= Utilidad neta</span><b class="${x.ut<0?"out":"in"}">${fmt(x.ut)}</b></div>
+    </div>
+    ${lc.length?`<h3>En qué se gastó</h3><div class="cats">${lc.map(([c,v])=>`<div class="cat"><div class="row"><span>${esc(c)}</span><span class="num">${fmt(v)} · ${x.g?Math.round(v/x.g*100):0}%</span></div><div class="bar2"><i style="width:${(v/mx*100).toFixed(1)}%;background:var(--out)"></i></div></div>`).join("")}</div>`:""}
+    <h3>Comprobantes de la obra (${regs.length})</h3><div id="obraRegs">${regs.map(r=>filaMov(r)).join("")}</div>`;
+  $("obraVolver").onclick=()=>{obraSel=null;pintarObraDet(null);renderObras();window.scrollTo(0,0)};
+}
 document.querySelectorAll(".chip.perO").forEach(b=>b.onclick=()=>{perObras=b.dataset.p;document.querySelectorAll(".chip.perO").forEach(x=>x.setAttribute("aria-pressed",x===b));renderObras()});
-$("obrasList").addEventListener("click",e=>{const b=e.target.closest("[data-obra]");if(!b||b.dataset.obra==="Sin obra asignada")return;
-  filtro="todos";document.querySelectorAll(".chip[data-f]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.f==="todos"));$("q").value=b.dataset.obra;renderMov();ir("movimientos")});
+$("obrasList").addEventListener("click",e=>{const b=e.target.closest("[data-obra]");if(!b)return;obraSel=b.dataset.obra;renderObras();if(!matchMedia("(min-width:1100px)").matches)window.scrollTo(0,0)});
+$("obraDet").addEventListener("click",e=>{const it=e.target.closest(".item.tap");if(it)abrirMov(it.dataset.id)});
+$("asigList").addEventListener("change",e=>{const c=e.target;if(c.type!=="checkbox")return;if(c.checked)asigMarcados.add(c.value);else asigMarcados.delete(c.value);$("asigMsg").textContent=asigMarcados.size?`${asigMarcados.size} marcado${asigMarcados.size===1?"":"s"}`:""});
+$("asigTodos").onclick=()=>{$("asigList").querySelectorAll("input").forEach(c=>{c.checked=true;asigMarcados.add(c.value)});$("asigMsg").textContent=`${asigMarcados.size} marcados`};
+$("asigNinguno").onclick=()=>{asigMarcados.clear();$("asigList").querySelectorAll("input").forEach(c=>c.checked=false);$("asigMsg").textContent=""};
+$("asigBtn").onclick=async()=>{
+  const obra=$("asigObra").value.trim();
+  if(!asigMarcados.size){$("asigMsg").textContent="Marca al menos un comprobante.";return}
+  if(!obra){$("asigMsg").textContent="Escribe el nombre de la obra.";$("asigObra").focus();return}
+  if(!soportaExtra()){$("asigMsg").textContent="Falta actualizar tu archivo de Google para guardar la obra.";return}
+  const ids=[...asigMarcados]; $("asigBtn").disabled=true; let ok=0;
+  for(const id of ids){$("asigMsg").textContent=`Guardando ${ok+1} de ${ids.length}…`;
+    const r=rows.find(x=>String(x.id)===id); if(!r)continue;
+    try{await store.edit(r.id,Object.assign({},r,{obra}));ok++}catch(e){}}
+  $("asigBtn").disabled=false; asigMarcados.clear(); obraSel=obra; $("asigObra").value=""; renderObras();
+  $("asigMsg").textContent=""; toast(ok===ids.length?`${ok} comprobante${ok===1?"":"s"} asignado${ok===1?"":"s"} a ${obra}`:`Se asignaron ${ok} de ${ids.length}. Revisa tu internet.`);
+};
 
 /* ===== Resumen anual con gráficos ===== */
 function barras(svg,datos,series){
