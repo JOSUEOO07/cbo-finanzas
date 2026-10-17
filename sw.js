@@ -1,5 +1,5 @@
 ﻿// CBO Finanzas — permite instalar la app y abrirla aunque no haya señal.
-const CACHE="cbo-finanzas-v9-cortina";
+const CACHE="cbo-finanzas-v10-codigo";
 const ARCHIVOS=["./","index.html","manifest.json","icon-192.png","icon-512.png","maskable-192.png","maskable-512.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ARCHIVOS)));self.skipWaiting()});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim()});

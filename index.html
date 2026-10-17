@@ -544,6 +544,7 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
             <div class="ph"><h2>Conexión</h2></div>
             <div class="cfgrow"><span class="hint">Estado</span><b id="cfgEstado">—</b></div>
             <div class="cfgrow"><div class="line"><button class="btnlink recargar" type="button">↻ Actualizar datos</button><button class="btnlink" id="desconectar" type="button">Cambiar enlace o clave</button></div></div>
+            <div class="cfgrow"><div class="line"><button class="btnlink" id="copiarCon" type="button">Copiar código de conexión</button><span class="hint" id="copiarConMsg"></span></div></div>
           </section>
           <section class="panel">
             <div class="ph"><h2>Seguridad</h2></div>
@@ -708,6 +709,9 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
     <label>Clave de acceso<input id="cfgClave" type="password" autocomplete="off"></label>
     <p class="msg" id="setupMsg"></p>
     <button class="btn" type="submit">Conectar</button>
+    <p class="hint" style="margin:6px 0 0">¿Guardaste un <b>código de conexión</b>? Pégalo aquí y conecta con un toque:</p>
+    <label>Código de conexión<input id="cfgCodigo" type="text" autocomplete="off" placeholder="CBO1:..."></label>
+    <button class="btn2" type="button" id="usarCodigo">Conectar con código</button>
   </form>
 </div>
 <div class="cargando" id="cargando" hidden>Actualizando…</div>
@@ -1395,6 +1399,21 @@ $("setupF").addEventListener("submit",async e=>{
   try{await api("datos",null,{url,clave});cfg={url,clave};guardarLS(CFG_K,cfg);$("setup").hidden=true;$("cfgClave").value="";cargar()}
   catch(err){$("setupMsg").textContent=err.code==="clave"?"La clave no es correcta.":"No se pudo conectar. Revisa el enlace y tu internet."}
 });
+/* Código de conexión: guarda enlace y clave en un texto para recuperarlos sin buscarlos (queda solo en manos del dueño) */
+const aCodigo=c=>"CBO1:"+btoa(unescape(encodeURIComponent(JSON.stringify({url:c.url,clave:c.clave}))));
+const deCodigo=t=>{const s=String(t||"").trim();if(!s.startsWith("CBO1:"))throw new Error("formato");const o=JSON.parse(decodeURIComponent(escape(atob(s.slice(5)))));if(!o.url||!o.clave)throw new Error("formato");return o};
+$("copiarCon").onclick=async()=>{
+  if(!cfg||!cfg.url){$("copiarConMsg").textContent="Primero conecta la app.";return}
+  const cod=aCodigo(cfg);
+  try{await navigator.clipboard.writeText(cod);$("copiarConMsg").textContent="Copiado. Pégalo en tus notas o en WhatsApp a ti mismo."}
+  catch(e){window.prompt("Copia este código y guárdalo:",cod)}
+};
+$("usarCodigo").onclick=async()=>{
+  let o;try{o=deCodigo($("cfgCodigo").value)}catch(e){$("setupMsg").textContent="Ese código no es válido. Cópialo completo, empieza con CBO1:";return}
+  $("setupMsg").textContent="Conectando…";
+  try{await api("datos",null,o);cfg={url:o.url,clave:o.clave};guardarLS(CFG_K,cfg);$("setup").hidden=true;$("cfgCodigo").value="";cargar()}
+  catch(err){$("setupMsg").textContent=err.code==="clave"?"La clave del código no es correcta.":"No se pudo conectar. Revisa tu internet."}
+};
 document.querySelectorAll(".recargar").forEach(b=>b.onclick=()=>cargar());
 $("desconectar").onclick=()=>abrirSetup("");
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")cargar()});
