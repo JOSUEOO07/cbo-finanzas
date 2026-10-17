@@ -378,7 +378,7 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
 @media (prefers-reduced-motion:reduce){.side{transition:none}}
 /* Entrada: continúa el splash de Android (mismo verde y logo) y se recoge hacia arriba */
 #intro{position:fixed;inset:0;z-index:9999;background:radial-gradient(circle at 100% 100%,rgba(233,220,195,.85) 0,rgba(233,220,195,0) 55%),#0D5C46;will-change:transform}
-.entra{opacity:0;transform:translateY(18px)}
+.entra-ini{opacity:0;transform:translateY(18px)}
 </style>
 </head>
 <body>
@@ -1429,14 +1429,14 @@ bloquearSiHayPin();
   const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
   if(reduce||!document.body.animate){const i=$("intro");if(i)i.remove();return}
   const piezas=[...document.querySelectorAll('[data-sec="inicio"] .big, [data-sec="inicio"] .panel, .bar')].slice(0,8);
-  piezas.forEach(p=>p.classList.add("entra"));
+  piezas.forEach(p=>p.classList.add("entra-ini"));
   const contar=el=>{if(!el)return;const s=el.querySelector("small");const txt=el.textContent.replace(/^S\//,"");const neg=txt.includes("−");const fin=parseInt(txt.replace(/[^\d]/g,""))||0;if(!fin)return;
     const t0=performance.now(),dur=900;const paso=t=>{const k=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-k,3);el.innerHTML=`<small>${s?s.textContent:"S/"}</small>${(neg?"−":"")+Math.round(fin*e).toLocaleString("es-PE")}`;if(k<1)requestAnimationFrame(paso)};requestAnimationFrame(paso)};
   const intro=$("intro");
   const salir=()=>{
     // Cortina sin logo: el panel de la marca sube con el borde curvo y deja ver el inicio
     if(intro){const c=intro.animate([{transform:"translateY(0)",borderRadius:"0"},{transform:"translateY(-100%)",borderRadius:"0 0 50% 50% / 0 0 14vh 14vh"}],{duration:720,delay:120,easing:"cubic-bezier(.76,0,.24,1)",fill:"forwards"});c.onfinish=()=>intro.remove()}
-    piezas.forEach((p,i)=>p.animate([{opacity:0,transform:"translateY(18px)"},{opacity:1,transform:"none"}],{duration:560,delay:(intro?420:0)+i*60,easing:"cubic-bezier(.22,1,.36,1)",fill:"forwards"}).onfinish=()=>{p.classList.remove("entra");p.getAnimations().forEach(a=>a.cancel())});
+    piezas.forEach((p,i)=>p.animate([{opacity:0,transform:"translateY(18px)"},{opacity:1,transform:"none"}],{duration:560,delay:(intro?420:0)+i*60,easing:"cubic-bezier(.22,1,.36,1)",fill:"forwards"}).onfinish=()=>{p.classList.remove("entra-ini");p.getAnimations().forEach(a=>a.cancel())});
     setTimeout(()=>{contar($("bigUtV"));contar($("bigSunV"))},intro?460:120);
   };
   // Espera a que la fuente y el primer pintado estén listos (máx. 600 ms) para que no salte
