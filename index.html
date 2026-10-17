@@ -92,8 +92,9 @@ body.menu .fab{display:none}
 .monthsel span{min-width:120px;text-align:center;font-weight:600;text-transform:capitalize;font-size:.92rem}
 .content{padding-inline:24px;padding-block:20px 110px;display:grid;gap:16px;max-width:1720px;width:100%}
 /* Computadora: más información para llenar la pantalla (en celular se oculta) */
-.desk,.kpi.desk{display:none}
+.desk,.kpi.desk,.g3.deskrow{display:none}
 @media (min-width:1100px){
+  .g3.deskrow{display:grid}
   .desk{display:block}
   .kpis.dos{grid-template-columns:repeat(4,minmax(0,1fr))}
   .kpi.desk{display:grid}
@@ -469,9 +470,14 @@ button.big{border:0}
             <div class="kpi dup"><div class="k">Utilidad</div><div class="v" id="kUt"></div><div class="s" id="kUtS"></div></div>
             <div class="kpi sunat dup"><div class="k">Pagar a SUNAT</div><div class="v" id="kSun"></div><div class="s" id="kSunS"></div></div>
           </div>
+          <div class="g3 deskrow">
+            <section class="panel"><div class="ph"><h2>IGV y renta del mes</h2><button class="btnlink" type="button" data-irsec="sunat">Detalle ›</button></div><div class="mini-l" id="dIgv"></div></section>
+            <section class="panel"><div class="ph"><h2 id="dCmpTit">Comparación</h2></div><div class="mini-l" id="dCmp"></div></section>
+            <section class="panel"><div class="ph"><h2>Comprobantes del mes</h2></div><div class="mini-l" id="dComp"></div></section>
+          </div>
           <div class="g3">
             <section class="panel wide span2">
-              <div class="ph"><h2>Últimos 6 meses</h2><div class="legend"><span><i style="background:var(--in)"></i>Ingresos</span><span><i style="background:var(--out)"></i>Gastos</span></div></div>
+              <div class="ph"><h2 id="chartTit">Últimos 6 meses</h2><div class="legend"><span><i style="background:var(--in)"></i>Ingresos</span><span><i style="background:var(--out)"></i>Gastos</span></div></div>
               <svg class="chart" id="chart" viewBox="0 0 560 220" role="img" aria-label="Ingresos y gastos de los últimos seis meses"></svg>
             </section>
             <div style="display:grid;gap:16px;min-width:0">
@@ -909,6 +915,21 @@ function render(){
   const dI=Sa.sI?Math.round((S.sI-Sa.sI)/Sa.sI*100):null;
   $("kVs").innerHTML=dI==null?"—":`<span class="delta ${dI>=0?"up":"down"}">${dI>=0?"▲":"▼"} ${Math.abs(dI)} %</span>`;
   $("kVsS").textContent=`Ventas de ${MESES[+addMes(mes,-1).slice(5)-1].toLowerCase()}: ${fmt0(Sa.sI)}`;
+  const f=(k,v,c="")=>`<div class="tl"><span>${k}</span><b class="${c}">${v}</b></div>`;
+  $("dIgv").innerHTML=f("IGV de ventas",fmt(t.deb))+f("IGV de compras (crédito)","− "+fmt(t.cred))
+    +(t.saldoAnt?f("Saldo a favor del mes anterior","− "+fmt(t.saldoAnt)):"")
+    +f("IGV a pagar",fmt(t.igv))+f("IGV a favor para el siguiente mes",fmt(t.saldoSig),t.saldoSig>0?"in":"")
+    +f("Renta 1%",fmt(t.renta))+f("Detracciones en Banco de la Nación",fmt(t.bn));
+  const mA=MESES[+addMes(mes,-1).slice(5)-1], tA=t.porMes[addMes(mes,-1)]||{tot:0};
+  $("dCmpTit").textContent=`Frente a ${mA.toLowerCase()}`;
+  const dif=(a,b,inv)=>{if(!b)return "—";const p=Math.round((a-b)/Math.abs(b)*100);const bien=inv?p<=0:p>=0;return `<span class="delta ${bien?"up":"down"}">${p>=0?"▲":"▼"} ${Math.abs(p)} %</span>`};
+  $("dCmp").innerHTML=[["Ingresos",S.sI,Sa.sI,0],["Gastos",S.sG,Sa.sG,1],["Utilidad",S.sI-S.sG,Sa.sI-Sa.sG,0],["SUNAT",t.tot,tA.tot,1],["Planilla",S.sP,Sa.sP,1]]
+    .map(([k,a,b,inv])=>`<div class="tl"><span>${k}</span><span style="display:flex;gap:12px;align-items:baseline"><span class="hint num">${fmt0(b)} →</span><b>${fmt0(a)}</b>${dif(a,b,inv)}</span></div>`).join("");
+  const cc={factura:[0,0,0,0],boleta:[0,0,0,0],ninguno:[0,0,0,0]};
+  lista.forEach(r=>{const k=r.comprobante||"ninguno",x=cc[k]||(cc[k]=[0,0,0,0]);if(r.tipo==="ingreso"){x[0]++;x[1]+=r.monto}else{x[2]++;x[3]+=r.monto}});
+  $("dComp").innerHTML=`<div class="tl"><span></span><span class="hint" style="display:flex;gap:18px"><span>Ventas</span><span>Gastos</span></span></div>`
+    +[["factura","Factura"],["boleta","Boleta"],["ninguno","Sin comprobante"]].map(([k,n])=>`<div class="tl"><span>${n}</span><span style="display:flex;gap:18px"><b class="in">${cc[k][0]} · ${fmt0(cc[k][1])}</b><b class="out">${cc[k][2]} · ${fmt0(cc[k][3])}</b></span></div>`).join("")
+    +(S.sI&&cc.ninguno[1]?`<p class="note">${Math.round(cc.ninguno[1]/S.sI*100)} % de tus ventas del mes no tiene comprobante.</p>`:"");
   const rec=[...lista].sort((a,b)=>b.fecha.localeCompare(a.fecha)||b.creado-a.creado).slice(0,6);
   $("recList").innerHTML=rec.length?rec.map(filaMov).join(""):`<div class="empty">Sin movimientos en ${lblMes(mes)}.</div>`;
   renderSunat(t); renderMov(); renderTerceros(); renderPlanilla(S); renderAnual(t);
@@ -995,11 +1016,13 @@ function renderAnual(t){
   $("anualTabla").innerHTML=h;
 }
 function chart(){
-  const ms=[...Array(6)].map((_,i)=>addMes(mes,i-5));
+  const N=matchMedia("(min-width:1100px)").matches?12:6;
+  $("chartTit").textContent=`Últimos ${N} meses`;
+  const ms=[...Array(N)].map((_,i)=>addMes(mes,i-N+1));
   const data=ms.map(m=>{const S=sumas(delMes(m));return{m,i:S.sI,g:S.sG}});
   const raw=Math.max(1000,...data.map(d=>Math.max(d.i,d.g)));
   const p=Math.pow(10,Math.floor(Math.log10(raw))); const step=[1,2,2.5,5,10].map(s=>s*p).find(s=>s*4>=raw); const max=step*4;
-  const L=56,R=552,B=190,H=180,W=R-L,cw=W/6,bw=Math.min(22,cw/3.2);
+  const L=56,R=552,B=190,H=180,W=R-L,cw=W/N,bw=Math.min(22,cw/3.2);
   const k=v=>v>=1000?(v/1000).toLocaleString("es-PE")+"k":v;
   let s="";
   for(let j=0;j<=4;j++){const y=B-H*j/4;s+=`<line x1="${L}" x2="${R}" y1="${y}" y2="${y}" stroke="var(--line)" stroke-width="1"/><text x="${L-8}" y="${y+4}" text-anchor="end">${k(step*j)}</text>`}
@@ -1075,6 +1098,8 @@ function abrirMov(id){
   abrirOv("ovMov");
 }
 $("verTodos").onclick=()=>verMov("todos");
+document.querySelectorAll("[data-irsec]").forEach(b=>b.onclick=()=>ir(b.dataset.irsec));
+matchMedia("(min-width:1100px)").addEventListener("change",()=>chart());
 ["list","plaList","recList"].forEach(id=>{
   $(id).addEventListener("click",e=>{const it=e.target.closest(".item.tap");if(it)abrirMov(it.dataset.id)});
   $(id).addEventListener("keydown",e=>{const it=e.target.closest(".item.tap");if(it&&(e.key==="Enter"||e.key===" ")){e.preventDefault();abrirMov(it.dataset.id)}});
@@ -1544,7 +1569,12 @@ bloquearSiHayPin();
   const listo=document.fonts&&document.fonts.ready?Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,600))]):Promise.resolve();
   void listo; requestAnimationFrame(salir);
 })();
-if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
+if("serviceWorker" in navigator){
+  // Busca la versión nueva en cada apertura y recarga una sola vez cuando llega
+  const habia=!!navigator.serviceWorker.controller; let recargado=false;
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{if(habia&&!recargado){recargado=true;location.reload()}});
+  window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>r.update()).catch(()=>{}));
+}
 </script>
 </body>
 </html>
