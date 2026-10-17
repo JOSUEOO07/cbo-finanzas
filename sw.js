@@ -1,4 +1,4 @@
-﻿// CBO Finanzas â€” permite instalar la app y abrirla aunque no haya seÃ±al.
+﻿// CBO Finanzas — permite instalar la app y abrirla aunque no haya señal.
 const CACHE="cbo-finanzas-v7-teclado";
 const ARCHIVOS=["./","index.html","manifest.json","icon-192.png","icon-512.png","maskable-192.png","maskable-512.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ARCHIVOS)));self.skipWaiting()});
