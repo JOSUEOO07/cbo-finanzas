@@ -1945,7 +1945,9 @@ $("asigBtn").onclick=async()=>{
   const ids=[...asigMarcados]; $("asigBtn").disabled=true; let ok=0;
   for(const id of ids){$("asigMsg").textContent=`Guardando ${ok+1} de ${ids.length}…`;
     const r=rows.find(x=>String(x.id)===id); if(!r)continue;
-    try{await store.edit(r.id,Object.assign({},r,{obra}));ok++}catch(e){}}
+    // En Google solo se escribe la columna OBRA (no se reescribe el comprobante)
+    try{if(esDemo())await store.edit(r.id,{obra});else{await api("editar",{id:r.id,registro:{obra},parcial:true});r.obra=obra}ok++}catch(e){}}
+  if(!esDemo()) await cargar();
   $("asigBtn").disabled=false; asigMarcados.clear(); obraSel=obra; $("asigObra").value=""; renderObras();
   $("asigMsg").textContent=""; toast(ok===ids.length?`${ok} comprobante${ok===1?"":"s"} asignado${ok===1?"":"s"} a ${obra}`:`Se asignaron ${ok} de ${ids.length}. Revisa tu internet.`);
 };
