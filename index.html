@@ -37,7 +37,22 @@
   --bg:#E9DCC3; --surface:#F4EDE0; --ink:#2A2414; --muted:#6B604A; --line:#D9B77A;
   --brand:#0D5C46; --brand-2:#0A3328; --brand-ink:#F4EDE0; --soft:#E9DFCC; --fab-ink:#F4EDE0;
   --in:#0D5C46; --out:#9C4A2E; --in-bg:#D7DDBE; --out-bg:#EFD6C4; --warn:#7A5510; --warn-bg:#E8D29E; color-scheme:light}
-:root[data-theme="claro"]{color-scheme:light}
+:root[data-theme="claro"]{
+  --bg:#F3F5F2; --surface:#FFFFFF; --ink:#0F1F19; --muted:#4A5A53; --line:#DDE3DE;
+  --brand:#0D5C46; --brand-2:#14805F; --brand-ink:#FFFFFF; --soft:#E7EEE9; --fab-ink:#FFFFFF;
+  --in:#14805F; --out:#B23A2B; --in-bg:#DDEFE4; --out-bg:#F8E1DC; --warn:#7A5A0E; --warn-bg:#F6E9C2; color-scheme:light}
+:root[data-theme="negro"]{
+  --bg:#000000; --surface:#111312; --ink:#F2F2EE; --muted:#A3ABA6; --line:#262A28;
+  --brand:#0D5C46; --brand-2:#6FD3A8; --brand-ink:#F4EDE0; --soft:#1A1D1B; --fab-ink:#000000;
+  --in:#6FD3A8; --out:#FF8A70; --in-bg:#0E2A1F; --out-bg:#2E1712; --warn:#F5C451; --warn-bg:#2A2410; color-scheme:dark}
+:root[data-theme="terracota"]{
+  --bg:#F1E2D3; --surface:#FBF3EA; --ink:#2B1A12; --muted:#6E5546; --line:#E2C8B2;
+  --brand:#8E3F22; --brand-2:#B4532F; --brand-ink:#FBF3EA; --soft:#EBD6C4; --fab-ink:#FBF3EA;
+  --in:#2F6B45; --out:#A8331F; --in-bg:#DCE6D3; --out-bg:#F2D5C8; --warn:#7A4E0E; --warn-bg:#EED8A8; color-scheme:light}
+:root[data-theme="oceano"]{
+  --bg:#081A26; --surface:#0E2738; --ink:#EAF3F7; --muted:#A9C0CC; --line:#1B3A4F;
+  --brand:#0F5E7A; --brand-2:#7CC7E0; --brand-ink:#EAF3F7; --soft:#13324A; --fab-ink:#081A26;
+  --in:#7FD6B0; --out:#F2967E; --in-bg:#0F3A33; --out-bg:#3A2420; --warn:#F2C96B; --warn-bg:#2C2A1A; color-scheme:dark}
 
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
@@ -206,6 +221,7 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
   .content{padding-inline:16px}
   .g2,.g3{grid-template-columns:minmax(0,1fr)}
   .opts{grid-template-columns:1fr 1fr}
+  .opt[data-t="auto"]{grid-column:1/-1}
 }
 @media (max-width:640px){
   .chart text{font-size:19px}
@@ -243,6 +259,14 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
 .big.sun{background:var(--warn-bg);color:var(--warn)}
 .big .pill{justify-self:start;margin-top:4px}
 .kpi.dup{display:none}
+/* Tarjetas que se tocan: Ingresos, Gastos y SUNAT llevan a su detalle */
+button.kpi,button.big{font:inherit;text-align:left;width:100%;-webkit-tap-highlight-color:transparent}
+button.big{border:0}
+.tap{position:relative;cursor:pointer;transition:transform .15s var(--ease),box-shadow .15s var(--ease)}
+.tap:active{transform:scale(.97)}
+.kpi.tap .s::after{content:" · Ver ›";font-weight:700;color:var(--brand-2)}
+.big .favor{margin-top:6px;padding:8px 10px;border-radius:12px;background:var(--in-bg);color:var(--in);font-size:.85rem;font-weight:600;line-height:1.35}
+.big .favor b{font-family:var(--mono);font-weight:700}
 .kpis.dos{grid-template-columns:repeat(2,minmax(0,1fr))}
 /* Barra inferior (celular) */
 .tabbar{display:none}
@@ -416,11 +440,11 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
         <div style="display:grid;gap:16px">
           <div class="hero">
             <div class="big ut" id="bigUt"><div class="k" id="bigUtK">Utilidad del mes</div><div class="v" id="bigUtV"></div><div class="s" id="bigUtS"></div></div>
-            <div class="big sun"><div class="k">Pagas a SUNAT</div><div class="v" id="bigSunV"></div><div class="s" id="bigSunS"></div><span id="bigSunP"></span></div>
+            <button type="button" class="big sun tap" id="bigSun" aria-label="Ver el detalle de impuestos"><div class="k">Pagas a SUNAT</div><div class="v" id="bigSunV"></div><div class="s" id="bigSunS"></div><div class="favor" id="bigSunF" hidden></div><span id="bigSunP"></span></button>
           </div>
           <div class="kpis dos">
-            <div class="kpi"><div class="k">Ingresos</div><div class="v in" id="kIn"></div><div class="s" id="kInS"></div></div>
-            <div class="kpi"><div class="k">Gastos</div><div class="v out" id="kOut"></div><div class="s" id="kOutS"></div></div>
+            <button type="button" class="kpi tap" data-ver="ingreso"><div class="k">Ingresos</div><div class="v in" id="kIn"></div><div class="s" id="kInS"></div></button>
+            <button type="button" class="kpi tap" data-ver="gasto"><div class="k">Gastos</div><div class="v out" id="kOut"></div><div class="s" id="kOutS"></div></button>
             <div class="kpi dup"><div class="k">Utilidad</div><div class="v" id="kUt"></div><div class="s" id="kUtS"></div></div>
             <div class="kpi sunat dup"><div class="k">Pagar a SUNAT</div><div class="v" id="kSun"></div><div class="s" id="kSunS"></div></div>
           </div>
@@ -528,10 +552,13 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
           <section class="panel">
             <div class="ph"><h2>Apariencia</h2></div>
             <div class="opts" id="temas">
-              <button class="opt" data-t="auto"><div class="mini" style="background:linear-gradient(90deg,#F4EDE0 50%,#061F18 50%)"></div><b>Automático</b><small>Según tu celular</small></button>
-              <button class="opt" data-t="claro"><div class="mini"><span style="background:#0D5C46"></span><span style="background:#F4EDE0"></span></div><b>Claro</b><small>Beige arena</small></button>
-              <button class="opt" data-t="oscuro"><div class="mini"><span style="background:#0D5C46"></span><span style="background:#061F18"></span></div><b>Oscuro</b><small>Para la noche</small></button>
-              <button class="opt" data-t="calido"><div class="mini"><span style="background:#0D5C46"></span><span style="background:#E9DCC3"></span></div><b>Cálido</b><small>Tonos tostados</small></button>
+              <button class="opt" data-t="calido"><div class="mini"><span style="background:#0D5C46"></span><span style="background:#E9DCC3"></span></div><b>Cálido</b><small>Beige tostado · predeterminado</small></button>
+              <button class="opt" data-t="claro"><div class="mini"><span style="background:#0D5C46"></span><span style="background:#FFFFFF"></span></div><b>Claro</b><small>Blanco limpio</small></button>
+              <button class="opt" data-t="terracota"><div class="mini"><span style="background:#8E3F22"></span><span style="background:#F1E2D3"></span></div><b>Terracota</b><small>Ladrillo y arcilla</small></button>
+              <button class="opt" data-t="oscuro"><div class="mini"><span style="background:#0D5C46"></span><span style="background:#061F18"></span></div><b>Oscuro</b><small>Verde noche</small></button>
+              <button class="opt" data-t="oceano"><div class="mini"><span style="background:#0F5E7A"></span><span style="background:#081A26"></span></div><b>Océano</b><small>Azul profundo</small></button>
+              <button class="opt" data-t="negro"><div class="mini"><span style="background:#6FD3A8"></span><span style="background:#000000"></span></div><b>Negro</b><small>Ahorra batería</small></button>
+              <button class="opt" data-t="auto"><div class="mini" style="background:linear-gradient(90deg,#E9DCC3 50%,#061F18 50%)"></div><b>Automático</b><small>Según tu celular</small></button>
             </div>
           </section>
           <section class="panel">
@@ -736,7 +763,9 @@ const leerLS=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.p
 const guardarLS=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 let mes=hoyISO.slice(0,7), filtro="todos", rows=[], store=null, pendingDel=null, seccion="inicio", periodoTer="mes";
 let fTipo="ingreso", fComp="factura";
-let ajustes=Object.assign({tema:"auto",meta:300000},leerLS("cbo-ajustes",{}));
+let ajustes=Object.assign({tema:"calido",meta:300000},leerLS("cbo-ajustes",{}));
+// v4: el tema predeterminado pasa a "Cálido" aunque antes se hubiera guardado "auto"
+if(!ajustes.v4){if(ajustes.tema==="auto")ajustes.tema="calido";ajustes.v4=1;guardarLS("cbo-ajustes",ajustes)}
 function esc(s){const d=document.createElement("div");d.textContent=s??"";return d.innerHTML}
 function addMes(m,k){let[y,mm]=m.split("-").map(Number);mm+=k;while(mm<1){mm+=12;y--}while(mm>12){mm-=12;y++}return `${y}-${pad(mm)}`}
 const lblMes=m=>{const[y,mm]=m.split("-");return `${MESES[+mm-1]} ${y}`};
@@ -810,6 +839,12 @@ function render(){
   $("bigUtS").textContent=`Ingresos ${fmt0(S.sI)} − gastos ${fmt0(S.sG)} · después de impuestos ${fmt0(ut-t.tot)}`;
   $("bigSunV").innerHTML=`<small>S/</small>${Math.round(t.tot).toLocaleString("es-PE")}`;
   $("bigSunS").textContent=t.usa>0?`En efectivo ${fmt0(t.efe)} · detracciones cubren ${fmt0(t.usa)}`:`IGV ${fmt0(t.igv)} + renta ${fmt0(t.renta)}`;
+  const fav=[];
+  const usado=Math.min(t.saldoAnt,Math.max(0,t.deb-t.cred));
+  if(usado>0) fav.push(`Usas <b>${fmt(usado)}</b> de IGV a favor del mes anterior`);
+  if(t.saldoSig>0) fav.push(`IGV a favor para el siguiente mes: <b>${fmt(t.saldoSig)}</b>`);
+  else if(t.igv>0) fav.push(`IGV a pagar <b>${fmt(t.igv)}</b> · sin saldo a favor`);
+  $("bigSunF").innerHTML=fav.join("<br>"); $("bigSunF").hidden=!fav.length;
   $("bigSunP").innerHTML=vi?(vi.dias<0?`<span class="pill gris">Venció el ${fechaCorta(vi.fecha)}</span>`:vi.dias===0?`<span class="pill mal">Vence hoy</span>`:`<span class="pill ${vi.dias<=5?"al":"ok"}">Vence el ${fechaCorta(vi.fecha)} · faltan ${vi.dias} días</span>`):"";
   chart();
   // Próxima declaración (del mes elegido)
@@ -948,10 +983,18 @@ $("prev").onclick=()=>cambiarMes(-1); $("next").onclick=()=>cambiarMes(1);
 document.querySelectorAll(".chip[data-f]").forEach(b=>b.onclick=()=>{filtro=b.dataset.f;document.querySelectorAll(".chip[data-f]").forEach(x=>x.setAttribute("aria-pressed",x===b));renderMov()});
 document.querySelectorAll(".chip.per").forEach(b=>b.onclick=()=>{periodoTer=b.dataset.p;document.querySelectorAll(".chip.per").forEach(x=>x.setAttribute("aria-pressed",x===b));renderTerceros()});
 $("q").addEventListener("input",renderMov);
+// Ver solo ingresos o solo gastos del mes desde las tarjetas de Inicio
+function verMov(f){
+  filtro=f; $("q").value="";
+  document.querySelectorAll(".chip[data-f]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.f===f));
+  renderMov(); ir("movimientos");
+}
+document.querySelectorAll(".kpi[data-ver]").forEach(b=>b.onclick=()=>verMov(b.dataset.ver));
+$("bigSun").onclick=()=>ir("sunat");
 
 /* ===== Barra inferior y hoja "Más" ===== */
 const abrirOv=id=>{$(id).hidden=false}, cerrarOv=id=>{$(id).hidden=true};
-document.querySelectorAll("#tabbar [data-tab]").forEach(b=>b.onclick=()=>{if(b.dataset.tab==="mas")abrirOv("ovMas");else ir(b.dataset.tab)});
+document.querySelectorAll("#tabbar [data-tab]").forEach(b=>b.onclick=()=>{if(b.dataset.tab==="mas")abrirOv("ovMas");else if(b.dataset.tab==="movimientos")verMov("todos");else ir(b.dataset.tab)});
 $("tabReg").onclick=()=>openF();
 document.querySelectorAll("#ovMas [data-ir]").forEach(b=>b.onclick=()=>{cerrarOv("ovMas");ir(b.dataset.ir)});
 document.querySelectorAll("[data-cerrar]").forEach(b=>b.onclick=()=>b.closest(".overlay").hidden=true);
