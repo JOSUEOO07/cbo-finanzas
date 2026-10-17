@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>CBO Finanzas</title>
-<meta name="theme-color" content="#14532D">
+<meta name="theme-color" content="#0D5C46">
 <meta name="description" content="Finanzas de Casa Bonita Oregón S.A.C.">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icon-192.png">
@@ -12,30 +12,31 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="CBO Finanzas">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=JetBrains+Mono:wght@500;700&display=swap">
 <style>
-/* Paleta CBO: verde Excel #14532D → beige arena #EADFC2 */
+/* Paleta CBO (igual que casabonitaoregon.github.io): verde bosque #0D5C46 / #0A3328 → arena #F4EDE0 / beige #E9DCC3 */
 :root{
-  --bg:#F1EAD7; --surface:#FBF8EF; --ink:#1B2A20; --muted:#5E6A5C; --line:#DDD3BA;
-  --brand:#14532D; --brand-2:#3B6C48; --brand-ink:#FBF8EF; --soft:#E7DEC6; --fab-ink:#FBF8EF;
-  --in:#2F6B45; --out:#A2452F; --in-bg:#DCE4CC; --out-bg:#F2DDD2; --warn:#7E5D12; --warn-bg:#EEDFB9;
-  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
-  --body:"Figtree",ui-sans-serif,system-ui,sans-serif;
+  --bg:#F4EDE0; --surface:#FBF7EE; --ink:#10241C; --muted:#3F544A; --line:#E2D6BE;
+  --brand:#0D5C46; --brand-2:#14805F; --brand-ink:#F4EDE0; --soft:#E9DFCC; --fab-ink:#F4EDE0;
+  --in:#14805F; --out:#A2452F; --in-bg:#D6E6D9; --out-bg:#F2DDD2; --warn:#7E5D12; --warn-bg:#EEDFB9;
+  --display:"Archivo",ui-sans-serif,system-ui,sans-serif;
+  --body:"Archivo",ui-sans-serif,system-ui,sans-serif;
   --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme]){
-  --bg:#0E1912; --surface:#16241B; --ink:#EADFC2; --muted:#A3AA91; --line:#2B3B30;
-  --brand:#14532D; --brand-2:#C3C6A7; --brand-ink:#F3ECD8; --soft:#1F3026; --fab-ink:#14532D;
-  --in:#A9C99B; --out:#E39C86; --in-bg:#22392A; --out-bg:#3A251E; --warn:#E6C77E; --warn-bg:#352B19; color-scheme:dark}}
+  --bg:#061F18; --surface:#0A3328; --ink:#F4EDE0; --muted:#B9C7BD; --line:#164536;
+  --brand:#0D5C46; --brand-2:#9CC3B1; --brand-ink:#F4EDE0; --soft:#0F3D30; --fab-ink:#061F18;
+  --in:#9CC3B1; --out:#E8866A; --in-bg:#11402F; --out-bg:#3A251E; --warn:#F2C14E; --warn-bg:#33301A; color-scheme:dark}}
 :root[data-theme="oscuro"]{
-  --bg:#0E1912; --surface:#16241B; --ink:#EADFC2; --muted:#A3AA91; --line:#2B3B30;
-  --brand:#14532D; --brand-2:#C3C6A7; --brand-ink:#F3ECD8; --soft:#1F3026; --fab-ink:#14532D;
-  --in:#A9C99B; --out:#E39C86; --in-bg:#22392A; --out-bg:#3A251E; --warn:#E6C77E; --warn-bg:#352B19; color-scheme:dark}
+  --bg:#061F18; --surface:#0A3328; --ink:#F4EDE0; --muted:#B9C7BD; --line:#164536;
+  --brand:#0D5C46; --brand-2:#9CC3B1; --brand-ink:#F4EDE0; --soft:#0F3D30; --fab-ink:#061F18;
+  --in:#9CC3B1; --out:#E8866A; --in-bg:#11402F; --out-bg:#3A251E; --warn:#F2C14E; --warn-bg:#33301A; color-scheme:dark}
 :root[data-theme="calido"]{
-  --bg:#E4D7B7; --surface:#F3EAD3; --ink:#2A2414; --muted:#6B604A; --line:#D2C29C;
-  --brand:#14532D; --brand-2:#6A8B69; --brand-ink:#F6EEDA; --soft:#E9DDBF; --fab-ink:#F6EEDA;
-  --in:#2F6B45; --out:#9C4A2E; --in-bg:#D7DDBE; --out-bg:#EFD6C4; --warn:#7A5510; --warn-bg:#E8D29E; color-scheme:light}
+  --bg:#E9DCC3; --surface:#F4EDE0; --ink:#2A2414; --muted:#6B604A; --line:#D9B77A;
+  --brand:#0D5C46; --brand-2:#0A3328; --brand-ink:#F4EDE0; --soft:#E9DFCC; --fab-ink:#F4EDE0;
+  --in:#0D5C46; --out:#9C4A2E; --in-bg:#D7DDBE; --out-bg:#EFD6C4; --warn:#7A5510; --warn-bg:#E8D29E; color-scheme:light}
 :root[data-theme="claro"]{color-scheme:light}
 
 *{box-sizing:border-box}
@@ -226,6 +227,141 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
   .item .amt{grid-column:3;grid-row:1;justify-self:end}
   .item .del{grid-column:3;grid-row:2;justify-self:end}
 }
+
+/* ===== Mejoras v3 ===== */
+.bar h1,.panel h2,.sheet h3,.setup h2{letter-spacing:-.02em}
+.bar h1{font-weight:800;font-variation-settings:"wdth" 110}
+/* Inicio: cifras grandes */
+.hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:12px}
+.big{border-radius:20px;padding:18px 20px;display:grid;gap:4px;min-width:0}
+.big .k{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;opacity:.85}
+.big .v{font-family:var(--display);font-weight:800;font-variation-settings:"wdth" 112;font-size:clamp(2.1rem,7vw,3.2rem);line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:4px 0}
+.big .v small{font-size:.5em;font-weight:700;margin-right:4px;opacity:.8}
+.big .s{font-size:.85rem;opacity:.9}
+.big.ut{background:var(--brand);color:var(--brand-ink)}
+.big.ut.neg .v{color:#F7B9A6}
+.big.sun{background:var(--warn-bg);color:var(--warn)}
+.big .pill{justify-self:start;margin-top:4px}
+.kpi.dup{display:none}
+.kpis.dos{grid-template-columns:repeat(2,minmax(0,1fr))}
+/* Barra inferior (celular) */
+.tabbar{display:none}
+@media (max-width:980px){
+  .tabbar{display:grid;grid-template-columns:repeat(5,1fr);align-items:end;position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));box-shadow:0 -6px 24px rgba(16,36,28,.08)}
+  .tabbar button{border:0;background:transparent;display:grid;justify-items:center;gap:2px;padding:6px 2px;font-size:.7rem;font-weight:600;color:var(--muted);border-radius:12px;min-height:52px;-webkit-tap-highlight-color:transparent}
+  .tabbar button svg{width:24px;height:24px}
+  .tabbar button[aria-current="page"]{color:var(--brand-2)}
+  .tabbar button[aria-current="page"] svg{transform:translateY(-1px)}
+  .tabbar .mas-reg{align-self:center}
+  .tabbar .mas-reg span.c{width:56px;height:56px;border-radius:18px;background:var(--brand);color:var(--brand-ink);display:grid;place-items:center;margin-top:-26px;box-shadow:0 8px 20px rgba(13,92,70,.35);transition:transform .15s var(--ease)}
+  .tabbar .mas-reg:active span.c{transform:scale(.94)}
+  .tabbar .mas-reg{color:var(--ink)}
+  .fab{display:none}
+  .hamb{display:none}
+  .content{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))}
+}
+@media (max-width:640px){.hero{grid-template-columns:minmax(0,1fr)}}
+/* Hojas */
+.overlay{animation:velo .2s ease both;z-index:35}
+.sheet{animation:sube .32s var(--ease) both}
+@keyframes velo{from{opacity:0}}
+@keyframes sube{from{transform:translateY(24px);opacity:0}}
+.seg button[aria-pressed="true"]{box-shadow:inset 0 0 0 1.5px currentColor}
+.lista-mas{display:grid;gap:6px}
+.lista-mas button{display:flex;align-items:center;gap:12px;border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:13px 14px;font-weight:600;text-align:left}
+.lista-mas button svg{width:22px;height:22px;color:var(--brand-2);flex:none}
+.lista-mas button small{display:block;font-weight:500;color:var(--muted);font-size:.78rem}
+.acciones{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.acciones button{border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:12px 6px;font-weight:700;display:grid;justify-items:center;gap:4px}
+.acciones button svg{width:22px;height:22px}
+.acciones button.peligro{color:var(--out)}
+.acciones button.peligro.confirm{background:var(--out);border-color:var(--out);color:#fff}
+.det-mov{display:grid;gap:2px;background:var(--bg);border-radius:14px;padding:12px 14px}
+.det-mov .amtg{font-family:var(--display);font-weight:800;font-size:2rem;letter-spacing:-.02em}
+.item.tap{cursor:pointer;border-radius:12px;transition:background .15s}
+.item.tap:hover{background:var(--soft)}
+.item.tap:active{background:var(--soft)}
+.item .chev{color:var(--muted);font-size:1.2rem}
+@media (max-width:640px){.item .chev{grid-column:3;grid-row:2;justify-self:end;line-height:1}}
+.btn2{border:1px solid var(--line);background:transparent;border-radius:12px;padding:12px 16px;font-weight:700;color:var(--ink)}
+.btn.pri{background:var(--brand);color:var(--brand-ink)}
+.rep{display:flex;gap:8px;flex-wrap:wrap}
+/* Registro por pasos */
+.pasos{display:flex;gap:6px}
+.pasos button{flex:1;border:0;background:transparent;padding:0;display:grid;gap:5px;font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;text-align:left}
+.pasos button i{display:block;height:4px;border-radius:99px;background:var(--soft);transition:background .25s var(--ease)}
+.pasos button.hecho i,.pasos button[aria-current="step"] i{background:var(--brand-2)}
+.pasos button[aria-current="step"]{color:var(--ink)}
+.paso{display:grid;gap:12px;animation:pasoIn .28s var(--ease) both}
+.paso.atras{animation-name:pasoBack}
+@keyframes pasoIn{from{opacity:0;transform:translateX(18px)}}
+@keyframes pasoBack{from{opacity:0;transform:translateX(-18px)}}
+.monto-big{display:flex;align-items:baseline;gap:8px;border-bottom:2px solid var(--brand-2);padding:6px 2px}
+.monto-big span{font-family:var(--display);font-weight:800;font-size:1.6rem;color:var(--muted)}
+.monto-big input{border:0;background:transparent;padding:0;font-family:var(--display);font-weight:800;font-size:clamp(2.4rem,11vw,3.4rem);letter-spacing:-.03em;line-height:1.1;color:var(--ink);outline:none}
+.monto-big:focus-within{border-color:var(--brand)}
+.qr-btn{display:flex;align-items:center;justify-content:center;gap:10px;border:1.5px dashed var(--brand-2);background:transparent;color:var(--brand-2);border-radius:14px;padding:12px;font-weight:700}
+.qr-btn svg{width:22px;height:22px}
+.nav-pasos{display:grid;grid-template-columns:auto 1fr;gap:10px;margin-top:4px}
+.nav-pasos .btn{width:100%}
+.ac-wrap{position:relative}
+.sug{position:absolute;left:0;right:0;top:100%;margin-top:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 28px rgba(16,36,28,.16);z-index:3;max-height:230px;overflow:auto}
+.sug button{display:block;width:100%;text-align:left;border:0;background:transparent;padding:10px 12px;border-bottom:1px solid var(--line)}
+.sug button:last-child{border-bottom:0}
+.sug button:hover,.sug button.sel{background:var(--soft)}
+.sug small{display:block;color:var(--muted);font-size:.78rem}
+.chips-fecha{display:flex;gap:6px}
+.resumen{background:var(--bg);border-radius:14px;padding:4px 14px}
+.resumen .tl button{border:0;background:transparent;color:var(--brand-2);font-weight:700;font-size:.8rem;padding:0 0 0 8px}
+.resumen .tl b{font-weight:600;text-align:right;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.aviso{background:var(--in-bg);color:var(--in);border-radius:12px;padding:10px 12px;font-size:.85rem;font-weight:600}
+/* Escáner QR */
+.escaner{position:fixed;inset:0;z-index:40;background:#000;display:flex;flex-direction:column;color:#fff;animation:velo .2s ease both}
+.escaner video{flex:1;width:100%;object-fit:cover;min-height:0}
+.escaner .marco{position:absolute;left:50%;top:42%;width:min(68vw,260px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:24px;box-shadow:0 0 0 2000px rgba(0,0,0,.45);border:3px solid #F4EDE0}
+.escaner .marco::after{content:"";position:absolute;left:8%;right:8%;height:2px;top:10%;background:#9CC3B1;animation:linea 2s ease-in-out infinite alternate}
+@keyframes linea{to{top:88%}}
+.escaner .pie-esc{position:relative;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));display:grid;gap:10px;background:#061F18}
+.escaner .pie-esc p{margin:0;font-size:.9rem;text-align:center;color:#D9E3DC}
+.escaner .pie-esc .row2 button{width:100%}
+.escaner .btn2{color:#F4EDE0;border-color:#2C5A4A}
+/* PIN */
+.bloqueo{position:fixed;inset:0;z-index:60;background:var(--brand);color:var(--brand-ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px}
+.bloqueo h2{font-family:var(--display);margin:0;font-size:1.3rem}
+.bloqueo .puntos{display:flex;gap:14px;height:16px}
+.bloqueo .puntos i{width:14px;height:14px;border-radius:50%;border:2px solid var(--brand-ink);transition:background .15s}
+.bloqueo .puntos i.on{background:var(--brand-ink)}
+.bloqueo .puntos.mal{animation:temblor .35s}
+@keyframes temblor{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.teclado{display:grid;grid-template-columns:repeat(3,72px);gap:14px}
+.teclado button{height:72px;border-radius:50%;border:0;background:rgba(244,237,224,.12);color:var(--brand-ink);font-size:1.6rem;font-weight:600;font-family:var(--display)}
+.teclado button:active{background:rgba(244,237,224,.28)}
+.teclado button.sin{background:transparent;font-size:.85rem}
+.bloqueo .msg{color:#F7D5C8;text-align:center}
+.bloqueo .olvido{border:0;background:transparent;color:var(--brand-ink);opacity:.8;text-decoration:underline;font-size:.85rem}
+/* Transiciones */
+.entra{animation:entra .32s var(--ease) both}
+@keyframes entra{from{opacity:0;transform:translateY(10px)}}
+.mes-sig{animation:mesSig .3s var(--ease) both}
+.mes-ant{animation:mesAnt .3s var(--ease) both}
+@keyframes mesSig{from{opacity:.2;transform:translateX(28px)}}
+@keyframes mesAnt{from{opacity:.2;transform:translateX(-28px)}}
+#mesLbl{display:inline-block}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:70;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;font-size:.88rem;box-shadow:0 10px 30px rgba(0,0,0,.25);animation:sube .3s var(--ease) both;max-width:calc(100% - 32px)}
+#reporte{display:none}
+@media print{
+  body>*:not(#reporte){display:none!important}
+  #reporte{display:block!important;color:#000;font-family:var(--body);font-size:11pt}
+  #reporte h1{font-size:16pt;margin:0 0 2pt}#reporte h2{font-size:12pt;margin:14pt 0 4pt}
+  #reporte table{width:100%;border-collapse:collapse}#reporte td,#reporte th{border-bottom:1px solid #bbb;padding:3pt 4pt;text-align:left;font-size:9.5pt}
+  #reporte td.n,#reporte th.n{text-align:right;font-family:var(--mono)}
+  #reporte .cab{display:flex;justify-content:space-between;border-bottom:2pt solid #0D5C46;padding-bottom:6pt}
+  #reporte .res td{font-size:10.5pt}
+  @page{margin:14mm}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
 @media (prefers-reduced-motion:reduce){.side{transition:none}}
 </style>
 </head>
@@ -242,7 +378,7 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
       <button data-s="anual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Resumen anual</button>
       <button data-s="config"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Configuración</button>
     </nav>
-    <div class="pie">CBO Finanzas · versión 2.0</div>
+    <div class="pie">CBO Finanzas · versión 3.0 (mejorada)</div>
   </aside>
   <div class="velo" id="velo"></div>
 
@@ -261,11 +397,15 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
       <!-- INICIO -->
       <section data-sec="inicio">
         <div style="display:grid;gap:16px">
-          <div class="kpis">
+          <div class="hero">
+            <div class="big ut" id="bigUt"><div class="k" id="bigUtK">Utilidad del mes</div><div class="v" id="bigUtV"></div><div class="s" id="bigUtS"></div></div>
+            <div class="big sun"><div class="k">Pagas a SUNAT</div><div class="v" id="bigSunV"></div><div class="s" id="bigSunS"></div><span id="bigSunP"></span></div>
+          </div>
+          <div class="kpis dos">
             <div class="kpi"><div class="k">Ingresos</div><div class="v in" id="kIn"></div><div class="s" id="kInS"></div></div>
             <div class="kpi"><div class="k">Gastos</div><div class="v out" id="kOut"></div><div class="s" id="kOutS"></div></div>
-            <div class="kpi"><div class="k">Utilidad</div><div class="v" id="kUt"></div><div class="s" id="kUtS"></div></div>
-            <div class="kpi sunat"><div class="k">Pagar a SUNAT</div><div class="v" id="kSun"></div><div class="s" id="kSunS"></div></div>
+            <div class="kpi dup"><div class="k">Utilidad</div><div class="v" id="kUt"></div><div class="s" id="kUtS"></div></div>
+            <div class="kpi sunat dup"><div class="k">Pagar a SUNAT</div><div class="v" id="kSun"></div><div class="s" id="kSunS"></div></div>
           </div>
           <div class="g3">
             <section class="panel wide span2">
@@ -303,7 +443,7 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
             </div>
           </div>
           <div class="ph" style="margin-bottom:4px"><span class="hint" id="count"></span>
-            <span style="display:flex;gap:8px;flex-wrap:wrap"><button class="btnlink recargar" type="button">↻ Actualizar</button><a class="xls" href="https://docs.google.com/spreadsheets/d/1Z2vnvIbbbxLsiNDlpRX7sYYJzCtOU8OXC0LejiBvmAo/edit" target="_blank" rel="noopener">Abrir mi Excel ↗</a></span></div>
+            <span style="display:flex;gap:8px;flex-wrap:wrap"><button class="btnlink recargar" type="button">↻ Actualizar</button><button class="btnlink repCsv" type="button">⬇ Excel</button><button class="btnlink repPdf" type="button">⬇ PDF</button><a class="xls" href="https://docs.google.com/spreadsheets/d/1Z2vnvIbbbxLsiNDlpRX7sYYJzCtOU8OXC0LejiBvmAo/edit" target="_blank" rel="noopener">Abrir mi Excel ↗</a></span></div>
           <div id="list"></div>
         </section>
       </section>
@@ -371,10 +511,10 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
           <section class="panel">
             <div class="ph"><h2>Apariencia</h2></div>
             <div class="opts" id="temas">
-              <button class="opt" data-t="auto"><div class="mini" style="background:linear-gradient(90deg,#F1EAD7 50%,#0E1912 50%)"></div><b>Automático</b><small>Según tu celular</small></button>
-              <button class="opt" data-t="claro"><div class="mini"><span style="background:#14532D"></span><span style="background:#F1EAD7"></span></div><b>Claro</b><small>Beige arena</small></button>
-              <button class="opt" data-t="oscuro"><div class="mini"><span style="background:#14532D"></span><span style="background:#0E1912"></span></div><b>Oscuro</b><small>Para la noche</small></button>
-              <button class="opt" data-t="calido"><div class="mini"><span style="background:#14532D"></span><span style="background:#E4D7B7"></span></div><b>Cálido</b><small>Tonos tostados</small></button>
+              <button class="opt" data-t="auto"><div class="mini" style="background:linear-gradient(90deg,#F4EDE0 50%,#061F18 50%)"></div><b>Automático</b><small>Según tu celular</small></button>
+              <button class="opt" data-t="claro"><div class="mini"><span style="background:#0D5C46"></span><span style="background:#F4EDE0"></span></div><b>Claro</b><small>Beige arena</small></button>
+              <button class="opt" data-t="oscuro"><div class="mini"><span style="background:#0D5C46"></span><span style="background:#061F18"></span></div><b>Oscuro</b><small>Para la noche</small></button>
+              <button class="opt" data-t="calido"><div class="mini"><span style="background:#0D5C46"></span><span style="background:#E9DCC3"></span></div><b>Cálido</b><small>Tonos tostados</small></button>
             </div>
           </section>
           <section class="panel">
@@ -389,8 +529,19 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
             <div class="cfgrow"><div class="line"><button class="btnlink recargar" type="button">↻ Actualizar datos</button><button class="btnlink" id="desconectar" type="button">Cambiar enlace o clave</button></div></div>
           </section>
           <section class="panel">
+            <div class="ph"><h2>Seguridad</h2></div>
+            <div class="cfgrow"><span class="hint">Bloqueo con PIN</span><b id="pinEstado">Desactivado</b></div>
+            <div class="cfgrow"><div class="line" id="pinBotones"></div><p class="msg" id="pinMsg" style="color:var(--muted)"></p></div>
+            <p class="note">El PIN se guarda cifrado (SHA-256) solo en este equipo. Si lo olvidas, puedes quitarlo con tu clave de acceso de Google.</p>
+          </section>
+          <section class="panel">
+            <div class="ph"><h2>Reporte del mes</h2></div>
+            <p class="hint" style="margin:0 0 10px">Descarga los movimientos del mes que estás viendo para tu contador.</p>
+            <div class="rep"><button class="btn repCsv" type="button">⬇ Excel (CSV)</button><button class="btn2 repPdf" type="button">⬇ PDF / imprimir</button></div>
+          </section>
+          <section class="panel">
             <div class="ph"><h2>Acerca de</h2></div>
-            <p class="hint" style="margin:0">CBO Finanzas 2.0. Tus datos se guardan en tu archivo de Google Sheets "CASA BONITA OREGON S.A.C.". Este celular solo guarda una copia para verlos sin internet.</p>
+            <p class="hint" style="margin:0">CBO Finanzas 3.0 (versión mejorada). Tus datos se guardan en tu archivo de Google Sheets "CASA BONITA OREGON S.A.C.". Este celular solo guarda una copia para verlos sin internet.</p>
           </section>
         </div>
       </section>
@@ -403,38 +554,131 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
 
 <div class="overlay" id="ov" hidden>
   <form class="sheet" id="f" novalidate>
-    <h3>Nuevo movimiento <button type="button" class="x" id="close" aria-label="Cerrar">✕</button></h3>
-    <div class="seg tipo" id="segTipo" role="group" aria-label="Tipo">
-      <button type="button" data-v="ingreso" aria-pressed="true">+ Ingreso / venta</button>
-      <button type="button" data-v="gasto" aria-pressed="false">− Gasto / compra</button>
+    <h3><span id="fTit">Nuevo movimiento</span> <button type="button" class="x" id="close" aria-label="Cerrar">✕</button></h3>
+    <div class="pasos" id="pasos">
+      <button type="button" data-p="1"><i></i>Monto</button>
+      <button type="button" data-p="2"><i></i>Comprobante</button>
+      <button type="button" data-p="3"><i></i><span id="pasoCliLbl">Cliente</span></button>
+      <button type="button" data-p="4"><i></i>Guardar</button>
     </div>
-    <div style="display:grid;gap:6px"><span style="font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Comprobante</span>
-      <div class="seg three" id="segComp" role="group" aria-label="Comprobante">
-        <button type="button" data-v="factura" aria-pressed="true">Factura</button>
-        <button type="button" data-v="boleta" aria-pressed="false">Boleta</button>
-        <button type="button" data-v="ninguno" aria-pressed="false">Sin comprob.</button>
+    <p class="aviso" id="avisoQR" hidden></p>
+
+    <div class="paso" data-paso="1">
+      <div class="seg tipo" id="segTipo" role="group" aria-label="Tipo">
+        <button type="button" data-v="ingreso" aria-pressed="true">+ Ingreso / venta</button>
+        <button type="button" data-v="gasto" aria-pressed="false">− Gasto / compra</button>
+      </div>
+      <label for="monto">Monto total (S/)</label>
+      <div class="monto-big"><span>S/</span><input id="monto" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" aria-label="Monto total en soles"></div>
+      <button type="button" class="qr-btn" id="btnQR"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><rect x="8" y="8" width="3" height="3"/><rect x="13" y="8" width="3" height="3"/><rect x="8" y="13" width="3" height="3"/><path d="M13 13h3v3"/></svg>Escanear QR del comprobante</button>
+    </div>
+
+    <div class="paso" data-paso="2" hidden>
+      <div style="display:grid;gap:6px"><span style="font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Comprobante</span>
+        <div class="seg three" id="segComp" role="group" aria-label="Comprobante">
+          <button type="button" data-v="factura" aria-pressed="true">Factura</button>
+          <button type="button" data-v="boleta" aria-pressed="false">Boleta</button>
+          <button type="button" data-v="ninguno" aria-pressed="false">Sin comprob.</button>
+        </div>
+      </div>
+      <div class="calc" id="calc"></div>
+      <label id="lblNro">Serie-N° (opcional)<input id="nro" type="text" maxlength="20" placeholder="E001-27" autocomplete="off"></label>
+      <div id="detBox" class="calc">
+        <label class="check"><input type="checkbox" id="det"> El cliente me hizo detracción</label>
+        <div id="detRow" hidden><span>Porcentaje</span><span><select id="detPct" style="width:auto;padding:4px 8px"><option value="4">4% construcción</option><option value="12">12% otros servicios</option></select></span></div>
+        <div id="detAmt" hidden></div>
       </div>
     </div>
-    <label>Monto total del comprobante (S/)<input id="monto" type="number" inputmode="decimal" step="0.01" min="0" placeholder="0.00"></label>
-    <div class="calc" id="calc"></div>
-    <label id="lblCli">Cliente / obra<input id="desc" type="text" maxlength="80"></label>
-    <div class="row2">
-      <label>RUC / DNI (opcional)<input id="ruc" type="text" inputmode="numeric" maxlength="11"></label>
-      <label>Serie-N° (opcional)<input id="nro" type="text" maxlength="20" placeholder="E001-27"></label>
+
+    <div class="paso" data-paso="3" hidden>
+      <div class="ac-wrap">
+        <label id="lblCli">Cliente / obra<input id="desc" type="text" maxlength="80" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="sug" aria-expanded="false"></label>
+        <div class="sug" id="sug" role="listbox" hidden></div>
+      </div>
+      <label>RUC / DNI (opcional)<input id="ruc" type="text" inputmode="numeric" maxlength="11" autocomplete="off"></label>
+      <p class="hint" style="margin:0" id="hintCli">Escribe y elige de tus clientes ya registrados: el RUC se llena solo.</p>
     </div>
-    <div class="row2">
-      <label>Categoría<select id="cat"></select></label>
-      <label>Fecha<input id="fecha" type="date"></label>
+
+    <div class="paso" data-paso="4" hidden>
+      <div class="row2">
+        <label>Categoría<select id="cat"></select></label>
+        <label>Fecha<input id="fecha" type="date"></label>
+      </div>
+      <div class="chips-fecha"><button type="button" class="chip" data-d="0">Hoy</button><button type="button" class="chip" data-d="-1">Ayer</button></div>
+      <div class="resumen" id="resumen"></div>
     </div>
-    <div id="detBox" class="calc">
-      <label class="check"><input type="checkbox" id="det"> El cliente me hizo detracción</label>
-      <div id="detRow" hidden><span>Porcentaje</span><span><select id="detPct" style="width:auto;padding:4px 8px"><option value="4">4% construcción</option><option value="12">12% otros servicios</option></select></span></div>
-      <div id="detAmt" hidden></div>
-    </div>
+
     <p class="msg" id="msg"></p>
-    <button class="btn" type="submit">Registrar</button>
+    <div class="nav-pasos">
+      <button class="btn2" type="button" id="btnAtras">Atrás</button>
+      <button class="btn pri" type="submit" id="btnSig">Siguiente</button>
+    </div>
   </form>
 </div>
+
+<!-- Barra inferior (celular) -->
+<nav class="tabbar" id="tabbar" aria-label="Secciones">
+  <button type="button" data-tab="inicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Inicio</button>
+  <button type="button" data-tab="movimientos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Movimientos</button>
+  <button type="button" class="mas-reg" id="tabReg" aria-label="Registrar movimiento"><span class="c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>Registrar</button>
+  <button type="button" data-tab="sunat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>SUNAT</button>
+  <button type="button" data-tab="mas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>Más</button>
+</nav>
+
+<!-- Hoja "Más" -->
+<div class="overlay" id="ovMas" hidden>
+  <div class="sheet">
+    <h3>Más opciones <button type="button" class="x" data-cerrar aria-label="Cerrar">✕</button></h3>
+    <div class="lista-mas">
+      <button type="button" data-ir="terceros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.5"/><path d="M15 15c3 0 6 1.5 6 4.5"/></svg><span>Clientes y proveedores<small>Quién te paga y a quién le compras</small></span></button>
+      <button type="button" data-ir="planilla"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M8 6V4h8v2M3 12h18"/></svg><span>Planilla<small>Pagos a trabajadores</small></span></button>
+      <button type="button" data-ir="anual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Resumen anual<small>Mes a mes, todo el año</small></span></button>
+      <button type="button" class="repCsv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>Reporte del mes en Excel<small>Archivo CSV para tu contador</small></span></button>
+      <button type="button" class="repPdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></svg><span>Reporte del mes en PDF<small>Vista para imprimir o guardar</small></span></button>
+      <button type="button" data-ir="config"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span>Configuración<small>Tema, PIN, conexión</small></span></button>
+    </div>
+  </div>
+</div>
+
+<!-- Hoja de un movimiento -->
+<div class="overlay" id="ovMov" hidden>
+  <div class="sheet">
+    <h3>Movimiento <button type="button" class="x" data-cerrar aria-label="Cerrar">✕</button></h3>
+    <div class="det-mov" id="movDet"></div>
+    <div class="acciones">
+      <button type="button" id="movEditar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>Editar</button>
+      <button type="button" id="movDup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg>Duplicar</button>
+      <button type="button" id="movBorrar" class="peligro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg><span>Borrar</span></button>
+    </div>
+    <p class="msg" id="movMsg"></p>
+  </div>
+</div>
+
+<!-- Escáner de QR SUNAT -->
+<div class="escaner" id="escaner" hidden>
+  <video id="video" playsinline muted></video>
+  <div class="marco" aria-hidden="true"></div>
+  <div class="pie-esc">
+    <p id="escMsg">Apunta al código QR del comprobante electrónico.</p>
+    <div class="row2">
+      <label class="btn2" style="display:flex;align-items:center;justify-content:center;text-transform:none;letter-spacing:0;font-size:.95rem;color:#F4EDE0;cursor:pointer">Elegir foto<input type="file" id="qrFoto" accept="image/*" hidden></label>
+      <button type="button" class="btn pri" id="escCerrar">Cancelar</button>
+    </div>
+  </div>
+  <canvas id="qrCanvas" hidden></canvas>
+</div>
+
+<!-- Bloqueo con PIN -->
+<div class="bloqueo" id="bloqueo" hidden>
+  <h2 id="pinTit">Escribe tu PIN</h2>
+  <div class="puntos" id="pinPuntos"></div>
+  <div class="teclado" id="teclado"></div>
+  <p class="msg" id="pinErr"></p>
+  <button type="button" class="olvido" id="pinOlvido">Olvidé mi PIN</button>
+  <button type="button" class="olvido" id="pinCancelar" hidden>Cancelar</button>
+</div>
+
+<div id="reporte" aria-hidden="true"></div>
 
 <div class="setup" id="setup" hidden>
   <form class="card" id="setupF" novalidate>
@@ -535,9 +779,17 @@ function render(){
   $("kUt").textContent=fmt(S.sI-S.sG); $("kUt").className="v "+(S.sI-S.sG<0?"out":"in");
   $("kUtS").textContent=`Después de impuestos: ${fmt(S.sI-S.sG-t.tot)}`;
   $("kSun").textContent=fmt(t.tot); $("kSunS").textContent=`IGV ${fmt(t.igv)} · Renta ${fmt(t.renta)}`;
+  // Cifras grandes
+  const ut=S.sI-S.sG, vi=vencInfo(mes);
+  $("bigUtK").textContent=`Utilidad de ${MESES[+mes.slice(5)-1]}`;
+  $("bigUtV").innerHTML=`<small>S/</small>${(ut<0?"−":"")+Math.round(Math.abs(ut)).toLocaleString("es-PE")}`;
+  $("bigUt").classList.toggle("neg",ut<0);
+  $("bigUtS").textContent=`Ingresos ${fmt0(S.sI)} − gastos ${fmt0(S.sG)} · después de impuestos ${fmt0(ut-t.tot)}`;
+  $("bigSunV").innerHTML=`<small>S/</small>${Math.round(t.tot).toLocaleString("es-PE")}`;
+  $("bigSunS").textContent=t.usa>0?`En efectivo ${fmt0(t.efe)} · detracciones cubren ${fmt0(t.usa)}`:`IGV ${fmt0(t.igv)} + renta ${fmt0(t.renta)}`;
+  $("bigSunP").innerHTML=vi?(vi.dias<0?`<span class="pill gris">Venció el ${fechaCorta(vi.fecha)}</span>`:vi.dias===0?`<span class="pill mal">Vence hoy</span>`:`<span class="pill ${vi.dias<=5?"al":"ok"}">Vence el ${fechaCorta(vi.fecha)} · faltan ${vi.dias} días</span>`):"";
   chart();
   // Próxima declaración (del mes elegido)
-  const vi=vencInfo(mes);
   $("vencBox").innerHTML=vi?`<div class="venc"><div class="dia"><div><b>${+vi.fecha.slice(8)}</b><small>${MESES[+vi.fecha.slice(5,7)-1].slice(0,3)}</small></div></div>
     <div style="display:grid;gap:4px"><span>Declaras <b>${lblMes(mes)}</b></span>
     <span class="num" style="font-size:1.1rem;font-weight:700">${fmt(t.tot)}</span>
@@ -595,10 +847,10 @@ function renderMov(){
   const compTxt={factura:"Factura",boleta:"Boleta",ninguno:"Sin comprobante"};
   $("list").innerHTML=vis.length?vis.slice(0,300).map(r=>{
     const c=r.tipo==="ingreso"?"in":"out"; const [y,m,d]=r.fecha.split("-");
-    return `<div class="item"><div class="ic ${c}"><span class="${c}">${c==="in"?"+":"−"}</span></div>
+    return `<div class="item tap" role="button" tabindex="0" data-id="${esc(r.id)}" aria-label="Ver ${esc(r.desc||r.categoria)}, ${fmt(r.monto)}"><div class="ic ${c}"><span class="${c}">${c==="in"?"+":"−"}</span></div>
       <div class="desc"><b>${esc(r.desc||r.categoria)}</b><small><span>${esc(r.categoria)}</span><span>${d}/${m}/${y}</span><span class="tag">${compTxt[r.comprobante||"ninguno"]}${r.serie?" "+esc(r.serie)+"-"+esc(r.numero):""}</span>${r.detraccion?`<span class="tag det">Detracción ${fmt(r.detMonto||0)}</span>`:""}</small></div>
       <div class="amt ${c}">${c==="in"?"+":"−"} ${fmt(r.monto)}</div>
-      <button class="del${pendingDel===r.id?" confirm":""}" data-id="${r.id}" aria-label="Borrar">${pendingDel===r.id?"¿Borrar?":"✕"}</button></div>`}).join("")
+      <span class="chev" aria-hidden="true">›</span></div>`}).join("")
     :`<div class="empty">${q?"No hay resultados para tu búsqueda.":`No hay movimientos en ${lblMes(mes)}.<br>Toca <b>+ Registrar</b> para agregar el primero.`}</div>`;
 }
 function renderTerceros(){
@@ -613,7 +865,7 @@ function renderPlanilla(S){
   const trab=[...new Set(S.pla.map(r=>r.desc))];
   $("plaKpis").innerHTML=[["Pagado en el mes",fmt(S.sP)],["Pagos",S.pla.length],["Trabajadores",trab.length],["Pagado en el año",fmt0(plaA.reduce((a,r)=>a+r.monto,0))]].map(([k,v])=>`<div class="kpi"><div class="k">${k}</div><div class="v">${v}</div></div>`).join("");
   const l=[...S.pla].sort((a,b)=>b.fecha.localeCompare(a.fecha));
-  $("plaList").innerHTML=l.length?l.map(r=>`<div class="item"><div class="ic out"><span class="out">S/</span></div><div class="desc"><b>${esc(titulo(r.desc))}</b><small><span>${esc(r.cargo||"Trabajador")}</span><span>DNI ${esc(r.ruc||"—")}</span><span>${fechaCorta(r.fecha)}</span></small></div><div class="amt out">${fmt(r.monto)}</div><span></span></div>`).join(""):`<div class="empty">Sin pagos de planilla en ${lblMes(mes)}.</div>`;
+  $("plaList").innerHTML=l.length?l.map(r=>`<div class="item tap" role="button" tabindex="0" data-id="${esc(r.id)}"><div class="ic out"><span class="out">S/</span></div><div class="desc"><b>${esc(titulo(r.desc))}</b><small><span>${esc(r.cargo||"Trabajador")}</span><span>DNI ${esc(r.ruc||"—")}</span><span>${fechaCorta(r.fecha)}</span></small></div><div class="amt out">${fmt(r.monto)}</div><span class="chev" aria-hidden="true">›</span></div>`).join(""):`<div class="empty">Sin pagos de planilla en ${lblMes(mes)}.</div>`;
 }
 function renderAnual(t){
   const anio=mes.slice(0,4); $("anualTit").textContent=`Resumen ${anio}`;
@@ -644,23 +896,73 @@ function chart(){
 }
 
 /* ===== Navegación ===== */
+const animar=(el,cls)=>{if(!el)return;el.classList.remove("entra","mes-sig","mes-ant");void el.offsetWidth;el.classList.add(cls)};
 function ir(s){
-  seccion=s; document.querySelectorAll("[data-sec]").forEach(x=>x.hidden=x.dataset.sec!==s);
+  const cambio=s!==seccion; seccion=s; document.querySelectorAll("[data-sec]").forEach(x=>x.hidden=x.dataset.sec!==s);
   document.querySelectorAll("#nav button").forEach(b=>b.setAttribute("aria-current",b.dataset.s===s?"page":"false"));
+  const enMas=["terceros","planilla","anual","config"].includes(s);
+  document.querySelectorAll("#tabbar [data-tab]").forEach(b=>b.setAttribute("aria-current",(b.dataset.tab===s||(b.dataset.tab==="mas"&&enMas))?"page":"false"));
   $("titulo").textContent=TITULOS[s]; $("monthsel").hidden=s==="config";
   $("app").classList.remove("abierto");document.body.classList.remove("menu"); try{history.replaceState(null,"","#"+s)}catch{}
+  if(cambio) animar(document.querySelector(`[data-sec="${s}"]`),"entra");
   window.scrollTo(0,0);
 }
 document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>ir(b.dataset.s));
 $("hamb").onclick=()=>{$("app").classList.add("abierto");document.body.classList.add("menu")};
 $("velo").onclick=()=>{$("app").classList.remove("abierto");document.body.classList.remove("menu")};
-$("prev").onclick=()=>{mes=addMes(mes,-1);render()}; $("next").onclick=()=>{mes=addMes(mes,1);render()};
+function cambiarMes(k){
+  mes=addMes(mes,k); render();
+  const cls=k>0?"mes-sig":"mes-ant";
+  animar(document.querySelector(`[data-sec="${seccion}"]`),cls); animar($("mesLbl"),cls);
+}
+$("prev").onclick=()=>cambiarMes(-1); $("next").onclick=()=>cambiarMes(1);
+// Deslizar a los lados para cambiar de mes (no en Configuración ni sobre tablas que se desplazan)
+(()=>{let x0=null,y0=0,t0=0;const zona=document.querySelector(".content");
+  zona.addEventListener("touchstart",e=>{if(e.touches.length!==1||seccion==="config"||e.target.closest(".scroll,input,select,textarea,.chart")){x0=null;return}x0=e.touches[0].clientX;y0=e.touches[0].clientY;t0=Date.now()},{passive:true});
+  zona.addEventListener("touchend",e=>{if(x0==null)return;const t=e.changedTouches[0],dx=t.clientX-x0,dy=t.clientY-y0;x0=null;
+    if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.6&&Date.now()-t0<700)cambiarMes(dx<0?1:-1)},{passive:true});
+})();
 document.querySelectorAll(".chip[data-f]").forEach(b=>b.onclick=()=>{filtro=b.dataset.f;document.querySelectorAll(".chip[data-f]").forEach(x=>x.setAttribute("aria-pressed",x===b));renderMov()});
 document.querySelectorAll(".chip.per").forEach(b=>b.onclick=()=>{periodoTer=b.dataset.p;document.querySelectorAll(".chip.per").forEach(x=>x.setAttribute("aria-pressed",x===b));renderTerceros()});
 $("q").addEventListener("input",renderMov);
-$("list").addEventListener("click",async e=>{const b=e.target.closest(".del");if(!b)return;const id=b.dataset.id;
-  if(pendingDel!==id){pendingDel=id;renderMov();setTimeout(()=>{if(pendingDel===id){pendingDel=null;renderMov()}},3000);return}
-  pendingDel=null; try{await store.remove(id)}catch{$("status").textContent="No se pudo borrar. Intenta de nuevo."}});
+
+/* ===== Barra inferior y hoja "Más" ===== */
+const abrirOv=id=>{$(id).hidden=false}, cerrarOv=id=>{$(id).hidden=true};
+document.querySelectorAll("#tabbar [data-tab]").forEach(b=>b.onclick=()=>{if(b.dataset.tab==="mas")abrirOv("ovMas");else ir(b.dataset.tab)});
+$("tabReg").onclick=()=>openF();
+document.querySelectorAll("#ovMas [data-ir]").forEach(b=>b.onclick=()=>{cerrarOv("ovMas");ir(b.dataset.ir)});
+document.querySelectorAll("[data-cerrar]").forEach(b=>b.onclick=()=>b.closest(".overlay").hidden=true);
+["ovMas","ovMov"].forEach(id=>$(id).addEventListener("click",e=>{if(e.target===$(id))cerrarOv(id)}));
+function toast(t){const d=document.createElement("div");d.className="toast";d.setAttribute("role","status");d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2600)}
+
+/* ===== Tocar un movimiento: ver, editar, duplicar, borrar ===== */
+let movSel=null;
+const COMP_TXT={factura:"Factura",boleta:"Boleta",ninguno:"Sin comprobante"};
+function abrirMov(id){
+  const r=rows.find(x=>String(x.id)===String(id)); if(!r)return; movSel=r; pendingDel=null;
+  const c=r.tipo==="ingreso"?"in":"out", p=partes(r);
+  $("movDet").innerHTML=`<span class="hint">${r.tipo==="ingreso"?"Ingreso":"Gasto"} · ${esc(r.categoria)}</span>
+    <span class="amtg ${c}">${c==="in"?"+":"−"} ${fmt(r.monto)}</span><b>${esc(r.desc||"Sin nombre")}</b>
+    <div class="tl"><span>Fecha</span><span>${fechaCorta(r.fecha)} ${r.fecha.slice(0,4)}</span></div>
+    <div class="tl"><span>Comprobante</span><span>${COMP_TXT[r.comprobante||"ninguno"]}${r.serie||r.numero?" "+esc([r.serie,r.numero].filter(Boolean).join("-")):""}</span></div>
+    ${r.ruc?`<div class="tl"><span>RUC / DNI</span><span class="num">${esc(r.ruc)}</span></div>`:""}
+    ${p.igv?`<div class="tl"><span>Valor sin IGV · IGV</span><span class="num">${fmt(p.base)} · ${fmt(p.igv)}</span></div>`:""}
+    ${r.detraccion?`<div class="tl"><span>Detracción ${r.detPct||""}%</span><span class="num">${fmt(r.detMonto||0)}</span></div>`:""}`;
+  $("movBorrar").classList.remove("confirm"); $("movBorrar").querySelector("span").textContent="Borrar"; $("movMsg").textContent="";
+  abrirOv("ovMov");
+}
+["list","plaList"].forEach(id=>{
+  $(id).addEventListener("click",e=>{const it=e.target.closest(".item.tap");if(it)abrirMov(it.dataset.id)});
+  $(id).addEventListener("keydown",e=>{const it=e.target.closest(".item.tap");if(it&&(e.key==="Enter"||e.key===" ")){e.preventDefault();abrirMov(it.dataset.id)}});
+});
+$("movEditar").onclick=()=>{const r=movSel;cerrarOv("ovMov");openF({modo:"editar",r})};
+$("movDup").onclick=()=>{const r=movSel;cerrarOv("ovMov");openF({modo:"duplicar",r})};
+$("movBorrar").onclick=async()=>{
+  const b=$("movBorrar"), r=movSel; if(!r)return;
+  if(!b.classList.contains("confirm")){b.classList.add("confirm");b.querySelector("span").textContent="¿Seguro?";setTimeout(()=>{b.classList.remove("confirm");b.querySelector("span").textContent="Borrar"},3500);return}
+  $("movMsg").textContent="Borrando…";
+  try{await store.remove(r.id);cerrarOv("ovMov");toast("Movimiento borrado")}catch{$("movMsg").textContent="No se pudo borrar. Intenta de nuevo."}
+};
 
 /* ===== Configuración ===== */
 function aplicarTema(){
@@ -675,8 +977,16 @@ $("meta").value=ajustes.meta;
 $("guardarMeta").onclick=()=>{const v=parseFloat($("meta").value);if(!(v>=0)){$("metaOk").textContent="Escribe un monto válido.";return}ajustes.meta=v;guardarLS("cbo-ajustes",ajustes);$("metaOk").textContent="Guardado";render()};
 aplicarTema();
 
-/* ===== Formulario ===== */
+/* ===== Formulario por pasos ===== */
+const RUC_CBO="20614484153";
+let paso=1, fModo="nuevo", fEditId=null, fEditOrig=null, qrIgv=null;
 function seg(id,val){document.querySelectorAll(`#${id} button`).forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===val))}
+const leerMonto=()=>{const v=parseFloat(String($("monto").value).replace(/[^\d.,]/g,"").replace(/,(?=\d{3}(\D|$))/g,"").replace(",","."));return isFinite(v)?v:0};
+function partesForm(m){
+  // Si el QR (o el registro original) trae el IGV exacto y el monto no cambió, se usa ese IGV
+  if(qrIgv&&fComp!=="ninguno"&&Math.abs(m-qrIgv.total)<0.005) return {base:r2(m-qrIgv.igv),igv:qrIgv.igv,noG:0};
+  return partes({monto:m,comprobante:fComp});
+}
 function syncForm(){
   const sinBoleta=fTipo==="ingreso";
   if(sinBoleta&&fComp==="boleta") fComp="factura";
@@ -685,39 +995,319 @@ function syncForm(){
   seg("segTipo",fTipo); seg("segComp",fComp);
   const prev=$("cat").value; $("cat").innerHTML=CATS[fTipo].map(c=>`<option>${c}</option>`).join(""); if(CATS[fTipo].includes(prev))$("cat").value=prev;
   $("lblCli").firstChild.textContent=fTipo==="ingreso"?"Cliente / obra":"Proveedor / detalle";
+  $("pasoCliLbl").textContent=fTipo==="ingreso"?"Cliente":"Proveedor";
+  $("hintCli").textContent=fTipo==="ingreso"?"Escribe y elige de tus clientes ya registrados: el RUC se llena solo.":"Escribe y elige de tus proveedores ya registrados: el RUC se llena solo.";
   $("desc").placeholder=fTipo==="ingreso"?"Ej. Inmobiliaria PSN S.A.C.":"Ej. Ferremesh S.A.C.";
-  const m=parseFloat($("monto").value)||0, p=partes({monto:m,comprobante:fComp});
+  $("lblNro").hidden=fComp==="ninguno";
+  const m=leerMonto(), p=partesForm(m);
   $("calc").innerHTML=fComp==="ninguno"?`<div><span>Sin comprobante: no se separa IGV</span></div>`:
     `<div><span>Valor sin IGV</span><span class="num">${fmt(p.base)}</span></div><div><span>IGV 18%</span><span class="num">${fmt(p.igv)}</span></div>`+(fTipo==="gasto"?`<div><span>${fComp==="factura"?"Este IGV se descuenta de tu pago":"Con boleta no recuperas el IGV"}</span></div>`:"");
   const showDet=fTipo==="ingreso"&&fComp==="factura"; $("detBox").hidden=!showDet;
   const on=showDet&&$("det").checked; $("detRow").hidden=!on; $("detAmt").hidden=!on;
   if(on){$("detAmt").innerHTML=`<span>Va a tu cuenta del Banco de la Nación</span><span class="num">${fmt(Math.round(m*$("detPct").value/100))}</span>`}
+  if(paso===4) pintarResumen();
 }
+function pintarResumen(){
+  const m=leerMonto();
+  const fila=(k,v,p)=>`<div class="tl"><span>${k}</span><span style="display:flex;min-width:0"><b>${v}</b><button type="button" data-ir-paso="${p}">Cambiar</button></span></div>`;
+  $("resumen").innerHTML=fila(fTipo==="ingreso"?"Ingreso":"Gasto",`<span class="num">${fmt(m)}</span>`,1)
+    +fila("Comprobante",esc(COMP_TXT[fComp]+($("nro").value.trim()&&fComp!=="ninguno"?" "+$("nro").value.trim():"")),2)
+    +fila(fTipo==="ingreso"?"Cliente":"Proveedor",esc($("desc").value.trim()||"—"),3);
+}
+$("resumen").addEventListener("click",e=>{const b=e.target.closest("[data-ir-paso]");if(b)irPaso(+b.dataset.irPaso)});
+function irPaso(n){
+  const atras=n<paso; paso=n;
+  document.querySelectorAll("#f .paso").forEach(d=>{const on=+d.dataset.paso===n;d.hidden=!on;if(on){d.classList.toggle("atras",atras);d.style.animation="none";void d.offsetWidth;d.style.animation=""}});
+  document.querySelectorAll("#pasos button").forEach(b=>{const k=+b.dataset.p;b.classList.toggle("hecho",k<n);if(k===n)b.setAttribute("aria-current","step");else b.removeAttribute("aria-current")});
+  $("btnAtras").textContent=n===1?"Cancelar":"Atrás";
+  $("btnSig").textContent=n<4?"Siguiente":(fModo==="editar"?"Guardar cambios":"Guardar");
+  $("msg").textContent=""; ocultarSug(); syncForm();
+  const foco={1:"monto",3:"desc"}[n];
+  if(foco) setTimeout(()=>{if(!$("ov").hidden)$(foco).focus({preventScroll:true})},60);
+}
+function validarPaso(n){
+  if(n===1&&!(leerMonto()>0)){$("msg").textContent="Escribe un monto mayor a 0.";return false}
+  if(n===4&&!$("fecha").value){$("msg").textContent="Elige una fecha.";return false}
+  return true;
+}
+$("pasos").onclick=e=>{const b=e.target.closest("button");if(!b)return;const n=+b.dataset.p;if(n>paso){for(let k=paso;k<n;k++)if(!validarPaso(k))return}irPaso(n)};
+$("btnAtras").onclick=()=>{if(paso===1)closeF();else irPaso(paso-1)};
 $("segTipo").onclick=e=>{const b=e.target.closest("button");if(b){fTipo=b.dataset.v;syncForm()}};
 $("segComp").onclick=e=>{const b=e.target.closest("button");if(b){fComp=b.dataset.v;syncForm()}};
-["monto","det","detPct"].forEach(id=>$(id).addEventListener("input",()=>{
-  if(id==="monto"&&!$("det").dataset.touched){$("det").checked=(parseFloat($("monto").value)||0)>700}
+["monto","det","detPct","nro"].forEach(id=>$(id).addEventListener("input",()=>{
+  if(id==="monto"&&!$("det").dataset.touched){$("det").checked=leerMonto()>700}
   if(id==="det")$("det").dataset.touched="1"; syncForm()}));
-function openF(){$("fecha").value=mes===hoyISO.slice(0,7)?hoyISO:mes+"-01";$("msg").textContent="";$("ov").hidden=false;syncForm();setTimeout(()=>$("monto").focus(),50)}
-function closeF(){$("ov").hidden=true}
-$("fab").onclick=openF; $("close").onclick=closeF;
+document.querySelectorAll(".chips-fecha .chip").forEach(b=>b.onclick=()=>{const d=new Date();d.setDate(d.getDate()+(+b.dataset.d));$("fecha").value=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`});
+
+/* Autocompletado de clientes / proveedores ya registrados */
+function terceros(tipo){
+  const g={};
+  rows.forEach(r=>{if(!r.desc)return;const k=r.desc.trim().toUpperCase();const x=g[k]||(g[k]={desc:r.desc.trim(),ruc:"",tipo:r.tipo,cat:r.categoria,n:0,ult:""});
+    x.n++; if(r.ruc&&!x.ruc)x.ruc=String(r.ruc); if(r.fecha>=x.ult){x.ult=r.fecha;x.cat=r.categoria;x.tipo=r.tipo;if(r.ruc)x.ruc=String(r.ruc)}});
+  return Object.values(g).sort((a,b)=>(b.tipo===tipo)-(a.tipo===tipo)||b.n-a.n);
+}
+const sinTildes=s=>String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+let sugLista=[], sugSel=-1;
+function mostrarSug(){
+  const q=sinTildes($("desc").value.trim());
+  sugLista=terceros(fTipo).filter(x=>!q||sinTildes(x.desc).includes(q)||x.ruc.includes(q)).filter(x=>x.desc.toUpperCase()!==$("desc").value.trim().toUpperCase()).slice(0,6);
+  sugSel=-1;
+  if(!sugLista.length){ocultarSug();return}
+  $("sug").innerHTML=sugLista.map((x,i)=>`<button type="button" role="option" data-i="${i}">${esc(x.desc)}<small>${x.ruc?"RUC/DNI "+esc(x.ruc)+" · ":""}${esc(x.cat)} · ${x.n} vez${x.n>1?"es":""}</small></button>`).join("");
+  $("sug").hidden=false; $("desc").setAttribute("aria-expanded","true");
+}
+function ocultarSug(){$("sug").hidden=true;$("desc").setAttribute("aria-expanded","false")}
+function elegirSug(i){const x=sugLista[i];if(!x)return;$("desc").value=x.desc;if(x.ruc)$("ruc").value=x.ruc;if(CATS[fTipo].includes(x.cat))$("cat").value=x.cat;ocultarSug();syncForm()}
+$("desc").addEventListener("input",mostrarSug);
+$("desc").addEventListener("focus",mostrarSug);
+$("desc").addEventListener("blur",()=>setTimeout(ocultarSug,150));
+$("desc").addEventListener("keydown",e=>{
+  if($("sug").hidden)return;
+  if(e.key==="ArrowDown"||e.key==="ArrowUp"){e.preventDefault();sugSel=(sugSel+(e.key==="ArrowDown"?1:-1)+sugLista.length)%sugLista.length;$("sug").querySelectorAll("button").forEach((b,i)=>b.classList.toggle("sel",i===sugSel))}
+  else if(e.key==="Enter"&&sugSel>=0){e.preventDefault();elegirSug(sugSel)}
+  else if(e.key==="Escape"){e.stopPropagation();ocultarSug()}
+});
+$("sug").addEventListener("mousedown",e=>e.preventDefault());
+$("sug").addEventListener("click",e=>{const b=e.target.closest("[data-i]");if(b)elegirSug(+b.dataset.i)});
+// Si escribe un RUC conocido y aún no hay nombre, se completa el nombre
+$("ruc").addEventListener("input",()=>{const v=$("ruc").value.trim();if(v.length<8||$("desc").value.trim())return;const x=terceros(fTipo).find(t=>t.ruc===v);if(x){$("desc").value=x.desc;if(CATS[fTipo].includes(x.cat))$("cat").value=x.cat}});
+
+function limpiarForm(){
+  $("monto").value="";$("desc").value="";$("ruc").value="";$("nro").value="";delete $("det").dataset.touched;$("det").checked=false;$("detPct").value="4";
+  qrIgv=null;$("avisoQR").hidden=true;
+}
+function cargarEnForm(r,conFecha){
+  fTipo=r.tipo==="gasto"?"gasto":"ingreso"; fComp=r.comprobante||"ninguno";
+  $("monto").value=String(r.monto); $("desc").value=r.desc||""; $("ruc").value=r.ruc||"";
+  $("nro").value=r.serie?`${r.serie}-${r.numero||""}`:(r.numero||"");
+  $("det").checked=!!r.detraccion; $("det").dataset.touched="1"; $("detPct").value=String(r.detPct===12?12:4);
+  syncForm(); if(CATS[fTipo].includes(r.categoria))$("cat").value=r.categoria;
+  $("fecha").value=conFecha?r.fecha:(mes===hoyISO.slice(0,7)?hoyISO:mes+"-01");
+  if(fComp!=="ninguno"&&typeof r.igv==="number") qrIgv={total:r.monto,igv:r.igv};
+}
+function openF(op){
+  op=op||{}; fModo=op.modo||"nuevo"; fEditId=fModo==="editar"?op.r.id:null; fEditOrig=fModo==="editar"?op.r:null;
+  limpiarForm(); paso=1;
+  $("fecha").value=mes===hoyISO.slice(0,7)?hoyISO:mes+"-01";
+  if(op.r) cargarEnForm(op.r,fModo==="editar");
+  $("fTit").textContent={nuevo:"Nuevo movimiento",editar:"Editar movimiento",duplicar:"Duplicar movimiento"}[fModo];
+  $("ov").hidden=false; irPaso(op.r?4:1);
+}
+function closeF(){$("ov").hidden=true;ocultarSug()}
+$("fab").onclick=()=>openF(); $("close").onclick=closeF;
 $("ov").addEventListener("click",e=>{if(e.target===$("ov"))closeF()});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("ov").hidden)closeF();$("app").classList.remove("abierto")}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("escaner").hidden)cerrarEscaner();else if(!$("ov").hidden)closeF();["ovMas","ovMov"].forEach(cerrarOv);$("app").classList.remove("abierto")}});
 $("f").addEventListener("submit",async e=>{
   e.preventDefault();
-  const monto=r2(parseFloat($("monto").value));
-  if(!(monto>0)){$("msg").textContent="Escribe un monto mayor a 0.";return}
-  if(!$("fecha").value){$("msg").textContent="Elige una fecha.";return}
+  if(!validarPaso(paso))return;
+  if(paso<4){irPaso(paso+1);return}
+  const monto=r2(leerMonto());
+  if(!(monto>0)){irPaso(1);$("msg").textContent="Escribe un monto mayor a 0.";return}
   const det=fTipo==="ingreso"&&fComp==="factura"&&$("det").checked;
-  const p=partes({monto,comprobante:fComp}); const [serie,...nn]=$("nro").value.trim().split("-");
+  const p=partesForm(monto); const nroTxt=fComp==="ninguno"?"":$("nro").value.trim(); const [serie,...nn]=nroTxt.split("-");
   const r={tipo:fTipo,comprobante:fComp,monto,base:p.base,igv:p.igv,noGravado:p.noG,ruc:$("ruc").value.trim(),serie:nn.length?serie:"",numero:nn.length?nn.join("-"):(serie||""),
-    estado:"PAGADO",desc:$("desc").value.trim(),categoria:$("cat").value,fecha:$("fecha").value,
+    estado:fEditOrig&&fEditOrig.estado?fEditOrig.estado:"PAGADO",desc:$("desc").value.trim(),categoria:$("cat").value,fecha:$("fecha").value,
     detraccion:det,detPct:det?+$("detPct").value:0,detMonto:det?Math.round(monto*$("detPct").value/100):0};
-  $("msg").textContent="Guardando…";
-  try{await store.add(r);$("monto").value="";$("desc").value="";$("ruc").value="";$("nro").value="";delete $("det").dataset.touched;$("det").checked=false;
-    mes=r.fecha.slice(0,7);closeF();render()}
-  catch(err){$("msg").textContent="No se pudo guardar"+(err&&err.message&&err.code!=="clave"?": "+err.message:". Revisa tu internet e intenta de nuevo.")}
+  if(fEditOrig&&fEditOrig.cargo) r.cargo=fEditOrig.cargo;
+  $("msg").textContent="Guardando…"; $("btnSig").disabled=true;
+  try{
+    if(fModo==="editar") await store.edit(fEditId,r); else await store.add(r);
+    const modo=fModo; limpiarForm(); mes=r.fecha.slice(0,7); closeF(); render();
+    toast(modo==="editar"?"Cambios guardados":"Movimiento registrado");
+  }catch(err){$("msg").textContent="No se pudo guardar"+(err&&err.message&&err.code!=="clave"?": "+err.message:". Revisa tu internet e intenta de nuevo.")}
+  finally{$("btnSig").disabled=false}
 });
+
+/* ===== QR SUNAT ===== */
+/* QR-SUNAT-INICIO (este bloque lo prueba pruebas/qr-sunat.test.js) */
+// Formato SUNAT: RUC_emisor|tipo|serie|número|IGV|total|fecha|tipoDocAdq|numDocAdq|hash...
+const TIPOS_CPE={"01":"factura","03":"boleta","07":"nota de crédito","08":"nota de débito"};
+function numQR(s){
+  s=String(s||"").trim().replace(/\s/g,""); if(!s)return 0;
+  if(/,\d{1,2}$/.test(s)&&!/\.\d{1,2}$/.test(s)) s=s.replace(/\./g,"").replace(",","."); // 1.234,50
+  else s=s.replace(/,/g,"");                                                              // 1,234.50
+  const n=parseFloat(s); return isFinite(n)?Math.round(n*100)/100:0;
+}
+function fechaQR(s){
+  s=String(s||"").trim(); let m;
+  if((m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/))) return `${m[1]}-${m[2].padStart(2,"0")}-${m[3].padStart(2,"0")}`;
+  if((m=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/))) return `${m[3]}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`;
+  if((m=s.match(/^(\d{4})(\d{2})(\d{2})$/))) return `${m[1]}-${m[2]}-${m[3]}`;
+  return "";
+}
+function parseQRSunat(texto,rucPropio){
+  const t=String(texto||"").trim().replace(/^﻿/,"");
+  const p=t.split("|").map(x=>x.trim());
+  if(p.length<7) return null;
+  const rucEmisor=p[0].replace(/\D/g,"");
+  if(!/^\d{11}$/.test(rucEmisor)) return null;
+  const tipo=p[1].padStart(2,"0"), serie=p[2].toUpperCase(), numero=p[3].replace(/^0+(?=\d)/,"");
+  const igv=numQR(p[4]), total=numQR(p[5]), fecha=fechaQR(p[6]);
+  if(!(total>0)||!serie) return null;
+  const tipoDocAdq=p[7]||"", numDocAdq=(p[8]||"").replace(/\s/g,"");
+  const esIngreso=rucEmisor===String(rucPropio||"");
+  return {rucEmisor,tipo,tipoNombre:TIPOS_CPE[tipo]||"comprobante",serie,numero,igv,total,fecha,tipoDocAdq,numDocAdq,
+    movimiento:esIngreso?"ingreso":"gasto",comprobante:tipo==="03"?"boleta":"factura",
+    rucTercero:esIngreso?(/^\d{8,11}$/.test(numDocAdq)?numDocAdq:""):rucEmisor};
+}
+/* QR-SUNAT-FIN */
+
+function aplicarQR(texto){
+  const q=parseQRSunat(texto,RUC_CBO);
+  if(!q){$("escMsg").textContent="Ese código no parece un QR de comprobante SUNAT. Intenta de nuevo.";return false}
+  cerrarEscaner();
+  fTipo=q.movimiento; fComp=q.movimiento==="ingreso"&&q.comprobante==="boleta"?"factura":q.comprobante;
+  $("monto").value=q.total.toFixed(2); $("nro").value=`${q.serie}-${q.numero}`; $("ruc").value=q.rucTercero;
+  const previo=q.rucTercero?terceros(fTipo).find(x=>x.ruc===q.rucTercero):null;
+  if(previo) $("desc").value=previo.desc;
+  if(q.fecha) $("fecha").value=q.fecha;
+  qrIgv={total:q.total,igv:q.igv};
+  if(!$("det").dataset.touched)$("det").checked=fTipo==="ingreso"&&q.total>700;
+  syncForm(); if(previo&&CATS[fTipo].includes(previo.cat))$("cat").value=previo.cat;
+  $("avisoQR").textContent=`QR leído: ${q.tipoNombre} ${q.serie}-${q.numero} por ${fmt(q.total)}${previo?" de "+previo.desc:""}. Revisa los datos y toca Guardar.`+(q.tipo==="07"?" Ojo: es una nota de crédito.":"");
+  $("avisoQR").hidden=false;
+  irPaso(previo?4:3);
+  return true;
+}
+let qrStream=null, qrDetector=null, qrTimer=null, qrJsQR=null;
+function cargarJsQR(){
+  // jsQR 1.4.0 no está publicado en cdnjs; se usa jsDelivr y, si falla, unpkg (misma versión exacta)
+  if(window.jsQR) return Promise.resolve(window.jsQR);
+  if(qrJsQR) return qrJsQR;
+  const urls=["https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js","https://unpkg.com/jsqr@1.4.0/dist/jsQR.js"];
+  qrJsQR=urls.reduce((pr,u)=>pr.catch(()=>new Promise((ok,mal)=>{const s=document.createElement("script");s.src=u;s.async=true;s.onload=()=>window.jsQR?ok(window.jsQR):mal();s.onerror=()=>{s.remove();mal()};document.head.appendChild(s)})),Promise.reject());
+  qrJsQR.catch(()=>{qrJsQR=null});
+  return qrJsQR;
+}
+async function prepararDetector(){
+  if(qrDetector) return qrDetector;
+  if("BarcodeDetector" in window){try{const f=await BarcodeDetector.getSupportedFormats();if(f.includes("qr_code")){const d=new BarcodeDetector({formats:["qr_code"]});qrDetector=async src=>{const r=await d.detect(src);return r[0]&&r[0].rawValue};return qrDetector}}catch{}}
+  const jsQR=await cargarJsQR();
+  const cv=$("qrCanvas"), cx=cv.getContext("2d",{willReadFrequently:true});
+  qrDetector=async src=>{const w=src.videoWidth||src.width, h=src.videoHeight||src.height; if(!w||!h)return null;
+    const k=Math.min(1,900/Math.max(w,h)); cv.width=Math.round(w*k); cv.height=Math.round(h*k); cx.drawImage(src,0,0,cv.width,cv.height);
+    const img=cx.getImageData(0,0,cv.width,cv.height); const r=jsQR(img.data,img.width,img.height,{inversionAttempts:"attemptBoth"}); return r&&r.data};
+  return qrDetector;
+}
+async function abrirEscaner(){
+  $("escaner").hidden=false; $("escMsg").textContent="Abriendo la cámara…";
+  let det; try{det=await prepararDetector()}catch{ $("escMsg").textContent="No se pudo cargar el lector de QR. Revisa tu internet.";return }
+  try{
+    if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia) throw new Error("sin cámara");
+    qrStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false});
+    if($("escaner").hidden){cerrarEscaner();return}
+    const v=$("video"); v.srcObject=qrStream; await v.play();
+    $("escMsg").textContent="Apunta al código QR del comprobante electrónico.";
+    const ciclo=async()=>{if($("escaner").hidden)return;try{const txt=await det(v);if(txt&&aplicarQR(txt))return}catch{}qrTimer=setTimeout(ciclo,180)};
+    ciclo();
+  }catch{ $("escMsg").textContent="No se pudo abrir la cámara. Toca «Elegir foto» y escoge una foto del QR." }
+}
+function cerrarEscaner(){
+  clearTimeout(qrTimer); if(qrStream){qrStream.getTracks().forEach(t=>t.stop());qrStream=null}
+  $("video").srcObject=null; $("escaner").hidden=true;
+}
+$("btnQR").onclick=abrirEscaner; $("escCerrar").onclick=cerrarEscaner;
+$("qrFoto").addEventListener("change",async e=>{
+  const f=e.target.files[0]; e.target.value=""; if(!f)return;
+  $("escMsg").textContent="Leyendo la foto…";
+  try{const det=await prepararDetector(); const img=await createImageBitmap(f); const txt=await det(img);
+    if(!txt){$("escMsg").textContent="No encontré un QR en esa foto. Prueba con una más cerca y nítida.";return}
+    aplicarQR(txt);
+  }catch{$("escMsg").textContent="No se pudo leer la foto."}
+});
+
+/* ===== Reporte del mes: Excel (CSV) y PDF ===== */
+function descargar(nombre,contenido,tipo){
+  const b=new Blob([contenido],{type:tipo}), u=URL.createObjectURL(b), a=document.createElement("a");
+  a.href=u; a.download=nombre; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),4000);
+}
+function reporteCSV(){
+  const lista=delMes(mes).slice().sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.tipo.localeCompare(b.tipo));
+  const S=sumas(lista), t=impuestos(mes);
+  const c=v=>{const s=v==null?"":String(v);return /[",;\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s};
+  const n=v=>(Math.round((v||0)*100)/100).toFixed(2);
+  const L=[["Casa Bonita Oregón S.A.C.","RUC 20614484153"],[`Reporte de ${lblMes(mes)}`],[],
+    ["Fecha","Tipo","Comprobante","Serie","Número","RUC / DNI","Cliente / proveedor","Categoría","Valor sin IGV","IGV","No gravado","Total","Detracción"]];
+  lista.forEach(r=>{const p=partes(r);L.push([r.fecha,r.tipo==="ingreso"?"Ingreso":"Gasto",COMP_TXT[r.comprobante||"ninguno"],r.serie||"",r.numero||"",r.ruc||"",r.desc||"",r.categoria||"",n(p.base),n(p.igv),n(p.noG),n(r.monto),r.detraccion?n(r.detMonto):""])});
+  L.push([],["Resumen"],["Ingresos",n(S.sI)],["Gastos",n(S.sG)],["Utilidad",n(S.sI-S.sG)],["IGV de ventas",n(t.deb)],["IGV de compras (crédito)",n(t.cred)],["IGV a pagar",n(t.igv)],["Renta 1%",n(t.renta)],["Total SUNAT",n(t.tot)],["Pagado con detracciones",n(t.usa)],["Pago en efectivo",n(t.efe)]);
+  descargar(`CBO-reporte-${mes}.csv`,"﻿"+L.map(f=>f.map(c).join(",")).join("\r\n"),"text/csv;charset=utf-8");
+  toast("Reporte en Excel descargado");
+}
+function reportePDF(){
+  const lista=delMes(mes).slice().sort((a,b)=>a.fecha.localeCompare(b.fecha));
+  const S=sumas(lista), t=impuestos(mes);
+  const tabla=arr=>arr.length?`<table><tr><th>Fecha</th><th>Comprobante</th><th>Cliente / proveedor</th><th>RUC / DNI</th><th>Categoría</th><th class="n">IGV</th><th class="n">Total</th></tr>`+
+    arr.map(r=>`<tr><td>${fechaCorta(r.fecha)}</td><td>${COMP_TXT[r.comprobante||"ninguno"]} ${esc([r.serie,r.numero].filter(Boolean).join("-"))}</td><td>${esc(r.desc||"")}</td><td>${esc(r.ruc||"")}</td><td>${esc(r.categoria||"")}</td><td class="n">${fmt(partes(r).igv)}</td><td class="n">${fmt(r.monto)}</td></tr>`).join("")+`</table>`:"<p>Sin registros.</p>";
+  $("reporte").innerHTML=`<div class="cab"><div><h1>Reporte de ${lblMes(mes)}</h1>Casa Bonita Oregón S.A.C. · RUC 20614484153</div><div style="text-align:right">Generado el ${fechaCorta(hoyISO)} ${hoyISO.slice(0,4)}<br>CBO Finanzas</div></div>
+    <h2>Resumen</h2><table class="res">
+    <tr><td>Ingresos</td><td class="n">${fmt(S.sI)}</td><td>IGV de ventas</td><td class="n">${fmt(t.deb)}</td></tr>
+    <tr><td>Gastos</td><td class="n">${fmt(S.sG)}</td><td>IGV de compras (crédito)</td><td class="n">${fmt(t.cred)}</td></tr>
+    <tr><td><b>Utilidad</b></td><td class="n"><b>${fmt(S.sI-S.sG)}</b></td><td>IGV a pagar + renta 1%</td><td class="n">${fmt(t.igv)} + ${fmt(t.renta)}</td></tr>
+    <tr><td>Planilla</td><td class="n">${fmt(S.sP)}</td><td><b>Total SUNAT</b> (efectivo ${fmt(t.efe)})</td><td class="n"><b>${fmt(t.tot)}</b></td></tr></table>
+    <h2>Ingresos (${S.ing.length})</h2>${tabla(S.ing)}<h2>Gastos (${S.gas.length})</h2>${tabla(S.gas)}
+    <p style="margin-top:12pt;font-size:8.5pt;color:#555">Cálculo referencial. Confírmalo con tu contador antes de declarar.</p>`;
+  setTimeout(()=>window.print(),50);
+}
+document.querySelectorAll(".repCsv").forEach(b=>b.addEventListener("click",()=>{cerrarOv("ovMas");reporteCSV()}));
+document.querySelectorAll(".repPdf").forEach(b=>b.addEventListener("click",()=>{cerrarOv("ovMas");reportePDF()}));
+
+/* ===== Bloqueo con PIN (opcional) ===== */
+const PIN_K="cbo-pin";
+async function hashPin(pin){
+  const d=new TextEncoder().encode("cbo-finanzas:"+pin);
+  const h=await crypto.subtle.digest("SHA-256",d);
+  return [...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+let pinBuf="", pinModo=null, pinNuevo="", pinOk=null, ocultoDesde=0;
+const PIN_LARGO=4;
+function pintarPuntos(){$("pinPuntos").innerHTML=Array.from({length:PIN_LARGO},(_,i)=>`<i class="${i<pinBuf.length?"on":""}"></i>`).join("")}
+$("teclado").innerHTML=["1","2","3","4","5","6","7","8","9","","0","⌫"].map(k=>k?`<button type="button" data-k="${k}" ${k==="⌫"?'aria-label="Borrar" class="sin"':""}>${k}</button>`:"<span></span>").join("");
+function abrirPin(modo,titulo){
+  pinModo=modo; pinBuf=""; $("pinTit").textContent=titulo; $("pinErr").textContent="";
+  $("pinOlvido").hidden=modo!=="desbloquear"; $("pinCancelar").hidden=modo==="desbloquear";
+  pintarPuntos(); $("bloqueo").hidden=false;
+  return new Promise(ok=>pinOk=ok);
+}
+function errorPin(t){$("pinErr").textContent=t;$("pinPuntos").classList.remove("mal");void $("pinPuntos").offsetWidth;$("pinPuntos").classList.add("mal");pinBuf="";pintarPuntos()}
+async function teclaPin(k){
+  if(k==="⌫"){pinBuf=pinBuf.slice(0,-1);pintarPuntos();return}
+  if(pinBuf.length>=PIN_LARGO)return;
+  pinBuf+=k; pintarPuntos();
+  if(pinBuf.length<PIN_LARGO)return;
+  const pin=pinBuf;
+  if(pinModo==="nuevo"){pinNuevo=pin;pinModo="confirmar";pinBuf="";$("pinTit").textContent="Repite tu nuevo PIN";setTimeout(pintarPuntos,120);return}
+  if(pinModo==="confirmar"){
+    if(pin!==pinNuevo){pinModo="nuevo";$("pinTit").textContent="Elige un PIN de 4 números";errorPin("No coinciden. Vuelve a intentarlo.");return}
+    guardarLS(PIN_K,await hashPin(pin)); cerrarPin(true); return}
+  const ok=(await hashPin(pin))===leerLS(PIN_K,"");
+  if(!ok){errorPin("PIN incorrecto");return}
+  cerrarPin(true);
+}
+function cerrarPin(res){$("bloqueo").hidden=true;pinBuf="";const f=pinOk;pinOk=null;if(f)f(res)}
+$("teclado").addEventListener("click",e=>{const b=e.target.closest("[data-k]");if(b)teclaPin(b.dataset.k)});
+document.addEventListener("keydown",e=>{if($("bloqueo").hidden)return;if(/^\d$/.test(e.key))teclaPin(e.key);else if(e.key==="Backspace")teclaPin("⌫")});
+$("pinCancelar").onclick=()=>cerrarPin(false);
+$("pinOlvido").onclick=()=>{
+  const c=prompt("Para quitar el PIN, escribe tu clave de acceso de Google (la del servidor):");
+  if(c==null)return;
+  if(cfg&&c.trim()===cfg.clave){try{localStorage.removeItem(PIN_K)}catch{}cerrarPin(true);pintarPinCfg();toast("PIN quitado")}
+  else errorPin("Esa no es tu clave de acceso.");
+};
+function pintarPinCfg(){
+  const activo=!!leerLS(PIN_K,"");
+  $("pinEstado").textContent=activo?"Activado":"Desactivado";
+  $("pinBotones").innerHTML=activo?`<button class="btnlink" type="button" id="pinCambiar">Cambiar PIN</button><button class="btnlink" type="button" id="pinQuitar">Quitar PIN</button><button class="btnlink" type="button" id="pinBloquear">Bloquear ahora</button>`
+    :`<button class="btn" type="button" id="pinActivar">Activar PIN</button>`;
+  const on=(id,fn)=>{const b=$(id);if(b)b.onclick=fn};
+  on("pinActivar",async()=>{if(await abrirPin("nuevo","Elige un PIN de 4 números")){pintarPinCfg();toast("PIN activado")}});
+  on("pinCambiar",async()=>{if(!await abrirPin("verificar","Escribe tu PIN actual"))return;if(await abrirPin("nuevo","Elige tu nuevo PIN")){pintarPinCfg();toast("PIN cambiado")}});
+  on("pinQuitar",async()=>{if(!await abrirPin("verificar","Escribe tu PIN para quitarlo"))return;try{localStorage.removeItem(PIN_K)}catch{}pintarPinCfg();toast("PIN quitado")});
+  on("pinBloquear",()=>abrirPin("desbloquear","Escribe tu PIN"));
+}
+if(!(window.crypto&&crypto.subtle)){$("pinMsg").textContent="Este navegador no permite el PIN (necesita https).";}
+pintarPinCfg();
+function bloquearSiHayPin(){if(leerLS(PIN_K,"")&&$("bloqueo").hidden)abrirPin("desbloquear","Escribe tu PIN")}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")ocultoDesde=Date.now();else if(ocultoDesde&&Date.now()-ocultoDesde>120000)bloquearSiHayPin()});
 
 /* ===== Conexión privada con tu Google Sheets ===== */
 const CFG_K="cbo-config", CACHE_K="cbo-cache";
@@ -729,11 +1319,17 @@ async function api(accion,extra,conf){
   if(!j.ok){const e=new Error(j.error||"Error");e.code=j.error;throw e}
   return j;
 }
+// Modo de prueba: solo cuando el enlace apunta a 127.0.0.1 (el simulador). Guarda en este equipo y no llama a Google.
+const esDemo=()=>!!(cfg&&/^https?:\/\/127\.0\.0\.1[:/]/.test(cfg.url||""));
+let versionServidor=1; // el Apps Script nuevo responde "version": 2 y entonces se usa la acción "editar"
 let cargando=false;
 async function cargar(){
-  if(!cfg||cargando)return; cargando=true; $("cargando").hidden=false;
+  if(!cfg||cargando)return;
+  if(esDemo()){$("status").textContent="Modo de prueba (simulador): los cambios se guardan solo en este equipo.";$("cfgEstado").textContent="Modo de prueba";return}
+  cargando=true; $("cargando").hidden=false;
   try{
     const j=await api("datos");
+    versionServidor=+j.version||1;
     rows=j.registros.filter(r=>typeof r.monto==="number"&&r.fecha);
     guardarLS(CACHE_K,rows); render();
     const h=new Date().toLocaleTimeString("es-PE",{hour:"2-digit",minute:"2-digit"});
@@ -743,10 +1339,27 @@ async function cargar(){
     else{$("status").textContent="Sin conexión. Mostrando los últimos datos guardados en este equipo.";$("cfgEstado").textContent="Sin conexión"}
   }finally{cargando=false;$("cargando").hidden=true}
 }
-store={
-  add:async r=>{$("cargando").hidden=false;try{await api("agregar",{registro:r})}finally{$("cargando").hidden=true}await cargar()},
-  remove:async id=>{await api("borrar",{id});rows=rows.filter(x=>x.id!==id);render();cargar()}
+const storeDemo={
+  add:async r=>{rows.push(Object.assign({id:"local"+Date.now().toString(36),creado:Date.now()},r));guardarLS(CACHE_K,rows);render()},
+  remove:async id=>{rows=rows.filter(x=>String(x.id)!==String(id));guardarLS(CACHE_K,rows);render()},
+  edit:async(id,r)=>{const i=rows.findIndex(x=>String(x.id)===String(id));if(i<0)throw new Error("No se encontró el registro");rows[i]=Object.assign({},rows[i],r);guardarLS(CACHE_K,rows);render()}
 };
+const storeGoogle={
+  add:async r=>{$("cargando").hidden=false;try{await api("agregar",{registro:r})}finally{$("cargando").hidden=true}await cargar()},
+  remove:async id=>{await api("borrar",{id});rows=rows.filter(x=>x.id!==id);render();cargar()},
+  // Editar: con el Apps Script nuevo usa "editar"; con el actual agrega el corregido y luego borra el anterior
+  // (en ese orden, para que si algo falla nunca se pierda el registro: a lo más queda duplicado).
+  edit:async(id,r)=>{
+    $("cargando").hidden=false;
+    try{
+      if(versionServidor>=2) await api("editar",{id,registro:r});
+      else{ await api("agregar",{registro:r});
+        try{await api("borrar",{id})}catch(e){await cargar();throw new Error("Se guardó el cambio pero no se pudo borrar el registro anterior; bórralo a mano")} }
+    }finally{$("cargando").hidden=true}
+    await cargar();
+  }
+};
+store={add:r=>(esDemo()?storeDemo:storeGoogle).add(r),remove:id=>(esDemo()?storeDemo:storeGoogle).remove(id),edit:(id,r)=>(esDemo()?storeDemo:storeGoogle).edit(id,r)};
 function abrirSetup(msg){$("setup").hidden=false;$("setupMsg").textContent=msg||"";if(cfg)$("cfgUrl").value=cfg.url||""}
 $("setupF").addEventListener("submit",async e=>{
   e.preventDefault();
@@ -765,6 +1378,7 @@ rows=leerLS(CACHE_K,[]);
 const inicial=(location.hash||"").slice(1); ir(TITULOS[inicial]?inicial:"inicio");
 render();
 if(!cfg) abrirSetup(""); else cargar();
+bloquearSiHayPin();
 if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))}
 </script>
 </body>
