@@ -1,7 +1,6 @@
 {
   "name": "CBO Finanzas",
   "short_name": "CBO Finanzas",
-  "id": "/cbo-finanzas/?app=cbo-finanzas-2",
   "description": "Finanzas de Casa Bonita Oregón S.A.C.",
   "start_url": "./",
   "scope": "./",
