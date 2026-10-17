@@ -1433,6 +1433,8 @@ $("fSun").addEventListener("submit",async e=>{
   if(!per){$("sMsg").textContent="Elige el mes que declaras.";return}
   if(!(monto>0)){$("sMsg").textContent="Escribe un monto mayor a 0.";return}
   if(!$("sFecha").value){$("sMsg").textContent="Elige la fecha de pago.";return}
+  // Con el Apps Script actual este pago entraría como COMPRA en el Registro de Compras: se bloquea hasta actualizarlo
+  if(!soportaExtra()){$("sMsg").textContent="Falta actualizar tu archivo de Google para guardar pagos a SUNAT sin que entren como compra. Aún no se guardó nada.";return}
   const r={tipo:"gasto",comprobante:"ninguno",monto,base:0,igv:0,noGravado:monto,ruc:RUC_SUNAT,serie:per,numero:$("sNro").value.trim(),
     estado:"PAGADO",desc:`SUNAT · ${sCon} · ${lblMes(per)}${sMedio==="detracciones"?" · con detracciones":""}`,categoria:CAT_SUN,fecha:$("sFecha").value,
     detraccion:false,detPct:0,detMonto:0};
