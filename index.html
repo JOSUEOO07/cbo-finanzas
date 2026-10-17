@@ -852,26 +852,29 @@ function rankHTML(lista,total,max,cls){
   if(!lista.length) return `<div class="empty" style="padding:10px">Sin registros en este periodo.</div>`;
   return lista.slice(0,max).map((x,i)=>`<div class="r"><span class="n">${i+1}</span><div class="who"><b style="font-weight:600">${esc(x.n)}</b><small>${x.ruc?esc(x.ruc)+" · ":""}${x.c} comprobante${x.c>1?"s":""}</small></div><div style="text-align:right"><span class="num ${cls}">${fmt(x.t)}</span><small class="hint" style="display:block">${total?Math.round(x.t/total*100):0}%</small></div></div>`).join("");
 }
+// Fecha propia de la empresa: se declara y paga el día 1 del mes siguiente (antes del plazo de SUNAT)
 function vencInfo(periodo){
-  const v=VENCE[periodo]; if(!v) return null;
+  const v=addMes(periodo,1)+"-01";
   const d=Math.round((new Date(v+"T12:00:00")-new Date(hoyISO+"T12:00:00"))/864e5);
-  return {fecha:v,dias:d};
+  return {fecha:v,dias:d,sunat:VENCE[periodo]||""};
 }
+// Utilidad = lo que queda en tu bolsillo: ingresos − todos los gastos (incluida planilla) − lo pagado a SUNAT (IGV + renta)
+const utilidad=(S,sunat)=>S.sI-S.sG-sunat;
 function render(){
   $("mesLbl").textContent=lblMes(mes);
   const lista=delMes(mes), S=sumas(lista), t=impuestos(mes);
   // KPIs
   $("kIn").textContent=fmt(S.sI); $("kInS").textContent=`${S.ing.length} registro${S.ing.length===1?"":"s"}`;
   $("kOut").textContent=fmt(S.sG); $("kOutS").textContent=`${S.gas.length} registro${S.gas.length===1?"":"s"}`;
-  $("kUt").textContent=fmt(S.sI-S.sG); $("kUt").className="v "+(S.sI-S.sG<0?"out":"in");
-  $("kUtS").textContent=`Después de impuestos: ${fmt(S.sI-S.sG-t.tot)}`;
+  const ut=utilidad(S,t.tot), vi=vencInfo(mes);
+  $("kUt").textContent=fmt(ut); $("kUt").className="v "+(ut<0?"out":"in");
+  $("kUtS").textContent=`Ya descontado gastos, planilla y SUNAT`;
   $("kSun").textContent=fmt(t.tot); $("kSunS").textContent=`IGV ${fmt(t.igv)} · Renta ${fmt(t.renta)}`;
   // Cifras grandes
-  const ut=S.sI-S.sG, vi=vencInfo(mes);
-  $("bigUtK").textContent=`Utilidad de ${MESES[+mes.slice(5)-1]}`;
+  $("bigUtK").textContent=`Utilidad de ${MESES[+mes.slice(5)-1]} · te queda`;
   $("bigUtV").innerHTML=`<small>S/</small>${(ut<0?"−":"")+Math.round(Math.abs(ut)).toLocaleString("es-PE")}`;
   $("bigUt").classList.toggle("neg",ut<0);
-  $("bigUtS").textContent=`Ingresos ${fmt0(S.sI)} − gastos ${fmt0(S.sG)} · después de impuestos ${fmt0(ut-t.tot)}`;
+  $("bigUtS").textContent=`Ingresos ${fmt0(S.sI)} − gastos y planilla ${fmt0(S.sG)} − SUNAT ${fmt0(t.tot)}`;
   $("bigSunV").innerHTML=`<small>S/</small>${Math.round(t.tot).toLocaleString("es-PE")}`;
   $("bigSunS").textContent=t.usa>0?`En efectivo ${fmt0(t.efe)} · detracciones cubren ${fmt0(t.usa)}`:`IGV ${fmt0(t.igv)} + renta ${fmt0(t.renta)}`;
   const fav=[];
@@ -880,12 +883,13 @@ function render(){
   if(t.saldoSig>0) fav.push(`IGV a favor para el siguiente mes: <b>${fmt(t.saldoSig)}</b>`);
   else if(t.igv>0) fav.push(`IGV a pagar <b>${fmt(t.igv)}</b> · sin saldo a favor`);
   $("bigSunF").innerHTML=fav.join("<br>"); $("bigSunF").hidden=!fav.length;
-  $("bigSunP").innerHTML=vi?(vi.dias<0?`<span class="pill gris">Venció el ${fechaCorta(vi.fecha)}</span>`:vi.dias===0?`<span class="pill mal">Vence hoy</span>`:`<span class="pill ${vi.dias<=5?"al":"ok"}">Vence el ${fechaCorta(vi.fecha)} · faltan ${vi.dias} días</span>`):"";
+  $("bigSunP").innerHTML=vi?(vi.dias<0?`<span class="pill gris">Venció el ${fechaCorta(vi.fecha)}</span>`:vi.dias===0?`<span class="pill mal">Vence hoy</span>`:`<span class="pill ${vi.dias<=5?"al":"ok"}">Pagar el ${fechaCorta(vi.fecha)} · faltan ${vi.dias} días</span>`):"";
   chart();
   // Próxima declaración (del mes elegido)
   $("vencBox").innerHTML=vi?`<div class="venc"><div class="dia"><div><b>${+vi.fecha.slice(8)}</b><small>${MESES[+vi.fecha.slice(5,7)-1].slice(0,3)}</small></div></div>
-    <div style="display:grid;gap:4px"><span>Declaras <b>${lblMes(mes)}</b></span>
+    <div style="display:grid;gap:4px"><span>Declaras y pagas <b>${lblMes(mes)}</b></span>
     <span class="num" style="font-size:1.1rem;font-weight:700">${fmt(t.tot)}</span>
+    ${vi.sunat?`<span class="hint">Plazo máximo de SUNAT: ${fechaCorta(vi.sunat)}</span>`:""}
     ${vi.dias<0?`<span class="pill gris">Venció hace ${-vi.dias} días</span>`:vi.dias===0?`<span class="pill mal">Vence hoy</span>`:vi.dias<=5?`<span class="pill al">Faltan ${vi.dias} días</span>`:`<span class="pill ok">Faltan ${vi.dias} días</span>`}</div></div>`
     :`<div class="empty" style="padding:10px">Sin fecha en el cronograma para ${lblMes(mes)}.</div>`;
   // Top clientes / proveedores
@@ -900,7 +904,7 @@ function render(){
   const anio=mes.slice(0,4), LA=sumas(rows.filter(r=>r.fecha.startsWith(anio)&&r.fecha.slice(0,7)<=mes));
   let sunatAnio=0; Object.entries(t.porMes).forEach(([m,x])=>{if(m.startsWith(anio))sunatAnio+=x.tot});
   $("anioLbl").textContent=`Enero a ${MESES[+mes.slice(5)-1]} ${anio}`;
-  $("anioKpis").innerHTML=[["Ventas",LA.sI,"in"],["Compras y gastos",LA.sG,"out"],["Utilidad",LA.sI-LA.sG,LA.sI-LA.sG<0?"out":"in"],["Impuestos",sunatAnio,""]].map(([k,v,c])=>`<div class="kpi" style="background:var(--bg)"><div class="k">${k}</div><div class="v ${c}">${fmt0(v)}</div></div>`).join("");
+  $("anioKpis").innerHTML=[["Ventas",LA.sI,"in"],["Compras y gastos",LA.sG,"out"],["Utilidad (te queda)",LA.sI-LA.sG-sunatAnio,LA.sI-LA.sG-sunatAnio<0?"out":"in"],["Impuestos",sunatAnio,""]].map(([k,v,c])=>`<div class="kpi" style="background:var(--bg)"><div class="k">${k}</div><div class="v ${c}">${fmt0(v)}</div></div>`).join("");
   const pctM=ajustes.meta>0?LA.sI/ajustes.meta*100:0;
   $("metaTxt").textContent=`Meta anual de ventas: ${fmt0(ajustes.meta)}`; $("metaPct").textContent=`${pctM.toFixed(1)}%`;
   $("metaBar").style.width=Math.min(100,pctM)+"%";
@@ -910,8 +914,8 @@ function render(){
 
   // Computadora: margen, comparación con el mes anterior y últimos movimientos
   const Sa=sumas(delMes(addMes(mes,-1)));
-  $("kMar").textContent=S.sI?Math.round((S.sI-S.sG)/S.sI*100)+" %":"—"; $("kMar").className="v "+(S.sI-S.sG<0?"out":"in");
-  $("kMarS").textContent=S.sI?`De cada S/ 100 vendidos te quedan S/ ${Math.max(0,Math.round((S.sI-S.sG)/S.sI*100))}`:"Sin ventas este mes";
+  $("kMar").textContent=S.sI?Math.round(ut/S.sI*100)+" %":"—"; $("kMar").className="v "+(ut<0?"out":"in");
+  $("kMarS").textContent=S.sI?`De cada S/ 100 vendidos te quedan S/ ${Math.max(0,Math.round(ut/S.sI*100))} en el bolsillo`:"Sin ventas este mes";
   const dI=Sa.sI?Math.round((S.sI-Sa.sI)/Sa.sI*100):null;
   $("kVs").innerHTML=dI==null?"—":`<span class="delta ${dI>=0?"up":"down"}">${dI>=0?"▲":"▼"} ${Math.abs(dI)} %</span>`;
   $("kVsS").textContent=`Ventas de ${MESES[+addMes(mes,-1).slice(5)-1].toLowerCase()}: ${fmt0(Sa.sI)}`;
@@ -923,7 +927,7 @@ function render(){
   const mA=MESES[+addMes(mes,-1).slice(5)-1], tA=t.porMes[addMes(mes,-1)]||{tot:0};
   $("dCmpTit").textContent=`Frente a ${mA.toLowerCase()}`;
   const dif=(a,b,inv)=>{if(!b)return "—";const p=Math.round((a-b)/Math.abs(b)*100);const bien=inv?p<=0:p>=0;return `<span class="delta ${bien?"up":"down"}">${p>=0?"▲":"▼"} ${Math.abs(p)} %</span>`};
-  $("dCmp").innerHTML=[["Ingresos",S.sI,Sa.sI,0],["Gastos",S.sG,Sa.sG,1],["Utilidad",S.sI-S.sG,Sa.sI-Sa.sG,0],["SUNAT",t.tot,tA.tot,1],["Planilla",S.sP,Sa.sP,1]]
+  $("dCmp").innerHTML=[["Ingresos",S.sI,Sa.sI,0],["Gastos",S.sG,Sa.sG,1],["Utilidad",ut,utilidad(Sa,tA.tot),0],["SUNAT",t.tot,tA.tot,1],["Planilla",S.sP,Sa.sP,1]]
     .map(([k,a,b,inv])=>`<div class="tl"><span>${k}</span><span style="display:flex;gap:12px;align-items:baseline"><span class="hint num">${fmt0(b)} →</span><b>${fmt0(a)}</b>${dif(a,b,inv)}</span></div>`).join("");
   const cc={factura:[0,0,0,0],boleta:[0,0,0,0],ninguno:[0,0,0,0]};
   lista.forEach(r=>{const k=r.comprobante||"ninguno",x=cc[k]||(cc[k]=[0,0,0,0]);if(r.tipo==="ingreso"){x[0]++;x[1]+=r.monto}else{x[2]++;x[3]+=r.monto}});
@@ -935,7 +939,7 @@ function render(){
   renderSunat(t); renderMov(); renderTerceros(); renderPlanilla(S); renderAnual(t);
 }
 function renderSunat(t){
-  $("declara").textContent=VENCE[mes]?`Vence el ${fechaCorta(VENCE[mes])}`:`Se declara en ${lblMes(addMes(mes,1))}`;
+  $("declara").textContent=`Pagas el ${fechaCorta(vencInfo(mes).fecha)}`+(VENCE[mes]?` · límite SUNAT ${fechaCorta(VENCE[mes])}`:"");
   $("tDeb").textContent=fmt(t.deb); $("tCred").textContent="− "+fmt(t.cred);
   $("rowSaldoAnt").hidden=!t.saldoAnt; $("tSaldoAnt").textContent="− "+fmt(t.saldoAnt);
   $("tIgv").textContent=fmt(t.igv);
@@ -950,10 +954,10 @@ function renderSunat(t){
   $("sinComp").textContent=`Tienes ${fmt(t.sinC)} en ventas sin comprobante este mes. No están en el cálculo, pero para SUNAT también son ventas gravadas; consulta con tu contador cómo regularizarlas.`;
   const tAll=impuestos(addMes(hoyISO.slice(0,7),0)>mes?hoyISO.slice(0,7):mes);
   const per=Object.keys(VENCE).filter(p=>p.startsWith("2026"));
-  $("calTabla").innerHTML=`<tr><th>Periodo</th><th>Vence</th><th>Monto</th><th>Estado</th></tr>`+per.map(p=>{
+  $("calTabla").innerHTML=`<tr><th>Periodo</th><th>Pagas el</th><th>Límite SUNAT</th><th>Monto</th><th>Estado</th></tr>`+per.map(p=>{
     const vi=vencInfo(p), x=tAll.porMes[p];
-    const est=vi.dias<0?`<span class="pill gris">Vencido</span>`:vi.dias<=5?`<span class="pill al">${vi.dias===0?"Hoy":"En "+vi.dias+" d"}</span>`:`<span class="pill ok">Pendiente</span>`;
-    return `<tr class="${p===mes?"hoy":""}"><td>${lblMes(p)}</td><td data-l="Vence">${fechaCorta(vi.fecha)}${vi.fecha.startsWith("2027")?" 2027":""}</td><td data-l="Monto">${x?fmt0(x.tot):"—"}</td><td data-l="Estado" style="font-family:var(--body)">${est}</td></tr>`}).join("");
+    const est=vi.dias<0?`<span class="pill gris">Pasó</span>`:vi.dias<=5?`<span class="pill al">${vi.dias===0?"Hoy":"En "+vi.dias+" d"}</span>`:`<span class="pill ok">Pendiente</span>`;
+    return `<tr class="${p===mes?"hoy":""}"><td>${lblMes(p)}</td><td data-l="Pagas el"><b>${fechaCorta(vi.fecha)}${vi.fecha.startsWith("2027")?" 2027":""}</b></td><td data-l="Límite SUNAT" class="hint">${vi.sunat?fechaCorta(vi.sunat)+(vi.sunat.startsWith("2027")?" 2027":""):"—"}</td><td data-l="Monto">${x?fmt0(x.tot):"—"}</td><td data-l="Estado" style="font-family:var(--body)">${est}</td></tr>`}).join("");
 }
 function renderMov(){
   const q=$("q").value.trim().toLowerCase();
@@ -1009,8 +1013,8 @@ function renderAnual(t){
   let tot={v:0,c:0,p:0,u:0,s:0}; let h=`<tr><th>Mes</th><th>Ventas</th><th>Compras y gastos</th><th>Planilla</th><th>Utilidad</th><th>SUNAT</th></tr>`;
   for(let i=1;i<=12;i++){
     const m=`${anio}-${pad(i)}`; const S=sumas(delMes(m)); const x=tAll.porMes[m]; const s=x?x.tot:0;
-    tot.v+=S.sI;tot.c+=S.sG-S.sP;tot.p+=S.sP;tot.u+=S.sI-S.sG;tot.s+=s;
-    h+=`<tr class="${m===mes?"hoy":""}"><td>${MESES[i-1]}</td><td data-l="Ventas">${fmt0(S.sI)}</td><td data-l="Compras">${fmt0(S.sG-S.sP)}</td><td data-l="Planilla">${fmt0(S.sP)}</td><td data-l="Utilidad" class="${S.sI-S.sG<0?"out":"in"}">${fmt0(S.sI-S.sG)}</td><td data-l="SUNAT">${fmt0(s)}</td></tr>`;
+    tot.v+=S.sI;tot.c+=S.sG-S.sP;tot.p+=S.sP;tot.u+=S.sI-S.sG-s;tot.s+=s;
+    h+=`<tr class="${m===mes?"hoy":""}"><td>${MESES[i-1]}</td><td data-l="Ventas">${fmt0(S.sI)}</td><td data-l="Compras">${fmt0(S.sG-S.sP)}</td><td data-l="Planilla">${fmt0(S.sP)}</td><td data-l="Utilidad" class="${S.sI-S.sG-s<0?"out":"in"}">${fmt0(S.sI-S.sG-s)}</td><td data-l="SUNAT">${fmt0(s)}</td></tr>`;
   }
   h+=`<tr class="total"><td>Total del año</td><td data-l="Ventas">${fmt0(tot.v)}</td><td data-l="Compras">${fmt0(tot.c)}</td><td data-l="Planilla">${fmt0(tot.p)}</td><td data-l="Utilidad" class="${tot.u<0?"out":"in"}">${fmt0(tot.u)}</td><td data-l="SUNAT">${fmt0(tot.s)}</td></tr>`;
   $("anualTabla").innerHTML=h;
@@ -1384,7 +1388,7 @@ function reporteCSV(){
   const L=[["Casa Bonita Oregón S.A.C.","RUC 20614484153"],[`Reporte de ${lblMes(mes)}`],[],
     ["Fecha","Tipo","Comprobante","Serie","Número","RUC / DNI","Cliente / proveedor","Categoría","Valor sin IGV","IGV","No gravado","Total","Detracción"]];
   lista.forEach(r=>{const p=partes(r);L.push([r.fecha,r.tipo==="ingreso"?"Ingreso":"Gasto",COMP_TXT[r.comprobante||"ninguno"],r.serie||"",r.numero||"",r.ruc||"",r.desc||"",r.categoria||"",n(p.base),n(p.igv),n(p.noG),n(r.monto),r.detraccion?n(r.detMonto):""])});
-  L.push([],["Resumen"],["Ingresos",n(S.sI)],["Gastos",n(S.sG)],["Utilidad",n(S.sI-S.sG)],["IGV de ventas",n(t.deb)],["IGV de compras (crédito)",n(t.cred)],["IGV a pagar",n(t.igv)],["Renta 1%",n(t.renta)],["Total SUNAT",n(t.tot)],["Pagado con detracciones",n(t.usa)],["Pago en efectivo",n(t.efe)]);
+  L.push([],["Resumen"],["Ingresos",n(S.sI)],["Gastos",n(S.sG)],["Utilidad (ya pagado SUNAT)",n(S.sI-S.sG-t.tot)],["IGV de ventas",n(t.deb)],["IGV de compras (crédito)",n(t.cred)],["IGV a pagar",n(t.igv)],["Renta 1%",n(t.renta)],["Total SUNAT",n(t.tot)],["Pagado con detracciones",n(t.usa)],["Pago en efectivo",n(t.efe)]);
   descargar(`CBO-reporte-${mes}.csv`,"﻿"+L.map(f=>f.map(c).join(",")).join("\r\n"),"text/csv;charset=utf-8");
   toast("Reporte en Excel descargado");
 }
@@ -1397,7 +1401,7 @@ function reportePDF(){
     <h2>Resumen</h2><table class="res">
     <tr><td>Ingresos</td><td class="n">${fmt(S.sI)}</td><td>IGV de ventas</td><td class="n">${fmt(t.deb)}</td></tr>
     <tr><td>Gastos</td><td class="n">${fmt(S.sG)}</td><td>IGV de compras (crédito)</td><td class="n">${fmt(t.cred)}</td></tr>
-    <tr><td><b>Utilidad</b></td><td class="n"><b>${fmt(S.sI-S.sG)}</b></td><td>IGV a pagar + renta 1%</td><td class="n">${fmt(t.igv)} + ${fmt(t.renta)}</td></tr>
+    <tr><td><b>Utilidad (te queda)</b></td><td class="n"><b>${fmt(S.sI-S.sG-t.tot)}</b></td><td>IGV a pagar + renta 1%</td><td class="n">${fmt(t.igv)} + ${fmt(t.renta)}</td></tr>
     <tr><td>Planilla</td><td class="n">${fmt(S.sP)}</td><td><b>Total SUNAT</b> (efectivo ${fmt(t.efe)})</td><td class="n"><b>${fmt(t.tot)}</b></td></tr></table>
     <h2>Ingresos (${S.ing.length})</h2>${tabla(S.ing)}<h2>Gastos (${S.gas.length})</h2>${tabla(S.gas)}
     <p style="margin-top:12pt;font-size:8.5pt;color:#555">Cálculo referencial. Confírmalo con tu contador antes de declarar.</p>`;
