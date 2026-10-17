@@ -278,6 +278,15 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
 .big.sun{background:var(--warn-bg);color:var(--warn)}
 .big .pill{justify-self:start;margin-top:4px}
 .kpi.dup{display:none}
+/* Pago a SUNAT */
+.pagosun-link{justify-self:start;margin-top:4px;text-align:left}
+.lbl-s{font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.opts-s{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.opts-s button{border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 8px;font-weight:600;font-size:.85rem;display:grid;gap:2px;text-align:center;min-height:52px;align-content:center}
+.opts-s button small{font-weight:500;font-size:.7rem;color:var(--muted)}
+.opts-s button[aria-pressed="true"]{border-color:var(--brand);background:var(--in-bg);color:var(--brand-2)}
+@media (max-width:520px){.opts-s{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tag.sun{background:var(--warn-bg);color:var(--warn)}
 /* Tarjetas que se tocan: Ingresos, Gastos y SUNAT llevan a su detalle */
 button.kpi,button.big{font:inherit;text-align:left;width:100%;-webkit-tap-highlight-color:transparent}
 button.big{border:0}
@@ -540,6 +549,7 @@ button.big{border:0}
               <div class="tl sub"><span>Se paga con tu cuenta de detracciones</span><span class="num" id="tDet"></span></div>
             </div>
             <div class="pay"><div><small>Pago en efectivo a SUNAT</small><b id="tEfe"></b></div><div style="text-align:right"><small>Saldo en Banco de la Nación</small><span class="num" id="tBN"></span></div></div>
+            <div class="line" style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap"><button class="btn" type="button" id="tPagar">🏛 Registrar pago a SUNAT</button><span class="hint" id="tPagado"></span></div>
             <div style="margin-top:14px;display:grid;gap:6px">
               <div class="tl" style="padding:0"><span class="hint">Ventas del año vs. límite de 300 UIT para pagar 1%</span><span class="num hint" id="tUitPct"></span></div>
               <div class="track"><i id="uitBar" style="width:0%"></i></div>
@@ -648,6 +658,7 @@ button.big{border:0}
         <button type="button" data-v="ingreso" aria-pressed="true">+ Ingreso / venta</button>
         <button type="button" data-v="gasto" aria-pressed="false">− Gasto / compra</button>
       </div>
+      <button type="button" class="btnlink pagosun-link" id="irPagoSun">🏛 ¿Pagaste a SUNAT (IGV, renta, multa)? Regístralo aquí ›</button>
       <label for="monto">Monto total (S/)</label>
       <div class="monto-fila">
         <div class="monto-big"><span>S/</span><input id="monto" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" aria-label="Monto total en soles"></div>
@@ -698,6 +709,43 @@ button.big{border:0}
   </form>
 </div>
 
+<!-- Pago a SUNAT: formulario propio, sin RUC ni comprobante -->
+<div class="overlay" id="ovSun" hidden>
+  <form class="sheet" id="fSun" novalidate>
+    <h3><span id="sunTit">Pago a SUNAT</span> <button type="button" class="x" data-cerrar aria-label="Cerrar">✕</button></h3>
+    <div class="row2">
+      <label>Mes que declaras<input id="sPer" type="month"></label>
+      <label>Fecha de pago<input id="sFecha" type="date"></label>
+    </div>
+    <div style="display:grid;gap:6px"><span class="lbl-s">Qué pagaste</span>
+      <div class="opts-s" id="sCon" role="group" aria-label="Concepto">
+        <button type="button" data-v="IGV + Renta" aria-pressed="true">IGV + renta<small>Declaración mensual</small></button>
+        <button type="button" data-v="IGV" aria-pressed="false">Solo IGV</button>
+        <button type="button" data-v="Renta 1%" aria-pressed="false">Solo renta 1%</button>
+        <button type="button" data-v="Planilla (ESSALUD / ONP)" aria-pressed="false">Planilla<small>ESSALUD / ONP</small></button>
+        <button type="button" data-v="Multa / intereses" aria-pressed="false">Multa o intereses</button>
+        <button type="button" data-v="Fraccionamiento" aria-pressed="false">Fraccionamiento</button>
+      </div>
+    </div>
+    <label for="sMonto">Monto pagado (S/)</label>
+    <div class="monto-big"><span>S/</span><input id="sMonto" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></div>
+    <p class="hint" id="sSug" style="margin:0"></p>
+    <div style="display:grid;gap:6px"><span class="lbl-s">Cómo pagaste</span>
+      <div class="seg" id="sMedio" role="group" aria-label="Medio de pago">
+        <button type="button" data-v="efectivo" aria-pressed="true">Efectivo / banco</button>
+        <button type="button" data-v="detracciones" aria-pressed="false">Con detracciones</button>
+      </div>
+    </div>
+    <label>N° de orden u operación (opcional)<input id="sNro" type="text" maxlength="20" inputmode="numeric" autocomplete="off" placeholder="Ej. 1234567890"></label>
+    <p class="hint" style="margin:0">No necesitas RUC ni comprobante. Este pago no se suma a tus gastos: la utilidad ya descuenta lo que debes a SUNAT.</p>
+    <p class="msg" id="sMsg"></p>
+    <div class="nav-pasos">
+      <button class="btn2" type="button" data-cerrar>Cancelar</button>
+      <button class="btn pri" type="submit" id="sGuardar">Guardar pago</button>
+    </div>
+  </form>
+</div>
+
 <!-- Barra inferior (celular) -->
 <nav class="tabbar" id="tabbar" aria-label="Secciones">
   <button type="button" data-tab="inicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Inicio</button>
@@ -717,6 +765,7 @@ button.big{border:0}
       <button type="button" data-ir="anual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Resumen anual<small>Mes a mes, todo el año</small></span></button>
       <button type="button" class="repCsv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>Reporte del mes en Excel<small>Archivo CSV para tu contador</small></span></button>
       <button type="button" class="repPdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></svg><span>Reporte del mes en PDF<small>Vista para imprimir o guardar</small></span></button>
+      <button type="button" id="masPagoSun"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 10l9-6 9 6M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/></svg><span>Registrar pago a SUNAT<small>IGV, renta, multas</small></span></button>
       <button type="button" data-ir="config"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg><span>Configuración<small>Tema, PIN, conexión</small></span></button>
     </div>
   </div>
@@ -784,6 +833,10 @@ const CATS={
   ingreso:["Venta de servicio","Servicio a todo costo","Solo mano de obra","Otros ingresos"],
   gasto:["Compra de materiales","Materiales de gasfitería","Materiales eléctricos","Herramientas y equipos","Planilla / jornales","Seguros","Servicios de terceros","Transporte y fletes","Combustible","Alquiler","Luz, agua, internet","Otros gastos"]
 };
+// Pagos a SUNAT: no son gasto (la utilidad ya descuenta lo que se debe); solo marcan el mes como pagado
+const CAT_SUN="Pago a SUNAT";
+const esPagoSun=r=>r.categoria===CAT_SUN;
+const pagadoSun=per=>rows.filter(r=>esPagoSun(r)&&r.serie===per&&!/Planilla|Multa|Fraccionamiento/.test(r.desc||"")).reduce((a,r)=>a+r.monto,0);
 // Cronograma SUNAT 2026, RUC terminado en 3 (periodo → fecha de vencimiento)
 const VENCE={"2025-12":"2026-01-21","2026-01":"2026-02-18","2026-02":"2026-03-18","2026-03":"2026-04-21","2026-04":"2026-05-20","2026-05":"2026-06-17","2026-06":"2026-07-17","2026-07":"2026-08-20","2026-08":"2026-09-17","2026-09":"2026-10-20","2026-10":"2026-11-18","2026-11":"2026-12-21","2026-12":"2027-01-20"};
 const MESES=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
@@ -836,7 +889,7 @@ function impuestos(hasta){
   out.porMes=porMes; return out;
 }
 function sumas(lista){
-  const ing=lista.filter(r=>r.tipo==="ingreso"), gas=lista.filter(r=>r.tipo==="gasto");
+  const ing=lista.filter(r=>r.tipo==="ingreso"), gas=lista.filter(r=>r.tipo==="gasto"&&!esPagoSun(r));
   const pla=gas.filter(r=>r.categoria==="Planilla / jornales");
   const s=a=>a.reduce((x,r)=>x+r.monto,0);
   return {ing,gas,pla,sI:s(ing),sG:s(gas),sP:s(pla)};
@@ -883,7 +936,8 @@ function render(){
   if(t.saldoSig>0) fav.push(`IGV a favor para el siguiente mes: <b>${fmt(t.saldoSig)}</b>`);
   else if(t.igv>0) fav.push(`IGV a pagar <b>${fmt(t.igv)}</b> · sin saldo a favor`);
   $("bigSunF").innerHTML=fav.join("<br>"); $("bigSunF").hidden=!fav.length;
-  $("bigSunP").innerHTML=vi?(vi.dias<0?`<span class="pill gris">Venció el ${fechaCorta(vi.fecha)}</span>`:vi.dias===0?`<span class="pill mal">Vence hoy</span>`:`<span class="pill ${vi.dias<=5?"al":"ok"}">Pagar el ${fechaCorta(vi.fecha)} · faltan ${vi.dias} días</span>`):"";
+  const pag=pagadoSun(mes), falta=r2(t.tot-pag);
+  $("bigSunP").innerHTML=t.tot>0&&falta<=0.5?`<span class="pill ok">✓ Pagado ${fmt0(pag)}</span>`:pag>0?`<span class="pill al">Pagaste ${fmt0(pag)} · falta ${fmt0(falta)}</span>`:vi?(vi.dias<0?`<span class="pill gris">Venció el ${fechaCorta(vi.fecha)}</span>`:vi.dias===0?`<span class="pill mal">Vence hoy</span>`:`<span class="pill ${vi.dias<=5?"al":"ok"}">Pagar el ${fechaCorta(vi.fecha)} · faltan ${vi.dias} días</span>`):"";
   chart();
   // Próxima declaración (del mes elegido)
   $("vencBox").innerHTML=vi?`<div class="venc"><div class="dia"><div><b>${+vi.fecha.slice(8)}</b><small>${MESES[+vi.fecha.slice(5,7)-1].slice(0,3)}</small></div></div>
@@ -945,6 +999,7 @@ function renderSunat(t){
   $("tIgv").textContent=fmt(t.igv);
   $("rowSaldoSig").hidden=!t.saldoSig; $("tSaldoSig").textContent=fmt(t.saldoSig);
   $("tRenta").textContent=fmt(t.renta); $("tTot").textContent=fmt(t.tot);
+  const pg=pagadoSun(mes); $("tPagado").textContent=pg>0?(pg>=t.tot-0.5?`✓ Ya pagaste ${fmt(pg)} de ${lblMes(mes)}`:`Pagaste ${fmt(pg)} · falta ${fmt(t.tot-pg)}`):`Aún no registras el pago de ${lblMes(mes)}`;
   $("tDet").textContent="− "+fmt(t.usa); $("tEfe").textContent=fmt(t.efe); $("tBN").textContent=fmt(t.bn);
   const anio=mes.slice(0,4);
   const ventasAnio=rows.filter(r=>r.tipo==="ingreso"&&r.fecha.startsWith(anio)&&r.fecha.slice(0,7)<=mes).reduce((a,r)=>a+neto(r),0);
@@ -956,7 +1011,8 @@ function renderSunat(t){
   const per=Object.keys(VENCE).filter(p=>p.startsWith("2026"));
   $("calTabla").innerHTML=`<tr><th>Periodo</th><th>Pagas el</th><th>Límite SUNAT</th><th>Monto</th><th>Estado</th></tr>`+per.map(p=>{
     const vi=vencInfo(p), x=tAll.porMes[p];
-    const est=vi.dias<0?`<span class="pill gris">Pasó</span>`:vi.dias<=5?`<span class="pill al">${vi.dias===0?"Hoy":"En "+vi.dias+" d"}</span>`:`<span class="pill ok">Pendiente</span>`;
+    const pg=pagadoSun(p), tt=x?x.tot:0;
+    const est=pg>0&&pg>=tt-0.5?`<span class="pill ok">✓ Pagado</span>`:pg>0?`<span class="pill al">Falta ${fmt0(tt-pg)}</span>`:vi.dias<0?`<span class="pill gris">Pasó</span>`:vi.dias<=5?`<span class="pill al">${vi.dias===0?"Hoy":"En "+vi.dias+" d"}</span>`:`<span class="pill ok">Pendiente</span>`;
     return `<tr class="${p===mes?"hoy":""}"><td>${lblMes(p)}</td><td data-l="Pagas el"><b>${fechaCorta(vi.fecha)}${vi.fecha.startsWith("2027")?" 2027":""}</b></td><td data-l="Límite SUNAT" class="hint">${vi.sunat?fechaCorta(vi.sunat)+(vi.sunat.startsWith("2027")?" 2027":""):"—"}</td><td data-l="Monto">${x?fmt0(x.tot):"—"}</td><td data-l="Estado" style="font-family:var(--body)">${est}</td></tr>`}).join("");
 }
 function renderMov(){
@@ -973,7 +1029,7 @@ function filaMov(r){
   const compTxt={factura:"Factura",boleta:"Boleta",ninguno:"Sin comprobante"};
   const c=r.tipo==="ingreso"?"in":"out"; const [y,m,d]=r.fecha.split("-");
   return `<div class="item tap" role="button" tabindex="0" data-id="${esc(r.id)}" aria-label="Ver ${esc(r.desc||r.categoria)}, ${fmt(r.monto)}"><div class="ic ${c}"><span class="${c}">${c==="in"?"+":"−"}</span></div>
-    <div class="desc"><b>${esc(r.desc||r.categoria)}</b><small><span>${esc(r.categoria)}</span><span>${d}/${m}/${y}</span><span class="tag">${compTxt[r.comprobante||"ninguno"]}${r.serie?" "+esc(r.serie)+"-"+esc(r.numero):""}</span>${r.detraccion?`<span class="tag det">Detracción ${fmt(r.detMonto||0)}</span>`:""}</small></div>
+    <div class="desc"><b>${esc(r.desc||r.categoria)}</b><small><span>${esc(r.categoria)}</span><span>${d}/${m}/${y}</span>${esPagoSun(r)?`<span class="tag sun">Pago SUNAT${r.numero?" · orden "+esc(r.numero):""}</span>`:`<span class="tag">${compTxt[r.comprobante||"ninguno"]}${r.serie?" "+esc(r.serie)+"-"+esc(r.numero):""}</span>`}${r.detraccion?`<span class="tag det">Detracción ${fmt(r.detMonto||0)}</span>`:""}</small></div>
     <div class="amt ${c}">${c==="in"?"+":"−"} ${fmt(r.monto)}</div>
     <span class="chev" aria-hidden="true">›</span></div>`;
 }
@@ -987,7 +1043,7 @@ function resumenMov(vis,q){
     +fila("Diferencia",fmt(S.sI-S.sG),S.sI-S.sG<0?"out":"in")+fila("IGV de ventas",fmt(igvV))+fila("IGV de compras (crédito)",fmt(igvC))
     +fila("Promedio por registro",vis.length?fmt((S.sI+S.sG)/vis.length):"—");
   const comp={factura:[0,0],boleta:[0,0],ninguno:[0,0]};
-  vis.forEach(r=>{const k=r.comprobante||"ninguno";(comp[k]=comp[k]||[0,0]);comp[k][0]++;comp[k][1]+=r.monto});
+  vis.filter(r=>!esPagoSun(r)).forEach(r=>{const k=r.comprobante||"ninguno";(comp[k]=comp[k]||[0,0]);comp[k][0]++;comp[k][1]+=r.monto});
   $("movComp").innerHTML=[["factura","Factura"],["boleta","Boleta"],["ninguno","Sin comprobante"]].map(([k,n])=>fila(`${n} (${comp[k][0]})`,fmt(comp[k][1]))).join("");
   const cat={}; vis.forEach(r=>{cat[r.categoria||"Otros"]=(cat[r.categoria||"Otros"]||0)+r.monto});
   const lc=Object.entries(cat).sort((a,b)=>b[1]-a[1]).slice(0,8), mx=lc.length?lc[0][1]:1;
@@ -1108,8 +1164,8 @@ matchMedia("(min-width:1100px)").addEventListener("change",()=>chart());
   $(id).addEventListener("click",e=>{const it=e.target.closest(".item.tap");if(it)abrirMov(it.dataset.id)});
   $(id).addEventListener("keydown",e=>{const it=e.target.closest(".item.tap");if(it&&(e.key==="Enter"||e.key===" ")){e.preventDefault();abrirMov(it.dataset.id)}});
 });
-$("movEditar").onclick=()=>{const r=movSel;cerrarOv("ovMov");openF({modo:"editar",r})};
-$("movDup").onclick=()=>{const r=movSel;cerrarOv("ovMov");openF({modo:"duplicar",r})};
+$("movEditar").onclick=()=>{const r=movSel;cerrarOv("ovMov");if(esPagoSun(r))abrirPagoSun(r);else openF({modo:"editar",r})};
+$("movDup").onclick=()=>{const r=movSel;cerrarOv("ovMov");if(esPagoSun(r))abrirPagoSun();else openF({modo:"duplicar",r})};
 $("movBorrar").onclick=async()=>{
   const b=$("movBorrar"), r=movSel; if(!r)return;
   if(!b.classList.contains("confirm")){b.classList.add("confirm");b.querySelector("span").textContent="¿Seguro?";setTimeout(()=>{b.classList.remove("confirm");b.querySelector("span").textContent="Borrar"},3500);return}
@@ -1275,6 +1331,55 @@ $("f").addEventListener("submit",async e=>{
     toast(modo==="editar"?"Cambios guardados":"Movimiento registrado");
   }catch(err){$("msg").textContent="No se pudo guardar"+(err&&err.message&&err.code!=="clave"?": "+err.message:". Revisa tu internet e intenta de nuevo.")}
   finally{$("btnSig").disabled=false}
+});
+
+/* ===== Pago a SUNAT =====
+   Se guarda como movimiento con categoría "Pago a SUNAT": serie = mes declarado (AAAA-MM), número = N° de orden.
+   No entra en gastos ni en la utilidad (la utilidad ya descuenta lo que se debe a SUNAT); sirve para marcar el mes como pagado. */
+const RUC_SUNAT="20131312955";
+let sCon="IGV + Renta", sMedio="efectivo", sEditId=null;
+function sugerirSun(){
+  const per=$("sPer").value; if(!per){$("sSug").textContent="";return}
+  const x=impuestos(per>hoyISO.slice(0,7)?per:hoyISO.slice(0,7)).porMes[per];
+  const v=x?{"IGV + Renta":x.tot,"IGV":x.igv,"Renta 1%":x.renta}[sCon]:null;
+  $("sSug").innerHTML=v!=null?`Según la app, por ${lblMes(per)} te toca <b>${fmt(v)}</b>. <button type="button" class="btnlink" id="sUsar">Usar este monto</button>`:"";
+  const b=$("sUsar"); if(b) b.onclick=()=>{$("sMonto").value=v.toFixed(2)};
+}
+function abrirPagoSun(r){
+  closeF(); cerrarOv("ovMov"); sEditId=r?r.id:null;
+  const per=r?r.serie:(mes<hoyISO.slice(0,7)?mes:addMes(hoyISO.slice(0,7),-1));
+  $("sPer").value=per; $("sFecha").value=r?r.fecha:hoyISO;
+  sCon=r?((r.desc||"").split(" · ")[1]||"IGV + Renta"):"IGV + Renta";
+  sMedio=r&&/detracciones/.test(r.desc||"")?"detracciones":"efectivo";
+  $("sMonto").value=""; $("sNro").value=r?(r.numero||""):""; $("sMsg").textContent="";
+  $("sunTit").textContent=r?"Editar pago a SUNAT":"Pago a SUNAT";
+  seg("sCon",sCon); seg("sMedio",sMedio); sugerirSun();
+  if(r) $("sMonto").value=String(r.monto);
+  else{const x=impuestos(per>hoyISO.slice(0,7)?per:hoyISO.slice(0,7)).porMes[per];const falta=x?r2(x.tot-pagadoSun(per)):0;if(falta>0)$("sMonto").value=falta.toFixed(2)}
+  $("ovSun").hidden=false;
+}
+$("irPagoSun").onclick=()=>abrirPagoSun();
+$("tPagar").onclick=()=>abrirPagoSun();
+$("masPagoSun").onclick=()=>{cerrarOv("ovMas");abrirPagoSun()};
+$("sCon").onclick=e=>{const b=e.target.closest("button");if(b){sCon=b.dataset.v;seg("sCon",sCon);sugerirSun()}};
+$("sMedio").onclick=e=>{const b=e.target.closest("button");if(b){sMedio=b.dataset.v;seg("sMedio",sMedio)}};
+$("sPer").addEventListener("change",sugerirSun);
+$("fSun").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const per=$("sPer").value, monto=r2(parseFloat(String($("sMonto").value).replace(/,/g,"").replace(/[^\d.]/g,""))||0);
+  if(!per){$("sMsg").textContent="Elige el mes que declaras.";return}
+  if(!(monto>0)){$("sMsg").textContent="Escribe un monto mayor a 0.";return}
+  if(!$("sFecha").value){$("sMsg").textContent="Elige la fecha de pago.";return}
+  const r={tipo:"gasto",comprobante:"ninguno",monto,base:0,igv:0,noGravado:monto,ruc:RUC_SUNAT,serie:per,numero:$("sNro").value.trim(),
+    estado:"PAGADO",desc:`SUNAT · ${sCon} · ${lblMes(per)}${sMedio==="detracciones"?" · con detracciones":""}`,categoria:CAT_SUN,fecha:$("sFecha").value,
+    detraccion:false,detPct:0,detMonto:0};
+  $("sMsg").textContent="Guardando…"; $("sGuardar").disabled=true;
+  const editando=!!sEditId;
+  try{
+    if(editando) await store.edit(sEditId,r); else await store.add(r);
+    $("ovSun").hidden=true; render(); toast(editando?"Pago actualizado":"Pago a SUNAT registrado");
+  }catch(err){$("sMsg").textContent="No se pudo guardar. Revisa tu internet e intenta de nuevo."}
+  finally{$("sGuardar").disabled=false}
 });
 
 /* ===== QR SUNAT ===== */
