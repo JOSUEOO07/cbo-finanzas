@@ -777,6 +777,10 @@ button.big{border:0}
       </div>
       <label>RUC / DNI (opcional)<input id="ruc" type="text" inputmode="numeric" maxlength="11" autocomplete="off"></label>
       <p class="hint" style="margin:0" id="hintCli">Escribe y elige de tus clientes ya registrados: el RUC se llena solo.</p>
+      <div class="ac-wrap" id="obraWrap">
+        <label>Obra (opcional, solo para ti)<input id="obra" type="text" maxlength="60" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="sugObra" aria-expanded="false" placeholder="Ej. Vivienda multifamiliar Barranco"></label>
+        <div class="sug" id="sugObra" role="listbox" hidden></div>
+      </div>
     </div>
 
     <div class="paso" data-paso="4" hidden>
@@ -786,7 +790,6 @@ button.big{border:0}
       </div>
       <div class="chips-fecha"><button type="button" class="chip" data-d="0">Hoy</button><button type="button" class="chip" data-d="-1">Ayer</button></div>
       <div id="extraBox" style="display:grid;gap:10px">
-        <label>Obra (opcional)<input id="obra" type="text" list="obrasDL" maxlength="60" autocomplete="off" placeholder="Ej. Edificio Venti – Miraflores"></label>
         <datalist id="obrasDL"></datalist>
         <div class="foto-fila">
           <button type="button" class="btn2" id="btnFoto">📷 Foto del comprobante</button>
@@ -795,7 +798,7 @@ button.big{border:0}
           <button type="button" class="btnlink" id="fotoQuitar" hidden>Quitar foto</button>
         </div>
       </div>
-      <p class="aviso-g" id="extraAviso" hidden>Para guardar <b>obra</b> y <b>foto</b>, falta actualizar tu archivo de Google (te guío, 5 minutos).</p>
+      <p class="aviso-g" id="extraAviso" hidden>Para guardar la <b>foto</b>, falta actualizar tu archivo de Google (te guío, 5 minutos).</p>
       <div class="resumen" id="resumen"></div>
     </div>
 
@@ -1320,7 +1323,7 @@ function syncForm(){
   const showDet=fTipo==="ingreso"&&fComp==="factura"; $("detBox").hidden=!showDet;
   const on=showDet&&$("det").checked; $("detRow").hidden=!on; $("detAmt").hidden=!on;
   if(on){$("detAmt").innerHTML=`<span>Va a tu cuenta del Banco de la Nación</span><span class="num">${fmt(Math.round(m*$("detPct").value/100))}</span>`}
-  const ext=soportaExtra(); $("extraBox").hidden=!ext; $("extraAviso").hidden=ext;
+  const ext=soportaExtra(); $("extraBox").hidden=!ext; $("extraAviso").hidden=ext; $("obraWrap").hidden=!ext;
   if(paso===4) pintarResumen();
 }
 function pintarResumen(){
@@ -1328,7 +1331,8 @@ function pintarResumen(){
   const fila=(k,v,p)=>`<div class="tl"><span>${k}</span><span style="display:flex;min-width:0"><b>${v}</b><button type="button" data-ir-paso="${p}">Cambiar</button></span></div>`;
   $("resumen").innerHTML=fila(fTipo==="ingreso"?"Ingreso":"Gasto",`<span class="num">${fmt(m)}</span>`,1)
     +fila("Comprobante",esc(COMP_TXT[fComp]+($("nro").value.trim()&&fComp!=="ninguno"?" "+$("nro").value.trim():"")),2)
-    +fila(fTipo==="ingreso"?"Cliente":"Proveedor",esc($("desc").value.trim()||"—"),3);
+    +fila(fTipo==="ingreso"?"Cliente":"Proveedor",esc($("desc").value.trim()||"—"),3)
+    +(soportaExtra()?fila("Obra",esc($("obra").value.trim()||"Sin obra"),3):"");
 }
 $("resumen").addEventListener("click",e=>{const b=e.target.closest("[data-ir-paso]");if(b)irPaso(+b.dataset.irPaso)});
 function irPaso(n){
@@ -1359,7 +1363,7 @@ document.querySelectorAll(".chips-fecha .chip").forEach(b=>b.onclick=()=>{const 
 function terceros(tipo){
   const g={};
   rows.forEach(r=>{if(!r.desc)return;const k=r.desc.trim().toUpperCase();const x=g[k]||(g[k]={desc:r.desc.trim(),ruc:"",tipo:r.tipo,cat:r.categoria,n:0,ult:""});
-    x.n++; if(r.ruc&&!x.ruc)x.ruc=String(r.ruc); if(r.fecha>=x.ult){x.ult=r.fecha;x.cat=r.categoria;x.tipo=r.tipo;if(r.ruc)x.ruc=String(r.ruc)}});
+    x.n++; if(r.ruc&&!x.ruc)x.ruc=String(r.ruc); if(r.fecha>=x.ult){x.ult=r.fecha;x.cat=r.categoria;x.tipo=r.tipo;if(r.ruc)x.ruc=String(r.ruc)} if(r.obra&&r.fecha>=(x.obraF||"")){x.obra=r.obra;x.obraF=r.fecha}});
   return Object.values(g).sort((a,b)=>(b.tipo===tipo)-(a.tipo===tipo)||b.n-a.n);
 }
 const sinTildes=s=>String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
@@ -1373,7 +1377,7 @@ function mostrarSug(){
   $("sug").hidden=false; $("desc").setAttribute("aria-expanded","true");
 }
 function ocultarSug(){$("sug").hidden=true;$("desc").setAttribute("aria-expanded","false")}
-function elegirSug(i){const x=sugLista[i];if(!x)return;$("desc").value=x.desc;if(x.ruc)$("ruc").value=x.ruc;if(CATS[fTipo].includes(x.cat))$("cat").value=x.cat;ocultarSug();syncForm()}
+function elegirSug(i){const x=sugLista[i];if(!x)return;$("desc").value=x.desc;if(x.ruc)$("ruc").value=x.ruc;if(x.obra&&!$("obra").value.trim())$("obra").value=x.obra;if(CATS[fTipo].includes(x.cat))$("cat").value=x.cat;ocultarSug();syncForm()}
 $("desc").addEventListener("input",mostrarSug);
 $("desc").addEventListener("focus",mostrarSug);
 $("desc").addEventListener("blur",()=>setTimeout(ocultarSug,150));
@@ -1385,6 +1389,35 @@ $("desc").addEventListener("keydown",e=>{
 });
 $("sug").addEventListener("mousedown",e=>e.preventDefault());
 $("sug").addEventListener("click",e=>{const b=e.target.closest("[data-i]");if(b)elegirSug(+b.dataset.i)});
+
+/* Autocompletado de obras: al escribir "vi" aparece "Vivienda multifamiliar Barranco" */
+let sugObras=[], sugObraSel=-1;
+function obrasConocidas(){
+  const g={};
+  rows.forEach(r=>{const n=(r.obra||"").trim();if(!n)return;const k=n.toUpperCase();const x=g[k]||(g[k]={n,c:0,ult:""});x.c++;if(r.fecha>x.ult){x.ult=r.fecha;x.n=n}});
+  return Object.values(g).sort((a,b)=>b.ult.localeCompare(a.ult));
+}
+function mostrarSugObra(){
+  const q=sinTildes($("obra").value.trim());
+  sugObras=obrasConocidas().filter(x=>!q||sinTildes(x.n).split(/\s+/).some(w=>w.startsWith(q))||sinTildes(x.n).includes(q)).filter(x=>x.n.toUpperCase()!==$("obra").value.trim().toUpperCase()).slice(0,6);
+  sugObraSel=-1;
+  if(!sugObras.length){ocultarSugObra();return}
+  $("sugObra").innerHTML=sugObras.map((x,i)=>`<button type="button" role="option" data-i="${i}">${esc(x.n)}<small>${x.c} comprobante${x.c===1?"":"s"} · último ${fechaCorta(x.ult)}</small></button>`).join("");
+  $("sugObra").hidden=false; $("obra").setAttribute("aria-expanded","true");
+}
+function ocultarSugObra(){$("sugObra").hidden=true;$("obra").setAttribute("aria-expanded","false")}
+function elegirSugObra(i){const x=sugObras[i];if(!x)return;$("obra").value=x.n;ocultarSugObra();syncForm()}
+$("obra").addEventListener("input",mostrarSugObra);
+$("obra").addEventListener("focus",mostrarSugObra);
+$("obra").addEventListener("blur",()=>setTimeout(ocultarSugObra,150));
+$("obra").addEventListener("keydown",e=>{
+  if($("sugObra").hidden)return;
+  if(e.key==="ArrowDown"||e.key==="ArrowUp"){e.preventDefault();sugObraSel=(sugObraSel+(e.key==="ArrowDown"?1:-1)+sugObras.length)%sugObras.length;$("sugObra").querySelectorAll("button").forEach((b,i)=>b.classList.toggle("sel",i===sugObraSel))}
+  else if((e.key==="Enter"||e.key==="Tab")&&sugObraSel>=0){e.preventDefault();elegirSugObra(sugObraSel)}
+  else if(e.key==="Escape"){e.stopPropagation();ocultarSugObra()}
+});
+$("sugObra").addEventListener("mousedown",e=>e.preventDefault());
+$("sugObra").addEventListener("click",e=>{const b=e.target.closest("[data-i]");if(b)elegirSugObra(+b.dataset.i)});
 // Si escribe un RUC conocido y aún no hay nombre, se completa el nombre
 $("ruc").addEventListener("input",()=>{const v=$("ruc").value.trim();if(v.length<8||$("desc").value.trim())return;const x=terceros(fTipo).find(t=>t.ruc===v);if(x){$("desc").value=x.desc;if(CATS[fTipo].includes(x.cat))$("cat").value=x.cat}});
 
