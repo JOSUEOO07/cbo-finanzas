@@ -343,6 +343,9 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
 .opts-s button[aria-pressed="true"]{border-color:var(--brand);background:var(--in-bg);color:var(--brand-2)}
 @media (max-width:520px){.opts-s{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .tag.sun{background:var(--warn-bg);color:var(--warn)}
+.ruc-info{margin:-4px 0 0;font-size:.82rem;color:var(--muted)}.ruc-info.ok{color:var(--in);font-weight:600}.ruc-info.mal{color:var(--out);font-weight:600}
+.tag.pend{background:var(--warn-bg);color:var(--warn);font-weight:700}
+.cola-aviso{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.cola-aviso[hidden]{display:none}
 /* Tarjetas que se tocan: Ingresos, Gastos y SUNAT llevan a su detalle */
 button.kpi,button.big{font:inherit;text-align:left;width:100%;-webkit-tap-highlight-color:transparent}
 button.big{border:0}
@@ -521,6 +524,7 @@ button.big{border:0}
     </header>
 
     <main class="content">
+      <p class="aviso-g cola-aviso" id="colaAviso" hidden></p>
       <!-- INICIO -->
       <section data-sec="inicio">
         <div style="display:grid;gap:16px">
@@ -776,6 +780,7 @@ button.big{border:0}
         <div class="sug" id="sug" role="listbox" hidden></div>
       </div>
       <label>RUC / DNI (opcional)<input id="ruc" type="text" inputmode="numeric" maxlength="11" autocomplete="off"></label>
+      <p class="ruc-info" id="rucInfo" hidden></p>
       <p class="hint" style="margin:0" id="hintCli">Escribe y elige de tus clientes ya registrados: el RUC se llena solo.</p>
       <div class="ac-wrap" id="obraWrap">
         <label>Obra (opcional, solo para ti)<input id="obra" type="text" maxlength="60" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="sugObra" aria-expanded="false" placeholder="Ej. Vivienda multifamiliar Barranco"></label>
@@ -1134,7 +1139,7 @@ function filaMov(r,acc){
   const compTxt={factura:"Factura",boleta:"Boleta",ninguno:"Sin comprobante"};
   const c=r.tipo==="ingreso"?"in":"out"; const [y,m,d]=r.fecha.split("-");
   const html=`<div class="item tap" role="button" tabindex="0" data-id="${esc(r.id)}" aria-label="Ver ${esc(r.desc||r.categoria)}, ${fmt(r.monto)}"><div class="ic ${c}"><span class="${c}">${c==="in"?"+":"−"}</span></div>
-    <div class="desc"><b>${esc(r.desc||r.categoria)}</b><small><span>${esc(r.categoria)}</span><span>${d}/${m}/${y}</span>${esPagoSun(r)?`<span class="tag sun">Pago SUNAT${r.numero?" · orden "+esc(r.numero):""}</span>`:`<span class="tag">${compTxt[r.comprobante||"ninguno"]}${r.serie?" "+esc(r.serie)+"-"+esc(r.numero):""}</span>`}${r.detraccion?`<span class="tag det">Detracción ${fmt(r.detMonto||0)}</span>`:""}</small></div>
+    <div class="desc"><b>${esc(r.desc||r.categoria)}</b><small><span>${esc(r.categoria)}</span><span>${d}/${m}/${y}</span>${r.pendiente?`<span class="tag pend">⏳ Por enviar</span>`:""}${esPagoSun(r)?`<span class="tag sun">Pago SUNAT${r.numero?" · orden "+esc(r.numero):""}</span>`:`<span class="tag">${compTxt[r.comprobante||"ninguno"]}${r.serie?" "+esc(r.serie)+"-"+esc(r.numero):""}</span>`}${r.detraccion?`<span class="tag det">Detracción ${fmt(r.detMonto||0)}</span>`:""}</small></div>
     <div class="amt ${c}">${c==="in"?"+":"−"} ${fmt(r.monto)}</div>
     <span class="chev" aria-hidden="true">›</span></div>`;
   return acc?`<div class="swipe" data-id="${esc(r.id)}"><div class="acc"><button type="button" data-a="editar">✎<span>Editar</span></button><button type="button" data-a="repetir">↻<span>Repetir</span></button><button type="button" data-a="borrar">🗑<span>Borrar</span></button></div>${html}</div>`:html;
@@ -1419,11 +1424,34 @@ $("obra").addEventListener("keydown",e=>{
 $("sugObra").addEventListener("mousedown",e=>e.preventDefault());
 $("sugObra").addEventListener("click",e=>{const b=e.target.closest("[data-i]");if(b)elegirSugObra(+b.dataset.i)});
 // Si escribe un RUC conocido y aún no hay nombre, se completa el nombre
-$("ruc").addEventListener("input",()=>{const v=$("ruc").value.trim();if(v.length<8||$("desc").value.trim())return;const x=terceros(fTipo).find(t=>t.ruc===v);if(x){$("desc").value=x.desc;if(CATS[fTipo].includes(x.cat))$("cat").value=x.cat}});
+$("ruc").addEventListener("input",()=>{const v=$("ruc").value.trim();$("rucInfo").hidden=true;if(v.length<8||$("desc").value.trim())return;const x=terceros(fTipo).find(t=>t.ruc===v);if(x){$("desc").value=x.desc;if(CATS[fTipo].includes(x.cat))$("cat").value=x.cat;return}buscarNombreRuc(v)});
+/* Nombre automático: si el RUC es nuevo, se pide la razón social a SUNAT (a través de tu Apps Script) */
+let rucBuscando="";
+async function buscarNombreRuc(v,alTerminar){
+  v=String(v||"").replace(/\D/g,"");
+  if(!/^(10|15|17|20)\d{9}$/.test(v)||rucBuscando===v)return;
+  const info=$("rucInfo");
+  if(esDemo()||versionServidor<2){return}
+  if(!navigator.onLine){info.textContent="Sin internet: escribe el nombre a mano.";info.className="ruc-info";info.hidden=false;return}
+  rucBuscando=v; info.textContent="Buscando en SUNAT…"; info.className="ruc-info"; info.hidden=false;
+  try{
+    const j=await api("ruc",{numero:v});
+    if($("ruc").value.replace(/\D/g,"")!==v)return;           // cambió el RUC mientras buscaba
+    if(!$("desc").value.trim()) $("desc").value=j.nombre;
+    const malo=(j.estado&&j.estado!=="ACTIVO")||(j.condicion&&j.condicion!=="HABIDO");
+    info.className="ruc-info "+(malo?"mal":"ok");
+    info.textContent=j.fuente==="directorio"?`✓ ${j.nombre} (de tu directorio)`
+      :malo?`⚠ ${j.nombre}: ${j.estado||""} · ${j.condicion||""}. Si es NO HABIDO o no está ACTIVO, el IGV de sus facturas no te sirve como crédito.`
+      :`✓ SUNAT: ${j.nombre} · ${j.estado} · ${j.condicion}`;
+    syncForm(); if(alTerminar)alTerminar(j);
+  }catch(e){
+    info.className="ruc-info"; info.textContent=(e&&e.code&&e.code!=="clave"?e.message:"No se pudo consultar SUNAT")+". Escribe el nombre a mano.";
+  }finally{rucBuscando=""}
+}
 
 function limpiarForm(){
   $("monto").value="";$("desc").value="";$("ruc").value="";$("nro").value="";delete $("det").dataset.touched;$("det").checked=false;$("detPct").value="4";
-  qrIgv=null;$("avisoQR").hidden=true;$("obra").value="";quitarFoto();
+  qrIgv=null;$("avisoQR").hidden=true;$("rucInfo").hidden=true;$("obra").value="";quitarFoto();
 }
 function cargarEnForm(r,conFecha){
   fTipo=r.tipo==="gasto"?"gasto":"ingreso"; fComp=r.comprobante||"ninguno";
@@ -1578,6 +1606,7 @@ function aplicarQR(texto){
   $("avisoQR").textContent=`QR leído: ${q.tipoNombre} ${q.serie}-${q.numero} por ${fmt(q.total)}${previo?" de "+previo.desc:""}. Revisa los datos y toca Guardar.`+(q.tipo==="07"?" Ojo: es una nota de crédito.":"");
   $("avisoQR").hidden=false;
   irPaso(previo?4:3);
+  if(!previo&&q.rucTercero) buscarNombreRuc(q.rucTercero,j=>{$("avisoQR").textContent=$("avisoQR").textContent.replace(". Revisa"," de "+j.nombre+". Revisa")});
   return true;
 }
 let qrStream=null, qrDetector=null, qrTimer=null, qrJsQR=null;
@@ -1725,7 +1754,11 @@ const CFG_K="cbo-config", CACHE_K="cbo-cache";
 let cfg=leerLS(CFG_K,null);
 async function api(accion,extra,conf){
   const c=conf||cfg;
-  const res=await fetch(c.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({clave:c.clave,accion},extra||{})),redirect:"follow"});
+  // Con señal débil la petición puede quedarse colgada: se corta a los 30 s y cuenta como "sin internet"
+  const ctl=new AbortController(), to=setTimeout(()=>ctl.abort(),30000);
+  let res;
+  try{res=await fetch(c.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({clave:c.clave,accion},extra||{})),redirect:"follow",signal:ctl.signal})}
+  finally{clearTimeout(to)}
   const j=await res.json();
   if(!j.ok){const e=new Error(j.error||"Error");e.code=j.error;throw e}
   return j;
@@ -1739,31 +1772,105 @@ async function cargar(){
   if(esDemo()){$("status").textContent="Modo de prueba (simulador): los cambios se guardan solo en este equipo.";$("cfgEstado").textContent="Modo de prueba";return}
   cargando=true; $("cargando").hidden=false;
   try{
+    await enviarCola();
     const j=await api("datos");
     versionServidor=+j.version||1;
-    rows=j.registros.filter(r=>typeof r.monto==="number"&&r.fecha);
-    guardarLS(CACHE_K,rows); render();
+    servidorRows=j.registros.filter(r=>typeof r.monto==="number"&&r.fecha);
+    guardarLS(CACHE_K,servidorRows); rows=conCola(servidorRows); render();
     const h=new Date().toLocaleTimeString("es-PE",{hour:"2-digit",minute:"2-digit"});
     $("status").textContent="Conectado con tu archivo de Google · "+h; $("cfgEstado").textContent="Conectado · actualizado "+h;
   }catch(e){
     if(e.code==="clave"){abrirSetup("La clave no es correcta.");}
-    else{$("status").textContent="Sin conexión. Mostrando los últimos datos guardados en este equipo.";$("cfgEstado").textContent="Sin conexión"}
-  }finally{cargando=false;$("cargando").hidden=true}
+    else{rows=conCola(servidorRows);render();$("status").textContent="Sin conexión. Mostrando los últimos datos guardados en este equipo.";$("cfgEstado").textContent="Sin conexión"}
+  }finally{cargando=false;$("cargando").hidden=true;pintarCola()}
 }
+
+/* ===== Registrar sin internet =====
+   Si no hay señal, cada cambio (agregar, editar, borrar, foto) se guarda en una cola en este equipo,
+   se ve en la app con la etiqueta "Por enviar" y se envía solo, en orden, cuando vuelve la conexión. */
+const COLA_K="cbo-cola";
+let cola=leerLS(COLA_K,[]), servidorRows=leerLS(CACHE_K,[]), enviando=false;
+const guardarCola=()=>{guardarLS(COLA_K,cola);pintarCola()};
+// Error de red (sin señal, tiempo agotado) frente a error del servidor (clave, datos inválidos)
+const esErrorRed=e=>!e||(!e.code&&(e.name==="TypeError"||e.name==="SyntaxError"||e.name==="AbortError"||/fetch|network|red|load failed/i.test(e.message||"")));
+// La vista = lo que tiene Google + los cambios que aún no se envían
+function conCola(base){
+  let out=base.map(r=>Object.assign({},r));
+  cola.forEach(op=>{
+    if(op.op==="agregar") out.push(Object.assign({creado:op.t},op.registro,{id:op.tmp,pendiente:true}));
+    else if(op.op==="editar"){const i=out.findIndex(r=>String(r.id)===String(op.id));if(i>=0)out[i]=Object.assign({},out[i],op.registro,{pendiente:true})}
+    else if(op.op==="borrar") out=out.filter(r=>String(r.id)!==String(op.id));
+  });
+  return out;
+}
+// Quita marcas internas de la app antes de guardar o enviar
+const limpioReg=r=>{const c=Object.assign({},r);["id","pendiente","creado"].forEach(k=>delete c[k]);return c};
+function encolar(op){if(op.registro)op.registro=limpioReg(op.registro);op.t=Date.now();cola.push(op);guardarCola();rows=conCola(servidorRows);render()}
+function pintarCola(){
+  const n=cola.length, el=$("colaAviso"); if(!el)return;
+  el.hidden=!n;
+  el.innerHTML=n?`⏳ <b>${n}</b> cambio${n===1?"":"s"} por enviar · se enviará${n===1?"":"n"} solo${n===1?"":"s"} cuando haya internet <button type="button" class="btnlink" id="colaReintentar">Enviar ahora</button>`:"";
+  const b=$("colaReintentar"); if(b) b.onclick=()=>cargar();
+}
+async function enviarCola(){
+  if(enviando||!cola.length||esDemo())return;
+  enviando=true;
+  try{
+    while(cola.length){
+      const op=cola[0];
+      try{
+        if(op.op==="agregar"){
+          const j=await api("agregar",{registro:op.registro});
+          const nuevo=j&&j.id;
+          // Las operaciones siguientes sobre este registro usan ya el id real
+          cola.slice(1).forEach(o=>{if(String(o.id)===String(op.tmp))o.id=nuevo});
+        }
+        else if(op.op==="editar") await api("editar",Object.assign({id:op.id,registro:op.registro},op.parcial?{parcial:true}:{}));
+        else if(op.op==="borrar") await api("borrar",{id:op.id});
+        else if(op.op==="foto"&&op.id&&!String(op.id).startsWith("tmp")) await api("subirFoto",{id:op.id,nombre:op.nombre,tipo:"image/jpeg",base64:op.base64});
+      }catch(e){
+        if(esErrorRed(e)) break;              // sigue sin señal: se intentará después
+        if(e.code==="clave") throw e;
+        toast("No se pudo enviar un cambio pendiente: "+(e.message||"error"));  // dato rechazado: se descarta para no bloquear la cola
+      }
+      cola.shift(); guardarCola();
+    }
+  }finally{enviando=false;pintarCola()}
+}
+window.addEventListener("online",()=>cargar());
+setInterval(()=>{if(cola.length&&navigator.onLine)cargar()},60000);
 const storeDemo={
   add:async r=>{const id="local"+Date.now().toString(36);rows.push(Object.assign({id,creado:Date.now()},r));guardarLS(CACHE_K,rows);render();return id},
   remove:async id=>{rows=rows.filter(x=>String(x.id)!==String(id));guardarLS(CACHE_K,rows);render()},
   edit:async(id,r)=>{const i=rows.findIndex(x=>String(x.id)===String(id));if(i<0)throw new Error("No se encontró el registro");rows[i]=Object.assign({},rows[i],r);guardarLS(CACHE_K,rows);render()}
 };
 const storeGoogle={
-  add:async r=>{let j;$("cargando").hidden=false;try{j=await api("agregar",{registro:r})}finally{$("cargando").hidden=true}await cargar();return j&&j.id},
-  remove:async id=>{await api("borrar",{id});rows=rows.filter(x=>x.id!==id);render();cargar()},
+  add:async r=>{
+    let j;$("cargando").hidden=false;
+    try{j=await api("agregar",{registro:r})}
+    catch(e){if(!esErrorRed(e))throw e;const tmp="tmp"+Date.now().toString(36);encolar({op:"agregar",tmp,registro:r});toast("Sin internet: guardado en el celular, se enviará solo");return tmp}
+    finally{$("cargando").hidden=true}
+    await cargar();return j&&j.id},
+  remove:async id=>{
+    if(String(id).startsWith("tmp")){cola=cola.filter(o=>o.tmp!==id&&String(o.id)!==String(id));guardarCola();rows=conCola(servidorRows);render();return}
+    try{await api("borrar",{id})}catch(e){if(!esErrorRed(e))throw e;encolar({op:"borrar",id});return}
+    rows=rows.filter(x=>x.id!==id);render();cargar()},
+  // Cambio parcial (solo obra o foto), con cola si no hay señal
+  editParcial:async(id,campos)=>{
+    if(String(id).startsWith("tmp")){const op=cola.find(o=>o.tmp===id);if(op)Object.assign(op.registro,campos);guardarCola();rows=conCola(servidorRows);render();return}
+    try{await api("editar",{id,registro:campos,parcial:true})}catch(e){if(!esErrorRed(e))throw e;encolar({op:"editar",id,registro:campos,parcial:true})}
+  },
   // Editar: con el Apps Script nuevo usa "editar"; con el actual agrega el corregido y luego borra el anterior
   // (en ese orden, para que si algo falla nunca se pierda el registro: a lo más queda duplicado).
   edit:async(id,r)=>{
+    // Registro que aún no se envía: se corrige dentro de la cola
+    if(String(id).startsWith("tmp")){const op=cola.find(o=>o.tmp===id);if(op)op.registro=limpioReg(r);guardarCola();rows=conCola(servidorRows);render();return}
     $("cargando").hidden=false;
     try{
-      if(versionServidor>=2) await api("editar",{id,registro:r});
+      if(versionServidor>=2){
+        try{await api("editar",{id,registro:r})}
+        catch(e){if(!esErrorRed(e))throw e;encolar({op:"editar",id,registro:r});toast("Sin internet: el cambio se enviará solo");return}
+      }
       else{ await api("agregar",{registro:r});
         try{await api("borrar",{id})}catch(e){await cargar();throw new Error("Se guardó el cambio pero no se pudo borrar el registro anterior; bórralo a mano")} }
     }finally{$("cargando").hidden=true}
@@ -1800,7 +1907,7 @@ document.querySelectorAll(".recargar").forEach(b=>b.onclick=()=>cargar());
 $("desconectar").onclick=()=>abrirSetup("");
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")cargar()});
 
-rows=leerLS(CACHE_K,[]);
+rows=conCola(servidorRows);
 const inicial=(location.hash||"").slice(1); ir(TITULOS[inicial]?inicial:"inicio");
 render();
 if(!cfg) abrirSetup(""); else cargar();
@@ -1845,7 +1952,10 @@ $("fotoIn").addEventListener("change",async()=>{
 async function subirFoto(id,data,r){
   if(esDemo()){await store.edit(id,{fotoUrl:data});return}
   const nombre=`${r.fecha} ${r.tipo==="ingreso"?"venta":"gasto"} ${r.desc||""} ${r.serie?r.serie+"-"+r.numero:""}`.trim().slice(0,70)+".jpg";
-  await api("subirFoto",{id,nombre,tipo:"image/jpeg",base64:data.split(",")[1]});
+  const base64=data.split(",")[1];
+  if(String(id).startsWith("tmp")){encolar({op:"foto",id,nombre,base64});return}
+  try{await api("subirFoto",{id,nombre,tipo:"image/jpeg",base64})}
+  catch(e){if(!esErrorRed(e))throw e;encolar({op:"foto",id,nombre,base64});toast("Sin internet: la foto se subirá sola");return}
   await cargar();
 }
 
@@ -1979,7 +2089,7 @@ $("asigBtn").onclick=async()=>{
   for(const id of ids){$("asigMsg").textContent=`Guardando ${ok+1} de ${ids.length}…`;
     const r=rows.find(x=>String(x.id)===id); if(!r)continue;
     // En Google solo se escribe la columna OBRA (no se reescribe el comprobante)
-    try{if(esDemo())await store.edit(r.id,{obra});else{await api("editar",{id:r.id,registro:{obra},parcial:true});r.obra=obra}ok++}catch(e){}}
+    try{if(esDemo())await store.edit(r.id,{obra});else{await storeGoogle.editParcial(r.id,{obra});r.obra=obra}ok++}catch(e){}}
   if(!esDemo()) await cargar();
   $("asigBtn").disabled=false; asigMarcados.clear(); obraSel=obra; $("asigObra").value=""; renderObras();
   $("asigMsg").textContent=""; toast(ok===ids.length?`${ok} comprobante${ok===1?"":"s"} asignado${ok===1?"":"s"} a ${obra}`:`Se asignaron ${ok} de ${ids.length}. Revisa tu internet.`);
