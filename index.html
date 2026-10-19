@@ -187,6 +187,7 @@ body.menu .fab{display:none}
 .item .amt{font-family:var(--mono);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
 .del{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:8px;padding:5px 9px;font-size:.8rem}
 .del.confirm{background:var(--out);border-color:var(--out);color:#fff}
+.trab-acc{display:flex;gap:8px;margin:2px 0 4px}
 .btnlink{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:10px;padding:6px 10px;font-weight:600;font-size:.82rem;text-decoration:none;white-space:nowrap}
 .xls{border:1px solid var(--brand-2);color:var(--brand-2);border-radius:10px;padding:6px 12px;font-weight:600;font-size:.85rem;text-decoration:none;white-space:nowrap}
 
@@ -940,6 +941,7 @@ button.big{border:0}
     <h3><span id="plaTit">Pago a trabajador</span> <button type="button" class="x" data-cerrar aria-label="Cerrar">✕</button></h3>
     <label>Trabajador<select id="pTrab"></select></label>
     <p class="hint" id="pTrabInfo" style="margin:-4px 0 0"></p>
+    <div class="trab-acc"><button type="button" class="btnlink" id="pTrabNuevo">+ Nuevo trabajador</button><button type="button" class="btnlink" id="pTrabEditar">Editar datos</button></div>
     <div class="row2">
       <label>Fecha de pago<input id="pFecha" type="date"></label>
       <label>Obra (opcional)<input id="pObra" type="text" list="obrasDL" maxlength="60" autocomplete="off" placeholder="Ej. Barranco"></label>
@@ -962,6 +964,32 @@ button.big{border:0}
     <div class="nav-pasos">
       <button class="btn2" type="button" data-cerrar>Cancelar</button>
       <button class="btn pri" type="submit" id="pGuardar">Guardar pago</button>
+    </div>
+  </form>
+</div>
+
+<!-- Trabajador nuevo o corregir sus datos: se guarda en el Excel (hoja Pago Trabajadores) -->
+<div class="overlay" id="ovTrab" hidden>
+  <form class="sheet" id="fTrab" novalidate>
+    <h3><span id="tTit">Nuevo trabajador</span> <button type="button" class="x" data-cerrar aria-label="Cerrar">✕</button></h3>
+    <div class="row2">
+      <label>DNI<input id="tDni" type="text" inputmode="numeric" maxlength="8" autocomplete="off" placeholder="8 dígitos"></label>
+      <label>Cargo<select id="tCargo"><option>AYUDANTE</option><option>OFICIAL</option><option>OPERARIO</option></select></label>
+    </div>
+    <label>Apellidos y nombres<input id="tNombre" type="text" maxlength="80" autocomplete="off" placeholder="Ej. Quispe Mamani Juan"></label>
+    <div class="row2">
+      <label>Jornal semanal (S/)<input id="tJornal" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></label>
+      <label>Horas por semana<input id="tHoras" type="text" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="Ej. 48"></label>
+    </div>
+    <label>Método de pago<select id="tMetodo"><option>EFECTIVO</option><option>TRANSFERENCIA</option><option>INTERBANCARIA</option><option>YAPE</option><option>PLIN</option></select></label>
+    <label id="tBancoL">Banco<select id="tBanco"><option>BCP</option><option>BBVA</option><option>INTERBANK</option><option>SCOTIABANK</option><option>BANCO DE LA NACIÓN</option><option>CAJA AREQUIPA</option><option>CAJA HUANCAYO</option><option>MIBANCO</option><option>OTRO</option></select></label>
+    <label id="tCuentaL">N° de cuenta<input id="tCuenta" type="text" inputmode="numeric" maxlength="24" autocomplete="off" placeholder="Como figura en el banco, con guiones"></label>
+    <label id="tCciL">CCI (20 dígitos)<input id="tCci" type="text" inputmode="numeric" maxlength="23" autocomplete="off" placeholder="000-000-000000000000-00"></label>
+    <label id="tYapeL">N° Yape / Plin<input id="tYape" type="text" inputmode="numeric" maxlength="9" autocomplete="off" placeholder="9 dígitos"></label>
+    <p class="msg" id="tMsg"></p>
+    <div class="nav-pasos">
+      <button class="btn2" type="button" data-cerrar>Cancelar</button>
+      <button class="btn pri" type="submit" id="tGuardar">Guardar trabajador</button>
     </div>
   </form>
 </div>
@@ -2266,7 +2294,7 @@ function abrirPagoPla(r){
   closeF(); cerrarOv("ovMov"); plaEditId=r?r.id:null;
   const ts=listaTrab();
   $("pTrab").innerHTML=ts.length?ts.map(t=>`<option value="${esc(t.dni)}">${esc(titulo(t.nombre))}</option>`).join("")
-    :`<option value="">Agrega trabajadores en tu Excel (hoja Pago Trabajadores)</option>`;
+    :`<option value="">Toca “+ Nuevo trabajador”</option>`;
   if(r){
     $("pTrab").value=String(r.ruc||""); $("pFecha").value=r.fecha; $("pIni").value=r.inicio||isoMas(r.fecha,-6); $("pFin").value=r.fin||r.fecha;
     $("pSueldo").value=String(r.sueldo||r.monto); $("pBono").value=r.bono||""; $("pHex").value=r.horasExtra||""; $("pDesc").value=r.descuento||"";
@@ -2308,6 +2336,48 @@ $("fPla").addEventListener("submit",async e=>{
 });
 $("irPagoPla").onclick=()=>abrirPagoPla();
 $("plaNuevo").onclick=()=>abrirPagoPla();
+
+/* ===== Trabajador nuevo / editar datos (se guarda en el Excel, hoja Pago Trabajadores) ===== */
+const soloDig=v=>String(v||"").replace(/\D/g,"");
+function verMetodoTrab(){const m=$("tMetodo").value;
+  $("tBancoL").hidden=!/TRANSFERENCIA|INTERBANCARIA/.test(m); $("tCuentaL").hidden=m!=="TRANSFERENCIA"; $("tCciL").hidden=m!=="INTERBANCARIA"; $("tYapeL").hidden=!/YAPE|PLIN/.test(m)}
+function abrirTrab(t){
+  $("tTit").textContent=t?"Editar trabajador":"Nuevo trabajador"; $("tDni").readOnly=!!t; $("tMsg").textContent="";
+  $("tDni").value=t?t.dni:""; $("tNombre").value=t?t.nombre:""; $("tCargo").value=t&&t.cargo?String(t.cargo).toUpperCase():"AYUDANTE";
+  $("tJornal").value=t&&t.jornal?Number(t.jornal).toFixed(2):""; $("tHoras").value=t&&t.horas?t.horas:"";
+  $("tMetodo").value=t&&t.metodo?String(t.metodo).toUpperCase():"EFECTIVO"; $("tBanco").value=t&&t.banco?String(t.banco).toUpperCase():"BCP";
+  $("tCuenta").value=t?t.cuenta||"":""; $("tCci").value=t?t.cci||"":""; $("tYape").value=t?t.yape||"":"";
+  verMetodoTrab(); $("ovTrab").hidden=false; setTimeout(()=>$(t?"tNombre":"tDni").focus(),60);
+}
+$("tMetodo").addEventListener("change",verMetodoTrab);
+// CCI con guiones mientras se escribe: 000-000-000000000000-00
+$("tCci").addEventListener("input",()=>{const d=soloDig($("tCci").value).slice(0,20);$("tCci").value=[d.slice(0,3),d.slice(3,6),d.slice(6,18),d.slice(18)].filter(Boolean).join("-")});
+$("pTrabNuevo").onclick=()=>abrirTrab();
+$("pTrabEditar").onclick=()=>{const t=pintarTrab();if(t)abrirTrab(t);else toast("Primero elige un trabajador")};
+$("fTrab").addEventListener("submit",async e=>{
+  e.preventDefault(); const m=$("tMetodo").value, msg=x=>$("tMsg").textContent=x;
+  const t={dni:soloDig($("tDni").value),nombre:$("tNombre").value.trim().replace(/\s+/g," ").toUpperCase(),cargo:$("tCargo").value,metodo:m,
+    banco:/TRANSFERENCIA|INTERBANCARIA/.test(m)?$("tBanco").value:"",cuenta:m==="TRANSFERENCIA"?$("tCuenta").value.trim():"",
+    cci:m==="INTERBANCARIA"?$("tCci").value.trim():"",yape:/YAPE|PLIN/.test(m)?soloDig($("tYape").value):"",
+    jornal:numIn("tJornal"),horas:parseInt(soloDig($("tHoras").value))||0};
+  if(t.dni.length!==8)return msg("El DNI debe tener 8 dígitos.");
+  if(!t.nombre)return msg("Escribe apellidos y nombres.");
+  if(!$("tDni").readOnly&&listaTrab().some(x=>String(x.dni)===t.dni))return msg("Ese DNI ya está registrado. Elígelo en la lista y toca Editar datos.");
+  if(m==="TRANSFERENCIA"&&!soloDig(t.cuenta))return msg("Escribe el número de cuenta.");
+  if(m==="INTERBANCARIA"&&soloDig(t.cci).length!==20)return msg("El CCI debe tener 20 dígitos.");
+  if(/YAPE|PLIN/.test(m)&&t.yape.length!==9)return msg("El número Yape / Plin debe tener 9 dígitos.");
+  if(!(t.jornal>0))return msg("Escribe el jornal semanal.");
+  msg("Guardando…"); $("tGuardar").disabled=true;
+  try{
+    if(esDemo()){const i=trabajadores.findIndex(x=>String(x.dni)===t.dni);if(i>=0)trabajadores[i]=t;else trabajadores.push(t)}
+    else{const j=await api("trabajador",{trabajador:t});trabajadores=j.trabajadores||trabajadores}
+    guardarLS("cbo-trab",trabajadores);
+    const ts=listaTrab(); $("pTrab").innerHTML=ts.map(x=>`<option value="${esc(x.dni)}">${esc(titulo(x.nombre))}</option>`).join("");
+    $("pTrab").value=t.dni; pintarTrab(); if(!plaEditId)$("pSueldo").value=t.jornal.toFixed(2); calcPla();
+    $("ovTrab").hidden=true; toast("Trabajador guardado");
+  }catch(err){msg(err.code==="lleno"?"Tu Excel ya tiene 6 trabajadores (es el máximo de la hoja Pago Trabajadores).":err.code==="Acción desconocida"?"Falta actualizar el servidor de Google.":"No se pudo guardar. Revisa tu internet e intenta de nuevo.")}
+  finally{$("tGuardar").disabled=false}
+});
 
 /* ===== Comprobante de pago (A4 horizontal: ejemplar del trabajador y de la empresa) ===== */
 function enLetrasMay(n){
