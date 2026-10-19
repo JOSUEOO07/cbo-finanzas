@@ -2338,7 +2338,7 @@ function comprobantePDF(r){
   const medio=String(r.medio||t.metodo||"").toUpperCase().replace("INTERBANCARIA","TRANSFERENCIA");
   const dig=String(t.cuenta||t.cci||"").replace(/\D/g,"");
   const cuenta=dig&&!/YAPE|PLIN|EFECTIVO/.test(medio)?"**** "+dig.slice(-6,-2)+"-"+dig.slice(-2):"";   // solo los últimos dígitos
-  const pago=[["MEDIO DE PAGO",medio],["BANCO",/YAPE|PLIN|EFECTIVO/.test(medio)?"":String(t.banco||"").toUpperCase()],["CUENTA (ÚLTIMOS DÍGITOS)",cuenta],["N° DE OPERACIÓN",r.operacion]].map(([k,v])=>[k,v||"—"]);   // las 4 casillas siempre
+  const pago=[["MEDIO DE PAGO",medio],["BANCO",/YAPE|PLIN|EFECTIVO/.test(medio)?"":String(t.banco||"").toUpperCase()],["CUENTA / CCI",cuenta]].map(([k,v])=>[k,v||"—"]);   // las 4 casillas siempre (con ESTADO)
   const [y,mm,d]=r.fecha.split("-");
   const ej=nombre=>`<section class="cp">
     <div class="cab"><div class="marca"><img src="logo-recibo.png" alt=""><div><b>CASA BONITA OREGÓN S.A.C.</b><span>RUC 20614484153 · Pago a trabajadores</span></div></div>
@@ -2350,7 +2350,7 @@ function comprobantePDF(r){
     <h4>DETALLE DEL PAGO</h4>
     <table><thead><tr><th>CONCEPTO</th><th class="n">CANTIDAD</th><th class="n">PRECIO UNIT.</th><th class="n">IMPORTE</th></tr></thead><tbody>${filas}</tbody></table>
     ${totales}<div class="son">SON: ${enLetrasMay(neto)}</div>
-    <h4 class="h4pago">FORMA DE PAGO<span class="estado">ESTADO: <b>PAGADO</b></span></h4><div class="grid2">${pago.map(([k,v])=>`<div class="celda"><small>${k}</small><b>${esc(v)}</b></div>`).join("")}</div>
+    <h4>FORMA DE PAGO</h4><div class="grid2">${pago.map(([k,v])=>`<div class="celda"><small>${k}</small><b>${esc(v)}</b></div>`).join("")}<div class="celda"><small>ESTADO</small><b class="pagado">PAGADO</b></div></div>
     <p class="decl">Declaro haber recibido a mi entera satisfacción el importe neto indicado en el presente comprobante, por los servicios prestados en el periodo señalado.</p>
     <p class="lugar">Lima, ${+d} de ${MESES[+mm-1]} de ${y}</p>
     <div class="firmas"><div class="firma"><img class="fimg" src="firma-gerente.png" alt=""><b>EMPLEADOR</b><span>Casa Bonita Oregón S.A.C.</span></div><div class="firma"><b>TRABAJADOR</b><span>${esc(String(r.desc||"").toUpperCase())} · DNI ${esc(r.ruc||"")}</span></div></div>
