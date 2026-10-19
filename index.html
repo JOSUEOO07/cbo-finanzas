@@ -338,7 +338,7 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
 .firma-actual{margin-top:12px;display:grid;gap:6px}
 .firma-actual img{max-width:240px;max-height:90px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px}
 #comprobante .firma{position:relative}
-#comprobante .firma .fimg{position:absolute;left:50%;bottom:100%;transform:translateX(-50%);height:14mm;max-width:52mm;object-fit:contain;margin-bottom:-1.5mm;mix-blend-mode:multiply}
+#comprobante .firma .fimg{position:absolute;left:50%;bottom:100%;transform:translateX(-50%);height:16mm;max-width:52mm;object-fit:contain;margin-bottom:.4mm}
 /* Pago a trabajador */
 .pla-link{background:var(--in-bg)!important;color:var(--in)!important}
 .pla-masbtn{justify-self:start}
@@ -359,43 +359,46 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
 #comprobante .hoja{width:297mm;height:209mm;background:#fff;display:grid;grid-template-columns:1fr 1fr;position:relative;font-family:var(--body);color:#10241C;font-size:2.9mm;-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:hidden}
 #comprobante .hoja::after{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:.3mm dashed #a9b4ae}
 #comprobante .tijera{position:absolute;left:50%;top:2mm;transform:translateX(-50%);font-size:3.2mm;color:#a9b4ae;background:#fff;z-index:1}
-#comprobante .cp{padding:9mm 10mm 7mm;display:flex;flex-direction:column;min-width:0}
+#comprobante .cp{padding:7mm 10mm 5mm;display:flex;flex-direction:column;min-width:0}
 #comprobante .cab{display:grid;grid-template-columns:1fr 46mm;border:.4mm solid #0D5C46}
-#comprobante .marca{background:#0D5C46;color:#F4EDE0;display:flex;align-items:center;gap:3.5mm;padding:4mm}
-#comprobante .marca img{width:14mm;display:block}
-#comprobante .marca b{display:block;font-weight:800;font-size:4.2mm}
-#comprobante .marca span{display:block;font-size:2.3mm;opacity:.85;margin-top:1mm}
-#comprobante .doc{display:grid;place-items:center;text-align:center;padding:3mm 2mm}
+#comprobante .marca{background:#0D5C46;color:#F4EDE0;display:flex;align-items:center;gap:3mm;padding:2.6mm 3mm}
+#comprobante .marca img{width:11mm;display:block}
+#comprobante .marca b{display:block;font-weight:800;font-size:3.7mm;white-space:nowrap}
+#comprobante .marca span{display:block;font-size:2.3mm;opacity:.85;margin-top:.8mm}
+#comprobante .doc{display:grid;place-items:center;text-align:center;padding:2mm 2mm}
 #comprobante .doc .t{font-weight:800;font-size:2.7mm;letter-spacing:.08em;color:#0D5C46}
-#comprobante .doc .n{font-weight:800;font-size:5.4mm;color:#0D5C46;margin:1.4mm 0}
+#comprobante .doc .n{font-weight:800;font-size:5mm;color:#0D5C46;margin:.8mm 0}
 #comprobante .doc .f{font-size:2.3mm;color:#5b6b63;border-top:.25mm solid #cfd8d3;padding-top:1.2mm;width:100%}
-#comprobante .ejemplar{align-self:flex-end;font-size:2.2mm;font-weight:700;letter-spacing:.14em;color:#5b6b63;margin-top:2mm}
-#comprobante h4{font-size:3mm;font-weight:800;color:#0D5C46;letter-spacing:.04em;margin:3.5mm 0 1.6mm;padding-bottom:1mm;border-bottom:.3mm solid #0D5C46}
+#comprobante .ejemplar{align-self:flex-end;font-size:2.2mm;font-weight:700;letter-spacing:.14em;color:#5b6b63;margin-top:1mm}
+#comprobante h4{font-size:3mm;font-weight:800;color:#0D5C46;letter-spacing:.04em;margin:2.6mm 0 1.4mm;padding-bottom:.8mm;border-bottom:.3mm solid #0D5C46}
 #comprobante .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.2mm}
-#comprobante .celda{background:#EEF3EF;padding:1.6mm 2.2mm}
+#comprobante .celda{background:#EEF3EF;padding:1.1mm 2.2mm}
 #comprobante .celda small{display:block;font-size:1.9mm;font-weight:700;letter-spacing:.08em;color:#5b6b63}
 #comprobante .celda b{display:block;font-size:2.9mm;font-weight:600;margin-top:.5mm}
 #comprobante table{width:100%;border-collapse:collapse}
-#comprobante th{background:#0D5C46;color:#F4EDE0;font-size:2.3mm;letter-spacing:.06em;text-align:left;padding:1.6mm 2mm;font-weight:700}
-#comprobante td{padding:1.7mm 2mm;border-bottom:.25mm solid #e3e9e5;font-size:2.9mm}
+#comprobante th{background:#0D5C46;color:#F4EDE0;font-size:2.3mm;letter-spacing:.06em;text-align:left;padding:1.3mm 2mm;font-weight:700}
+#comprobante td{padding:1.2mm 2mm;border-bottom:.25mm solid #e3e9e5;font-size:2.9mm}
 #comprobante th.n,#comprobante td.n{text-align:right;white-space:nowrap}
 #comprobante td.menos{color:#A8331F}
 #comprobante .totales{display:grid;gap:1.2mm;margin-top:2.4mm}
 #comprobante .totales.tres{grid-template-columns:1fr 1fr 1.25fr}
-#comprobante .tot{background:#EEF3EF;text-align:center;padding:2mm 1mm}
+#comprobante .tot{background:#EEF3EF;text-align:center;padding:1.6mm 1mm}
 #comprobante .tot small{display:block;font-size:1.9mm;font-weight:700;letter-spacing:.08em;color:#5b6b63}
 #comprobante .tot b{display:block;font-size:3.6mm;margin-top:.8mm}
 #comprobante .tot.neto{background:#0D5C46;color:#F4EDE0}
 #comprobante .tot.neto small{color:#cfe0d6}
 #comprobante .tot.neto b{font-size:5mm}
 #comprobante .son{text-align:center;font-weight:700;font-style:italic;color:#0D5C46;font-size:2.7mm;margin-top:2mm}
-#comprobante .decl{font-size:2.3mm;font-style:italic;color:#5b6b63;text-align:center;margin-top:3mm;line-height:1.4}
-#comprobante .lugar{text-align:center;font-style:italic;margin-top:1.6mm;font-size:2.6mm}
+#comprobante .decl{font-size:2.3mm;font-style:italic;color:#5b6b63;text-align:center;margin-top:2.2mm;line-height:1.4}
+#comprobante .lugar{text-align:center;font-style:italic;margin-top:1.2mm;margin-bottom:13mm;font-size:2.6mm}
 #comprobante .firmas{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:12mm;padding:0 4mm}
 #comprobante .firma{text-align:center;border-top:.3mm solid #10241C;padding-top:1.4mm}
 #comprobante .firma b{display:block;font-size:2.7mm}
 #comprobante .firma span{display:block;font-size:2.1mm;color:#5b6b63;margin-top:.4mm}
-#comprobante .pie{text-align:center;font-size:2mm;color:#8a968f;margin-top:3mm;font-style:italic}
+#comprobante .grid2.pago3{grid-template-columns:1fr 1fr 1fr}
+#comprobante .celda.ancho{grid-column:span 2}
+#comprobante .celda b.pagado{color:#0D5C46;font-weight:800}
+#comprobante .pie{text-align:center;font-size:2mm;color:#8a968f;margin-top:2mm;font-style:italic}
 
 /* Pago a SUNAT */
 @media (max-width:520px){#f [data-paso="4"] .row2{grid-template-columns:minmax(0,1fr)}}
@@ -779,7 +782,7 @@ button.big{border:0}
             <div class="cfgrow"><div class="line" id="pinBotones"></div><p class="msg" id="pinMsg" style="color:var(--muted)"></p></div>
             <p class="note">El PIN se guarda cifrado (SHA-256) solo en este equipo. Si lo olvidas, puedes quitarlo con tu clave de acceso de Google.</p>
           </section>
-          <section class="panel">
+          <section class="panel" hidden>
             <div class="ph"><h2>Firma para comprobantes</h2><span class="hint" id="firmaEstado"></span></div>
             <p class="hint" style="margin:0 0 10px">Sale encima de la línea del EMPLEADOR en los comprobantes de pago. Firma con el dedo (o el mouse), o sube una foto de tu firma en hoja blanca.</p>
             <canvas class="firma-pad" id="firmaPad" aria-label="Recuadro para firmar"></canvas>
@@ -2316,7 +2319,6 @@ function enLetrasMay(n){
   return t+" CON "+String(c).padStart(2,"0")+"/100 SOLES";
 }
 function comprobantePDF(r){
-  const firmaGuardada=leerLS("cbo-firma","");
   const t=listaTrab().find(x=>String(x.dni)===String(r.ruc))||{};
   const pla=rows.filter(esPlanilla).sort((a,b)=>a.fecha.localeCompare(b.fecha)||(a.creado||0)-(b.creado||0));
   const num="CP-"+String(r.numero||(pla.findIndex(x=>x.id===r.id)+1)).padStart(4,"0");
@@ -2335,10 +2337,10 @@ function comprobantePDF(r){
   const medio=String(r.medio||t.metodo||"").toUpperCase().replace("INTERBANCARIA","TRANSFERENCIA");
   const dig=String(t.cuenta||t.cci||"").replace(/\D/g,"");
   const cuenta=dig&&!/YAPE|PLIN|EFECTIVO/.test(medio)?"**** "+dig.slice(-6,-2)+"-"+dig.slice(-2):"";   // solo los últimos dígitos
-  const pago=[["MEDIO DE PAGO",medio],["BANCO",/YAPE|PLIN|EFECTIVO/.test(medio)?"":String(t.banco||"").toUpperCase()],["CUENTA (ÚLTIMOS DÍGITOS)",cuenta],["N° DE OPERACIÓN",r.operacion]].filter(([,v])=>v);
+  const pago=[["MEDIO DE PAGO",medio],["BANCO",/YAPE|PLIN|EFECTIVO/.test(medio)?"":String(t.banco||"").toUpperCase()],["CUENTA (ÚLTIMOS DÍGITOS)",cuenta],["N° DE OPERACIÓN",r.operacion]].map(([k,v])=>[k,v||"—"]);   // las 4 casillas siempre
   const [y,mm,d]=r.fecha.split("-");
   const ej=nombre=>`<section class="cp">
-    <div class="cab"><div class="marca"><img src="logo-recibo.png" alt=""><div><b>CASA BONITA OREGÓN S.A.C.</b><span>RUC 20614484153</span><span>Pago a trabajadores</span></div></div>
+    <div class="cab"><div class="marca"><img src="logo-recibo.png" alt=""><div><b>CASA BONITA OREGÓN S.A.C.</b><span>RUC 20614484153 · Pago a trabajadores</span></div></div>
       <div class="doc"><div><div class="t">COMPROBANTE DE PAGO</div><div class="n">N° ${num}</div><div class="f">Fecha de pago: ${fF(r.fecha)}</div></div></div></div>
     <span class="ejemplar">${nombre}</span>
     <h4>DATOS DEL TRABAJADOR</h4>
@@ -2347,10 +2349,10 @@ function comprobantePDF(r){
     <h4>DETALLE DEL PAGO</h4>
     <table><thead><tr><th>CONCEPTO</th><th class="n">CANTIDAD</th><th class="n">PRECIO UNIT.</th><th class="n">IMPORTE</th></tr></thead><tbody>${filas}</tbody></table>
     ${totales}<div class="son">SON: ${enLetrasMay(neto)}</div>
-    ${pago.length?`<h4>FORMA DE PAGO</h4><div class="grid2">${pago.map(([k,v])=>`<div class="celda"><small>${k}</small><b>${esc(v)}</b></div>`).join("")}</div>`:""}
+    <h4>FORMA DE PAGO</h4><div class="grid2 pago3">${pago.map(([k,v])=>`<div class="celda"><small>${k}</small><b>${esc(v)}</b></div>`).join("")}<div class="celda ancho"><small>ESTADO</small><b class="pagado">PAGADO</b></div></div>
     <p class="decl">Declaro haber recibido a mi entera satisfacción el importe neto indicado en el presente comprobante, por los servicios prestados en el periodo señalado.</p>
     <p class="lugar">Lima, ${+d} de ${MESES[+mm-1]} de ${y}</p>
-    <div class="firmas"><div class="firma">${firmaGuardada?`<img class="fimg" src="${firmaGuardada}" alt="">`:""}<b>EMPLEADOR</b><span>Casa Bonita Oregón S.A.C.</span></div><div class="firma"><b>TRABAJADOR</b><span>${esc(String(r.desc||"").toUpperCase())} · DNI ${esc(r.ruc||"")}</span></div></div>
+    <div class="firmas"><div class="firma"><img class="fimg" src="firma-gerente.png" alt=""><b>EMPLEADOR</b><span>Casa Bonita Oregón S.A.C.</span></div><div class="firma"><b>TRABAJADOR</b><span>${esc(String(r.desc||"").toUpperCase())} · DNI ${esc(r.ruc||"")}</span></div></div>
     <p class="pie">${nombre.charAt(0)+nombre.slice(1).toLowerCase()} · Documento interno de control de pagos</p>
   </section>`;
   $("comprobante").innerHTML=`<div class="hoja">${ej("EJEMPLAR TRABAJADOR")}${ej("EJEMPLAR EMPRESA")}<span class="tijera">✂</span></div>`;
@@ -2360,8 +2362,8 @@ function comprobantePDF(r){
   const titulo0=document.title; document.title=`Comprobante ${num} ${titulo(r.desc||"")}`;   // nombre sugerido del PDF
   const fin=()=>{document.body.classList.remove("imp-cp");pagina.remove();document.title=titulo0;window.removeEventListener("afterprint",fin)};
   window.addEventListener("afterprint",fin);
-  const img=$("comprobante").querySelector("img"), ir=()=>setTimeout(()=>window.print(),80);
-  if(img&&!img.complete){img.onload=ir;img.onerror=ir}else ir();
+  // espera a que carguen el logo y la firma antes de imprimir
+  Promise.all([...$("comprobante").querySelectorAll("img")].map(i=>i.complete?0:new Promise(ok=>{i.onload=i.onerror=ok}))).then(()=>setTimeout(()=>window.print(),80));
 }
 /* ===== Firma para comprobantes: dibujar o subir foto (se guarda en este equipo) ===== */
 (()=>{
