@@ -333,6 +333,12 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
   .volver{display:none}
 }
 @media (max-width:1099px){.obrasgrid.ver-det .obras-col{display:none}}
+/* Firma del empleador */
+.firma-pad{display:block;width:100%;height:150px;background:#fff;border:1.5px dashed var(--line);border-radius:12px;touch-action:none;cursor:crosshair}
+.firma-actual{margin-top:12px;display:grid;gap:6px}
+.firma-actual img{max-width:240px;max-height:90px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px}
+#comprobante .firma{position:relative}
+#comprobante .firma .fimg{position:absolute;left:50%;bottom:100%;transform:translateX(-50%);height:14mm;max-width:52mm;object-fit:contain;margin-bottom:-1.5mm;mix-blend-mode:multiply}
 /* Pago a trabajador */
 .pla-link{background:var(--in-bg)!important;color:var(--in)!important}
 .pla-masbtn{justify-self:start}
@@ -772,6 +778,19 @@ button.big{border:0}
             <div class="cfgrow"><span class="hint">Bloqueo con PIN</span><b id="pinEstado">Desactivado</b></div>
             <div class="cfgrow"><div class="line" id="pinBotones"></div><p class="msg" id="pinMsg" style="color:var(--muted)"></p></div>
             <p class="note">El PIN se guarda cifrado (SHA-256) solo en este equipo. Si lo olvidas, puedes quitarlo con tu clave de acceso de Google.</p>
+          </section>
+          <section class="panel">
+            <div class="ph"><h2>Firma para comprobantes</h2><span class="hint" id="firmaEstado"></span></div>
+            <p class="hint" style="margin:0 0 10px">Sale encima de la línea del EMPLEADOR en los comprobantes de pago. Firma con el dedo (o el mouse), o sube una foto de tu firma en hoja blanca.</p>
+            <canvas class="firma-pad" id="firmaPad" aria-label="Recuadro para firmar"></canvas>
+            <div class="line" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+              <button class="btn" type="button" id="firmaGuardar">Guardar firma</button>
+              <button class="btnlink" type="button" id="firmaLimpiar">Borrar recuadro</button>
+              <button class="btnlink" type="button" id="firmaFoto">📷 Subir foto de la firma</button>
+              <button class="btnlink" type="button" id="firmaQuitar">Quitar firma guardada</button>
+              <input type="file" id="firmaIn" accept="image/*" hidden>
+            </div>
+            <div class="firma-actual" id="firmaActual" hidden><span class="hint">Firma guardada:</span><img id="firmaImg" alt="Firma guardada"></div>
           </section>
           <section class="panel">
             <div class="ph"><h2>Reporte del mes</h2></div>
@@ -2297,6 +2316,7 @@ function enLetrasMay(n){
   return t+" CON "+String(c).padStart(2,"0")+"/100 SOLES";
 }
 function comprobantePDF(r){
+  const firmaGuardada=leerLS("cbo-firma","");
   const t=listaTrab().find(x=>String(x.dni)===String(r.ruc))||{};
   const pla=rows.filter(esPlanilla).sort((a,b)=>a.fecha.localeCompare(b.fecha)||(a.creado||0)-(b.creado||0));
   const num="CP-"+String(r.numero||(pla.findIndex(x=>x.id===r.id)+1)).padStart(4,"0");
@@ -2330,7 +2350,7 @@ function comprobantePDF(r){
     ${pago.length?`<h4>FORMA DE PAGO</h4><div class="grid2">${pago.map(([k,v])=>`<div class="celda"><small>${k}</small><b>${esc(v)}</b></div>`).join("")}</div>`:""}
     <p class="decl">Declaro haber recibido a mi entera satisfacción el importe neto indicado en el presente comprobante, por los servicios prestados en el periodo señalado.</p>
     <p class="lugar">Lima, ${+d} de ${MESES[+mm-1]} de ${y}</p>
-    <div class="firmas"><div class="firma"><b>EMPLEADOR</b><span>Casa Bonita Oregón S.A.C.</span></div><div class="firma"><b>TRABAJADOR</b><span>${esc(String(r.desc||"").toUpperCase())} · DNI ${esc(r.ruc||"")}</span></div></div>
+    <div class="firmas"><div class="firma">${firmaGuardada?`<img class="fimg" src="${firmaGuardada}" alt="">`:""}<b>EMPLEADOR</b><span>Casa Bonita Oregón S.A.C.</span></div><div class="firma"><b>TRABAJADOR</b><span>${esc(String(r.desc||"").toUpperCase())} · DNI ${esc(r.ruc||"")}</span></div></div>
     <p class="pie">${nombre.charAt(0)+nombre.slice(1).toLowerCase()} · Documento interno de control de pagos</p>
   </section>`;
   $("comprobante").innerHTML=`<div class="hoja">${ej("EJEMPLAR TRABAJADOR")}${ej("EJEMPLAR EMPRESA")}<span class="tijera">✂</span></div>`;
@@ -2343,6 +2363,37 @@ function comprobantePDF(r){
   const img=$("comprobante").querySelector("img"), ir=()=>setTimeout(()=>window.print(),80);
   if(img&&!img.complete){img.onload=ir;img.onerror=ir}else ir();
 }
+/* ===== Firma para comprobantes: dibujar o subir foto (se guarda en este equipo) ===== */
+(()=>{
+  const cv=$("firmaPad"), ctx=cv.getContext("2d"); let dibujando=false, hay=false, ult=null;
+  const ajustar=()=>{const r=cv.getBoundingClientRect(),k=window.devicePixelRatio||1;if(!r.width)return;cv.width=Math.round(r.width*k);cv.height=Math.round(r.height*k);
+    ctx.setTransform(k,0,0,k,0,0);ctx.fillStyle="#fff";ctx.fillRect(0,0,r.width,r.height);ctx.lineCap="round";ctx.lineJoin="round";ctx.strokeStyle="#0B2A55";ctx.lineWidth=2.4;hay=false};
+  const pos=e=>{const r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+  cv.addEventListener("pointerdown",e=>{if(!cv.width)ajustar();dibujando=true;ult=pos(e);cv.setPointerCapture(e.pointerId);e.preventDefault()});
+  cv.addEventListener("pointermove",e=>{if(!dibujando)return;const p=pos(e);ctx.beginPath();ctx.moveTo(ult.x,ult.y);ctx.lineTo(p.x,p.y);ctx.stroke();ult=p;hay=true});
+  ["pointerup","pointercancel"].forEach(t=>cv.addEventListener(t,()=>dibujando=false));
+  // Recorta el espacio blanco sobrante y devuelve la firma en PNG con fondo blanco
+  const recortar=src=>{const w=src.width,h=src.height,d=src.getContext("2d").getImageData(0,0,w,h).data;let x0=w,y0=h,x1=0,y1=0;
+    for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=(y*w+x)*4;if(d[i]+d[i+1]+d[i+2]<600){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}}
+    if(x1<=x0||y1<=y0)return"";const m=8,o=document.createElement("canvas");o.width=x1-x0+2*m;o.height=y1-y0+2*m;const c=o.getContext("2d");
+    c.fillStyle="#fff";c.fillRect(0,0,o.width,o.height);c.drawImage(src,x0,y0,x1-x0,y1-y0,m,m,x1-x0,y1-y0);return o.toDataURL("image/png")};
+  const pintarActual=()=>{const f=leerLS("cbo-firma","");$("firmaActual").hidden=!f;if(f)$("firmaImg").src=f;$("firmaEstado").textContent=f?"✓ Firma guardada":"Sin firma"};
+  $("firmaLimpiar").onclick=ajustar;
+  $("firmaGuardar").onclick=()=>{if(!hay){toast("Primero firma en el recuadro");return}const f=recortar(cv);if(!f){toast("No se detectó la firma");return}guardarLS("cbo-firma",f);pintarActual();ajustar();toast("Firma guardada")};
+  $("firmaQuitar").onclick=()=>{try{localStorage.removeItem("cbo-firma")}catch{}pintarActual();toast("Firma quitada")};
+  $("firmaFoto").onclick=()=>$("firmaIn").click();
+  // Foto: lo claro (el papel) pasa a blanco y el trazo se oscurece, para que se vea limpia al imprimir
+  $("firmaIn").addEventListener("change",async()=>{const f=$("firmaIn").files[0];if(!f)return;
+    try{const b=await createImageBitmap(f),k=Math.min(1,1400/Math.max(b.width,b.height)),c=document.createElement("canvas");c.width=Math.round(b.width*k);c.height=Math.round(b.height*k);
+      const x=c.getContext("2d");x.drawImage(b,0,0,c.width,c.height);const im=x.getImageData(0,0,c.width,c.height),d=im.data;
+      let suma=0;for(let i=0;i<d.length;i+=4)suma+=d[i]+d[i+1]+d[i+2];const fondo=suma/(d.length/4), corte=fondo*0.72;
+      for(let i=0;i<d.length;i+=4){const v=d[i]+d[i+1]+d[i+2];if(v>corte){d[i]=d[i+1]=d[i+2]=255}else{d[i]=11;d[i+1]=42;d[i+2]=85}}
+      x.putImageData(im,0,0);const r=recortar(c);if(!r){toast("No se encontró la firma en la foto");return}guardarLS("cbo-firma",r);pintarActual();toast("Firma guardada desde la foto")}
+    catch(e){toast("No se pudo leer la foto")}finally{$("firmaIn").value=""}});
+  pintarActual();
+  // el recuadro se prepara cuando Configuración está visible
+  new ResizeObserver(()=>{if(cv.getBoundingClientRect().width&&!hay)ajustar()}).observe(cv);
+})();
 $("movCP").onclick=()=>{const r=movSel;cerrarOv("ovMov");if(r)comprobantePDF(r)};
 
 if("serviceWorker" in navigator){
