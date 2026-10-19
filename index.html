@@ -344,11 +344,11 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
 
 /* Comprobante de pago: A4 horizontal, ejemplar del trabajador y de la empresa */
 #comprobante{display:none}
-@page cp{size:A4 landscape;margin:0}
 @media print{
   body.imp-cp>*:not(#comprobante){display:none!important}
   body.imp-cp #reporte{display:none!important}
-  body.imp-cp #comprobante{display:block!important;page:cp}
+  body.imp-cp #comprobante{display:block!important}
+  html:has(body.imp-cp),body.imp-cp{padding:0!important;margin:0!important;height:auto!important;min-height:0!important}
 }
 #comprobante .hoja{width:297mm;height:209mm;background:#fff;display:grid;grid-template-columns:1fr 1fr;position:relative;font-family:var(--body);color:#10241C;font-size:2.9mm;-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:hidden}
 #comprobante .hoja::after{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:.3mm dashed #a9b4ae}
@@ -2335,8 +2335,10 @@ function comprobantePDF(r){
   </section>`;
   $("comprobante").innerHTML=`<div class="hoja">${ej("EJEMPLAR TRABAJADOR")}${ej("EJEMPLAR EMPRESA")}<span class="tijera">✂</span></div>`;
   document.body.classList.add("imp-cp");
+  // Solo mientras se imprime el comprobante: una sola hoja A4 horizontal, sin márgenes
+  const pagina=document.createElement("style"); pagina.id="cpPagina"; pagina.textContent="@page{size:A4 landscape;margin:0}"; document.head.appendChild(pagina);
   const titulo0=document.title; document.title=`Comprobante ${num} ${titulo(r.desc||"")}`;   // nombre sugerido del PDF
-  const fin=()=>{document.body.classList.remove("imp-cp");document.title=titulo0;window.removeEventListener("afterprint",fin)};
+  const fin=()=>{document.body.classList.remove("imp-cp");pagina.remove();document.title=titulo0;window.removeEventListener("afterprint",fin)};
   window.addEventListener("afterprint",fin);
   const img=$("comprobante").querySelector("img"), ir=()=>setTimeout(()=>window.print(),80);
   if(img&&!img.complete){img.onload=ir;img.onerror=ir}else ir();
