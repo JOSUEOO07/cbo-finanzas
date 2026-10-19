@@ -333,6 +333,64 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
   .volver{display:none}
 }
 @media (max-width:1099px){.obrasgrid.ver-det .obras-col{display:none}}
+/* Pago a trabajador */
+.pla-link{background:var(--in-bg)!important;color:var(--in)!important}
+.pla-masbtn{justify-self:start}
+.pla-mas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+@media (max-width:520px){.pla-mas{grid-template-columns:minmax(0,1fr)}}
+.pla-neto{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--brand);color:var(--brand-ink);border-radius:14px;padding:12px 16px;font-weight:600}
+.pla-neto b{font-family:var(--mono);font-size:1.45rem}
+.cp-btn{width:100%;margin:4px 0 10px}
+
+/* Comprobante de pago: A4 horizontal, ejemplar del trabajador y de la empresa */
+#comprobante{display:none}
+@page cp{size:A4 landscape;margin:0}
+@media print{
+  body.imp-cp>*:not(#comprobante){display:none!important}
+  body.imp-cp #reporte{display:none!important}
+  body.imp-cp #comprobante{display:block!important;page:cp}
+}
+#comprobante .hoja{width:297mm;height:209mm;background:#fff;display:grid;grid-template-columns:1fr 1fr;position:relative;font-family:var(--body);color:#10241C;font-size:2.9mm;-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:hidden}
+#comprobante .hoja::after{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:.3mm dashed #a9b4ae}
+#comprobante .tijera{position:absolute;left:50%;top:2mm;transform:translateX(-50%);font-size:3.2mm;color:#a9b4ae;background:#fff;z-index:1}
+#comprobante .cp{padding:9mm 10mm 7mm;display:flex;flex-direction:column;min-width:0}
+#comprobante .cab{display:grid;grid-template-columns:1fr 46mm;border:.4mm solid #0D5C46}
+#comprobante .marca{background:#0D5C46;color:#F4EDE0;display:flex;align-items:center;gap:3.5mm;padding:4mm}
+#comprobante .marca img{width:14mm;display:block}
+#comprobante .marca b{display:block;font-weight:800;font-size:4.2mm}
+#comprobante .marca span{display:block;font-size:2.3mm;opacity:.85;margin-top:1mm}
+#comprobante .doc{display:grid;place-items:center;text-align:center;padding:3mm 2mm}
+#comprobante .doc .t{font-weight:800;font-size:2.7mm;letter-spacing:.08em;color:#0D5C46}
+#comprobante .doc .n{font-weight:800;font-size:5.4mm;color:#0D5C46;margin:1.4mm 0}
+#comprobante .doc .f{font-size:2.3mm;color:#5b6b63;border-top:.25mm solid #cfd8d3;padding-top:1.2mm;width:100%}
+#comprobante .ejemplar{align-self:flex-end;font-size:2.2mm;font-weight:700;letter-spacing:.14em;color:#5b6b63;margin-top:2mm}
+#comprobante h4{font-size:3mm;font-weight:800;color:#0D5C46;letter-spacing:.04em;margin:3.5mm 0 1.6mm;padding-bottom:1mm;border-bottom:.3mm solid #0D5C46}
+#comprobante .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.2mm}
+#comprobante .celda{background:#EEF3EF;padding:1.6mm 2.2mm}
+#comprobante .celda small{display:block;font-size:1.9mm;font-weight:700;letter-spacing:.08em;color:#5b6b63}
+#comprobante .celda b{display:block;font-size:2.9mm;font-weight:600;margin-top:.5mm}
+#comprobante table{width:100%;border-collapse:collapse}
+#comprobante th{background:#0D5C46;color:#F4EDE0;font-size:2.3mm;letter-spacing:.06em;text-align:left;padding:1.6mm 2mm;font-weight:700}
+#comprobante td{padding:1.7mm 2mm;border-bottom:.25mm solid #e3e9e5;font-size:2.9mm}
+#comprobante th.n,#comprobante td.n{text-align:right;white-space:nowrap}
+#comprobante td.menos{color:#A8331F}
+#comprobante .totales{display:grid;gap:1.2mm;margin-top:2.4mm}
+#comprobante .totales.tres{grid-template-columns:1fr 1fr 1.25fr}
+#comprobante .tot{background:#EEF3EF;text-align:center;padding:2mm 1mm}
+#comprobante .tot small{display:block;font-size:1.9mm;font-weight:700;letter-spacing:.08em;color:#5b6b63}
+#comprobante .tot b{display:block;font-size:3.6mm;margin-top:.8mm}
+#comprobante .tot.neto{background:#0D5C46;color:#F4EDE0}
+#comprobante .tot.neto small{color:#cfe0d6}
+#comprobante .tot.neto b{font-size:5mm}
+#comprobante .son{text-align:center;font-weight:700;font-style:italic;color:#0D5C46;font-size:2.7mm;margin-top:2mm}
+#comprobante .decl{font-size:2.3mm;font-style:italic;color:#5b6b63;text-align:center;margin-top:3mm;line-height:1.4}
+#comprobante .lugar{text-align:center;font-style:italic;margin-top:1.6mm;font-size:2.6mm}
+#comprobante .firmas{margin-top:auto;display:grid;grid-template-columns:1fr 1fr;gap:12mm;padding:0 4mm}
+#comprobante .firma{text-align:center;border-top:.3mm solid #10241C;padding-top:1.4mm}
+#comprobante .firma b{display:block;font-size:2.7mm}
+#comprobante .firma span{display:block;font-size:2.1mm;color:#5b6b63;margin-top:.4mm}
+#comprobante .pie{text-align:center;font-size:2mm;color:#8a968f;margin-top:3mm;font-style:italic}
+
 /* Pago a SUNAT */
 @media (max-width:520px){#f [data-paso="4"] .row2{grid-template-columns:minmax(0,1fr)}}
 .pagosun-link{justify-self:stretch;margin-top:2px;text-align:left;white-space:normal;line-height:1.35;padding:10px 12px;background:var(--warn-bg);color:var(--warn);border-color:transparent}
@@ -641,7 +699,7 @@ button.big{border:0}
       <!-- PLANILLA -->
       <section data-sec="planilla" hidden>
         <div class="kpis" id="plaKpis"></div>
-        <section class="panel" style="margin-top:16px"><div class="ph"><h2>Pagos del mes</h2></div><div id="plaList"></div></section>
+        <section class="panel" style="margin-top:16px"><div class="ph"><h2>Pagos del mes</h2><button class="btn" type="button" id="plaNuevo">+ Registrar pago</button></div><div id="plaList"></div></section>
       </section>
 
       <!-- RESUMEN ANUAL -->
@@ -754,6 +812,7 @@ button.big{border:0}
         <div class="monto-big"><span>S/</span><input id="monto" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" aria-label="Monto total en soles"></div>
         <button type="button" class="qr-btn" id="btnQR" aria-label="Escanear QR del comprobante"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><rect x="8" y="8" width="3" height="3"/><rect x="13" y="8" width="3" height="3"/><rect x="8" y="13" width="3" height="3"/><path d="M13 13h3v3"/></svg><span>Escanear QR</span></button>
       </div>
+      <button type="button" class="btnlink pagosun-link pla-link" id="irPagoPla">👷 ¿Pagaste a un trabajador? Regístralo aquí ›</button>
       <button type="button" class="btnlink pagosun-link" id="irPagoSun">🏛 ¿Pagaste a SUNAT? Regístralo aquí ›</button>
     </div>
 
@@ -852,6 +911,38 @@ button.big{border:0}
   </form>
 </div>
 
+<!-- Pago a trabajador: sueldo + bono, horas extra o descuento (solo si se usan) -->
+<div class="overlay" id="ovPla" hidden>
+  <form class="sheet" id="fPla" novalidate>
+    <h3><span id="plaTit">Pago a trabajador</span> <button type="button" class="x" data-cerrar aria-label="Cerrar">✕</button></h3>
+    <label>Trabajador<select id="pTrab"></select></label>
+    <p class="hint" id="pTrabInfo" style="margin:-4px 0 0"></p>
+    <div class="row2">
+      <label>Fecha de pago<input id="pFecha" type="date"></label>
+      <label>Obra (opcional)<input id="pObra" type="text" list="obrasDL" maxlength="60" autocomplete="off" placeholder="Ej. Barranco"></label>
+    </div>
+    <div class="row2">
+      <label>Periodo del<input id="pIni" type="date"></label>
+      <label>al<input id="pFin" type="date"></label>
+    </div>
+    <label for="pSueldo">Sueldo / jornal (S/)</label>
+    <div class="monto-big"><span>S/</span><input id="pSueldo" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></div>
+    <button type="button" class="btnlink pla-masbtn" id="pMasBtn">+ Bono, horas extra o descuento</button>
+    <div class="pla-mas" id="pMas" hidden>
+      <label>Bonificación (S/)<input id="pBono" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></label>
+      <label>Horas extra (S/)<input id="pHex" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></label>
+      <label>Adelanto / descuento (S/)<input id="pDesc" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></label>
+    </div>
+    <div class="pla-neto"><span>Neto a pagar</span><b id="pNeto">S/ 0.00</b></div>
+    <label>N° de operación (opcional)<input id="pOper" type="text" maxlength="24" inputmode="numeric" autocomplete="off" placeholder="De la transferencia o el Yape"></label>
+    <p class="msg" id="pMsg"></p>
+    <div class="nav-pasos">
+      <button class="btn2" type="button" data-cerrar>Cancelar</button>
+      <button class="btn pri" type="submit" id="pGuardar">Guardar pago</button>
+    </div>
+  </form>
+</div>
+
 <!-- Barra inferior (celular) -->
 <nav class="tabbar" id="tabbar" aria-label="Secciones">
   <button type="button" data-tab="inicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Inicio</button>
@@ -883,6 +974,7 @@ button.big{border:0}
   <div class="sheet">
     <h3>Movimiento <button type="button" class="x" data-cerrar aria-label="Cerrar">✕</button></h3>
     <div class="det-mov" id="movDet"></div>
+    <button type="button" class="btn cp-btn" id="movCP" hidden>📄 Comprobante de pago (PDF)</button>
     <div class="acciones">
       <button type="button" id="movEditar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>Editar</button>
       <button type="button" id="movDup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg>Duplicar</button>
@@ -918,6 +1010,7 @@ button.big{border:0}
 </div>
 
 <div id="reporte" aria-hidden="true"></div>
+<div id="comprobante" aria-hidden="true"></div>
 
 <div class="setup" id="setup" hidden>
   <form class="card" id="setupF" novalidate>
@@ -939,7 +1032,7 @@ button.big{border:0}
 const IGV=0.18, UIT=5500, LIM_UIT=300;
 const CATS={
   ingreso:["Venta de servicio","Servicio a todo costo","Solo mano de obra","Otros ingresos"],
-  gasto:["Compra de materiales","Materiales de gasfitería","Materiales eléctricos","Herramientas y equipos","Planilla / jornales","Seguros","Servicios de terceros","Transporte y fletes","Combustible","Alquiler","Luz, agua, internet","Otros gastos"]
+  gasto:["Compra de materiales","Materiales de gasfitería","Materiales eléctricos","Herramientas y equipos","Seguros","Servicios de terceros","Transporte y fletes","Combustible","Alquiler","Luz, agua, internet","Otros gastos"]
 };
 // Pagos a SUNAT: no son gasto (la utilidad ya descuenta lo que se debe); solo marcan el mes como pagado
 const CAT_SUN="Pago a SUNAT";
@@ -1258,6 +1351,7 @@ let movSel=null;
 const COMP_TXT={factura:"Factura",boleta:"Boleta",ninguno:"Sin comprobante"};
 function abrirMov(id){
   const r=rows.find(x=>String(x.id)===String(id)); if(!r)return; movSel=r; pendingDel=null;
+  $("movCP").hidden=!esPlanilla(r);
   const c=r.tipo==="ingreso"?"in":"out", p=partes(r);
   $("movDet").innerHTML=`<span class="hint">${r.tipo==="ingreso"?"Ingreso":"Gasto"} · ${esc(r.categoria)}</span>
     <span class="amtg ${c}">${c==="in"?"+":"−"} ${fmt(r.monto)}</span><b>${esc(r.desc||"Sin nombre")}</b>
@@ -1278,8 +1372,8 @@ matchMedia("(min-width:1100px)").addEventListener("change",()=>{chart();renderOb
   $(id).addEventListener("click",e=>{const it=e.target.closest(".item.tap");if(it)abrirMov(it.dataset.id)});
   $(id).addEventListener("keydown",e=>{const it=e.target.closest(".item.tap");if(it&&(e.key==="Enter"||e.key===" ")){e.preventDefault();abrirMov(it.dataset.id)}});
 });
-$("movEditar").onclick=()=>{const r=movSel;cerrarOv("ovMov");if(esPagoSun(r))abrirPagoSun(r);else openF({modo:"editar",r})};
-$("movDup").onclick=()=>{const r=movSel;cerrarOv("ovMov");if(esPagoSun(r))abrirPagoSun();else openF({modo:"duplicar",r})};
+$("movEditar").onclick=()=>{const r=movSel;cerrarOv("ovMov");if(esPagoSun(r))abrirPagoSun(r);else if(esPlanilla(r))abrirPagoPla(r);else openF({modo:"editar",r})};
+$("movDup").onclick=()=>{const r=movSel;cerrarOv("ovMov");if(esPagoSun(r))abrirPagoSun();else if(esPlanilla(r))abrirPagoPla();else openF({modo:"duplicar",r})};
 $("movBorrar").onclick=async()=>{
   const b=$("movBorrar"), r=movSel; if(!r)return;
   if(!b.classList.contains("confirm")){b.classList.add("confirm");b.querySelector("span").textContent="¿Seguro?";setTimeout(()=>{b.classList.remove("confirm");b.querySelector("span").textContent="Borrar"},3500);return}
@@ -1775,6 +1869,7 @@ async function cargar(){
     await enviarCola();
     const j=await api("datos");
     versionServidor=+j.version||1;
+    if(Array.isArray(j.trabajadores)){trabajadores=j.trabajadores;guardarLS("cbo-trab",trabajadores)}
     servidorRows=j.registros.filter(r=>typeof r.monto==="number"&&r.fecha);
     guardarLS(CACHE_K,servidorRows); rows=conCola(servidorRows); render();
     const h=new Date().toLocaleTimeString("es-PE",{hour:"2-digit",minute:"2-digit"});
@@ -1964,7 +2059,8 @@ async function repetirMov(r){
   if(!r)return;
   if(esPagoSun(r)){abrirPagoSun();return}
   const c=Object.assign({},r); ["id","creado","editado","fotoUrl"].forEach(k=>delete c[k]);
-  c.fecha=hoyISO; c.serie=""; c.numero=""; if(c.detraccion)c.detMonto=Math.round(c.monto*(c.detPct||4)/100);
+  c.fecha=hoyISO; c.serie=""; c.numero="";
+  if(esPlanilla(c)){c.fin=hoyISO;c.inicio=isoMas(hoyISO,-6);c.operacion=""} if(c.detraccion)c.detMonto=Math.round(c.monto*(c.detPct||4)/100);
   try{await store.add(c); mes=hoyISO.slice(0,7); render(); toast(`Repetido hoy: ${c.desc||c.categoria} ${fmt(c.monto)}`)}
   catch(e){toast("No se pudo repetir. Revisa tu internet.")}
 }
@@ -1989,7 +2085,7 @@ $("movRep").onclick=()=>{const r=movSel;cerrarOv("ovMov");repetirMov(r)};
     const s=e.target.closest(".swipe"); if(!s)return;
     const b=e.target.closest(".acc button");
     if(b){e.stopImmediatePropagation();const r=rows.find(x=>String(x.id)===String(s.dataset.id));if(!r)return;
-      if(b.dataset.a==="editar"){s.classList.remove("open");if(esPagoSun(r))abrirPagoSun(r);else openF({modo:"editar",r})}
+      if(b.dataset.a==="editar"){s.classList.remove("open");if(esPagoSun(r))abrirPagoSun(r);else if(esPlanilla(r))abrirPagoPla(r);else openF({modo:"editar",r})}
       else if(b.dataset.a==="repetir"){s.classList.remove("open");repetirMov(r)}
       else if(b.dataset.a==="borrar"){
         if(!b.classList.contains("confirm")){b.classList.add("confirm");b.querySelector("span").textContent="¿Seguro?";setTimeout(()=>{b.classList.remove("confirm");const sp=b.querySelector("span");if(sp)sp.textContent="Borrar"},3000);return}
@@ -2125,6 +2221,127 @@ function renderAnualGraf(){
   $("anCats").innerHTML=lc.length?lc.map(([c,v])=>`<div class="cat"><div class="row"><span>${esc(c)}</span><span class="num">${fmt(v)} · ${SA.sG?Math.round(v/SA.sG*100):0}%</span></div><div class="bar2"><i style="width:${(v/mx*100).toFixed(1)}%;background:var(--out)"></i></div></div>`).join(""):`<div class="empty" style="padding:10px">Sin gastos este año.</div>`;
   $("anCli").innerHTML=rankHTML(agrupar(SA.ing),SA.sI,6,"in");
 }
+
+/* ===== Planilla: pago a trabajador (sueldo + bono, horas extra o descuento, solo si se usan) ===== */
+var trabajadores=leerLS("cbo-trab",[]), plaEditId=null;
+const esPlanilla=r=>!!r&&r.categoria==="Planilla / jornales";
+const numIn=id=>{const v=parseFloat(String($(id).value).replace(/,/g,"").replace(/[^\d.]/g,""));return isFinite(v)?r2(v):0};
+const isoMas=(iso,d)=>{const t=new Date(iso+"T12:00:00");t.setDate(t.getDate()+d);return `${t.getFullYear()}-${pad(t.getMonth()+1)}-${pad(t.getDate())}`};
+// Directorio del Excel (hoja Pago Trabajadores); si falta alguien, se toma de los pagos ya registrados
+function listaTrab(){
+  const m=new Map(trabajadores.map(t=>[String(t.dni),t]));
+  rows.filter(esPlanilla).forEach(r=>{const d=String(r.ruc||"");if(d&&!m.has(d))m.set(d,{dni:d,nombre:r.desc||"",cargo:r.cargo||"",jornal:r.sueldo||r.monto})});
+  return [...m.values()];
+}
+function pintarTrab(){
+  const t=listaTrab().find(x=>String(x.dni)===$("pTrab").value);
+  $("pTrabInfo").textContent=t?[t.cargo,t.metodo&&t.metodo.replace("INTERBANCARIA","Transferencia"),t.banco].filter(Boolean).map(titulo).join(" · "):"";
+  return t;
+}
+function calcPla(){const n=r2(numIn("pSueldo")+numIn("pBono")+numIn("pHex")-numIn("pDesc"));$("pNeto").textContent=fmt(Math.max(0,n));return n}
+function abrirPagoPla(r){
+  closeF(); cerrarOv("ovMov"); plaEditId=r?r.id:null;
+  const ts=listaTrab();
+  $("pTrab").innerHTML=ts.length?ts.map(t=>`<option value="${esc(t.dni)}">${esc(titulo(t.nombre))}</option>`).join("")
+    :`<option value="">Agrega trabajadores en tu Excel (hoja Pago Trabajadores)</option>`;
+  if(r){
+    $("pTrab").value=String(r.ruc||""); $("pFecha").value=r.fecha; $("pIni").value=r.inicio||isoMas(r.fecha,-6); $("pFin").value=r.fin||r.fecha;
+    $("pSueldo").value=String(r.sueldo||r.monto); $("pBono").value=r.bono||""; $("pHex").value=r.horasExtra||""; $("pDesc").value=r.descuento||"";
+    $("pOper").value=r.operacion||""; $("pObra").value=r.obra||"";
+    pintarTrab();
+  }else{
+    $("pFecha").value=hoyISO; $("pIni").value=isoMas(hoyISO,-6); $("pFin").value=hoyISO;
+    ["pBono","pHex","pDesc","pOper","pObra"].forEach(k=>$(k).value="");
+    const t=pintarTrab(); $("pSueldo").value=t&&t.jornal?Number(t.jornal).toFixed(2):"";
+  }
+  const extras=numIn("pBono")||numIn("pHex")||numIn("pDesc");
+  $("pMas").hidden=!extras; $("pMasBtn").hidden=!!extras;
+  $("plaTit").textContent=r?"Editar pago":"Pago a trabajador"; $("pMsg").textContent="";
+  calcPla(); $("ovPla").hidden=false;
+}
+$("pTrab").addEventListener("change",()=>{const t=pintarTrab();if(t&&t.jornal&&!plaEditId)$("pSueldo").value=Number(t.jornal).toFixed(2);calcPla()});
+["pSueldo","pBono","pHex","pDesc"].forEach(k=>$(k).addEventListener("input",calcPla));
+$("pFecha").addEventListener("change",()=>{if(!plaEditId&&$("pFecha").value){$("pFin").value=$("pFecha").value;$("pIni").value=isoMas($("pFecha").value,-6)}});
+$("pMasBtn").onclick=()=>{$("pMas").hidden=false;$("pMasBtn").hidden=true;$("pBono").focus()};
+$("fPla").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const t=listaTrab().find(x=>String(x.dni)===$("pTrab").value);
+  if(!t){$("pMsg").textContent="Elige un trabajador.";return}
+  if(!(numIn("pSueldo")>0)){$("pMsg").textContent="Escribe el sueldo o jornal.";return}
+  const neto=calcPla();
+  if(!(neto>0)){$("pMsg").textContent="El neto a pagar debe ser mayor a 0.";return}
+  if(!$("pFecha").value){$("pMsg").textContent="Elige la fecha de pago.";return}
+  const r={tipo:"gasto",categoria:"Planilla / jornales",comprobante:"ninguno",monto:neto,base:0,igv:0,noGravado:neto,
+    ruc:String(t.dni),desc:t.nombre,cargo:t.cargo||"",fecha:$("pFecha").value,inicio:$("pIni").value,fin:$("pFin").value,
+    sueldo:numIn("pSueldo"),bono:numIn("pBono"),horasExtra:numIn("pHex"),descuento:numIn("pDesc"),
+    operacion:$("pOper").value.trim(),obra:$("pObra").value.trim(),medio:t.metodo||"",estado:"PAGADO",detraccion:false,detPct:0,detMonto:0};
+  $("pMsg").textContent="Guardando…"; $("pGuardar").disabled=true;
+  const editando=!!plaEditId;
+  try{
+    if(editando) await store.edit(plaEditId,r); else await store.add(r);
+    $("ovPla").hidden=true; mes=r.fecha.slice(0,7); render(); toast(editando?"Pago actualizado":"Pago registrado");
+  }catch(err){$("pMsg").textContent="No se pudo guardar. Revisa tu internet e intenta de nuevo."}
+  finally{$("pGuardar").disabled=false}
+});
+$("irPagoPla").onclick=()=>abrirPagoPla();
+$("plaNuevo").onclick=()=>abrirPagoPla();
+
+/* ===== Comprobante de pago (A4 horizontal: ejemplar del trabajador y de la empresa) ===== */
+function enLetrasMay(n){
+  const U=["","UNO","DOS","TRES","CUATRO","CINCO","SEIS","SIETE","OCHO","NUEVE","DIEZ","ONCE","DOCE","TRECE","CATORCE","QUINCE","DIECISÉIS","DIECISIETE","DIECIOCHO","DIECINUEVE","VEINTE","VEINTIUNO","VEINTIDÓS","VEINTITRÉS","VEINTICUATRO","VEINTICINCO","VEINTISÉIS","VEINTISIETE","VEINTIOCHO","VEINTINUEVE"];
+  const D=["","","","TREINTA","CUARENTA","CINCUENTA","SESENTA","SETENTA","OCHENTA","NOVENTA"];
+  const C=["","CIENTO","DOSCIENTOS","TRESCIENTOS","CUATROCIENTOS","QUINIENTOS","SEISCIENTOS","SETECIENTOS","OCHOCIENTOS","NOVECIENTOS"];
+  const m=x=>{if(!x)return"";if(x===100)return"CIEN";const c=Math.floor(x/100),r=x%100;let t=C[c];if(r)t+=(t?" ":"")+(r<30?U[r]:D[Math.floor(r/10)]+(r%10?" Y "+U[r%10]:""));return t};
+  const e=Math.floor(n),c=Math.round((n-e)*100);let t="";
+  if(!e)t="CERO";else{const k=Math.floor(e/1000),r=e%1000;if(k)t=k===1?"MIL":m(k).replace(/UNO$/,"UN")+" MIL";if(r)t+=(t?" ":"")+m(r)}
+  return t+" CON "+String(c).padStart(2,"0")+"/100 SOLES";
+}
+function comprobantePDF(r){
+  const t=listaTrab().find(x=>String(x.dni)===String(r.ruc))||{};
+  const pla=rows.filter(esPlanilla).sort((a,b)=>a.fecha.localeCompare(b.fecha)||(a.creado||0)-(b.creado||0));
+  const num="CP-"+String(r.numero||(pla.findIndex(x=>x.id===r.id)+1)).padStart(4,"0");
+  const bono=r.bono||0, hex=r.horasExtra||0, desc=r.descuento||0, neto=r.monto;
+  const sueldo=r.sueldo||r2(neto-bono-hex+desc);
+  const fF=iso=>iso?iso.split("-").reverse().join("/"):"";
+  const periodo=r.inicio&&r.fin?`Semana del ${fF(r.inicio)} al ${fF(r.fin)}`:`Pago del ${fF(r.fecha)}`;
+  // cantidad y precio unitario solo si cuadran con el sueldo (si se cambió el sueldo, no se muestran)
+  const cuadra=r.horas&&r.pagoHora&&Math.abs(r.horas*r.pagoHora-sueldo)<1;
+  const filas=`<tr><td>${esc(String(r.glosa||"JORNAL SEMANAL").toUpperCase())}</td><td class="n">${cuadra?r.horas+" h":""}</td><td class="n">${cuadra?fmt(r.pagoHora):""}</td><td class="n">${fmt(sueldo)}</td></tr>`
+    +[["BONIFICACIÓN",bono],["HORAS EXTRA",hex]].filter(([,v])=>v>0).map(([k,v])=>`<tr><td>${k}</td><td class="n"></td><td class="n"></td><td class="n">${fmt(v)}</td></tr>`).join("")
+    +(desc>0?`<tr><td>(−) ADELANTOS / DESCUENTOS</td><td class="n"></td><td class="n"></td><td class="n menos">− ${fmt(desc)}</td></tr>`:"");
+  const totales=desc>0
+    ?`<div class="totales tres"><div class="tot"><small>TOTAL INGRESOS</small><b>${fmt(sueldo+bono+hex)}</b></div><div class="tot"><small>TOTAL DESCUENTOS</small><b style="color:#A8331F">${fmt(desc)}</b></div><div class="tot neto"><small>NETO A RECIBIR</small><b>${fmt(neto)}</b></div></div>`
+    :`<div class="totales"><div class="tot neto"><small>NETO A RECIBIR</small><b>${fmt(neto)}</b></div></div>`;
+  const medio=String(r.medio||t.metodo||"").toUpperCase().replace("INTERBANCARIA","TRANSFERENCIA");
+  const dig=String(t.cuenta||t.cci||"").replace(/\D/g,"");
+  const cuenta=dig&&!/YAPE|PLIN|EFECTIVO/.test(medio)?"**** "+dig.slice(-6,-2)+"-"+dig.slice(-2):"";   // solo los últimos dígitos
+  const pago=[["MEDIO DE PAGO",medio],["BANCO",/YAPE|PLIN|EFECTIVO/.test(medio)?"":String(t.banco||"").toUpperCase()],["CUENTA (ÚLTIMOS DÍGITOS)",cuenta],["N° DE OPERACIÓN",r.operacion]].filter(([,v])=>v);
+  const [y,mm,d]=r.fecha.split("-");
+  const ej=nombre=>`<section class="cp">
+    <div class="cab"><div class="marca"><img src="logo-recibo.png" alt=""><div><b>CASA BONITA OREGÓN S.A.C.</b><span>RUC 20614484153</span><span>Pago a trabajadores</span></div></div>
+      <div class="doc"><div><div class="t">COMPROBANTE DE PAGO</div><div class="n">N° ${num}</div><div class="f">Fecha de pago: ${fF(r.fecha)}</div></div></div></div>
+    <span class="ejemplar">${nombre}</span>
+    <h4>DATOS DEL TRABAJADOR</h4>
+    <div class="grid2"><div class="celda"><small>APELLIDOS Y NOMBRES</small><b>${esc(String(r.desc||"").toUpperCase())}</b></div><div class="celda"><small>PERIODO PAGADO</small><b>${periodo}</b></div>
+      <div class="celda"><small>DNI</small><b>${esc(r.ruc||"")}</b></div><div class="celda"><small>CARGO</small><b>${esc(String(r.cargo||t.cargo||"").toUpperCase())}</b></div></div>
+    <h4>DETALLE DEL PAGO</h4>
+    <table><thead><tr><th>CONCEPTO</th><th class="n">CANTIDAD</th><th class="n">PRECIO UNIT.</th><th class="n">IMPORTE</th></tr></thead><tbody>${filas}</tbody></table>
+    ${totales}<div class="son">SON: ${enLetrasMay(neto)}</div>
+    ${pago.length?`<h4>FORMA DE PAGO</h4><div class="grid2">${pago.map(([k,v])=>`<div class="celda"><small>${k}</small><b>${esc(v)}</b></div>`).join("")}</div>`:""}
+    <p class="decl">Declaro haber recibido a mi entera satisfacción el importe neto indicado en el presente comprobante, por los servicios prestados en el periodo señalado.</p>
+    <p class="lugar">Lima, ${+d} de ${MESES[+mm-1]} de ${y}</p>
+    <div class="firmas"><div class="firma"><b>EMPLEADOR</b><span>Casa Bonita Oregón S.A.C.</span></div><div class="firma"><b>TRABAJADOR</b><span>${esc(String(r.desc||"").toUpperCase())} · DNI ${esc(r.ruc||"")}</span></div></div>
+    <p class="pie">${nombre.charAt(0)+nombre.slice(1).toLowerCase()} · Documento interno de control de pagos</p>
+  </section>`;
+  $("comprobante").innerHTML=`<div class="hoja">${ej("EJEMPLAR TRABAJADOR")}${ej("EJEMPLAR EMPRESA")}<span class="tijera">✂</span></div>`;
+  document.body.classList.add("imp-cp");
+  const titulo0=document.title; document.title=`Comprobante ${num} ${titulo(r.desc||"")}`;   // nombre sugerido del PDF
+  const fin=()=>{document.body.classList.remove("imp-cp");document.title=titulo0;window.removeEventListener("afterprint",fin)};
+  window.addEventListener("afterprint",fin);
+  const img=$("comprobante").querySelector("img"), ir=()=>setTimeout(()=>window.print(),80);
+  if(img&&!img.complete){img.onload=ir;img.onerror=ir}else ir();
+}
+$("movCP").onclick=()=>{const r=movSel;cerrarOv("ovMov");if(r)comprobantePDF(r)};
 
 if("serviceWorker" in navigator){
   // Busca la versión nueva en cada apertura y recarga una sola vez cuando llega
