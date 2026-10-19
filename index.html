@@ -395,8 +395,9 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
 #comprobante .firma{text-align:center;border-top:.3mm solid #10241C;padding-top:1.4mm}
 #comprobante .firma b{display:block;font-size:2.7mm}
 #comprobante .firma span{display:block;font-size:2.1mm;color:#5b6b63;margin-top:.4mm}
-#comprobante .grid2.pago3{grid-template-columns:1fr 1fr 1fr}
-#comprobante .celda.ancho{grid-column:span 2}
+#comprobante .h4pago{display:flex;justify-content:space-between;align-items:baseline}
+#comprobante .h4pago .estado{font-size:2.5mm;color:#5b6b63}
+#comprobante .h4pago .estado b{color:#0D5C46;font-weight:800}
 #comprobante .celda b.pagado{color:#0D5C46;font-weight:800}
 #comprobante .pie{text-align:center;font-size:2mm;color:#8a968f;margin-top:2mm;font-style:italic}
 
@@ -2349,7 +2350,7 @@ function comprobantePDF(r){
     <h4>DETALLE DEL PAGO</h4>
     <table><thead><tr><th>CONCEPTO</th><th class="n">CANTIDAD</th><th class="n">PRECIO UNIT.</th><th class="n">IMPORTE</th></tr></thead><tbody>${filas}</tbody></table>
     ${totales}<div class="son">SON: ${enLetrasMay(neto)}</div>
-    <h4>FORMA DE PAGO</h4><div class="grid2 pago3">${pago.map(([k,v])=>`<div class="celda"><small>${k}</small><b>${esc(v)}</b></div>`).join("")}<div class="celda ancho"><small>ESTADO</small><b class="pagado">PAGADO</b></div></div>
+    <h4 class="h4pago">FORMA DE PAGO<span class="estado">ESTADO: <b>PAGADO</b></span></h4><div class="grid2">${pago.map(([k,v])=>`<div class="celda"><small>${k}</small><b>${esc(v)}</b></div>`).join("")}</div>
     <p class="decl">Declaro haber recibido a mi entera satisfacción el importe neto indicado en el presente comprobante, por los servicios prestados en el periodo señalado.</p>
     <p class="lugar">Lima, ${+d} de ${MESES[+mm-1]} de ${y}</p>
     <div class="firmas"><div class="firma"><img class="fimg" src="firma-gerente.png" alt=""><b>EMPLEADOR</b><span>Casa Bonita Oregón S.A.C.</span></div><div class="firma"><b>TRABAJADOR</b><span>${esc(String(r.desc||"").toUpperCase())} · DNI ${esc(r.ruc||"")}</span></div></div>
