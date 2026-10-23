@@ -523,6 +523,9 @@ button.big{border:0}
 .escaner .pie-esc p{margin:0;font-size:.9rem;text-align:center;color:#D9E3DC}
 .escaner .pie-esc .row2 button{width:100%}
 .escaner .btn2{color:#F4EDE0;border-color:#2C5A4A}
+.escaner #escFoto{width:100%}
+.escaner.leyendo .marco::after{animation-duration:.6s}
+.req{font-weight:600;opacity:.75;text-transform:none;letter-spacing:0}
 /* PIN */
 .bloqueo{position:fixed;inset:0;z-index:60;background:var(--brand);color:var(--brand-ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px}
 .bloqueo h2{font-family:var(--display);margin:0;font-size:1.3rem}
@@ -838,7 +841,7 @@ button.big{border:0}
       <label for="monto">Monto total (S/)</label>
       <div class="monto-fila">
         <div class="monto-big"><span>S/</span><input id="monto" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" aria-label="Monto total en soles"></div>
-        <button type="button" class="qr-btn" id="btnQR" aria-label="Escanear QR del comprobante"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><rect x="8" y="8" width="3" height="3"/><rect x="13" y="8" width="3" height="3"/><rect x="8" y="13" width="3" height="3"/><path d="M13 13h3v3"/></svg><span>Escanear QR</span></button>
+        <button type="button" class="qr-btn" id="btnQR" aria-label="Escanear comprobante: QR, foto o captura"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><rect x="8" y="8" width="3" height="3"/><rect x="13" y="8" width="3" height="3"/><rect x="8" y="13" width="3" height="3"/><path d="M13 13h3v3"/></svg><span>Escanear</span></button>
       </div>
       <button type="button" class="btnlink pagosun-link pla-link" id="irPagoPla">👷 ¿Pagaste a un trabajador? Regístralo aquí ›</button>
       <button type="button" class="btnlink pagosun-link" id="irPagoSun">🏛 ¿Pagaste a SUNAT? Regístralo aquí ›</button>
@@ -853,7 +856,7 @@ button.big{border:0}
         </div>
       </div>
       <div class="calc" id="calc"></div>
-      <label id="lblNro">Serie-N° (opcional)<input id="nro" type="text" maxlength="20" placeholder="E001-27" autocomplete="off"></label>
+      <label id="lblNro">Serie-N° <span class="req">(obligatorio)</span><input id="nro" type="text" maxlength="20" placeholder="E001-27" autocomplete="off"></label>
       <div id="detBox" class="calc">
         <label class="check"><input type="checkbox" id="det"> El cliente me hizo detracción</label>
         <div id="detRow" hidden><span>Porcentaje</span><span><select id="detPct" style="width:auto;padding:4px 8px"><option value="4">4% construcción</option><option value="12">12% otros servicios</option></select></span></div>
@@ -866,7 +869,7 @@ button.big{border:0}
         <label id="lblCli">Cliente / obra<input id="desc" type="text" maxlength="80" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="sug" aria-expanded="false"></label>
         <div class="sug" id="sug" role="listbox" hidden></div>
       </div>
-      <label>RUC / DNI (opcional)<input id="ruc" type="text" inputmode="numeric" maxlength="11" autocomplete="off"></label>
+      <label id="lblRuc"><span id="lblRucTxt">RUC (obligatorio)</span><input id="ruc" type="text" inputmode="numeric" maxlength="11" autocomplete="off"></label>
       <p class="ruc-info" id="rucInfo" hidden></p>
       <p class="hint" style="margin:0" id="hintCli">Escribe y elige de tus clientes ya registrados: el RUC se llena solo.</p>
       <div class="ac-wrap" id="obraWrap">
@@ -1048,10 +1051,11 @@ button.big{border:0}
   <video id="video" playsinline muted></video>
   <div class="marco" aria-hidden="true"></div>
   <div class="pie-esc">
-    <p id="escMsg">Apunta al código QR del comprobante electrónico.</p>
+    <p id="escMsg">Apunta al QR del comprobante. ¿No tiene QR? Toma foto al comprobante completo.</p>
+    <button type="button" class="btn pri" id="escFoto">📸 Tomar foto al comprobante</button>
     <div class="row2">
-      <label class="btn2" style="display:flex;align-items:center;justify-content:center;text-transform:none;letter-spacing:0;font-size:.95rem;color:#F4EDE0;cursor:pointer">Elegir foto<input type="file" id="qrFoto" accept="image/*" hidden></label>
-      <button type="button" class="btn pri" id="escCerrar">Cancelar</button>
+      <label class="btn2" style="display:flex;align-items:center;justify-content:center;text-transform:none;letter-spacing:0;font-size:.95rem;color:#F4EDE0;cursor:pointer">🖼 Foto o captura<input type="file" id="qrFoto" accept="image/*" hidden></label>
+      <button type="button" class="btn2" id="escCerrar">Cancelar</button>
     </div>
   </div>
   <canvas id="qrCanvas" hidden></canvas>
@@ -1474,6 +1478,7 @@ function syncForm(){
   $("hintCli").textContent=fTipo==="ingreso"?"Escribe y elige de tus clientes ya registrados: el RUC se llena solo.":"Escribe y elige de tus proveedores ya registrados: el RUC se llena solo.";
   $("desc").placeholder=fTipo==="ingreso"?"Ej. Inmobiliaria PSN S.A.C.":"Ej. Ferremesh S.A.C.";
   $("lblNro").hidden=fComp==="ninguno";
+  $("lblRucTxt").textContent=fComp==="ninguno"?"RUC / DNI (opcional)":"RUC (obligatorio)";
   const m=leerMonto(), p=partesForm(m);
   $("calc").innerHTML=fComp==="ninguno"?`<div><span>Sin comprobante: no se separa IGV</span></div>`:
     `<div><span>Valor sin IGV</span><span class="num">${fmt(p.base)}</span></div><div><span>IGV 18%</span><span class="num">${fmt(p.igv)}</span></div>`+(fTipo==="gasto"?`<div><span>${fComp==="factura"?"Este IGV se descuenta de tu pago":"Con boleta no recuperas el IGV"}</span></div>`:"");
@@ -1502,8 +1507,13 @@ function irPaso(n){
   const foco={1:"monto",3:"desc"}[n];
   if(foco) setTimeout(()=>{if(!$("ov").hidden)$(foco).focus({preventScroll:true})},60);
 }
+// Con factura o boleta: serie-número y RUC del proveedor/cliente son obligatorios
+const nroValido=v=>/^[A-Z0-9]{1,4}\s*-\s*\d{1,8}$/i.test(String(v||"").trim());
+const rucValido=v=>/^(10|15|16|17|20)\d{9}$/.test(String(v||"").replace(/\s/g,""));
 function validarPaso(n){
   if(n===1&&!(leerMonto()>0)){$("msg").textContent="Escribe un monto mayor a 0.";return false}
+  if(n===2&&fComp!=="ninguno"&&!nroValido($("nro").value)){$("msg").textContent="Escribe la serie y el número del comprobante (ej. F001-1234). Es obligatorio.";$("nro").focus();return false}
+  if(n===3&&fComp!=="ninguno"&&!rucValido($("ruc").value)){$("msg").textContent=`Escribe el RUC del ${fTipo==="ingreso"?"cliente":"proveedor"} (11 números). Es obligatorio.`;$("ruc").focus();return false}
   if(n===4&&!$("fecha").value){$("msg").textContent="Elige una fecha.";return false}
   return true;
 }
@@ -1637,6 +1647,7 @@ $("f").addEventListener("submit",async e=>{
   e.preventDefault();
   if(!validarPaso(paso))return;
   if(paso<4){irPaso(paso+1);return}
+  for(const k of [1,2,3]){if(!validarPaso(k)){const m=$("msg").textContent;irPaso(k);$("msg").textContent=m;return}}
   const monto=r2(leerMonto());
   if(!(monto>0)){irPaso(1);$("msg").textContent="Escribe un monto mayor a 0.";return}
   const det=fTipo==="ingreso"&&fComp==="factura"&&$("det").checked;
@@ -1789,23 +1800,118 @@ async function abrirEscaner(){
     qrStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false});
     if($("escaner").hidden){cerrarEscaner();return}
     const v=$("video"); v.srcObject=qrStream; await v.play();
-    $("escMsg").textContent="Apunta al código QR del comprobante electrónico.";
+    $("escMsg").textContent="Apunta al QR del comprobante. ¿No tiene QR? Toca 📸 y tómale foto completo.";
     const ciclo=async()=>{if($("escaner").hidden)return;try{const txt=await det(v);if(txt&&aplicarQR(txt))return}catch{}qrTimer=setTimeout(ciclo,180)};
     ciclo();
-  }catch{ $("escMsg").textContent="No se pudo abrir la cámara. Toca «Elegir foto» y escoge una foto del QR." }
+  }catch{ $("escMsg").textContent="No se pudo abrir la cámara. Toca «Foto o captura» y escoge la imagen del comprobante." }
 }
 function cerrarEscaner(){
   clearTimeout(qrTimer); if(qrStream){qrStream.getTracks().forEach(t=>t.stop());qrStream=null}
   $("video").srcObject=null; $("escaner").hidden=true;
 }
 $("btnQR").onclick=abrirEscaner; $("escCerrar").onclick=cerrarEscaner;
+/* ===== Comprobante sin QR: se lee el texto de la foto (en el mismo celular/PC, sin enviar la imagen a nadie) ===== */
+/* OCR-INICIO (lógica de lectura, probada aparte) */
+function parseTextoComprobante(texto,rucPropio){
+  const T=String(texto||"").toUpperCase().replace(/[|]/g,"I");
+  const L=T.split(/\n+/).map(x=>x.trim()).filter(Boolean);
+  // RUC: 11 dígitos (permite espacios o guiones que mete la lectura)
+  const rucs=[]; (T.match(/\b(?:10|15|16|17|20)[\d\s-]{9,13}\b/g)||[]).forEach(m=>{const d=m.replace(/\D/g,"");if(d.length===11&&!rucs.includes(d))rucs.push(d)});
+  const tercero=rucs.find(r=>r!==rucPropio)||"";
+  const esIngreso=rucs[0]===rucPropio&&!!rucPropio;
+  // Serie-número: F001-123, E001-45, B001-9, FA01-…, EB01-…
+  let serie="",numero="", m=T.match(/\b([FBE][A-Z0-9]{3})\s*(?:-|–|—|N[°ºO]\.?|\s)\s*0*(\d{1,8})\b/);
+  if(m){serie=m[1].replace(/O/g,"0");numero=m[2]}
+  const comprobante=/BOLETA/.test(T)||/^(B|EB)/.test(serie)?"boleta":(/FACTURA/.test(T)||/^(F|E)/.test(serie))?"factura":"ninguno";
+  // Fecha: la primera que sea razonable
+  let fecha=""; const reF=/\b(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})\b|\b(20\d{2})-(\d{2})-(\d{2})\b/g; let f;
+  while((f=reF.exec(T))&&!fecha){
+    let y,mo,d; if(f[4]){y=+f[4];mo=+f[5];d=+f[6]}else{d=+f[1];mo=+f[2];y=+f[3];if(y<100)y+=2000}
+    if(y>=2020&&y<=2035&&mo>=1&&mo<=12&&d>=1&&d<=31) fecha=`${y}-${String(mo).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+  }
+  // Montos: número con 2 decimales (1,234.50 o 1.234,50)
+  const montos=s=>(s.match(/\d{1,3}(?:[.,\s]\d{3})*[.,]\d{2}\b|\d+[.,]\d{2}\b/g)||[]).map(x=>{let t=x.replace(/\s/g,"");if(/,\d{2}$/.test(t))t=t.replace(/\./g,"").replace(",",".");else t=t.replace(/,/g,"");return +t}).filter(n=>n>0&&n<10000000);
+  let total=0;
+  const prefer=L.filter(l=>/TOTAL/.test(l)&&!/SUB\s*TOTAL|GRAVAD|EXONER|INAFEC|DESCUENTO|TOTAL\s*IGV|ANTICIP/.test(l));
+  prefer.forEach(l=>montos(l).forEach(n=>{if(n>total)total=n}));
+  if(!total){ const imp=L.filter(l=>/IMPORTE|A PAGAR|PAGAR/.test(l)); imp.forEach(l=>montos(l).forEach(n=>{if(n>total)total=n})) }
+  if(!total) montos(T).forEach(n=>{if(n>total)total=n});
+  let igv=0; L.filter(l=>/I\.?\s*G\.?\s*V/.test(l)).forEach(l=>montos(l).forEach(n=>{if(n<total&&Math.abs(n-(total-total/1.18))<=Math.max(0.05,total*0.01))igv=n}));
+  // Nombre del emisor: suele estar en las primeras líneas, antes del RUC
+  let nombre=""; for(const l of L.slice(0,6)){if(/S\.?A\.?C|E\.?I\.?R\.?L|S\.?R\.?L|S\.?A\.?\b|[A-ZÁÉÍÓÚÑ]{3,}\s+[A-ZÁÉÍÓÚÑ]{3,}/.test(l)&&!/RUC|FACTURA|BOLETA|ELECTR|DIRECC|AV\.|JR\.|CAL\./.test(l)){nombre=l.replace(/[^A-ZÁÉÍÓÚÑ0-9.&\s-]/g,"").trim();break}}
+  return {rucs,rucTercero:tercero,movimiento:esIngreso?"ingreso":"gasto",comprobante,serie,numero,fecha,total:Math.round(total*100)/100,igv:Math.round(igv*100)/100,nombre};
+}
+/* OCR-FIN */
+let ocrWorker=null;
+function cargarOCR(){
+  if(ocrWorker) return ocrWorker;
+  ocrWorker=new Promise((ok,mal)=>{const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";s.async=true;
+    s.onload=()=>window.Tesseract?ok(window.Tesseract):mal();s.onerror=()=>{s.remove();mal()};document.head.appendChild(s)})
+    .then(T=>T.createWorker("spa",1,{logger:m=>{if(m.status==="recognizing text")$("escMsg").textContent=`Leyendo el comprobante… ${Math.round((m.progress||0)*100)}%`;else if(/load|initializ/.test(m.status||""))$("escMsg").textContent="Preparando el lector (solo la primera vez tarda un poco)…"}}));
+  ocrWorker.catch(()=>{ocrWorker=null});
+  return ocrWorker;
+}
+// Imagen lista para leer: hasta 2000 px, en grises y con más contraste
+function imagenParaLeer(img){
+  const w=img.width,h=img.height,k=Math.min(1,2000/Math.max(w,h)),cv=document.createElement("canvas");
+  cv.width=Math.round(w*k);cv.height=Math.round(h*k);const cx=cv.getContext("2d",{willReadFrequently:true});cx.drawImage(img,0,0,cv.width,cv.height);
+  const d=cx.getImageData(0,0,cv.width,cv.height),p=d.data;
+  for(let i=0;i<p.length;i+=4){let g=.299*p[i]+.587*p[i+1]+.114*p[i+2];g=Math.max(0,Math.min(255,(g-128)*1.5+140));p[i]=p[i+1]=p[i+2]=g}
+  cx.putImageData(d,0,0);return cv;
+}
+// Guarda la foto como foto del comprobante (si tu archivo de Google ya lo permite)
+function guardarComoFoto(img){
+  try{const k=Math.min(1,1600/Math.max(img.width,img.height)),cv=document.createElement("canvas");cv.width=Math.round(img.width*k);cv.height=Math.round(img.height*k);
+    cv.getContext("2d").drawImage(img,0,0,cv.width,cv.height);fotoData=cv.toDataURL("image/jpeg",.72);
+    $("fotoPrev").src=fotoData;$("fotoPrev").hidden=false;$("fotoQuitar").hidden=false;$("btnFoto").textContent="📷 Cambiar foto"}catch(e){}
+}
+function aplicarTexto(q){
+  cerrarEscaner();
+  fTipo=q.movimiento; fComp=q.comprobante;
+  if(q.total>0)$("monto").value=q.total.toFixed(2);
+  if(q.serie)$("nro").value=`${q.serie}-${q.numero}`;
+  if(q.rucTercero)$("ruc").value=q.rucTercero;
+  const previo=q.rucTercero?terceros(fTipo).find(x=>x.ruc===q.rucTercero):null;
+  if(previo)$("desc").value=previo.desc;
+  if(q.fecha)$("fecha").value=q.fecha;
+  qrIgv=q.igv>0&&q.total>0?{total:q.total,igv:q.igv}:null;
+  if(!$("det").dataset.touched)$("det").checked=fTipo==="ingreso"&&q.total>700;
+  syncForm(); if(previo&&CATS[fTipo].includes(previo.cat))$("cat").value=previo.cat;
+  const falta=[!(q.total>0)&&"monto",fComp!=="ninguno"&&!q.serie&&"serie-número",fComp!=="ninguno"&&!q.rucTercero&&"RUC",!q.fecha&&"fecha"].filter(Boolean);
+  $("avisoQR").textContent=`Leído de la foto: ${COMP_TXT[fComp]}${q.serie?" "+q.serie+"-"+q.numero:""}${q.total?" por "+fmt(q.total):""}${previo?" de "+previo.desc:""}. `
+    +(falta.length?`No pude leer: ${falta.join(", ")}. Complétalo a mano.`:"Revisa que los datos coincidan con el comprobante y toca Guardar.");
+  $("avisoQR").hidden=false;
+  // Lleva al primer dato que falte; si está todo, al resumen
+  irPaso(!(q.total>0)?1:(fComp!=="ninguno"&&!q.serie)?2:(fComp!=="ninguno"&&!q.rucTercero)||!previo?3:4);
+  if(!previo&&q.rucTercero) buscarNombreRuc(q.rucTercero,j=>{$("avisoQR").textContent=$("avisoQR").textContent.replace(". Revisa"," de "+j.nombre+". Revisa")});
+  else if(!previo&&!q.rucTercero&&q.nombre&&!$("desc").value.trim()) $("desc").value=q.nombre;
+}
+// Una sola entrada para todo: primero busca el QR; si no hay, lee el comprobante completo
+async function leerImagenComprobante(img){
+  $("escaner").classList.add("leyendo"); $("escMsg").textContent="Buscando el QR…";
+  try{
+    try{const det=await prepararDetector(); const txt=await det(img); if(txt&&parseQRSunat(txt,RUC_CBO)){aplicarQR(txt);guardarComoFoto(img);return}}catch(e){}
+    $("escMsg").textContent="Sin QR: leyendo el comprobante…";
+    let T; try{T=await cargarOCR()}catch(e){$("escMsg").textContent="No se pudo cargar el lector. Revisa tu internet e intenta de nuevo.";return}
+    const r=await T.recognize(imagenParaLeer(img));
+    const q=parseTextoComprobante(r&&r.data&&r.data.text,RUC_CBO);
+    if(!(q.total>0)&&!q.serie&&!q.rucs.length){$("escMsg").textContent="No pude leer el comprobante. Toma la foto más de cerca, con buena luz y sin sombras.";return}
+    aplicarTexto(q); guardarComoFoto(img);
+  }catch(e){$("escMsg").textContent="No se pudo leer la foto. Intenta otra vez."}
+  finally{$("escaner").classList.remove("leyendo")}
+}
+$("escFoto").onclick=async()=>{
+  const v=$("video");
+  if(!qrStream||!v.videoWidth){$("qrFoto").click();return}           // sin cámara en vivo: abre la cámara/galería del equipo
+  const cv=document.createElement("canvas");cv.width=v.videoWidth;cv.height=v.videoHeight;cv.getContext("2d").drawImage(v,0,0);
+  clearTimeout(qrTimer); leerImagenComprobante(cv);
+};
 $("qrFoto").addEventListener("change",async e=>{
   const f=e.target.files[0]; e.target.value=""; if(!f)return;
-  $("escMsg").textContent="Leyendo la foto…";
-  try{const det=await prepararDetector(); const img=await createImageBitmap(f); const txt=await det(img);
-    if(!txt){$("escMsg").textContent="No encontré un QR en esa foto. Prueba con una más cerca y nítida.";return}
-    aplicarQR(txt);
-  }catch{$("escMsg").textContent="No se pudo leer la foto."}
+  if($("escaner").hidden)$("escaner").hidden=false;
+  clearTimeout(qrTimer);
+  let img; try{img=await createImageBitmap(f)}catch{$("escMsg").textContent="No se pudo abrir esa imagen.";return}
+  leerImagenComprobante(img);
 });
 
 /* ===== Reporte del mes: Excel (CSV) y PDF ===== */
