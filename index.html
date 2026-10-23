@@ -2074,7 +2074,7 @@ function pintarCola(){
   const b=$("colaReintentar"); if(b) b.onclick=()=>cargar();
 }
 // ¿Ya está en Google? (mismo tipo, fecha, monto, comprobante, RUC y descripción)
-const mismoReg=(a,b)=>a.tipo===b.tipo&&a.fecha===b.fecha&&Math.abs((+a.monto||0)-(+b.monto||0))<0.005
+const mismoReg=(a,b)=>a.tipo===b.tipo&&a.fecha===b.fecha&&Math.abs((+a.monto||0)-(+b.monto||0))<=0.05
   &&String(a.serie||"")===String(b.serie||"")&&String(a.numero||"")===String(b.numero||"")
   &&String(a.ruc||"").replace(/\D/g,"")===String(b.ruc||"").replace(/\D/g,"")&&(a.categoria||"")===(b.categoria||"");
 async function enviarCola(){
@@ -2089,9 +2089,7 @@ async function enviarCola(){
           // Si el envío anterior se cortó por tiempo, Google pudo haberlo guardado igual: se revisa antes de repetirlo
           if(op.dudoso){
             const d=await api("datos");
-            const ya=(d.registros||[]).filter(r=>mismoReg(r,op.registro));
-            const usados=new Set(servidorRows.filter(r=>mismoReg(r,op.registro)).map(r=>String(r.id)));
-            const hallado=ya.find(r=>!usados.has(String(r.id)));
+            const hallado=(d.registros||[]).find(r=>mismoReg(r,op.registro));
             if(hallado) nuevo=hallado.id;
           }
           if(!nuevo){
