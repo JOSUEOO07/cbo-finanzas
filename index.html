@@ -1907,7 +1907,7 @@ let cfg=leerLS(CFG_K,null);
 async function api(accion,extra,conf){
   const c=conf||cfg;
   // Con señal débil la petición puede quedarse colgada: se corta a los 30 s y cuenta como "sin internet"
-  const ctl=new AbortController(), to=setTimeout(()=>ctl.abort(),30000);
+  const ctl=new AbortController(), to=setTimeout(()=>ctl.abort(),45000);
   let res;
   try{res=await fetch(c.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({clave:c.clave,accion},extra||{})),redirect:"follow",signal:ctl.signal})}
   finally{clearTimeout(to)}
@@ -1945,7 +1945,8 @@ const COLA_K="cbo-cola";
 let cola=leerLS(COLA_K,[]), servidorRows=leerLS(CACHE_K,[]), enviando=false;
 const guardarCola=()=>{guardarLS(COLA_K,cola);pintarCola()};
 // Error de red (sin señal, tiempo agotado) frente a error del servidor (clave, datos inválidos)
-const esErrorRed=e=>!e||(!e.code&&(e.name==="TypeError"||e.name==="SyntaxError"||e.name==="AbortError"||/fetch|network|red|load failed/i.test(e.message||"")));
+// Ojo: el corte por tiempo (AbortError) trae un "code" numérico del navegador; solo los errores del servidor traen code de texto
+const esErrorRed=e=>!e||(typeof e.code!=="string"&&(e.name==="TypeError"||e.name==="SyntaxError"||e.name==="AbortError"||/fetch|network|red|load failed|abort/i.test(e.message||"")));
 // La vista = lo que tiene Google + los cambios que aún no se envían
 function conCola(base){
   let out=base.map(r=>Object.assign({},r));
@@ -1962,19 +1963,35 @@ function encolar(op){if(op.registro)op.registro=limpioReg(op.registro);op.t=Date
 function pintarCola(){
   const n=cola.length, el=$("colaAviso"); if(!el)return;
   el.hidden=!n;
-  el.innerHTML=n?`⏳ <b>${n}</b> cambio${n===1?"":"s"} por enviar · se enviará${n===1?"":"n"} solo${n===1?"":"s"} cuando haya internet <button type="button" class="btnlink" id="colaReintentar">Enviar ahora</button>`:"";
+  el.innerHTML=!n?"":(enviando&&navigator.onLine)?`⏳ Guardando en Google · <b>${n}</b> cambio${n===1?"":"s"} en camino… puedes seguir usando la app`
+    :`⏳ <b>${n}</b> cambio${n===1?"":"s"} por enviar · se enviará${n===1?"":"n"} solo${n===1?"":"s"} cuando haya internet <button type="button" class="btnlink" id="colaReintentar">Enviar ahora</button>`;
   const b=$("colaReintentar"); if(b) b.onclick=()=>cargar();
 }
+// ¿Ya está en Google? (mismo tipo, fecha, monto, comprobante, RUC y descripción)
+const mismoReg=(a,b)=>a.tipo===b.tipo&&a.fecha===b.fecha&&Math.abs((+a.monto||0)-(+b.monto||0))<0.005
+  &&String(a.serie||"")===String(b.serie||"")&&String(a.numero||"")===String(b.numero||"")
+  &&String(a.ruc||"").replace(/\D/g,"")===String(b.ruc||"").replace(/\D/g,"")&&(a.categoria||"")===(b.categoria||"");
 async function enviarCola(){
   if(enviando||!cola.length||esDemo())return;
-  enviando=true;
+  enviando=true; pintarCola();
   try{
     while(cola.length){
       const op=cola[0];
       try{
         if(op.op==="agregar"){
-          const j=await api("agregar",{registro:op.registro});
-          const nuevo=j&&j.id;
+          let nuevo=null;
+          // Si el envío anterior se cortó por tiempo, Google pudo haberlo guardado igual: se revisa antes de repetirlo
+          if(op.dudoso){
+            const d=await api("datos");
+            const ya=(d.registros||[]).filter(r=>mismoReg(r,op.registro));
+            const usados=new Set(servidorRows.filter(r=>mismoReg(r,op.registro)).map(r=>String(r.id)));
+            const hallado=ya.find(r=>!usados.has(String(r.id)));
+            if(hallado) nuevo=hallado.id;
+          }
+          if(!nuevo){
+            try{const j=await api("agregar",{registro:op.registro});nuevo=j&&j.id}
+            catch(e){if(esErrorRed(e)){op.dudoso=true;guardarCola()}throw e}
+          }
           // Las operaciones siguientes sobre este registro usan ya el id real
           cola.slice(1).forEach(o=>{if(String(o.id)===String(op.tmp))o.id=nuevo});
         }
@@ -1990,6 +2007,10 @@ async function enviarCola(){
     }
   }finally{enviando=false;pintarCola()}
 }
+/* Envío en segundo plano: la pantalla se actualiza al instante y Google recibe los cambios detrás.
+   Varios cambios seguidos (por ejemplo, borrar 5 comprobantes) se envían juntos y al final se recarga una sola vez. */
+let sincT=null;
+function sincronizar(){clearTimeout(sincT);sincT=setTimeout(async()=>{if(!cola.length)return;await enviarCola();if(!cola.length)cargar()},400)}
 window.addEventListener("online",()=>cargar());
 setInterval(()=>{if(cola.length&&navigator.onLine)cargar()},60000);
 const storeDemo={
@@ -1999,15 +2020,13 @@ const storeDemo={
 };
 const storeGoogle={
   add:async r=>{
-    let j;$("cargando").hidden=false;
-    try{j=await api("agregar",{registro:r})}
-    catch(e){if(!esErrorRed(e))throw e;const tmp="tmp"+Date.now().toString(36);encolar({op:"agregar",tmp,registro:r});toast("Sin internet: guardado en el celular, se enviará solo");return tmp}
-    finally{$("cargando").hidden=true}
-    await cargar();return j&&j.id},
+    const tmp="tmp"+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+    encolar({op:"agregar",tmp,registro:r});
+    if(!navigator.onLine) toast("Sin internet: guardado en el celular, se enviará solo");
+    sincronizar(); return tmp},
   remove:async id=>{
     if(String(id).startsWith("tmp")){cola=cola.filter(o=>o.tmp!==id&&String(o.id)!==String(id));guardarCola();rows=conCola(servidorRows);render();return}
-    try{await api("borrar",{id})}catch(e){if(!esErrorRed(e))throw e;encolar({op:"borrar",id});return}
-    rows=rows.filter(x=>x.id!==id);render();cargar()},
+    encolar({op:"borrar",id}); sincronizar()},
   // Cambio parcial (solo obra o foto), con cola si no hay señal
   editParcial:async(id,campos)=>{
     if(String(id).startsWith("tmp")){const op=cola.find(o=>o.tmp===id);if(op)Object.assign(op.registro,campos);guardarCola();rows=conCola(servidorRows);render();return}
@@ -2020,10 +2039,7 @@ const storeGoogle={
     if(String(id).startsWith("tmp")){const op=cola.find(o=>o.tmp===id);if(op)op.registro=limpioReg(r);guardarCola();rows=conCola(servidorRows);render();return}
     $("cargando").hidden=false;
     try{
-      if(versionServidor>=2){
-        try{await api("editar",{id,registro:r})}
-        catch(e){if(!esErrorRed(e))throw e;encolar({op:"editar",id,registro:r});toast("Sin internet: el cambio se enviará solo");return}
-      }
+      if(versionServidor>=2){ encolar({op:"editar",id,registro:r}); sincronizar(); return }
       else{ await api("agregar",{registro:r});
         try{await api("borrar",{id})}catch(e){await cargar();throw new Error("Se guardó el cambio pero no se pudo borrar el registro anterior; bórralo a mano")} }
     }finally{$("cargando").hidden=true}
@@ -2106,7 +2122,7 @@ async function subirFoto(id,data,r){
   if(esDemo()){await store.edit(id,{fotoUrl:data});return}
   const nombre=`${r.fecha} ${r.tipo==="ingreso"?"venta":"gasto"} ${r.desc||""} ${r.serie?r.serie+"-"+r.numero:""}`.trim().slice(0,70)+".jpg";
   const base64=data.split(",")[1];
-  if(String(id).startsWith("tmp")){encolar({op:"foto",id,nombre,base64});return}
+  if(String(id).startsWith("tmp")){encolar({op:"foto",id,nombre,base64});sincronizar();return}
   try{await api("subirFoto",{id,nombre,tipo:"image/jpeg",base64})}
   catch(e){if(!esErrorRed(e))throw e;encolar({op:"foto",id,nombre,base64});toast("Sin internet: la foto se subirá sola");return}
   await cargar();
