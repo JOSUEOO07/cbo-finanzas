@@ -191,6 +191,38 @@ body.menu .fab{display:none}
 .btnlink{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:10px;padding:6px 10px;font-weight:600;font-size:.82rem;text-decoration:none;white-space:nowrap}
 .xls{border:1px solid var(--brand-2);color:var(--brand-2);border-radius:10px;padding:6px 12px;font-weight:600;font-size:.85rem;text-decoration:none;white-space:nowrap}
 
+/* Colores combinables, transiciones y firma del trabajador (v35) */
+.tprev{border-radius:14px;padding:14px;border:1px solid var(--line);margin-top:12px}
+.tpcard{border:1px solid;border-radius:12px;padding:12px 14px;display:grid;gap:4px;position:relative;overflow:hidden;max-width:340px}
+.tpbar{position:absolute;left:0;top:0;bottom:0;width:5px}.tpbtn{justify-self:start;border-radius:999px;padding:5px 14px;font-size:.8rem;font-weight:700;margin-top:4px}
+.tpl{margin:14px 0 6px;font-weight:700;font-size:.9rem}.tpl small{font-weight:500;color:var(--muted)}
+.combos{display:flex;flex-wrap:wrap;gap:8px}
+.cmb{width:46px;height:46px;border-radius:50%;padding:3px;border:2px solid var(--line);background:var(--surface);cursor:pointer}
+.cmb i{display:block;width:100%;height:100%;border-radius:50%;position:relative;overflow:hidden}
+.cmb em{position:absolute;right:0;bottom:0;width:50%;height:50%;border-top-left-radius:100%}
+.cmb[aria-pressed="true"]{border-color:var(--brand-2)}
+.swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
+.swc{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:8px 4px;display:grid;gap:6px;justify-items:center;font-size:.78rem;font-weight:600;cursor:pointer;min-width:0}
+.swc span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.swc i{width:34px;height:34px;border-radius:50%;display:block}
+.swc[aria-pressed="true"]{border-color:var(--brand-2);box-shadow:inset 0 0 0 1px var(--brand-2)}
+.trx{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px}
+.trb{text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:10px 12px;display:grid;gap:2px;cursor:pointer;min-width:0}
+.trb small{color:var(--muted);font-size:.76rem;line-height:1.3}.trb[aria-pressed="true"]{border-color:var(--brand-2);box-shadow:inset 0 0 0 1px var(--brand-2)}
+.ftrab-pad{display:block;width:100%;height:230px;background:#fff;border:1.5px dashed var(--line);border-radius:12px;touch-action:none;cursor:crosshair}
+.ftrab-info{display:grid;gap:2px;background:var(--soft);border-radius:12px;padding:10px 12px;font-size:.88rem}
+.ftrab-info b{overflow-wrap:anywhere}
+.ftrab-ok{display:flex;gap:10px;align-items:center;background:var(--in-bg);color:var(--in);border-radius:12px;padding:8px 12px;font-weight:700;font-size:.86rem}
+.ftrab-ok img{height:40px;max-width:120px;object-fit:contain;background:#fff;border-radius:6px;padding:2px}
+#movFirmaEst{grid-column:1/-1}#movFirmaEst:empty{display:none}#movFirmar{grid-column:1/-1}
+.cp-btn.cp-firma{background:var(--surface);color:var(--brand-2);border:1.5px solid var(--brand-2)}
+#comprobante .firma .ffecha{font-size:1.8mm;color:#5b6b63;margin-top:.3mm}
+.firmados{display:grid;gap:6px}
+.firmados button{display:flex;justify-content:space-between;gap:10px;align-items:center;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:8px 10px;font:inherit;font-size:.85rem;cursor:pointer;min-width:0}
+.firmados button span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.firmados button small{color:var(--muted);white-space:nowrap}
+@media (max-width:520px){.opts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
 /* Configuración */
 .opts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
 .opt{border:2px solid var(--line);border-radius:14px;background:var(--surface);padding:10px;display:grid;gap:8px;text-align:left}
@@ -584,7 +616,7 @@ button.big{border:0}
       <button data-s="anual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Resumen anual</button>
       <button data-s="config"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Configuración</button>
     </nav>
-    <div class="pie">CBO Finanzas · versión 3.0 (mejorada)</div>
+    <div class="pie">CBO Finanzas · versión 3.1</div>
   </aside>
   <div class="velo" id="velo"></div>
 
@@ -772,6 +804,17 @@ button.big{border:0}
               <button class="opt" data-t="negro"><div class="mini"><span style="background:#6FD3A8"></span><span style="background:#000000"></span></div><b>Negro</b><small>Ahorra batería</small></button>
               <button class="opt" data-t="auto"><div class="mini" style="background:linear-gradient(90deg,#E9DCC3 50%,#061F18 50%)"></div><b>Automático</b><small>Según tu celular</small></button>
             </div>
+            <div id="combinar"></div>
+          </section>
+          <section class="panel">
+            <div class="ph"><h2>Transición entre pantallas</h2></div>
+            <p class="hint" style="margin:0 0 10px">Se ve al cambiar de sección (Inicio, Movimientos, Planilla…). Toca una para probarla.</p>
+            <div class="trx" id="trx"></div>
+          </section>
+          <section class="panel">
+            <div class="ph"><h2>Comprobantes firmados</h2><span class="hint" id="firmadosN"></span></div>
+            <p class="hint" style="margin:0 0 10px">Recibos de pago que el trabajador firmó en este equipo. Toca uno para descargar su PDF firmado.</p>
+            <div class="firmados" id="firmados"></div>
           </section>
           <section class="panel">
             <div class="ph"><h2>Empresa</h2></div>
@@ -811,7 +854,7 @@ button.big{border:0}
           </section>
           <section class="panel">
             <div class="ph"><h2>Acerca de</h2></div>
-            <p class="hint" style="margin:0">CBO Finanzas 3.0 (versión mejorada). Tus datos se guardan en tu archivo de Google Sheets "CASA BONITA OREGON S.A.C.". Este celular solo guarda una copia para verlos sin internet.</p>
+            <p class="hint" style="margin:0">CBO Finanzas 3.1. Tus datos se guardan en tu archivo de Google Sheets "CASA BONITA OREGON S.A.C.". Este celular solo guarda una copia para verlos sin internet.</p>
           </section>
         </div>
       </section>
@@ -1033,6 +1076,8 @@ button.big{border:0}
     <h3>Movimiento <button type="button" class="x" data-cerrar aria-label="Cerrar">✕</button></h3>
     <div class="det-mov" id="movDet"></div>
     <div class="cp-btns" id="movCPs" hidden>
+      <div id="movFirmaEst"></div>
+      <button type="button" class="btn cp-btn cp-firma" id="movFirmar">✍ Firma del trabajador</button>
       <button type="button" class="btn cp-btn" id="movCP">📄 Comprobante (PDF)</button>
       <button type="button" class="btn cp-btn cp-wa" id="movCPWa"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.1 5.1 0 0 0 1.1 2.7 11.6 11.6 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>Enviar por WhatsApp</button>
     </div>
@@ -1043,6 +1088,21 @@ button.big{border:0}
       <button type="button" id="movBorrar" class="peligro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg><span>Borrar</span></button>
     </div>
     <p class="msg" id="movMsg"></p>
+  </div>
+</div>
+
+<div class="overlay" id="ovFirmaT" hidden>
+  <div class="sheet">
+    <h3>Firma del trabajador <button type="button" class="x" data-cerrar aria-label="Cerrar">✕</button></h3>
+    <div class="ftrab-info" id="ftInfo"></div>
+    <p class="hint" style="margin:0">Pásale el celular al trabajador para que firme con el dedo dentro del recuadro.</p>
+    <canvas class="ftrab-pad" id="ftPad" aria-label="Recuadro para la firma del trabajador"></canvas>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn" type="button" id="ftGuardar">Guardar firma</button>
+      <button class="btnlink" type="button" id="ftBorrar">Borrar y volver a firmar</button>
+      <button class="btnlink" type="button" id="ftQuitar" hidden>Quitar firma guardada</button>
+    </div>
+    <p class="msg" id="ftMsg"></p>
   </div>
 </div>
 
@@ -1362,6 +1422,7 @@ function chart(){
 /* ===== Navegación ===== */
 const animar=(el,cls)=>{if(!el)return;el.classList.remove("entra","mes-sig","mes-ant");void el.offsetWidth;el.classList.add(cls)};
 function ir(s){
+  if(s!==seccion) screenFx(s, ultimoToque);
   const cambio=s!==seccion; seccion=s; document.querySelectorAll("[data-sec]").forEach(x=>x.hidden=x.dataset.sec!==s);
   document.querySelectorAll("#nav button").forEach(b=>b.setAttribute("aria-current",b.dataset.s===s?"page":"false"));
   const enMas=["terceros","planilla","anual","obras","config"].includes(s);
@@ -1369,7 +1430,7 @@ function ir(s){
   $("titulo").textContent=TITULOS[s]; $("monthsel").hidden=s==="config";
   $("app").classList.remove("abierto");document.body.classList.remove("menu"); try{history.replaceState(null,"","#"+s)}catch{}
   if(s==="obras") try{renderObras()}catch(e){console.error(e)}
-  if(cambio) animar(document.querySelector(`[data-sec="${s}"]`),"entra");
+  if(cambio&&fxType()!=="none"&&fxType()!=="choreo"&&fxType()!=="morph") {/* la transición elegida ya anima */}
   window.scrollTo(0,0);
 }
 document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>ir(b.dataset.s));
@@ -1405,7 +1466,7 @@ document.querySelectorAll("#tabbar [data-tab]").forEach(b=>b.onclick=()=>{if(b.d
 $("tabReg").onclick=()=>openF();
 document.querySelectorAll("#ovMas [data-ir]").forEach(b=>b.onclick=()=>{cerrarOv("ovMas");ir(b.dataset.ir)});
 document.querySelectorAll("[data-cerrar]").forEach(b=>b.onclick=()=>b.closest(".overlay").hidden=true);
-["ovMas","ovMov"].forEach(id=>$(id).addEventListener("click",e=>{if(e.target===$(id))cerrarOv(id)}));
+["ovMas","ovMov","ovFirmaT"].forEach(id=>$(id).addEventListener("click",e=>{if(e.target===$(id))cerrarOv(id)}));
 function toast(t){const d=document.createElement("div");d.className="toast";d.setAttribute("role","status");d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2600)}
 
 /* ===== Tocar un movimiento: ver, editar, duplicar, borrar ===== */
@@ -1413,7 +1474,7 @@ let movSel=null;
 const COMP_TXT={factura:"Factura",boleta:"Boleta",ninguno:"Sin comprobante"};
 function abrirMov(id){
   const r=rows.find(x=>String(x.id)===String(id)); if(!r)return; movSel=r; pendingDel=null;
-  $("movCPs").hidden=!esPlanilla(r);if(esPlanilla(r))cargarLibsPDF().catch(()=>{});
+  $("movCPs").hidden=!esPlanilla(r);if(esPlanilla(r)){cargarLibsPDF().catch(()=>{});pintarFirmaMov()}
   const c=r.tipo==="ingreso"?"in":"out", p=partes(r);
   $("movDet").innerHTML=`<span class="hint">${r.tipo==="ingreso"?"Ingreso":"Gasto"} · ${esc(r.categoria)}</span>
     <span class="amtg ${c}">${c==="in"?"+":"−"} ${fmt(r.monto)}</span><b>${esc(r.desc||"Sin nombre")}</b>
@@ -1455,6 +1516,284 @@ document.querySelectorAll("#temas .opt").forEach(b=>b.onclick=()=>{ajustes.tema=
 $("meta").value=ajustes.meta;
 $("guardarMeta").onclick=()=>{const v=parseFloat($("meta").value);if(!(v>=0)){$("metaOk").textContent="Escribe un monto válido.";return}ajustes.meta=v;guardarLS("cbo-ajustes",ajustes);$("metaOk").textContent="Guardado";render()};
 aplicarTema();
+
+
+/* ===== v35: colores combinables (predominante + acento) ===== */
+const ACENTOS=[["cbo","Verde CBO","#0D5C46","#14805F","#9CC3B1"],["bosque","Bosque","#2F5A1E","#4B8A2E","#A6DC84"],["esmeralda","Esmeralda","#0E6A4E","#17956D","#5FD3A8"],["oceano","Océano","#0B5A86","#1580C2","#6CC0F5"],["indigo","Índigo","#2F2A85","#4740C9","#8A84FF"],["vino","Vino","#7A1F3D","#A7315A","#F08AB0"],["terracota","Terracota","#8E3F22","#B4532F","#F0A27E"],["naranja","Naranja","#A8420C","#D9611B","#FFAD73"],["dorado","Dorado","#7A5A12","#A67C1C","#E8C46A"],["violeta","Violeta","#5A2A9B","#7B45D0","#C4A6FF"],["turquesa","Turquesa","#0B6B6B","#139B9B","#6FE0DB"],["grafito","Grafito","#2A2E36","#4B5262","#B3BCCC"]];
+// [id, nombre, fondo, tarjetas, texto, texto suave, líneas, suave, oscuro?]
+const FONDOS=[["beige","Beige","#E9DCC3","#F4EDE0","#2A2414","#6B604A","#D9C7A2","#E9DFCC"],["arena","Arena","#F4EDE0","#FBF7EE","#10241C","#3F544A","#E2D6BE","#E9DFCC"],["blanco","Blanco","#F3F5F2","#FFFFFF","#0F1F19","#4A5A53","#DDE3DE","#E7EEE9"],["perla","Gris perla","#E6E7EA","#FBFBFC","#1D2027","#555B67","#D2D5DB","#E9EAEE"],["menta","Menta","#DCEAE2","#F6FAF7","#10241C","#4A5F55","#CFE0D5","#E3EFE8"],["celeste","Celeste","#DDE9F3","#F5F9FC","#13202C","#4A5B6B","#CBDBE8","#E4EEF6"],["rosapalo","Rosa palo","#F3E2E2","#FFFAFA","#2A1A1C","#6C5155","#E6CFCF","#F2E3E3"],["lavanda","Lavanda","#E7E2F3","#FDFCFF","#1E1A2B","#5A5270","#D6CEE8","#ECE8F6"],["durazno","Durazno","#F7E2D0","#FFFAF5","#2B1D12","#6E5745","#EAD0B9","#F5E3D3"],["noche","Verde noche","#061F18","#0A3328","#F4EDE0","#B9C7BD","#164536","#0F3D30",1],["azulnoche","Azul noche","#081A26","#0E2738","#EAF3F7","#A9C0CC","#1B3A4F","#13324A",1],["negro","Negro","#000000","#111312","#F2F2EE","#A3ABA6","#262A28","#1A1D1B",1]];
+const COMBOS=[["beige","cbo"],["arena","cbo"],["blanco","oceano"],["celeste","indigo"],["rosapalo","vino"],["durazno","terracota"],["perla","grafito"],["lavanda","violeta"],["menta","esmeralda"],["noche","cbo"],["negro","dorado"]];
+function aplicarColores(){
+  let st=document.getElementById("cboVars"); if(!st){st=document.createElement("style");st.id="cboVars";document.head.appendChild(st)}
+  const F=FONDOS.find(x=>x[0]===ajustes.fondo), C=ACENTOS.find(x=>x[0]===ajustes.acento);
+  if(!F||!C){st.textContent="";return}
+  const dk=!!F[8], b=C[2], b2=dk?C[4]:C[3];
+  st.textContent=`:root:root{--bg:${F[2]};--surface:${F[3]};--ink:${F[4]};--muted:${F[5]};--line:${F[6]};--soft:${F[7]};--brand:${b};--brand-2:${b2};--brand-ink:${dk?F[4]:"#FFFFFF"};--fab-ink:${dk?F[2]:"#FFFFFF"};color-scheme:${dk?"dark":"light"}}`;
+  document.querySelector('meta[name="theme-color"]').setAttribute("content",b);
+}
+function pintarCombinar(){
+  const F=FONDOS.find(x=>x[0]===ajustes.fondo)||FONDOS[0], C=ACENTOS.find(x=>x[0]===ajustes.acento)||ACENTOS[0], dk=!!F[8];
+  $("combinar").innerHTML=`<p class="tpl">Combina tus colores <small>(o elige un tema de arriba)</small></p>
+  <div class="tprev" style="background:${F[2]};color:${F[4]}"><div class="tpcard" style="background:${F[3]};border-color:${F[6]}"><span class="tpbar" style="background:${dk?C[4]:C[3]}"></span><b style="color:${dk?C[4]:C[2]}">Así se verá</b><small style="color:${F[5]}">${F[1]} + ${C[1]}</small><span class="tpbtn" style="background:${dk?C[4]:C[3]};color:${dk?F[2]:"#fff"}">Registrar</span></div></div>
+  <p class="tpl">Combinaciones sugeridas</p>
+  <div class="combos">${COMBOS.map(([f,c])=>{const a=FONDOS.find(x=>x[0]===f),z=ACENTOS.find(x=>x[0]===c);return `<button type="button" class="cmb" data-combo="${f}|${c}" aria-pressed="${ajustes.fondo===f&&ajustes.acento===c}" title="${a[1]} + ${z[1]}"><i style="background:${a[2]}"><em style="background:${a[8]?z[4]:z[2]}"></em></i></button>`}).join("")}</div>
+  <p class="tpl">1. Color predominante <small>(fondo de toda la app)</small></p>
+  <div class="swatches">${FONDOS.map(x=>`<button type="button" class="swc" data-fondo="${x[0]}" aria-pressed="${ajustes.fondo===x[0]}"><i style="background:${x[2]};box-shadow:inset 0 0 0 1px ${x[6]}"></i><span>${x[1]}</span></button>`).join("")}</div>
+  <p class="tpl">2. Color de acento <small>(botones, barras y títulos)</small></p>
+  <div class="swatches">${ACENTOS.map(x=>`<button type="button" class="swc" data-acento="${x[0]}" aria-pressed="${ajustes.acento===x[0]}"><i style="background:linear-gradient(135deg,${x[2]} 0 55%,${x[3]} 55% 100%)"></i><span>${x[1]}</span></button>`).join("")}</div>`;
+}
+$("combinar").addEventListener("click",e=>{
+  const c=e.target.closest("[data-combo]"),f=e.target.closest("[data-fondo]"),a=e.target.closest("[data-acento]"); if(!c&&!f&&!a)return;
+  if(c){[ajustes.fondo,ajustes.acento]=c.dataset.combo.split("|")}
+  if(f){ajustes.fondo=f.dataset.fondo; if(!ajustes.acento)ajustes.acento="cbo"}
+  if(a){ajustes.acento=a.dataset.acento; if(!ajustes.fondo)ajustes.fondo="beige"}
+  const F=FONDOS.find(x=>x[0]===ajustes.fondo); ajustes.tema=F&&F[8]?"oscuro":"calido";   // base clara u oscura para lo que no cambia
+  guardarLS("cbo-ajustes",ajustes); aplicarTema(); aplicarColores(); pintarCombinar();
+  document.querySelectorAll("#temas .opt").forEach(b=>b.setAttribute("aria-pressed","false"));
+});
+// elegir un tema de los de arriba quita la combinación personalizada
+document.querySelectorAll("#temas .opt").forEach(b=>b.addEventListener("click",()=>{delete ajustes.fondo;delete ajustes.acento;guardarLS("cbo-ajustes",ajustes);aplicarColores();pintarCombinar()}));
+aplicarColores(); pintarCombinar();
+if(ajustes.fondo&&ajustes.acento) document.querySelectorAll("#temas .opt").forEach(b=>b.setAttribute("aria-pressed","false"));
+
+/* ===== v35: transiciones entre pantallas (por defecto ninguna) ===== */
+let ultimoToque=null;
+document.addEventListener("pointerdown",e=>{ultimoToque=e.target.closest&&e.target.closest("button,a,[role=button]")||null},true);
+/* Transición de desintegración: la pantalla actual completa se deshace en partículas que se lleva el viento
+   y deja ver la nueva. Se dibuja la pantalla en un canvas (sin librerías) y se anima con un búfer de píxeles. */
+const Dust = {busy: false};
+function dustSnap(W, H, dpr) {
+  const c = document.createElement('canvas'); c.width = Math.round(W * dpr); c.height = Math.round(H * dpr);
+  const g = c.getContext('2d'); g.scale(dpr, dpr);
+  const cs0 = getComputedStyle(document.body); g.fillStyle = cs0.backgroundColor && cs0.backgroundColor !== 'rgba(0, 0, 0, 0)' ? cs0.backgroundColor : getComputedStyle(document.documentElement).getPropertyValue('--bg') || '#efe5d1'; g.fillRect(0, 0, W, H);
+  const alpha = col => { const m = /rgba?\(([^)]+)\)/.exec(col || ''); if (!m) return 0; const p = m[1].split(',').map(x => parseFloat(x)); return p.length > 3 ? p[3] : 1; };
+  const rr = (x, y, w, h, r) => { g.beginPath(); if (g.roundRect && r > 0) g.roundRect(x, y, w, h, Math.min(r, w / 2, h / 2)); else g.rect(x, y, w, h); };
+  const late = [];
+  const box = (el, cs, r) => {
+    const rad = parseFloat(cs.borderTopLeftRadius) || 0, bi = cs.backgroundImage;
+    if (bi && bi.includes('gradient')) {
+      const cols = bi.match(/rgba?\([^)]+\)/g) || [];
+      if (cols.length) { const gr = g.createLinearGradient(r.left, r.top, r.right, r.bottom); cols.forEach((cc, i) => gr.addColorStop(cols.length > 1 ? i / (cols.length - 1) : 0, cc)); g.fillStyle = gr; rr(r.left, r.top, r.width, r.height, rad); g.fill(); }
+    } else if (alpha(cs.backgroundColor) > 0) { g.fillStyle = cs.backgroundColor; rr(r.left, r.top, r.width, r.height, rad); g.fill(); }
+    const bw = parseFloat(cs.borderTopWidth) || 0;
+    if (bw > 0 && alpha(cs.borderTopColor) > 0 && cs.borderTopStyle !== 'none') { g.strokeStyle = cs.borderTopColor; g.lineWidth = bw; rr(r.left + bw / 2, r.top + bw / 2, r.width - bw, r.height - bw, rad); g.stroke(); }
+  };
+  const text = (node, cs, clip) => {
+    const t = node.nodeValue; if (!t || !t.trim()) return;
+    const rg = document.createRange(); rg.selectNodeContents(node); const rects = [...rg.getClientRects()].filter(q => q.width > 0);
+    if (!rects.length) return;
+    g.fillStyle = cs.color; g.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`; g.textBaseline = 'middle';
+    if (rects.length === 1) { const q = rects[0]; g.fillText(t.replace(/\s+/g, ' ').trim(), q.left, q.top + q.height / 2, q.width + 2); }
+    else { // varias líneas: el texto se reparte por líneas de forma aproximada
+      const words = t.replace(/\s+/g, ' ').trim().split(' '); let wi = 0;
+      rects.forEach(q => { let line = ''; while (wi < words.length && g.measureText(line + words[wi]).width <= q.width + 4) line += words[wi++] + ' '; if (!line && wi < words.length) line = words[wi++]; g.fillText(line.trim(), q.left, q.top + q.height / 2, q.width + 2); });
+    }
+  };
+  const walk = (el, clip, deferFixed) => {
+    if (el.nodeType === 3) { if (clip) { g.save(); g.beginPath(); g.rect(clip.left, clip.top, clip.right - clip.left, clip.bottom - clip.top); g.clip(); } text(el, getComputedStyle(el.parentElement), clip); if (clip) g.restore(); return; }
+    if (el.nodeType !== 1 || el.id === 'dustcv' || /^(SCRIPT|STYLE|LINK|META|TEMPLATE|NOSCRIPT)$/.test(el.tagName) || el.hidden) return;
+    const cs = getComputedStyle(el); if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity === 0) return;
+    if (deferFixed && cs.position === 'fixed') { late.push(el); return; }
+    const r = el.getBoundingClientRect();
+    if (clip) { g.save(); g.beginPath(); g.rect(clip.left, clip.top, clip.right - clip.left, clip.bottom - clip.top); g.clip(); }
+    if (r.width && r.height && r.bottom > 0 && r.top < H && r.right > 0 && r.left < W) {
+      if (el.tagName === 'IMG') { g.fillStyle = 'rgba(120,110,90,.35)'; g.beginPath(); g.arc(r.left + r.width / 2, r.top + r.height / 2, Math.min(r.width, r.height) / 2, 0, 7); g.fill(); }
+      else if (el.tagName === 'svg' || el.tagName === 'SVG') { const isLogo = el.classList.contains('logo'); g.fillStyle = isLogo ? getComputedStyle(document.documentElement).getPropertyValue('--brand').trim() || '#0d5c46' : cs.color; g.globalAlpha = isLogo ? 1 : .55; rr(r.left + r.width * .18, r.top + r.height * .18, r.width * .64, r.height * .64, isLogo ? r.width * .25 : 3); g.fill(); g.globalAlpha = 1; }
+      else box(el, cs, r);
+      if ((el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') && el.value) { g.fillStyle = cs.color; g.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`; g.textBaseline = 'middle'; g.fillText(el.value, r.left + (parseFloat(cs.paddingLeft) || 4), r.top + r.height / 2, r.width - 8); }
+      if (el.tagName === 'SELECT' && el.selectedOptions[0]) { g.fillStyle = cs.color; g.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`; g.textBaseline = 'middle'; g.fillText(el.selectedOptions[0].text, r.left + 6, r.top + r.height / 2, r.width - 20); }
+    }
+    if (clip) g.restore();
+    if (/^(svg|SVG|INPUT|TEXTAREA|SELECT|IMG|CANVAS)$/.test(el.tagName)) return;
+    let c2 = clip;
+    if (cs.overflowX !== 'visible' || cs.overflowY !== 'visible') { const k = {left: r.left, top: r.top, right: r.right, bottom: r.bottom}; c2 = clip ? {left: Math.max(clip.left, k.left), top: Math.max(clip.top, k.top), right: Math.min(clip.right, k.right), bottom: Math.min(clip.bottom, k.bottom)} : k; if (c2.right <= c2.left || c2.bottom <= c2.top) return; }
+    for (const ch of el.childNodes) walk(ch, c2, deferFixed);
+  };
+  walk(document.body, null, true);
+  late.forEach(el => walk(el, null, false));
+  return c;
+}
+function dustRun(snap, W, H) {
+  // partículas: muestreo de la pantalla a baja resolución (unas 22 mil en total)
+  const st = Math.max(3, Math.ceil(Math.sqrt(W * H / 22000))), cw = Math.ceil(W / st), chh = Math.ceil(H / st);
+  const small = document.createElement('canvas'); small.width = cw; small.height = chh; const sg = small.getContext('2d'); sg.imageSmoothingEnabled = true; sg.drawImage(snap, 0, 0, cw, chh);
+  const px = new Uint32Array(sg.getImageData(0, 0, cw, chh).data.buffer);
+  const n = cw * chh, P = {x: new Float32Array(n), y: new Float32Array(n), c: px, d: new Float32Array(n), vx: new Float32Array(n), vy: new Float32Array(n), ph: new Float32Array(n)};
+  for (let j = 0, k = 0; j < chh; j++) for (let i = 0; i < cw; i++, k++) { P.x[k] = i * st; P.y[k] = j * st; P.d[k] = i / cw * .5 + Math.random() * .14; P.vx[k] = 60 + Math.random() * 190; P.vy[k] = -(20 + Math.random() * 130); P.ph[k] = Math.random() * 6.28; }
+  const cv = document.createElement('canvas'); cv.id = 'dustcv'; cv.width = snap.width; cv.height = snap.height; cv.setAttribute('aria-hidden', 'true');
+  cv.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:9999;pointer-events:none';
+  document.body.appendChild(cv);
+  const g = cv.getContext('2d'), buf = document.createElement('canvas'); buf.width = W; buf.height = H;
+  const bg = buf.getContext('2d'), img = bg.createImageData(W, H), out = new Uint32Array(img.data.buffer), sx = cv.width / W;
+  const MS = 1250, t0 = performance.now();
+  const frame = now => {
+    const t = Math.min(1, (now - t0) / MS);
+    g.clearRect(0, 0, cv.width, cv.height);
+    // lo que aún no empieza a deshacerse se ve nítido
+    const front = Math.max(0, (t - .14) / .5) * W;
+    if (front < W) g.drawImage(snap, front * sx, 0, cv.width - front * sx, cv.height, front * sx, 0, cv.width - front * sx, cv.height);
+    out.fill(0);
+    for (let k = 0; k < n; k++) {
+      if (P.x[k] >= front) continue;
+      const lt = (t - P.d[k]) / (1 - P.d[k] * .8); if (lt >= 1) continue;
+      const e = lt > 0 ? lt * lt : 0, a = lt > 0 ? 1 - lt : 1;
+      const x0 = (P.x[k] + P.vx[k] * e * 1.7 + Math.sin(P.ph[k] + lt * 6) * 7 * Math.max(0, lt)) | 0, y0 = (P.y[k] + P.vy[k] * e * 1.5) | 0;
+      const sz = Math.max(1, (st * (1 - Math.max(0, lt) * .45)) | 0), col = P.c[k], al = ((col >>> 24) * a) | 0;
+      if (!al) continue; const cc = (col & 0x00ffffff) | (al << 24);
+      for (let yy = y0; yy < y0 + sz; yy++) { if (yy < 0 || yy >= H) continue; const row = yy * W; for (let xx = x0; xx < x0 + sz; xx++) if (xx >= 0 && xx < W) out[row + xx] = cc; }
+    }
+    bg.putImageData(img, 0, 0); g.imageSmoothingEnabled = false; g.drawImage(buf, 0, 0, cv.width, cv.height);
+    if (t < 1) requestAnimationFrame(frame); else { cv.remove(); Dust.busy = false; }
+  };
+  frame(t0);
+}
+
+/* Transiciones entre pantallas: el usuario elige en Más (o "Ninguna") */
+const FX_LIST = [['none', 'Ninguna', 'Cambio directo, sin animación (predeterminado)'], ['dust', 'Desintegración', 'La pantalla se deshace en partículas'], ['choreo', 'Coreografía escalonada', 'Las tarjetas entran en cascada (estilo Apple)'], ['morph', 'Botón que se transforma', 'El botón crece hasta ser la pantalla (estilo Google)'], ['page', 'Pasar la página', 'La hoja se dobla como un libro contable'], ['glass', 'Cristal que se rompe', 'Fragmentos que caen girando'], ['ink', 'Tinta', 'Una mancha verde abre la nueva pantalla'], ['wave', 'Onda expansiva', 'Anillos de luz desde el botón'], ['rain', 'Lluvia de números', 'Caen cifras contables y aparece la nueva'], ['origami', 'Origami', 'La pantalla se pliega en franjas'], ['fade', 'Fundido', 'Se desvanece suavemente']];
+function fxType() { return FX_LIST.some(x => x[0] === ajustes.tr) ? ajustes.tr : 'none'; }
+const fxE = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+function fxCanvas(snap) {
+  const cv = document.createElement('canvas'); cv.id = 'dustcv'; cv.width = snap.width; cv.height = snap.height; cv.setAttribute('aria-hidden', 'true');
+  cv.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:9999;pointer-events:none'; document.body.appendChild(cv);
+  const g = cv.getContext('2d'), k = cv.width / innerWidth; g.setTransform(k, 0, 0, k, 0, 0); return {cv, g, k};
+}
+function fxLoop(ms, draw, done) { const t0 = performance.now(); const fr = now => { const t = Math.min(1, (now - t0) / ms); draw(t); if (t < 1) requestAnimationFrame(fr); else done(); }; requestAnimationFrame(fr); draw(0); }
+function fxEnter(delay = 0) { setTimeout(() => { const v = document.querySelector('[data-sec]:not([hidden])'); if (!v || !v.animate) return; [...v.children].slice(0, 12).forEach((el, i) => el.animate([{opacity: 0, transform: 'translateY(26px) scale(.97)'}, {opacity: 1, transform: 'none'}], {duration: 520, delay: i * 60, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'backwards'})); }, delay); }
+function screenFx(to, src, force) {
+  const ty = fxType();
+  if (ty === 'none' || Dust.busy || (!force && to === seccion) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const W = innerWidth, H = innerHeight; let snap;
+  try { snap = dustSnap(W, H, Math.min(2, devicePixelRatio || 1)); } catch (e) { console.warn('fx', e); return; }
+  Dust.busy = true; const off = () => { Dust.busy = false; };
+  if (ty === 'dust') { dustRun(snap, W, H); setTimeout(off, 1300); return; }
+  const r = src && src.getBoundingClientRect ? src.getBoundingClientRect() : {left: W / 2, top: H / 2, width: 0, height: 0, right: W / 2, bottom: H / 2};
+  const ox = r.left + r.width / 2, oy = r.top + r.height / 2, big = Math.hypot(Math.max(ox, W - ox), Math.max(oy, H - oy)) + 30;
+  const {cv, g, k} = fxCanvas(snap), done = () => { cv.remove(); off(); };
+  const img = (sx, sy, sw, sh, dx, dy, dw, dh) => { if (sw > 0 && sh > 0) g.drawImage(snap, sx * k, sy * k, sw * k, sh * k, dx, dy, dw, dh); };
+  const brand = getComputedStyle(document.documentElement).getPropertyValue('--brand').trim() || '#0d5c46';
+  const brand2 = getComputedStyle(document.documentElement).getPropertyValue('--brand-2').trim() || '#14805f';
+  const clear = () => g.clearRect(0, 0, W, H);
+  if (ty === 'fade') return fxLoop(380, t => { clear(); g.globalAlpha = 1 - fxE(t); img(0, 0, W, H, 0, 0, W, H); g.globalAlpha = 1; }, done);
+  if (ty === 'choreo') { fxEnter(160); return fxLoop(300, t => { clear(); g.globalAlpha = 1 - t; img(0, 0, W, H, -18 * t, -10 * t, W, H); g.globalAlpha = 1; }, done); }
+  if (ty === 'morph') {
+    const box = document.createElement('div'); box.style.cssText = `position:fixed;z-index:10000;pointer-events:none;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;border-radius:14px;background:linear-gradient(135deg,${brand},${brand2});box-shadow:0 20px 40px rgba(0,0,0,.25)`; document.body.appendChild(box);
+    box.animate([{left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px', borderRadius: '14px'}, {left: '0px', top: '0px', width: W + 'px', height: H + 'px', borderRadius: '0px'}], {duration: 420, easing: 'cubic-bezier(.3,0,.1,1)', fill: 'forwards'});
+    setTimeout(() => { cv.remove(); box.animate([{opacity: 1}, {opacity: 0}], {duration: 320, fill: 'forwards'}); fxEnter(0); setTimeout(() => { box.remove(); off(); }, 340); }, 430);
+    return fxLoop(430, t => { clear(); g.globalAlpha = 1 - t * .5; img(0, 0, W, H, W * .03 * t, H * .03 * t, W * (1 - .06 * t), H * (1 - .06 * t)); g.globalAlpha = 1; }, () => {});
+  }
+  if (ty === 'page') return fxLoop(950, t => {
+    clear(); const f = W * (1 - fxE(t)), w = W - f, l = 2 * f - W;
+    img(0, 0, f, H, 0, 0, f, H);
+    if (w > 0 && t < .99) {
+      g.save(); g.beginPath(); g.rect(Math.max(0, l), 0, f - Math.max(0, l), H); g.clip();
+      g.shadowColor = 'rgba(40,25,5,.35)'; g.shadowBlur = 24; g.fillStyle = '#f3e9d3'; g.fillRect(l, 0, w, H); g.shadowBlur = 0;
+      g.globalAlpha = .12; g.save(); g.translate(2 * f, 0); g.scale(-1, 1); img(f, 0, w, H, f, 0, w, H); g.restore(); g.globalAlpha = 1;
+      const gr = g.createLinearGradient(l, 0, f, 0); gr.addColorStop(0, 'rgba(120,95,50,.35)'); gr.addColorStop(.55, 'rgba(245,236,216,.5)'); gr.addColorStop(.92, 'rgba(255,252,242,.9)'); gr.addColorStop(1, 'rgba(190,165,120,.6)'); g.fillStyle = gr; g.fillRect(l, 0, w, H); g.restore();
+      const cs = g.createLinearGradient(f, 0, f + 60, 0); cs.addColorStop(0, 'rgba(40,25,5,.35)'); cs.addColorStop(1, 'rgba(40,25,5,0)'); g.fillStyle = cs; g.fillRect(f, 0, 60, H);
+    }
+  }, done);
+  if (ty === 'glass') {
+    const C = W > 700 ? 7 : 4, Rw = W > 700 ? 5 : 7, P = [];
+    for (let j = 0; j <= Rw; j++) { P.push([]); for (let i = 0; i <= C; i++) P[j].push([i * W / C + (i > 0 && i < C ? (Math.random() - .5) * W / C * .5 : 0), j * H / Rw + (j > 0 && j < Rw ? (Math.random() - .5) * H / Rw * .5 : 0)]); }
+    const T = []; for (let j = 0; j < Rw; j++) for (let i = 0; i < C; i++) { const a = P[j][i], b = P[j][i + 1], c = P[j + 1][i + 1], d = P[j + 1][i]; (Math.random() < .5 ? [[a, b, c], [a, c, d]] : [[a, b, d], [b, c, d]]).forEach(tr => { const mx = (tr[0][0] + tr[1][0] + tr[2][0]) / 3, my = (tr[0][1] + tr[1][1] + tr[2][1]) / 3; T.push({tr, mx, my, dl: Math.hypot(mx - ox, my - oy) / big * .18, vx: (mx - W / 2) * .5 + (Math.random() - .5) * 120, vy: H * (.9 + Math.random() * .5), rot: (Math.random() - .5) * 4, sq: Math.random() * 6}); }); }
+    return fxLoop(1250, t => {
+      clear();
+      T.forEach(s => { const lt = Math.max(0, (t - .12 - s.dl) / (.88 - s.dl)); if (lt >= 1) return; const e = lt * lt;
+        g.save(); g.globalAlpha = 1 - lt * .7; g.translate(s.mx + s.vx * e + (t < .12 ? (s.mx - ox) * .02 * t / .12 : (s.mx - ox) * .02), s.my + s.vy * e + (t < .12 ? (s.my - oy) * .02 * t / .12 : (s.my - oy) * .02)); g.rotate(s.rot * e); g.scale(1, Math.cos(s.sq * e)); g.translate(-s.mx, -s.my);
+        g.beginPath(); s.tr.forEach((p, i) => i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1])); g.closePath(); g.save(); g.clip(); img(0, 0, W, H, 0, 0, W, H); g.restore();
+        g.strokeStyle = 'rgba(255,255,255,.85)'; g.lineWidth = 1.2; g.stroke(); g.restore(); });
+    }, done);
+  }
+  if (ty === 'ink' || ty === 'wave') {
+    const seeds = Array.from({length: 7}, () => [Math.random() * 6.28, 1 + Math.random() * 4]);
+    const ms = ty === 'ink' ? 950 : 850;
+    return fxLoop(ms, t => {
+      clear(); img(0, 0, W, H, 0, 0, W, H); const e = fxE(t), rad = e * (big + 60);
+      g.beginPath();
+      for (let i = 0; i <= 72; i++) { const a = i / 72 * 6.283; let m = 1; if (ty === 'ink') seeds.forEach(([p, f]) => { m += Math.sin(a * f * 2 + p + t * 3) * .05; }); const rr = rad * m; i ? g.lineTo(ox + Math.cos(a) * rr, oy + Math.sin(a) * rr) : g.moveTo(ox + Math.cos(a) * rr, oy + Math.sin(a) * rr); }
+      g.closePath(); g.globalCompositeOperation = 'destination-out'; g.fill(); g.globalCompositeOperation = 'source-over';
+      if (ty === 'ink') { g.lineWidth = 18 * (1 - t) + 2; g.strokeStyle = brand; g.globalAlpha = .85 * (1 - t * .6); g.stroke(); g.globalAlpha = 1; }
+      else { g.shadowColor = 'rgba(201,164,106,.9)'; g.shadowBlur = 24; g.lineWidth = 4; g.strokeStyle = '#c9a46a'; g.globalAlpha = 1 - t * .5; g.stroke(); g.shadowBlur = 0;
+        for (let i = 1; i <= 3; i++) { const rr = rad + i * 36 * (1 - t) + i * 10; g.beginPath(); g.arc(ox, oy, rr, 0, 6.283); g.lineWidth = 3 - i * .6; g.strokeStyle = i % 2 ? brand2 : '#c9a46a'; g.globalAlpha = (1 - t) * (1 - i * .22); g.stroke(); }
+        g.globalAlpha = 1; }
+    }, done);
+  }
+  if (ty === 'rain') {
+    const cw = W > 700 ? 16 : 13, n = Math.ceil(W / cw), cols = Array.from({length: n}, (_, i) => ({d: Math.random() * .25 + Math.abs(i - n / 2) / n * .15, sp: 1.1 + Math.random() * .5})), ch = '0123456789S/.,-+';
+    return fxLoop(1150, t => {
+      clear(); g.font = `bold ${cw - 1}px ui-monospace,Menlo,monospace`; g.textBaseline = 'top';
+      cols.forEach((c, i) => { const p = Math.max(0, Math.min(1.3, (t - c.d) * c.sp / .75)), hy = p * (H + 120) - 60, cut = Math.max(0, Math.min(H, hy - 40));
+        img(i * cw, cut, cw, H - cut, i * cw, cut, cw, H - cut);
+        for (let q = 0; q < 14; q++) { const yy = hy - q * (cw + 3); if (yy < -20 || yy > H) continue; g.globalAlpha = Math.max(0, 1 - q / 14) * (t > .85 ? (1 - t) / .15 : 1); g.fillStyle = q === 0 ? '#fff4cf' : q < 3 ? '#c9a46a' : brand2; g.fillText(ch[(Math.random() * ch.length) | 0], i * cw + 1, yy); } g.globalAlpha = 1; });
+    }, done);
+  }
+  if (ty === 'origami') {
+    const N = 6, h = H / N;
+    return fxLoop(950, t => {
+      clear();
+      for (let i = 0; i < N; i++) { const p = Math.max(0, Math.min(1, (t - (N - 1 - i) * .08) / .55)); if (p >= 1) continue; const c = Math.cos(p * Math.PI / 2), up = (N - 1 - i) * h * .25 * p, hh = h * c, y0 = i * h - up + (i % 2 ? 0 : h - hh);
+        img(0, i * h, W, h, 0, y0, W, hh); g.fillStyle = `rgba(30,20,5,${.5 * p})`; g.fillRect(0, y0, W, hh); }
+    }, done);
+  }
+  done();
+}
+
+
+function pintarTrx(){$("trx").innerHTML=FX_LIST.map(([k,n,d])=>`<button type="button" class="trb" data-trx="${k}" aria-pressed="${k===fxType()}"><b>${n}</b><small>${d}</small></button>`).join("")}
+$("trx").addEventListener("click",e=>{const b=e.target.closest("[data-trx]");if(!b)return;ajustes.tr=b.dataset.trx;guardarLS("cbo-ajustes",ajustes);
+  if(ajustes.tr==="none"){pintarTrx();toast("Sin transición");return}
+  const y=scrollY; screenFx("config",b,true); pintarTrx(); window.scrollTo(0,y);});
+pintarTrx();
+
+/* ===== v35: firma electrónica del trabajador en el comprobante de pago ===== */
+// Se guarda en este equipo (IndexedDB) junto con la fecha y hora; el PDF firmado se puede descargar cuando quieras.
+const FIRMAS={};
+const fechaHora=ts=>{const d=new Date(ts);return `${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")}/${d.getFullYear()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`};
+const firmasDB=(()=>{let p=null;const abrir=()=>p||(p=new Promise((ok,mal)=>{const q=indexedDB.open("cbo-firmas",1);q.onupgradeneeded=()=>q.result.createObjectStore("f",{keyPath:"id"});q.onsuccess=()=>ok(q.result);q.onerror=()=>mal(q.error)}));
+  const tx=(m,fn)=>abrir().then(db=>new Promise((ok,mal)=>{const t=db.transaction("f",m),st=t.objectStore("f"),r=fn(st);t.oncomplete=()=>ok(r&&r.result);t.onerror=()=>mal(t.error)}));
+  return {todas:()=>tx("readonly",st=>st.getAll()),guardar:o=>tx("readwrite",st=>st.put(o)),quitar:id=>tx("readwrite",st=>st.delete(id))}})();
+firmasDB.todas().then(L=>{(L||[]).forEach(f=>FIRMAS[f.id]=f);pintarFirmados()}).catch(()=>{});
+function pintarFirmaMov(){
+  const r=movSel, f=r&&FIRMAS[r.id];
+  $("movFirmaEst").innerHTML=f?`<div class="ftrab-ok"><img src="${f.png}" alt="Firma"><span>✓ Firmado por el trabajador<br><small style="font-weight:500">${fechaHora(f.ts)}</small></span></div>`:"";
+  $("movFirmar").textContent=f?"✍ Volver a firmar":"✍ Firma del trabajador";
+}
+function pintarFirmados(){
+  const L=Object.values(FIRMAS).sort((a,b)=>b.ts-a.ts);
+  $("firmadosN").textContent=L.length?L.length+" firmado"+(L.length>1?"s":""):"";
+  $("firmados").innerHTML=L.length?L.map(f=>`<button type="button" data-fid="${esc(String(f.id))}"><span>${esc(f.num||"")} · ${esc(titulo(f.nombre||""))}</span><small>${fechaHora(f.ts)} ⬇</small></button>`).join(""):`<p class="hint" style="margin:0">Aún no hay comprobantes firmados.</p>`;
+}
+async function descargarFirmado(r){
+  toast("Preparando PDF firmado…");
+  try{const a=await comprobanteArchivo(r);const u=URL.createObjectURL(a.file),l=document.createElement("a");l.href=u;l.download=a.file.name;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),4000)}
+  catch(e){toast("No se pudo crear el PDF. Revisa tu internet.")}
+}
+$("firmados").addEventListener("click",e=>{const b=e.target.closest("[data-fid]");if(!b)return;const r=rows.find(x=>String(x.id)===b.dataset.fid);if(!r){toast("Ese pago ya no está en la lista");return}descargarFirmado(r)});
+(()=>{
+  const cv=$("ftPad"), ctx=cv.getContext("2d"); let dib=false, hay=false, ult=null;
+  const ajustar=()=>{const r=cv.getBoundingClientRect(),k=window.devicePixelRatio||1;if(!r.width)return;cv.width=Math.round(r.width*k);cv.height=Math.round(r.height*k);
+    ctx.setTransform(k,0,0,k,0,0);ctx.fillStyle="#fff";ctx.fillRect(0,0,r.width,r.height);ctx.lineCap="round";ctx.lineJoin="round";ctx.strokeStyle="#0B2A55";ctx.lineWidth=2.6;hay=false;$("ftMsg").textContent=""};
+  const pos=e=>{const r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+  cv.addEventListener("pointerdown",e=>{if(!cv.width)ajustar();dib=true;ult=pos(e);cv.setPointerCapture(e.pointerId);e.preventDefault()});
+  cv.addEventListener("pointermove",e=>{if(!dib)return;const p=pos(e);ctx.beginPath();ctx.moveTo(ult.x,ult.y);ctx.lineTo(p.x,p.y);ctx.stroke();ult=p;hay=true});
+  ["pointerup","pointercancel"].forEach(t=>cv.addEventListener(t,()=>dib=false));
+  const recortar=src=>{const w=src.width,h=src.height,d=src.getContext("2d").getImageData(0,0,w,h).data;let x0=w,y0=h,x1=0,y1=0;
+    for(let y=0;y<h;y++)for(let x=0;x<w;x++){const i=(y*w+x)*4;if(d[i]+d[i+1]+d[i+2]<600){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}}
+    if(x1<=x0||y1<=y0)return"";const m=8,o=document.createElement("canvas");o.width=x1-x0+2*m;o.height=y1-y0+2*m;const c=o.getContext("2d");
+    c.fillStyle="#fff";c.fillRect(0,0,o.width,o.height);c.drawImage(src,x0,y0,x1-x0,y1-y0,m,m,x1-x0,y1-y0);return o.toDataURL("image/png")};
+  $("movFirmar").onclick=()=>{const r=movSel;if(!r)return;const info=comprobantePDF(r,true);$("comprobante").innerHTML="";
+    $("ftInfo").innerHTML=`<span class="hint">Comprobante ${esc(info.num)} · ${fechaCorta(r.fecha)} ${r.fecha.slice(0,4)}</span><b>${esc(titulo(r.desc||""))} · DNI ${esc(r.ruc||"")}</b><span>Neto a recibir: <b class="num">${fmt(r.monto)}</b></span>`;
+    $("ftQuitar").hidden=!FIRMAS[r.id]; abrirOv("ovFirmaT"); requestAnimationFrame(ajustar)};
+  $("ftBorrar").onclick=ajustar;
+  $("ftGuardar").onclick=async()=>{const r=movSel;if(!r)return;if(!hay){$("ftMsg").textContent="Primero el trabajador debe firmar en el recuadro.";return}
+    const png=recortar(cv);if(!png){$("ftMsg").textContent="No se detectó la firma.";return}
+    const info=comprobantePDF(r,true);$("comprobante").innerHTML="";
+    const f={id:r.id,png,ts:Date.now(),dni:r.ruc||"",nombre:r.desc||"",num:info.num,monto:r.monto,fecha:r.fecha};
+    try{await firmasDB.guardar(f)}catch(e){$("ftMsg").textContent="No se pudo guardar en este equipo.";return}
+    FIRMAS[r.id]=f; cerrarOv("ovFirmaT"); pintarFirmaMov(); pintarFirmados(); toast("Firma guardada en el comprobante")};
+  $("ftQuitar").onclick=async()=>{const r=movSel;if(!r)return;try{await firmasDB.quitar(r.id)}catch{}delete FIRMAS[r.id];cerrarOv("ovFirmaT");pintarFirmaMov();pintarFirmados();toast("Firma quitada")};
+  new ResizeObserver(()=>{if(cv.getBoundingClientRect().width&&!hay)ajustar()}).observe(cv);
+})();
 
 /* ===== Formulario por pasos ===== */
 const RUC_CBO="20614484153";
@@ -2550,7 +2889,7 @@ function comprobantePDF(r,soloArmar){
     <h4>FORMA DE PAGO</h4><div class="grid2">${pago.map(([k,v])=>`<div class="celda"><small>${k}</small><b>${esc(v)}</b></div>`).join("")}<div class="celda"><small>ESTADO</small><b class="pagado">PAGADO</b></div></div>
     <p class="decl">Declaro haber recibido a mi entera satisfacción el importe neto indicado en el presente comprobante, por los servicios prestados en el periodo señalado.</p>
     <p class="lugar">Lima, ${+d} de ${MESES[+mm-1]} de ${y}</p>
-    <div class="firmas"><div class="firma"><img class="fimg" src="firma-gerente.png" alt=""><b>EMPLEADOR</b><span>Casa Bonita Oregón S.A.C.</span></div><div class="firma"><b>TRABAJADOR</b><span>${esc(String(r.desc||"").toUpperCase())} · DNI ${esc(r.ruc||"")}</span></div></div>
+    <div class="firmas"><div class="firma"><img class="fimg" src="firma-gerente.png" alt=""><b>EMPLEADOR</b><span>Casa Bonita Oregón S.A.C.</span></div><div class="firma">${FIRMAS[r.id]?`<img class="fimg" src="${FIRMAS[r.id].png}" alt="">`:""}<b>TRABAJADOR</b><span>${esc(String(r.desc||"").toUpperCase())} · DNI ${esc(r.ruc||"")}</span>${FIRMAS[r.id]?`<span class="ffecha">Firmado digitalmente el ${fechaHora(FIRMAS[r.id].ts)}</span>`:""}</div></div>
     <p class="pie">${nombre.charAt(0)+nombre.slice(1).toLowerCase()} · Documento interno de control de pagos</p>
   </section>`;
   $("comprobante").innerHTML=`<div class="hoja">${ej("EJEMPLAR TRABAJADOR")}${ej("EJEMPLAR EMPRESA")}<span class="tijera">✂</span></div>`;
