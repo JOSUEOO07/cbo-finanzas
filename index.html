@@ -382,7 +382,10 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
 .cp-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0 10px}
 .cp-btn{width:100%;margin:0;display:flex;align-items:center;justify-content:center;gap:6px}
 .cp-wa{background:#25D366!important;color:#fff!important;border-color:#25D366!important}
-.cp-wa svg{width:18px;height:18px}
+.cp-wa svg{width:18px;height:18px;flex:none}
+.cp-btn{flex-wrap:wrap;text-align:center;line-height:1.2}
+.cp-btn .cpsub{flex-basis:100%;font-size:.72rem;font-weight:600;opacity:.9}
+.cp-wa2{grid-column:1/-1;background:#128C7E!important;border-color:#128C7E!important}
 @media (max-width:380px){.cp-btns{grid-template-columns:1fr}}
 
 /* Comprobante de pago: A4 horizontal, ejemplar del trabajador y de la empresa */
@@ -618,7 +621,7 @@ button.big{border:0}
       <button data-s="anual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Resumen anual</button>
       <button data-s="config"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Configuración</button>
     </nav>
-    <div class="pie">CBO Finanzas · versión 3.2</div>
+    <div class="pie">CBO Finanzas · versión 3.3</div>
   </aside>
   <div class="velo" id="velo"></div>
 
@@ -856,7 +859,7 @@ button.big{border:0}
           </section>
           <section class="panel">
             <div class="ph"><h2>Acerca de</h2></div>
-            <p class="hint" style="margin:0">CBO Finanzas 3.2. Tus datos se guardan en tu archivo de Google Sheets "CASA BONITA OREGON S.A.C.". Este celular solo guarda una copia para verlos sin internet.</p>
+            <p class="hint" style="margin:0">CBO Finanzas 3.3. Tus datos se guardan en tu archivo de Google Sheets "CASA BONITA OREGON S.A.C.". Este celular solo guarda una copia para verlos sin internet.</p>
           </section>
         </div>
       </section>
@@ -1081,7 +1084,8 @@ button.big{border:0}
       <div id="movFirmaEst"></div>
       <button type="button" class="btn cp-btn cp-firma" id="movFirmar">✍ Firma del trabajador</button>
       <button type="button" class="btn cp-btn" id="movCP">📄 Comprobante (PDF)</button>
-      <button type="button" class="btn cp-btn cp-wa" id="movCPWa"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.1 5.1 0 0 0 1.1 2.7 11.6 11.6 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>Enviar por WhatsApp</button>
+      <button type="button" class="btn cp-btn cp-wa" id="movCPWa"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.1 5.1 0 0 0 1.1 2.7 11.6 11.6 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>WhatsApp al trabajador<small class="cpsub">1 comprobante · vertical</small></button>
+      <button type="button" class="btn cp-btn cp-wa cp-wa2" id="movCPWa2"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.6.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.1 5.1 0 0 0 1.1 2.7 11.6 11.6 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg>WhatsApp para imprimir<small class="cpsub">2 partes · horizontal</small></button>
     </div>
     <div class="acciones">
       <button type="button" id="movEditar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>Editar</button>
@@ -2881,7 +2885,7 @@ function comprobantePDF(r,soloArmar,uno){
   const ej=nombre=>`<section class="cp">
     <div class="cab"><div class="marca"><img src="logo-recibo.png" alt=""><div><b>CASA BONITA OREGÓN S.A.C.</b><span>RUC 20614484153 · Pago a trabajadores</span></div></div>
       <div class="doc"><div><div class="t">COMPROBANTE DE PAGO</div><div class="n">N° ${num}</div><div class="f">Fecha de pago: ${fF(r.fecha)}</div></div></div></div>
-    <span class="ejemplar">${nombre}</span>
+    ${nombre?`<span class="ejemplar">${nombre}</span>`:""}
     <h4>DATOS DEL TRABAJADOR</h4>
     <div class="grid2"><div class="celda"><small>APELLIDOS Y NOMBRES</small><b>${esc(String(r.desc||"").toUpperCase())}</b></div><div class="celda"><small>PERIODO PAGADO</small><b>${periodo}</b></div>
       <div class="celda"><small>DNI</small><b>${esc(r.ruc||"")}</b></div><div class="celda"><small>CARGO</small><b>${esc(String(r.cargo||t.cargo||"").toUpperCase())}</b></div></div>
@@ -2892,9 +2896,9 @@ function comprobantePDF(r,soloArmar,uno){
     <p class="decl">Declaro haber recibido a mi entera satisfacción el importe neto indicado en el presente comprobante, por los servicios prestados en el periodo señalado.</p>
     <p class="lugar">Lima, ${+d} de ${MESES[+mm-1]} de ${y}</p>
     <div class="firmas"><div class="firma"><img class="fimg" src="firma-gerente.png" alt=""><b>EMPLEADOR</b><span>Casa Bonita Oregón S.A.C.</span></div><div class="firma">${FIRMAS[r.id]?`<img class="fimg" src="${FIRMAS[r.id].png}" alt="">`:""}<b>TRABAJADOR</b><span>${esc(String(r.desc||"").toUpperCase())} · DNI ${esc(r.ruc||"")}</span>${FIRMAS[r.id]?`<span class="ffecha">Firmado digitalmente el ${fechaHora(FIRMAS[r.id].ts)}</span>`:""}</div></div>
-    <p class="pie">${nombre.charAt(0)+nombre.slice(1).toLowerCase()} · Documento interno de control de pagos</p>
+    <p class="pie">${nombre?nombre.charAt(0)+nombre.slice(1).toLowerCase()+" · ":""}Documento interno de control de pagos</p>
   </section>`;
-  $("comprobante").innerHTML=uno?`<div class="hoja uno">${ej("EJEMPLAR TRABAJADOR")}</div>`:`<div class="hoja">${ej("EJEMPLAR TRABAJADOR")}${ej("EJEMPLAR EMPRESA")}<span class="tijera">✂</span></div>`;
+  $("comprobante").innerHTML=uno?`<div class="hoja uno">${ej("")}</div>`:`<div class="hoja">${ej("EJEMPLAR TRABAJADOR")}${ej("EJEMPLAR EMPRESA")}<span class="tijera">✂</span></div>`;
   if(soloArmar) return {num, archivo:`Comprobante ${num} ${titulo(r.desc||"")}`, trab:t};
   document.body.classList.add("imp-cp");
   // Solo mientras se imprime el comprobante: una sola hoja A4 horizontal, sin márgenes
@@ -2944,19 +2948,21 @@ let libsPDF=null;
 const cargarLibsPDF=()=>libsPDF||(libsPDF=Promise.all([
   window.html2canvas||cargarJs("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"),
   window.jspdf||cargarJs("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js")]).catch(e=>{libsPDF=null;throw e}));
-async function comprobanteArchivo(r){
+async function comprobanteArchivo(r,dos){
   await cargarLibsPDF();
-  const info=comprobantePDF(r,true,true), c=$("comprobante");   // un solo ejemplar, en vertical
+  const info=comprobantePDF(r,true,!dos), c=$("comprobante");   // uno: un solo ejemplar en vertical · dos: hoja horizontal con las 2 partes
   c.style.cssText="display:block;position:fixed;left:-20000px;top:0;z-index:-1";
   try{
     await Promise.all([...c.querySelectorAll("img")].map(i=>i.complete?0:new Promise(ok=>{i.onload=i.onerror=ok})));
     if(document.fonts&&document.fonts.ready) await document.fonts.ready;
     const lienzo=await html2canvas(c.querySelector(".hoja"),{scale:3,backgroundColor:"#ffffff",logging:false});
-    // A4 vertical: el ejemplar ocupa toda la hoja (mismo formato, ampliado)
-    const pdf=new jspdf.jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
-    const h=210*lienzo.height/lienzo.width;
-    pdf.addImage(lienzo.toDataURL("image/jpeg",0.92),"JPEG",0,Math.max(0,(297-h)/2),210,Math.min(297,h));
-    return {file:new File([pdf.output("blob")],info.archivo+".pdf",{type:"application/pdf"}),info};
+    let pdf;
+    if(dos){pdf=new jspdf.jsPDF({orientation:"landscape",unit:"mm",format:"a4"});pdf.addImage(lienzo.toDataURL("image/jpeg",0.92),"JPEG",0,0,297,210)}
+    else{// A4 vertical: el ejemplar ocupa toda la hoja (mismo formato, ampliado)
+      pdf=new jspdf.jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
+      const h=210*lienzo.height/lienzo.width;
+      pdf.addImage(lienzo.toDataURL("image/jpeg",0.92),"JPEG",0,Math.max(0,(297-h)/2),210,Math.min(297,h));}
+    return {file:new File([pdf.output("blob")],info.archivo+(dos?" (para imprimir)":"")+".pdf",{type:"application/pdf"}),info};
   }finally{c.style.cssText="";c.innerHTML=""}
 }
 function waNumero(t){const d=String(t&&t.yape||"").replace(/\D/g,"");return /^9\d{8}$/.test(d)?"51"+d:""}
@@ -2964,30 +2970,34 @@ async function compartirPDF(f,texto){
   if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:f.name,text:texto});return true}
   return false;
 }
-$("movCPWa").onclick=async()=>{
-  const r=movSel; if(!r)return; const b=$("movCPWa"), txt0=b.innerHTML;
-  b.disabled=true; b.lastChild.textContent="Preparando PDF…";
-  let a;
-  try{a=await comprobanteArchivo(r)}
-  catch(e){toast("No se pudo crear el PDF. Revisa tu internet.");b.disabled=false;b.innerHTML=txt0;return}
-  b.disabled=false; b.innerHTML=txt0;
-  const texto=`Comprobante de pago ${a.info.num} - Casa Bonita Oregón S.A.C.`;
-  try{if(await compartirPDF(a.file,texto)){cerrarOv("ovMov");return}}
-  catch(e){
-    if(e.name==="AbortError")return;               // cerró el menú de compartir
-    if(e.name==="NotAllowedError"){                 // el PDF tardó: se pide un toque más para abrir WhatsApp
-      b.lastChild.textContent="Toca otra vez para enviar";
-      b.onclick=async()=>{b.onclick=$("movCPWa")._orig;b.innerHTML=txt0;try{if(await compartirPDF(a.file,texto))cerrarOv("ovMov")}catch(e2){}};
-      return;
+function botonWA(id,dos){
+  const b=$(id);
+  const accion=async()=>{
+    const r=movSel; if(!r)return; const txt0=b.innerHTML;
+    b.disabled=true; b.innerHTML="Preparando PDF…";
+    let a;
+    try{a=await comprobanteArchivo(r,dos)}
+    catch(e){toast("No se pudo crear el PDF. Revisa tu internet.");b.disabled=false;b.innerHTML=txt0;return}
+    b.disabled=false; b.innerHTML=txt0;
+    const texto=`Comprobante de pago ${a.info.num} - Casa Bonita Oregón S.A.C.`+(dos?" (para imprimir: 2 partes en una hoja A4 horizontal)":"");
+    try{if(await compartirPDF(a.file,texto)){cerrarOv("ovMov");return}}
+    catch(e){
+      if(e.name==="AbortError")return;               // cerró el menú de compartir
+      if(e.name==="NotAllowedError"){                 // el PDF tardó: se pide un toque más para abrir WhatsApp
+        b.innerHTML="Toca otra vez para enviar";
+        b.onclick=async()=>{b.onclick=accion;b.innerHTML=txt0;try{if(await compartirPDF(a.file,texto))cerrarOv("ovMov")}catch(e2){}};
+        return;
+      }
     }
-  }
-  // Computadora: se descarga el PDF y se abre WhatsApp para adjuntarlo
-  const u=URL.createObjectURL(a.file), l=document.createElement("a"); l.href=u; l.download=a.file.name; document.body.appendChild(l); l.click(); l.remove();
-  setTimeout(()=>URL.revokeObjectURL(u),60000);
-  window.open(`https://wa.me/${waNumero(a.info.trab)}?text=${encodeURIComponent(texto)}`,"_blank","noopener");
-  toast("PDF descargado: adjúntalo en el chat de WhatsApp"); cerrarOv("ovMov");
-};
-$("movCPWa")._orig=$("movCPWa").onclick;
+    // Computadora: se descarga el PDF y se abre WhatsApp para adjuntarlo
+    const u=URL.createObjectURL(a.file), l=document.createElement("a"); l.href=u; l.download=a.file.name; document.body.appendChild(l); l.click(); l.remove();
+    setTimeout(()=>URL.revokeObjectURL(u),60000);
+    window.open(`https://wa.me/${dos?"":waNumero(a.info.trab)}?text=${encodeURIComponent(texto)}`,"_blank","noopener");
+    toast("PDF descargado: adjúntalo en el chat de WhatsApp"); cerrarOv("ovMov");
+  };
+  b.onclick=accion;
+}
+botonWA("movCPWa",false); botonWA("movCPWa2",true);
 
 
 if("serviceWorker" in navigator){
