@@ -394,6 +394,8 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
   html:has(body.imp-cp),body.imp-cp{padding:0!important;margin:0!important;height:auto!important;min-height:0!important}
 }
 #comprobante .hoja{width:297mm;height:209mm;background:#fff;display:grid;grid-template-columns:1fr 1fr;position:relative;font-family:var(--body);color:#10241C;font-size:2.9mm;-webkit-print-color-adjust:exact;print-color-adjust:exact;overflow:hidden}
+#comprobante .hoja.uno{width:148.5mm;grid-template-columns:1fr}
+#comprobante .hoja.uno::after{display:none}
 #comprobante .hoja::after{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:.3mm dashed #a9b4ae}
 #comprobante .tijera{position:absolute;left:50%;top:2mm;transform:translateX(-50%);font-size:3.2mm;color:#a9b4ae;background:#fff;z-index:1}
 #comprobante .cp{padding:7mm 10mm 5mm;display:flex;flex-direction:column;min-width:0}
@@ -616,7 +618,7 @@ button.big{border:0}
       <button data-s="anual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Resumen anual</button>
       <button data-s="config"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Configuración</button>
     </nav>
-    <div class="pie">CBO Finanzas · versión 3.1</div>
+    <div class="pie">CBO Finanzas · versión 3.2</div>
   </aside>
   <div class="velo" id="velo"></div>
 
@@ -854,7 +856,7 @@ button.big{border:0}
           </section>
           <section class="panel">
             <div class="ph"><h2>Acerca de</h2></div>
-            <p class="hint" style="margin:0">CBO Finanzas 3.1. Tus datos se guardan en tu archivo de Google Sheets "CASA BONITA OREGON S.A.C.". Este celular solo guarda una copia para verlos sin internet.</p>
+            <p class="hint" style="margin:0">CBO Finanzas 3.2. Tus datos se guardan en tu archivo de Google Sheets "CASA BONITA OREGON S.A.C.". Este celular solo guarda una copia para verlos sin internet.</p>
           </section>
         </div>
       </section>
@@ -2855,7 +2857,7 @@ function enLetrasMay(n){
   if(!e)t="CERO";else{const k=Math.floor(e/1000),r=e%1000;if(k)t=k===1?"MIL":m(k).replace(/UNO$/,"UN")+" MIL";if(r)t+=(t?" ":"")+m(r)}
   return t+" CON "+String(c).padStart(2,"0")+"/100 SOLES";
 }
-function comprobantePDF(r,soloArmar){
+function comprobantePDF(r,soloArmar,uno){
   const t=listaTrab().find(x=>String(x.dni)===String(r.ruc))||{};
   const pla=rows.filter(esPlanilla).sort((a,b)=>a.fecha.localeCompare(b.fecha)||(a.creado||0)-(b.creado||0));
   const num="CP-"+String(r.numero||(pla.findIndex(x=>x.id===r.id)+1)).padStart(4,"0");
@@ -2892,7 +2894,7 @@ function comprobantePDF(r,soloArmar){
     <div class="firmas"><div class="firma"><img class="fimg" src="firma-gerente.png" alt=""><b>EMPLEADOR</b><span>Casa Bonita Oregón S.A.C.</span></div><div class="firma">${FIRMAS[r.id]?`<img class="fimg" src="${FIRMAS[r.id].png}" alt="">`:""}<b>TRABAJADOR</b><span>${esc(String(r.desc||"").toUpperCase())} · DNI ${esc(r.ruc||"")}</span>${FIRMAS[r.id]?`<span class="ffecha">Firmado digitalmente el ${fechaHora(FIRMAS[r.id].ts)}</span>`:""}</div></div>
     <p class="pie">${nombre.charAt(0)+nombre.slice(1).toLowerCase()} · Documento interno de control de pagos</p>
   </section>`;
-  $("comprobante").innerHTML=`<div class="hoja">${ej("EJEMPLAR TRABAJADOR")}${ej("EJEMPLAR EMPRESA")}<span class="tijera">✂</span></div>`;
+  $("comprobante").innerHTML=uno?`<div class="hoja uno">${ej("EJEMPLAR TRABAJADOR")}</div>`:`<div class="hoja">${ej("EJEMPLAR TRABAJADOR")}${ej("EJEMPLAR EMPRESA")}<span class="tijera">✂</span></div>`;
   if(soloArmar) return {num, archivo:`Comprobante ${num} ${titulo(r.desc||"")}`, trab:t};
   document.body.classList.add("imp-cp");
   // Solo mientras se imprime el comprobante: una sola hoja A4 horizontal, sin márgenes
@@ -2944,14 +2946,16 @@ const cargarLibsPDF=()=>libsPDF||(libsPDF=Promise.all([
   window.jspdf||cargarJs("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js")]).catch(e=>{libsPDF=null;throw e}));
 async function comprobanteArchivo(r){
   await cargarLibsPDF();
-  const info=comprobantePDF(r,true), c=$("comprobante");
+  const info=comprobantePDF(r,true,true), c=$("comprobante");   // un solo ejemplar, en vertical
   c.style.cssText="display:block;position:fixed;left:-20000px;top:0;z-index:-1";
   try{
     await Promise.all([...c.querySelectorAll("img")].map(i=>i.complete?0:new Promise(ok=>{i.onload=i.onerror=ok})));
     if(document.fonts&&document.fonts.ready) await document.fonts.ready;
-    const lienzo=await html2canvas(c.querySelector(".hoja"),{scale:2,backgroundColor:"#ffffff",logging:false});
-    const pdf=new jspdf.jsPDF({orientation:"landscape",unit:"mm",format:"a4"});
-    pdf.addImage(lienzo.toDataURL("image/jpeg",0.92),"JPEG",0,0,297,210);
+    const lienzo=await html2canvas(c.querySelector(".hoja"),{scale:3,backgroundColor:"#ffffff",logging:false});
+    // A4 vertical: el ejemplar ocupa toda la hoja (mismo formato, ampliado)
+    const pdf=new jspdf.jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
+    const h=210*lienzo.height/lienzo.width;
+    pdf.addImage(lienzo.toDataURL("image/jpeg",0.92),"JPEG",0,Math.max(0,(297-h)/2),210,Math.min(297,h));
     return {file:new File([pdf.output("blob")],info.archivo+".pdf",{type:"application/pdf"}),info};
   }finally{c.style.cssText="";c.innerHTML=""}
 }
