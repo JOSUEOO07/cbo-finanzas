@@ -733,6 +733,50 @@ body.deco-mov h1.deco-h1::after{animation:flotar 3s ease-in-out infinite}
 .chart-tip{margin-top:8px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--brand-2) 10%,transparent);font-size:.85rem;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
 @media (prefers-reduced-motion:reduce){#chart rect.b,.celebra .caja,.metam .barra i{animation:none;transition:none}}
 
+
+/* Inicio fusionado */
+.ud-sal{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.ud-sal h2{margin:0;font-size:1.25rem;letter-spacing:-.01em}.ud-sal p{margin:3px 0 0;color:var(--muted);font-size:.84rem;line-height:1.35}.ud-sal p b{color:var(--brand)}
+.ud-trio button{all:unset;cursor:pointer;display:block;border-radius:15px;padding:9px 10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);min-width:0}
+.ud-trio button:active{background:rgba(255,255,255,.14)}
+.ud-sunf{display:grid;gap:8px}
+.ud-sunf .fila{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;flex-wrap:wrap}
+.ud-sunf .v{font-size:1.7rem!important;margin:0!important}
+.ud-sunf .det{font-size:.78rem;opacity:.85;font-weight:600}
+.ud-sunf .favor{font-size:.8rem;padding:8px 10px;border-radius:12px;background:rgba(255,255,255,.45)}
+.ud-sunf .pill{font-size:.72rem}
+.ud-metab{display:grid;gap:8px}
+.ud-metab .fila{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:.84rem}.ud-metab .fila b{font-size:1rem}
+.ud-metab .barra{height:12px;border-radius:99px;background:color-mix(in srgb,var(--brand-2) 14%,transparent);overflow:hidden}
+.ud-metab .barra i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#2FB383,var(--brand));transition:width 1.1s cubic-bezier(.22,1,.36,1)}
+.ud-metab.ok .barra i{background:linear-gradient(90deg,#F2C14E,#C9962A)}
+.ud-duo2{display:grid;grid-template-columns:minmax(0,1fr);gap:14px}
+.ud-tl{display:flex;justify-content:space-between;gap:8px;padding:7px 0;font-size:.84rem;border-bottom:1px dashed var(--line)}.ud-tl:last-child{border:0}.ud-tl b{font-variant-numeric:tabular-nums}
+.ud-k4{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.ud-k4 div{background:var(--bg);border-radius:14px;padding:9px 10px}.ud-k4 span{display:block;font-size:.62rem;letter-spacing:.08em;font-weight:800;color:var(--muted);text-transform:uppercase}.ud-k4 b{font-size:.95rem;font-variant-numeric:tabular-nums}
+@media (min-width:700px){.ud-duo2{grid-template-columns:1fr 1fr}}
+@media (min-width:1100px){.ud{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}.ud-sal{grid-column:1/-1}.ud-hero{grid-column:1;grid-row:span 3}.ud-duo2,.ud-logros{grid-column:1/-1}}
+
+
+/* ===== Barra suprema ===== */
+.selbar{font:inherit;font-size:.85rem;padding:8px 10px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+@media (max-width:980px){
+  body[data-barra="d"] .tabbar{transition:transform .35s cubic-bezier(.22,1,.36,1),opacity .25s}
+  body.barra-oculta[data-barra="d"] .tabbar{transform:translateY(140%);opacity:0}
+  body[data-barra="d"] .tabbar .badge.sun{background:#D4A72C;color:#3A2A05}
+  body[data-barra="d"] .tabbar .mas-reg span.c svg{transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
+  body.abanico[data-barra="d"] .tabbar .mas-reg span.c svg{transform:rotate(135deg)}
+  body.abanico[data-barra="d"] .tabbar .mas-reg span.c{animation:none}
+}
+.abanico-velo{position:fixed;inset:0;z-index:19;background:rgba(6,30,23,.38);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);opacity:0;transition:opacity .25s;pointer-events:none}
+body.abanico .abanico-velo{opacity:1;pointer-events:auto}
+.abanico-op{position:fixed;z-index:21;left:50%;bottom:calc(46px + env(safe-area-inset-bottom,0px));display:grid;justify-items:center;gap:6px;border:0;background:transparent;font:inherit;font-size:.74rem;font-weight:800;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.4);
+  transform:translate(-50%,0) scale(.3);opacity:0;pointer-events:none;transition:transform .42s cubic-bezier(.34,1.56,.64,1),opacity .2s;-webkit-tap-highlight-color:transparent;width:84px}
+.abanico-op i{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:var(--surface);color:var(--brand);box-shadow:0 10px 24px rgba(0,0,0,.25)}
+.abanico-op i svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.abanico-op.pri i{background:linear-gradient(150deg,#2FB383,var(--brand));color:#fff}
+body.abanico .abanico-op{opacity:1;pointer-events:auto;transform:translate(calc(-50% + var(--x)),var(--y)) scale(1)}
+@media (min-width:981px){.abanico-op,.abanico-velo{display:none}}
+
 /* ===== Inicio Ultra Deluxe ===== */
 .ini-viejo{display:none!important}
 .ud{display:grid;gap:14px;grid-template-columns:minmax(0,1fr)}
@@ -757,7 +801,7 @@ body.deco-mov h1.deco-h1::after{animation:flotar 3s ease-in-out infinite}
 .ud-hero:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(115deg,rgba(255,255,255,.03) 0 1px,transparent 1px 12px);pointer-events:none}
 .ud-hero.neg{background:linear-gradient(160deg,#9A3B22,#6E2614)}
 .ud-hero .tp{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;position:relative}
-.ud-hero .deco-esq{right:104px;top:14px;font-size:22px}.ud-hero .deco-chip{position:relative;margin-top:10px}
+.ud-hero .deco-esq{right:16px;top:14px;font-size:24px}.ud-hero .deco-chip{position:relative;margin-top:10px}
 .ud-hero .k{font-size:.7rem;letter-spacing:.16em;font-weight:700;opacity:.82;text-transform:uppercase}
 .ud-hero .v{font-size:2.6rem;font-weight:800;letter-spacing:-.025em;line-height:1.05;margin-top:6px;font-variant-numeric:tabular-nums}.ud-hero .v small{font-size:1.05rem;opacity:.7;margin-right:4px}.ud-hero .v em{font-style:normal;font-size:1.25rem;opacity:.55}
 .ud-delta{display:inline-flex;align-items:center;gap:4px;margin-top:8px;font-size:.72rem;font-weight:800;padding:4px 9px;border-radius:99px;background:rgba(127,227,184,.18);color:#9BF0C9}.ud-delta.baja{background:rgba(247,185,160,.18);color:#F7B9A0}
@@ -766,7 +810,7 @@ body.deco-mov h1.deco-h1::after{animation:flotar 3s ease-in-out infinite}
 .ud-flow{position:relative;margin:14px 0 6px;height:12px;border-radius:9px;display:flex;overflow:hidden;background:rgba(255,255,255,.1)}
 .ud-flow i{display:block;height:100%;transition:width 1s cubic-bezier(.22,1,.36,1)}
 .ud-flowl{display:flex;justify-content:space-between;gap:6px;font-size:.66rem;font-weight:600;opacity:.88;position:relative;flex-wrap:wrap}.ud-flowl span{display:flex;align-items:center;gap:5px}.ud-flowl i{width:7px;height:7px;border-radius:2px;display:inline-block}
-.ud-trio{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;position:relative}
+.ud-trio{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:12px;position:relative}
 .ud-trio div{border-radius:15px;padding:9px 10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);min-width:0}
 .ud-trio span{display:flex;align-items:center;gap:5px;font-size:.66rem;opacity:.82;font-weight:600}.ud-trio span svg{width:14px;height:14px}
 .ud-trio b{display:block;font-size:.95rem;margin-top:3px;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ud-trio em{font-style:normal;font-size:.62rem;font-weight:800;color:#9BF0C9}.ud-trio em.m{color:#F7B9A0}
@@ -842,7 +886,7 @@ button.ud-card{cursor:pointer;width:100%}
       <button data-s="anual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Resumen anual</button>
       <button data-s="config"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Configuración</button>
     </nav>
-    <div class="pie">CBO Finanzas · versión 3.8</div>
+    <div class="pie">CBO Finanzas · versión 3.9</div>
   </aside>
   <div class="velo" id="velo"></div>
 
@@ -863,17 +907,14 @@ button.ud-card{cursor:pointer;width:100%}
       <!-- INICIO -->
       <section data-sec="inicio">
         <div class="ud" id="ud">
-          <div class="ud-hdr"><div class="ud-av" id="udAv">JV</div><div class="ud-tx"><small id="udFecha"></small><b id="udHola"></b></div><button type="button" class="ud-ib" id="udBell" aria-label="Avisos"><svg class="ic" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="dot" id="udBellDot" hidden></span></button></div>
-          <div class="ud-dice" id="udDice"></div>
-          <div class="ud-semana" id="udSemana"></div>
+          <div class="ud-sal" id="udSal"></div>
           <div class="ud-hero" id="udHero"></div>
-          <div class="ud-dock" id="udDock"></div>
+          <button type="button" class="ud-card ud-sunf" id="udSun"></button>
+          <button type="button" class="ud-card ud-metab" id="udMeta"></button>
           <div class="ud-ins" id="udIns"></div>
-          <div class="ud-duo"><button type="button" class="ud-card ud-sun" id="udSun"></button><button type="button" class="ud-card" id="udMeta"></button></div>
-          <div class="ud-card ud-act" id="udAct"></div>
           <div class="ud-card" id="udChart"></div>
-          <div class="ud-duo"><button type="button" class="ud-card" id="udPla"></button><button type="button" class="ud-card" id="udAnio"></button></div>
-          <div class="ud-card" id="udLogros"></div>
+          <div class="ud-card ud-act" id="udAct"></div>
+          <div class="ud-duo2"><div class="ud-card" id="udPla"></div><div class="ud-card" id="udAnio"></div></div>
         </div>
         <div class="ini-viejo" style="display:grid;gap:16px">
           <div class="saludo" id="saludo"></div>
@@ -1051,6 +1092,7 @@ button.ud-card{cursor:pointer;width:100%}
             <div id="combinar"></div>
             <div class="deco-cfg">
               <div class="deco-fila"><span><b>Decoraciones de temporada</b><small class="hint" id="decoTxt" style="display:block"></small></span><div class="seg" id="decoSeg" style="min-width:190px"><button type="button" data-deco="1">Automático</button><button type="button" data-deco="0">Desactivadas</button></div></div>
+              <div class="deco-fila"><span><b>Barra de abajo</b><small class="hint" style="display:block">Elige los 2 accesos junto al botón +</small></span><span style="display:flex;gap:6px;flex-wrap:wrap"><select id="barA" class="selbar"></select><select id="barB" class="selbar"></select></span></div>
               <div class="deco-fila"><span><b>Sonidos</b><small class="hint" style="display:block">Al registrar y al llegar a la meta</small></span><div class="seg" id="sonSeg" style="min-width:190px"><button type="button" data-son="1">Activados</button><button type="button" data-son="0">Desactivados</button></div></div>
               <div class="deco-fila"><span><b>Movimiento</b><small class="hint" style="display:block">Adornos que se mecen y caen despacio</small></span><div class="seg" id="decoMovSeg" style="min-width:190px"><button type="button" data-decomov="1">Con movimiento</button><button type="button" data-decomov="0">Quietas</button></div></div>
               <p class="hint" style="margin:6px 0 0">Toca una temporada para verla (después vuelve sola a automático):</p>
@@ -1111,7 +1153,7 @@ button.ud-card{cursor:pointer;width:100%}
           </section>
           <section class="panel">
             <div class="ph"><h2>Acerca de</h2></div>
-            <p class="hint" style="margin:0">CBO Finanzas 3.8. Tus datos se guardan en tu archivo de Google Sheets "CASA BONITA OREGON S.A.C.". Este celular solo guarda una copia para verlos sin internet.</p>
+            <p class="hint" style="margin:0">CBO Finanzas 3.9. Tus datos se guardan en tu archivo de Google Sheets "CASA BONITA OREGON S.A.C.". Este celular solo guarda una copia para verlos sin internet.</p>
           </section>
         </div>
       </section>
@@ -1327,6 +1369,8 @@ button.ud-card{cursor:pointer;width:100%}
   <div class="sheet">
     <h3>Más opciones <button type="button" class="x" data-cerrar aria-label="Cerrar">✕</button></h3>
     <div class="lista-mas">
+      <button type="button" data-ir="sunat" class="mas-sunat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>Impuestos SUNAT<small>IGV, renta y vencimientos</small></span></button>
+      <button type="button" data-ir="movimientos" class="mas-movimientos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span>Movimientos<small>Todos tus registros</small></span></button>
       <button type="button" data-ir="terceros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.5"/><path d="M15 15c3 0 6 1.5 6 4.5"/></svg><span>Clientes y proveedores<small>Quién te paga y a quién le compras</small></span></button>
       <button type="button" data-ir="planilla"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M8 6V4h8v2M3 12h18"/></svg><span>Planilla<small>Pagos a trabajadores</small></span></button>
       <button type="button" data-ir="obras"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V10l7-5 7 5v11M9 21v-6h6v6"/></svg><span>Ganancia por obra<small>Cuánto dejó cada obra</small></span></button>
@@ -1707,7 +1751,7 @@ function ir(s){
   if(s!==seccion) screenFx(s, ultimoToque);
   const cambio=s!==seccion; seccion=s; document.querySelectorAll("[data-sec]").forEach(x=>x.hidden=x.dataset.sec!==s);
   document.querySelectorAll("#nav button").forEach(b=>b.setAttribute("aria-current",b.dataset.s===s?"page":"false"));
-  const enMas=["terceros","planilla","anual","obras","config"].includes(s);
+  const enMas=!["inicio",...[...document.querySelectorAll("#tabbar [data-tab]")].map(b=>b.dataset.tab)].includes(s);
   document.querySelectorAll("#tabbar [data-tab]").forEach(b=>b.setAttribute("aria-current",(b.dataset.tab===s||(b.dataset.tab==="mas"&&enMas))?"page":"false"));
   $("titulo").textContent=TITULOS[s]; $("monthsel").hidden=s==="config";
   $("app").classList.remove("abierto");document.body.classList.remove("menu"); try{history.replaceState(null,"","#"+s)}catch{}
@@ -3459,7 +3503,7 @@ const UDI={
  trophy:'<path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M9 20h6M10 17h4"/>',gem:'<path d="M7 4h10l4 5-9 11L3 9z"/><path d="M3 9h18M9.5 4L12 9l2.5-5M12 9v11"/>',stack:'<path d="M4 7l8-4 8 4-8 4z"/><path d="M4 12l8 4 8-4M4 17l8 4 8-4"/>',building:'<path d="M3 21h18M5 21V10l7-5 7 5v11M9 21v-6h6v6"/>'};
 const udic=(n,st)=>`<svg class="ic" viewBox="0 0 24 24"${st?` style="${st}"`:""}>${UDI[n]}</svg>`;
 const UD_LOGRO_IC={primero:["sprout","#7FD38A,#2E8B57"],c100:["stack","#7FB8E3,#2F5D8A"],c500:["building","#A99BE0,#5B4AA8"],v100k:["coins","#F2D27A,#C9962A"],v1m:["gem","#9FE7F2,#1C8FA8"],meta:["target","#7FE3B8,#0D5C46"],r7:["flame","#F7B267,#E8761E"],r30:["trophy","#F2D27A,#B8860B"],pla:["helmet","#F0A07A,#B0472B"],obra:["building","#C9B08A,#7A5A12"]};
-let udTab="rec", udSel=null;
+let udTab="cli", udSel=null;
 const udPct=(a,b)=>b>0?Math.round((a-b)/b*100):null;
 const udIni=t=>{const w=String(t||"?").replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ0-9 ]/g,"").trim().split(/\s+/).filter(x=>!/^(S\.?A\.?C?|E\.?I\.?R\.?L|DE|LA|EL|Y)$/i.test(x));return ((w[0]||"?")[0]+((w[1]||"")[0]||"")).toUpperCase()};
 const UD_COL=["#2FB383,#0D5C46","#E8956A,#B0472B","#6C8FD6,#2F5D8A","#D4A72C,#9A6E12","#A99BE0,#5B4AA8","#5FC9C2,#127A73"];
@@ -3468,78 +3512,59 @@ function pintarUD(){
   if(!$("ud")) return;
   const S=sumas(delMes(mes)), t=impuestos(mes), ut=utilidad(S,t.tot), vi=vencInfo(mes), pag=pagadoSun(mes), falta=r2(t.tot-pag);
   const mAnt=addMes(mes,-1), SA=sumas(delMes(mAnt)), tA=impuestos(mAnt), utA=utilidad(SA,tA.tot);
-  const nomMes=MESES[+mes.slice(5)-1], nomAnt=MESES[+mAnt.slice(5)-1];
-  // Encabezado
-  const h=new Date().getHours(), sal=h<12?"Buenos días":h<19?"Buenas tardes":"Buenas noches";
-  const hoy=new Date(); $("udFecha").textContent=hoy.toLocaleDateString("es-PE",{weekday:"long",day:"numeric",month:"long"});
-  $("udHola").textContent=`${sal}, ${nomCorto(quien)||""}`;
-  $("udAv").textContent=udIni(titulo(quien||"CBO")); $("udAv").classList.toggle("jesus",/JES/.test(quien||""));
-  const viHoy=vencInfo(addMes(hoyISO.slice(0,7),-1)), pagHoy=pagadoSun(addMes(hoyISO.slice(0,7),-1)), tHoy=impuestos(addMes(hoyISO.slice(0,7),-1));
-  const sunPend=viHoy&&viHoy.dias>=0&&viHoy.dias<=3&&tHoy.tot-pagHoy>0.5;
-  $("udBellDot").hidden=!(cola.length||sunPend);
-  // Mensaje del día
-  const metaM=Math.round((ajustes.meta||0)/12), pm=metaM?S.sI/metaM:0, frases=[];
-  if(metaM) frases.push(pm>=1?`¡Llegaste a la meta de ${nomMes}! Vendiste <b>${fmt0(S.sI)}</b>.`:`Vas <b>${Math.round(pm*100)}%</b> de la meta de ${nomMes} y te faltan <b>${fmt0(metaM-S.sI)}</b>.`);
-  if(viHoy&&viHoy.dias>=0&&viHoy.dias<=7&&tHoy.tot-pagHoy>0.5) frases.push(viHoy.dias===0?`SUNAT vence <b>hoy</b>: ${fmt0(tHoy.tot-pagHoy)}.`:`SUNAT vence en <b>${viHoy.dias} día${viHoy.dias>1?"s":""}</b>: ${fmt0(tHoy.tot-pagHoy)}.`);
-  if(cola.length) frases.push(`Tienes <b>${cola.length}</b> registro${cola.length>1?"s":""} por enviar al Excel.`);
-  $("udDice").innerHTML=udic("spark")+`<span>${frases.join(" ")||"Registra tus ventas y compras y aquí verás cómo va tu mes."}</span>`;
-  // Semana (de lunes a domingo, la actual)
-  const d0=new Date(hoyISO+"T12:00:00"); d0.setDate(d0.getDate()-((d0.getDay()+6)%7));
-  const iso=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-  $("udSemana").innerHTML=[...Array(7)].map((_,i)=>{const d=new Date(d0);d.setDate(d0.getDate()+i);const f=iso(d), rs=rows.filter(r=>r.fecha===f);
-    const pts=(rs.some(r=>r.tipo==="gasto")?'<i style="background:#2FB383"></i>':"")+(rs.some(r=>r.tipo==="ingreso")?'<i style="background:#D4A72C"></i>':"")+(viHoy&&viHoy.fecha===f?'<i style="background:#E8761E"></i>':"");
-    return `<div class="${f===hoyISO?"hoy":""}" title="${rs.length} registro${rs.length===1?"":"s"}">${"LMMJVSD"[i]}<b>${d.getDate()}</b><span class="pts">${pts}</span></div>`}).join("");
-  // Tarjeta principal
+  const nomMes=MESES[+mes.slice(5)-1], nomAnt=MESES[+mAnt.slice(5)-1], anio=mes.slice(0,4);
+  const metaM=Math.round((ajustes.meta||0)/12), pm=metaM?S.sI/metaM:0;
+  // Saludo (con lo importante del día en una línea)
+  const h=new Date().getHours(), sal=h<12?"Buenos días":h<19?"Buenas tardes":"Buenas noches", ra=racha();
+  const mHoy=addMes(hoyISO.slice(0,7),-1), viHoy=vencInfo(mHoy), tHoy=impuestos(mHoy), pendHoy=r2(tHoy.tot-pagadoSun(mHoy)), fr=[];
+  if(cola.length) fr.push(`<b>${cola.length}</b> por enviar al Excel`);
+  const hc=leerLS("cbo-hoy",{d:"",n:0}); if(!fr.length) fr.push(hc.d===hoyISO&&hc.n?`Hoy registraste ${hc.n} movimiento${hc.n>1?"s":""}`:"Aún no registras nada hoy");
+  $("udSal").innerHTML=`<div><h2>${sal}, ${esc(nomCorto(quien)||"")}</h2><p>${fr.join(" · ")}</p></div>${ra>=2?`<span class="racha">🔥 ${ra} días seguidos</span>`:""}`;
+  // Utilidad (tarjeta principal)
   const dUt=udPct(ut,utA), dI=udPct(S.sI,SA.sI), dG=udPct(S.sG,SA.sG);
-  let salud=null;
-  if(S.sI>0){const mg=Math.max(0,ut)/S.sI, p1=Math.min(1,mg/.4)*40, p2=metaM?Math.min(1,pm)*30:20, p3=t.tot<=0.5||falta<=0.5?30:(vi&&vi.dias>=0?20:0); salud=Math.round(p1+p2+p3)}
-  const gauge=`<svg width="78" height="52" viewBox="0 0 78 52"><defs><linearGradient id="udgg" x1="0" x2="1"><stop offset="0" stop-color="#F2C14E"/><stop offset="1" stop-color="#7FE3B8"/></linearGradient></defs><path d="M9 46 A30 30 0 0 1 69 46" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="7" stroke-linecap="round"/><path d="M9 46 A30 30 0 0 1 69 46" fill="none" stroke="url(#udgg)" stroke-width="7" stroke-linecap="round" stroke-dasharray="94.3" stroke-dashoffset="${94.3*(1-(salud||0)/100)}" style="transition:stroke-dashoffset 1.2s"/><text x="39" y="44" text-anchor="middle" font-size="18" font-weight="800" fill="#fff">${salud==null?"–":salud}</text></svg>`;
   const ent=Math.trunc(Math.abs(ut)), cen=Math.round((Math.abs(ut)-ent)*100);
   const pG=S.sI>0?Math.min(100,S.sG/S.sI*100):0, pS=S.sI>0?Math.min(100-pG,t.tot/S.sI*100):0, pQ=Math.max(0,100-pG-pS);
   const hero=$("udHero"); hero.classList.toggle("neg",ut<0);
   hero.querySelectorAll(":scope > :not(.deco-esq):not(.deco-chip)").forEach(x=>x.remove());
-  hero.insertAdjacentHTML("afterbegin",`<div class="tp"><div><div class="k">${ut<0?"Pierdes este mes":"Te queda en "+nomMes}</div><div class="v" id="udUt"><small>S/</small>${(ut<0?"−":"")+ent.toLocaleString("es-PE")}<em>.${String(cen).padStart(2,"0")}</em></div>
-    ${dUt!=null&&isFinite(dUt)?`<span class="ud-delta${dUt<0?" baja":""}">${udic(dUt<0?"down":"up")} ${Math.abs(dUt)}% vs ${nomAnt}</span>`:""}</div><div class="ud-salud" title="Salud del negocio: margen, meta y SUNAT al día">${gauge}<small>SALUD DEL<br>NEGOCIO</small></div></div>
+  const dl=(d,inv)=>d!=null&&isFinite(d)?`<em class="${(inv?d>0:d<0)?"m":""}">${d<0?"▼":"▲"} ${Math.abs(d)}%</em>`:"";
+  hero.insertAdjacentHTML("afterbegin",`<div class="tp"><div><div class="k">Utilidad de ${nomMes} · ${ut<0?"pierdes":"te queda"}</div><div class="v" id="udUt"><small>S/</small>${(ut<0?"−":"")+ent.toLocaleString("es-PE")}<em>.${String(cen).padStart(2,"0")}</em></div>
+    ${dUt!=null&&isFinite(dUt)?`<span class="ud-delta${dUt<0?" baja":""}">${udic(dUt<0?"down":"up")} ${Math.abs(dUt)}% vs ${nomAnt}</span>`:""}</div></div>
     <div class="ud-flow"><i style="width:${pG}%;background:linear-gradient(90deg,#F2C14E,#E8A317)"></i><i style="width:${pS}%;background:linear-gradient(90deg,#F0A07A,#D9714A)"></i><i style="width:${pQ}%;background:linear-gradient(90deg,#5FD3A4,#9BF0C9)"></i></div>
-    <div class="ud-flowl"><span><i style="background:#F2C14E"></i>Gastos ${Math.round(pG)}%</span><span><i style="background:#E8956A"></i>SUNAT ${Math.round(pS)}%</span><span><i style="background:#7FE3B8"></i>Te queda ${Math.round(pQ)}%</span></div>
-    <div class="ud-trio"><div><span>${udic("down")}Ingresos</span><b>${Math.round(S.sI).toLocaleString("es-PE")}</b>${dI!=null&&isFinite(dI)?`<em class="${dI<0?"m":""}">${dI<0?"▼":"▲"} ${Math.abs(dI)}%</em>`:""}</div>
-    <div><span>${udic("up")}Gastos</span><b>${Math.round(S.sG).toLocaleString("es-PE")}</b>${dG!=null&&isFinite(dG)?`<em class="${dG>0?"m":""}">${dG<0?"▼":"▲"} ${Math.abs(dG)}%</em>`:""}</div>
-    <div><span>${udic("bank")}SUNAT</span><b>${Math.round(t.tot).toLocaleString("es-PE")}</b><em class="${falta>0.5?"m":""}">${t.tot<=0.5?"sin pago":falta<=0.5?"pagado":vi?(vi.dias<0?"vencido":vi.dias===0?"hoy":vi.dias===1?"mañana":vi.dias+" días"):""}</em></div></div>`);
+    <div class="ud-flowl"><span><i style="background:#F2C14E"></i>Gastos y planilla ${Math.round(pG)}%</span><span><i style="background:#E8956A"></i>SUNAT ${Math.round(pS)}%</span><span><i style="background:#7FE3B8"></i>Te queda ${Math.round(pQ)}%</span></div>
+    <div class="ud-trio"><button type="button" data-udver="ingreso"><span>${udic("down")}Ingresos ›</span><b>${Math.round(S.sI).toLocaleString("es-PE")}</b>${dl(dI)}</button>
+    <button type="button" data-udver="gasto"><span>${udic("up")}Gastos ›</span><b>${Math.round(S.sG).toLocaleString("es-PE")}</b>${dl(dG,1)}</button>
+    </div>`);
+  // SUNAT (el detalle de antes: IGV, renta, saldo a favor y estado)
+  const sun=$("udSun"); sun.classList.add("ud-sun"); sun.classList.toggle("ok",t.tot>0.5&&falta<=0.5);
+  const favor=$("bigSunF")&&!$("bigSunF").hidden?$("bigSunF").innerHTML:"", estado=$("bigSunP")?$("bigSunP").innerHTML:"";
+  sun.innerHTML=`<div class="k">${udic("clock")} Pagas a SUNAT · ${nomMes}</div><div class="fila"><div class="v">${fmt(t.tot)}</div><span class="det">IGV ${fmt0(t.igv)} + renta ${fmt0(t.renta)}${t.usa>0?` · detracciones cubren ${fmt0(t.usa)}`:""}</span></div>${favor?`<div class="favor">${favor}</div>`:""}${estado?`<div>${estado}</div>`:""}`;
+  // Meta del mes (barra, como antes)
+  const mm=$("udMeta"); mm.hidden=!metaM; mm.classList.toggle("ok",pm>=1);
+  mm.innerHTML=`<div class="fila"><span class="k" style="letter-spacing:.1em">${udic("target")} Meta de ventas de ${nomMes}</span><b>${Math.round(pm*100)}%</b></div><div class="barra"><i></i></div><div class="fila"><span class="h" style="color:var(--muted);font-size:.78rem">Llevas ${fmt0(S.sI)} de ${fmt0(metaM)}</span><span style="color:var(--muted);font-size:.78rem">${pm>=1?"¡Lograda!":"Faltan "+fmt0(metaM-S.sI)}</span></div>`;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{const i=mm.querySelector(".barra i");if(i)i.style.width=Math.min(100,pm*100)+"%"}));
   // Botones rápidos
-  if(!$("udDock").children.length){
-    $("udDock").innerHTML=[["compra","receipt","Compra",1],["venta","coins","Venta"],["planilla","helmet","Planilla"],["escanear","scan","Escanear"]].map(([k,i,n,p])=>`<button type="button" class="ud-dk${p?" pri":""}" data-ud="${k}"><i>${udic(i)}</i>${n}</button>`).join("");
-  }
-  // Consejos
-  const ins=[], anio=mes.slice(0,4), meses=[...Array(+mes.slice(5))].map((_,i)=>`${anio}-${String(i+1).padStart(2,"0")}`), vts=meses.map(m=>sumas(delMes(m)).sI), conV=vts.filter(v=>v>0);
+  if($("udDock")&&!$("udDock").children.length) $("udDock").innerHTML=[["compra","receipt","Compra",1],["venta","coins","Venta"],["planilla","helmet","Pagar trabajador"],["escanear","scan","Escanear"]].map(([k,i,n,p])=>`<button type="button" class="ud-dk${p?" pri":""}" data-ud="${k}"><i>${udic(i)}</i>${n}</button>`).join("");
+  // Consejos (solo los que dicen algo útil)
+  const ins=[], meses=[...Array(+mes.slice(5))].map((_,i)=>`${anio}-${String(i+1).padStart(2,"0")}`), vts=meses.map(m=>sumas(delMes(m)).sI), conV=vts.filter(v=>v>0);
   if(S.sI>0&&conV.length>=2&&S.sI>=Math.max(...vts)) ins.push(["trend","#2FB383,#0D5C46","Mejor mes del año",`Vendiste ${fmt0(S.sI)}: lo más alto de ${anio}.`]);
   const prev=vts.slice(0,-1).filter(v=>v>0); if(S.sI>0&&prev.length){const av=prev.reduce((a,b)=>a+b,0)/prev.length, d=Math.round((S.sI-av)/av*100); if(Math.abs(d)>=10) ins.push([d>0?"trend":"trendd",d>0?"#2FB383,#0D5C46":"#E8956A,#B0472B",d>0?`${d}% sobre tu promedio`:`${-d}% bajo tu promedio`,`Tu promedio de ventas en ${anio} es ${fmt0(av)} al mes.`])}
   const cli=agrupar(S.ing); if(cli.length&&S.sI>0&&cli[0].t/S.sI>=.6) ins.push(["users","#6C8FD6,#2F5D8A",`${Math.round(cli[0].t/S.sI*100)}% de tus ventas`,`Vienen de ${titulo(cli[0].n)}. Conviene tener más clientes.`]);
   if(dG!=null&&dG>=20&&SA.sG>0) ins.push(["alert","#F2C14E,#C9962A",`Gastos ▲ ${dG}%`,`Gastaste ${fmt0(S.sG)} frente a ${fmt0(SA.sG)} en ${nomAnt}.`]);
-  if(S.sP>0&&S.sI>0) ins.push(["helmet","#F0A07A,#B0472B",`Planilla: ${Math.round(S.sP/S.sI*100)}% de tus ventas`,`Pagaste ${fmt0(S.sP)} a trabajadores en ${nomMes}.`]);
-  if(cola.length) ins.push(["cloud","#7FB8E3,#2F5D8A",`${cola.length} por enviar`,"Se enviarán solos al Excel cuando haya internet."]);
-  if(!ins.length) ins.push(["spark","#2FB383,#0D5C46","Todo en orden",`Sigue registrando: aquí aparecerán consejos de ${nomMes}.`]);
-  $("udIns").innerHTML=ins.slice(0,4).map(([i,c,b,s2])=>`<div class="ud-insc"><span class="ico" style="background:linear-gradient(135deg,${c})">${udic(i)}</span><div><b>${esc(b)}</b><small>${esc(s2)}</small></div></div>`).join("");
-  // SUNAT y meta
-  const sun=$("udSun"); sun.classList.toggle("ok",t.tot>0.5&&falta<=0.5);
-  sun.innerHTML=`<div class="k">${udic("clock")} SUNAT · ${nomMes.slice(0,3)}</div><div class="v">${fmt0(t.tot)}</div>${t.tot<=0.5?`<small class="h" style="color:inherit;opacity:.8">No hay impuesto este mes</small>`:falta<=0.5?`<div class="ud-cnt">${udic("check")}<small>Pagado<br>${fmt0(pag)}</small></div>`:vi?`<div class="ud-cnt"><b><span>${vi.dias<0?"!":vi.dias}</span></b><small>${vi.dias<0?"Venció el "+fechaCorta(vi.fecha):vi.dias===0?"Vence hoy":(vi.dias===1?"día":"días")+" · vence "+fechaCorta(vi.fecha)}<br>IGV ${fmt0(t.igv)} + renta ${fmt0(t.renta)}</small></div>`:""}`;
-  const C=144.5, pr=Math.min(1,pm);
-  $("udMeta").innerHTML=`<div class="k">${udic("target")} Meta</div>${metaM?`<div class="ud-ring"><svg width="60" height="60" viewBox="0 0 58 58"><defs><linearGradient id="udrg" x1="0" x2="1"><stop offset="0" stop-color="${pm>=1?"#F2C14E":"#2FB383"}"/><stop offset="1" stop-color="${pm>=1?"#C9962A":"var(--brand)"}"/></linearGradient></defs><circle cx="29" cy="29" r="23" fill="none" stroke="currentColor" stroke-opacity=".1" stroke-width="7"/><circle class="p" cx="29" cy="29" r="23" fill="none" stroke="url(#udrg)" stroke-width="7" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C}" transform="rotate(-90 29 29)"/><text x="29" y="33" text-anchor="middle" font-size="13" font-weight="800" fill="currentColor">${Math.round(pm*100)}%</text></svg><small>${pm>=1?"¡Lograda!":"Faltan"}<br><b>${pm>=1?fmt0(S.sI):fmt0(metaM-S.sI)}</b><br>de ${fmt0(metaM)}</small></div>`:`<small class="h">Toca para poner tu meta de ventas</small>`}`;
-  requestAnimationFrame(()=>requestAnimationFrame(()=>{const c=$("udMeta").querySelector("circle.p");if(c)c.style.strokeDashoffset=C*(1-pr)}));
-  pintarUDAct(S);
-  pintarUDChart();
-  // Planilla y año
-  const trab=new Set(S.pla.map(r=>r.ruc||r.desc)).size;
-  $("udPla").innerHTML=`<div class="k">${udic("helmet")} Planilla</div><div class="v">${fmt(S.sP)}</div><small class="h">${S.pla.length} pago${S.pla.length===1?"":"s"} · ${trab} trabajador${trab===1?"":"es"}</small>`;
+  $("udIns").hidden=!ins.length;
+  $("udIns").innerHTML=ins.slice(0,3).map(([i,c,b,s2])=>`<div class="ud-insc"><span class="ico" style="background:linear-gradient(135deg,${c})">${udic(i)}</span><div><b>${esc(b)}</b><small>${esc(s2)}</small></div></div>`).join("");
+  pintarUDChart(); pintarUDAct(S);
+  // Planilla del mes (como antes)
+  const trab=new Set(S.pla.map(r=>r.ruc||r.desc)).size, ult=S.pla.slice().sort((a,b)=>b.fecha.localeCompare(a.fecha))[0];
+  $("udPla").innerHTML=`<div class="ud-ch"><b>Planilla del mes</b><button type="button" class="btnlink" data-udir2="planilla">Ver ›</button></div>${S.pla.length?`<div class="ud-tl"><span>Total pagado</span><b>${fmt(S.sP)}</b></div><div class="ud-tl"><span>Pagos</span><b>${S.pla.length}</b></div><div class="ud-tl"><span>Trabajadores</span><b>${trab}</b></div><div class="ud-tl"><span>Último pago</span><b>${fechaCorta(ult.fecha)}</b></div>`:`<div class="ud-vacio">Aún no hay pagos en ${nomMes}.</div>`}`;
+  // Resumen del año (como antes)
   const LA=sumas(rows.filter(r=>r.fecha.startsWith(anio)&&r.fecha.slice(0,7)<=mes)); let sunA=0; Object.entries(t.porMes||{}).forEach(([m,x])=>{if(m.startsWith(anio))sunA+=x.tot});
   const utAn=LA.sI-LA.sG-sunA, pAn=ajustes.meta>0?LA.sI/ajustes.meta*100:0;
-  $("udAnio").innerHTML=`<div class="k">${udic("chart")} Año ${anio}</div><div class="v" style="color:${utAn<0?"var(--out)":"var(--in)"}">${fmt0(utAn)}</div><small class="h">Te quedó · meta anual ${pAn.toFixed(0)}%</small><div class="ud-minib"><i style="width:${Math.min(100,pAn)}%"></i></div>`;
-  // Logros
-  const gan=leerLS("cbo-logros",[])||[];
-  $("udLogros").innerHTML=`<div class="ud-ch"><b>Logros</b><small>${gan.length} de ${LOGROS.length}</small></div><div class="ud-badges">${LOGROS.map(l=>{const [i,c]=UD_LOGRO_IC[l.k]||["spark","#2FB383,#0D5C46"];const ok=gan.includes(l.k);return `<span class="ud-bd${ok?"":" off"}" title="${esc(l.n)}${ok?"":" (por lograr)"}" style="background:linear-gradient(135deg,${c})">${udic(i)}</span>`}).join("")}</div>`;
+  $("udAnio").innerHTML=`<div class="ud-ch"><b>Resumen del año</b><small>Enero a ${nomMes} ${anio}</small></div><div class="ud-k4"><div><span>Ventas</span><b style="color:var(--in)">${fmt0(LA.sI)}</b></div><div><span>Compras y gastos</span><b style="color:var(--out)">${fmt0(LA.sG)}</b></div><div><span>Te quedó</span><b style="color:${utAn<0?"var(--out)":"var(--in)"}">${fmt0(utAn)}</b></div><div><span>Impuestos</span><b>${fmt0(sunA)}</b></div></div><div class="ud-ch" style="margin-top:10px"><small>Meta anual ${fmt0(ajustes.meta||0)}</small><small>${pAn.toFixed(1)}%</small></div><div class="ud-minib"><i style="width:${Math.min(100,pAn)}%"></i></div>`;
+
 }
 function pintarUDAct(S){
   S=S||sumas(delMes(mes));
-  const tabs=[["rec","Recientes"],["cli","Clientes"],["prov","Proveed."],["gas","Gastos"]];
+  const tabs=[["cli","Top clientes"],["prov","Top proveedores"],["gas","Gastos por tipo"]];
   let body="";
   if(udTab==="rec"){
     const L=delMes(mes).slice().sort((a,b)=>b.fecha.localeCompare(a.fecha)||(b.creado||0)-(a.creado||0)).slice(0,5);
@@ -3575,10 +3600,12 @@ function pintarUDChart(){
   $("udChart").innerHTML=`<div class="ud-ch"><b>Ingresos y gastos</b><div class="ud-lg"><span><i style="background:var(--in)"></i>Ingresos</span><span><i style="background:var(--out)"></i>Gastos</span></div></div>${svg}${sel?`<div class="ud-tip"><span><b>${titulo(MESES[+sel.m.slice(5)-1])}</b> · Ingresos ${fmt0(sel.i)} · Gastos ${fmt0(sel.g)}</span>${sel.m!==mes?`<button type="button" class="btnlink" data-udir="${sel.m}">Ver ese mes ›</button>`:""}</div>`:`<small class="h" style="color:var(--muted);font-size:.72rem">Toca un mes para ver el detalle</small>`}`;
 }
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-udtab],[data-udmov],[data-udver],[data-udm],[data-udir],[data-ud],#udSun,#udMeta,#udPla,#udAnio,#udBell,#udLogros"); if(!t||!t.closest("#ud")) return;
+  const t=e.target.closest("[data-udtab],[data-udmov],[data-udver],[data-udsun],[data-udir2],[data-udm],[data-udir],[data-ud],#udSun,#udMeta,#udLogros"); if(!t||!t.closest("#ud")) return;
   if(t.dataset.udtab){udTab=t.dataset.udtab;pintarUDAct();return}
   if(t.dataset.udmov){abrirMov(t.dataset.udmov);return}
-  if(t.dataset.udver){verMov("todos");return}
+  if(t.dataset.udver){verMov(t.dataset.udver);return}
+  if(t.dataset.udsun){ir("sunat");return}
+  if(t.dataset.udir2){ir(t.dataset.udir2);return}
   if(t.dataset.udm){udSel=udSel===t.dataset.udm?null:t.dataset.udm;pintarUDChart();return}
   if(t.dataset.udir){mes=t.dataset.udir;udSel=null;render();return}
   const k=t.dataset.ud;
@@ -3592,6 +3619,48 @@ document.addEventListener("click",e=>{
   if(t.id==="udLogros"){const l=$("logros");toast(`Logros: ${(leerLS("cbo-logros",[])||[]).length} de ${LOGROS.length}`);return}
   if(t.id==="udBell"){if(cola.length)toast(`${cola.length} registro${cola.length>1?"s":""} por enviar al Excel`);else ir("sunat");return}
 });
+
+
+/* ===== Barra suprema: accesos a elección, botón + con abanico, avisos y se esconde al bajar ===== */
+const BAR_DEF={movimientos:["Movim.",'<path d="M4 6h16M4 12h16M4 18h10"/>'],sunat:["SUNAT",'<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/>'],planilla:["Planilla",'<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M8 6V4h8v2M3 12h18"/>'],obras:["Obras",'<path d="M3 21h18M5 21V10l7-5 7 5v11M9 21v-6h6v6"/>'],terceros:["Clientes",'<circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.5"/><path d="M15 15c3 0 6 1.5 6 4.5"/>'],anual:["Anual",'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>']};
+function pintarBarra(){
+  const a=BAR_DEF[ajustes.barA]?ajustes.barA:"movimientos", b=BAR_DEF[ajustes.barB]&&ajustes.barB!==a?ajustes.barB:(a==="planilla"?"sunat":"planilla");
+  const bt=[...document.querySelectorAll("#tabbar [data-tab]")].filter(x=>x.dataset.tab!=="inicio"&&x.dataset.tab!=="mas");
+  [[bt[0],a],[bt[1],b]].forEach(([el,k])=>{if(!el)return;el.dataset.tab=k;const sv=el.querySelector("svg");if(sv)sv.innerHTML=BAR_DEF[k][1];const lb=el.querySelector(".lb");if(lb)lb.textContent=BAR_DEF[k][0];el.querySelectorAll(".badge").forEach(x=>x.remove())});
+  ["barA","barB"].forEach((id,i)=>{const s=$(id);if(!s)return;s.innerHTML=Object.entries(BAR_DEF).map(([k,v])=>`<option value="${k}">${v[0]==="Movim."?"Movimientos":v[0]}</option>`).join("");s.value=i?b:a});
+  document.querySelectorAll("#ovMas [data-ir]").forEach(x=>{x.hidden=x.dataset.ir===a||x.dataset.ir===b});
+  document.querySelectorAll("#ovMas .mas-movimientos,#ovMas .mas-sunat").forEach(x=>{if(x.dataset.ir!==a&&x.dataset.ir!==b)x.hidden=false});
+  if(typeof seccion!=="undefined") document.querySelectorAll("#tabbar [data-tab]").forEach(x=>x.setAttribute("aria-current",(x.dataset.tab===seccion||(x.dataset.tab==="mas"&&!["inicio",a,b].includes(seccion)))?"page":"false"));
+}
+if(!ajustes.barA){ajustes.barA="movimientos";ajustes.barB="planilla"}
+["barA","barB"].forEach(id=>$(id)&&$(id).addEventListener("change",()=>{ajustes[id]=$(id).value;if(ajustes.barA===ajustes.barB)ajustes[id==="barA"?"barB":"barA"]=Object.keys(BAR_DEF).find(k=>k!==ajustes[id]);guardarLS("cbo-ajustes",ajustes);pintarBarra();toast("Barra actualizada")}));
+// Los botones de la barra leen su sección al tocarlos (así sirven aunque cambien)
+document.querySelectorAll("#tabbar [data-tab]").forEach(b=>b.onclick=()=>{const k=b.dataset.tab;if(k==="mas")abrirOv("ovMas");else if(k==="movimientos")verMov("todos");else ir(k)});
+document.querySelectorAll("#ovMas [data-ir]").forEach(b=>b.onclick=()=>{cerrarOv("ovMas");if(b.dataset.ir==="movimientos")verMov("todos");else ir(b.dataset.ir)});
+pintarBarra();
+// Botón + : abre un abanico con lo que más se registra
+const ABANICO=[["compra","Compra",'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/>',1],["venta","Venta",'<ellipse cx="9" cy="7" rx="5" ry="2.5"/><path d="M4 7v4c0 1.4 2.2 2.5 5 2.5s5-1.1 5-2.5V7"/><path d="M10 15.5c.7 1.2 2.8 2 5 2 2.8 0 5-1.1 5-2.5v-4c0-1.2-1.6-2.2-3.8-2.4"/>'],["planilla","Pagar trabajador",'<path d="M4 16a8 8 0 0 1 16 0"/><path d="M2.5 16h19v2.5h-19z"/><path d="M10 8.5V6h4v2.5"/><path d="M12 10v6"/>'],["escanear","Escanear",'<path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M7 12h10"/>'],["sunat","Pago SUNAT",'<path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/>']];
+(function(){
+  const velo=document.createElement("div"); velo.className="abanico-velo"; document.body.appendChild(velo);
+  const R=136, n=ABANICO.length;
+  ABANICO.forEach(([k,lbl,ico,pri],i)=>{const ang=Math.PI*(.93-.86*i/(n-1)), b=document.createElement("button");b.type="button";b.className="abanico-op"+(pri?" pri":"");b.dataset.ab=k;
+    b.style.setProperty("--x",(Math.cos(ang)*Math.min(R,(innerWidth/2-46))).toFixed(1)+"px");b.style.setProperty("--y",(-Math.sin(ang)*R*.92-18).toFixed(1)+"px");b.style.transitionDelay=(i*35)+"ms";
+    b.innerHTML=`<i><svg viewBox="0 0 24 24">${ico}</svg></i>${lbl}`;document.body.appendChild(b)});
+  const cerrar=()=>document.body.classList.remove("abanico");
+  velo.onclick=cerrar;
+  $("tabReg").onclick=()=>{if(matchMedia("(min-width:981px)").matches){openF();return}document.body.classList.toggle("abanico");try{navigator.vibrate&&navigator.vibrate(10)}catch{}};
+  document.addEventListener("click",e=>{const b=e.target.closest("[data-ab]");if(!b)return;cerrar();const k=b.dataset.ab;
+    if(k==="compra"||k==="venta"){openF();const t=document.querySelector(`#segTipo [data-v="${k==="compra"?"gasto":"ingreso"}"]`);if(t)t.click()}
+    else if(k==="planilla")abrirPagoPla(); else if(k==="escanear"){openF();try{abrirEscaner()}catch{}} else if(k==="sunat")abrirPagoSun()});
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")cerrar()});
+})();
+// Avisos en la barra: SUNAT por vencer (días) — Movimientos ya muestra los pendientes
+setInterval(()=>{const sb=document.querySelector('#tabbar [data-tab="sunat"]');document.querySelectorAll("#tabbar .badge.sun").forEach(x=>{if(x.parentElement!==sb)x.remove()});if(!sb)return;
+  const m=addMes(hoyISO.slice(0,7),-1), vi=vencInfo(m), pend=r2(impuestos(m).tot-pagadoSun(m)); let bd=sb.querySelector(".badge.sun");
+  if(!(vi&&vi.dias>=0&&vi.dias<=3&&pend>0.5)){if(bd)bd.remove();return} if(!bd){bd=document.createElement("span");bd.className="badge sun";sb.appendChild(bd)} bd.textContent=vi.dias===0?"hoy":vi.dias+"d"},2000);
+// Se esconde al bajar y vuelve al subir (más espacio para ver)
+(function(){let y0=scrollY,acc=0;addEventListener("scroll",()=>{const y=scrollY,d=y-y0;y0=y;if(document.body.classList.contains("abanico"))return;acc=(Math.sign(d)===Math.sign(acc)?acc:0)+d;
+  if(acc>40&&y>140)document.body.classList.add("barra-oculta");else if(acc<-25||y<80)document.body.classList.remove("barra-oculta")},{passive:true})})();
 
 /* ===== Extras: celebración, sonidos, saludo, meta del mes, racha, logros, contadores ===== */
 let audioCtx=null;
@@ -3659,7 +3728,7 @@ function pintarExtras(){
     metaOk:Object.keys(localStorage).some(k=>k.startsWith("cbo-meta-cel-"))||ok,racha:Math.max(ra,leerLS("cbo-racha-max",0)),pagos:rows.filter(esPlanilla).length,obras:new Set(rows.map(r=>r.obra).filter(Boolean)).size};
   if(ra>leerLS("cbo-racha-max",0)) guardarLS("cbo-racha-max",ra);
   const ganados=LOGROS.filter(l=>l.ok(x)).map(l=>l.k), antes=leerLS("cbo-logros",null);
-  if(antes){const nuevos=ganados.filter(k=>!antes.includes(k)&&k!=="meta"); if(nuevos.length&&extrasListos){const l=LOGROS.find(z=>z.k===nuevos[0]);setTimeout(()=>{confeti(60);sonar("logro");toast(`${l.ic} ¡Nuevo logro: ${l.n}!`)},900)}}
+  if(antes){const nuevos=ganados.filter(k=>!antes.includes(k)&&k!=="meta"); if(false&&nuevos.length&&extrasListos){const l=LOGROS.find(z=>z.k===nuevos[0]);setTimeout(()=>{confeti(60);sonar("logro");toast(`${l.ic} ¡Nuevo logro: ${l.n}!`)},900)}}
   guardarLS("cbo-logros",ganados);
   const lg=$("logros"), abierto=lg.open;
   lg.innerHTML=`<summary><span>🏅 Logros</span><span class="hint">${ganados.length} de ${LOGROS.length} ›</span></summary><div class="ins">${LOGROS.map(l=>`<div class="in${ganados.includes(l.k)?"":" no"}"><span>${l.ic}</span>${esc(l.n)}</div>`).join("")}</div>`;
