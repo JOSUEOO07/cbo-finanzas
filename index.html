@@ -2517,6 +2517,10 @@ const storeGoogle={
 /* ===== Quién registra (Josué / Jesús) y control de duplicados ===== */
 const PERSONAS=["JOSUÉ VILLAR","JESÚS VILLAR"];
 let quien=""; try{quien=localStorage.getItem("cbo-quien")||""}catch{}
+// Celular de Josué: se marca una vez abriendo el enlace ?soy=josue. Cualquier otro equipo registra como Jesús.
+try{const soy=(new URLSearchParams(location.search).get("soy")||"").toLowerCase();
+  if(soy==="josue"||soy==="jesus"){quien=soy==="josue"?"JOSUÉ VILLAR":"JESÚS VILLAR";localStorage.setItem("cbo-quien",quien);history.replaceState(null,"",location.pathname)}}catch{}
+if(!quien) quien="JESÚS VILLAR";
 const nomCorto=n=>{const t=String(n||"").trim();return t?titulo(t.split(/\s+/)[0]):""};
 function pintarQuien(){
   const seg=$("quienSeg"); if(seg) seg.innerHTML=PERSONAS.map(n=>`<button type="button" data-quien="${n}" aria-pressed="${quien===n}">${titulo(n)}</button>`).join("");
@@ -2525,7 +2529,7 @@ function pintarQuien(){
 }
 function elegirQuien(n){quien=n;try{localStorage.setItem("cbo-quien",n)}catch{};pintarQuien();cerrarOv("ovQuien");toast("Registrarás como "+titulo(n))}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-quien]");if(b)elegirQuien(b.dataset.quien)});
-pintarQuien(); setTimeout(()=>{if(!quien&&cfg)abrirOv("ovQuien")},1500);
+pintarQuien();
 const sinCeros=v=>String(v||"").trim().replace(/^0+/,"");
 // Busca si lo que se va a guardar ya está registrado (por cualquiera de los dos)
 function dupLocal(r){
