@@ -727,6 +727,41 @@ body.deco-mov h1.deco-h1::after{animation:flotar 3s ease-in-out infinite}
 .logo-h span{display:grid;line-height:1.1}.logo-h b{font-size:1.05rem;letter-spacing:-.01em;color:var(--ink)}.logo-h small{font-size:.7rem;color:var(--muted);font-weight:700;letter-spacing:.04em}
 @media (max-width:980px){body.en-inicio #titulo{display:none}body.en-inicio .logo-h{display:flex}}
 
+
+/* ===== Configuración compacta (se toca y se despliega) ===== */
+.cfg-lista{display:grid;gap:8px;max-width:760px}
+.cfg-grupo{margin:12px 4px 2px;font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.cfg-grupo:first-child{margin-top:0}
+.cfg-item{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.cfg-item summary{list-style:none;display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.cfg-item summary::-webkit-details-marker{display:none}
+.cfg-ic{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;flex:0 0 auto;background:color-mix(in srgb,var(--brand) 10%,transparent);color:var(--brand)}
+.cfg-ic svg,.cfg-ch{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.cfg-t{flex:1;min-width:0;display:grid}.cfg-t b{font-size:.95rem}
+.cfg-v{color:var(--muted);font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px}
+.cfg-v i{display:inline-block;width:12px;height:12px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.12)}
+.cfg-ch{color:var(--muted);transition:transform .25s}
+.cfg-item[open] .cfg-ch{transform:rotate(90deg)}
+.cfg-item[open] summary{border-bottom:1px solid var(--line)}
+.cfg-body{padding:14px;display:grid;gap:10px;animation:cfgAbre .25s ease}
+@keyframes cfgAbre{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.cfg-body .deco-cfg,.cfg-body .deco-fila{margin:0;padding:0;border:0}
+.cfg-body .opts{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:8px}.cfg-body .opt{padding:6px;gap:5px;border-radius:12px;justify-items:center;text-align:center}.cfg-body .opt .mini{height:34px;width:100%;border-radius:8px}.cfg-body .opt b{font-size:.68rem;line-height:1.15}.cfg-body .opt small{display:none}.cfg-body .opt[data-t="auto"],.cfg-body .opt[data-t="nocheauto"]{grid-column:auto}
+
+
+.combos2{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:8px}
+.cmb2{display:grid;gap:5px;justify-items:center;padding:6px;border-radius:14px;border:2px solid transparent;background:transparent;cursor:pointer;font:inherit;color:var(--ink)}
+.cmb2[aria-pressed="true"]{border-color:var(--brand-2);background:color-mix(in srgb,var(--brand-2) 8%,transparent)}
+.cmb2 small{font-size:.66rem;font-weight:700;line-height:1.2;text-align:center;color:var(--muted)}
+.cmb2-prev{position:relative;display:block;width:100%;aspect-ratio:1.25;border-radius:12px;padding:8px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);overflow:hidden}
+.cmb2-prev>span{display:grid;gap:4px;padding:6px;border-radius:8px;border:1px solid;height:70%}
+.cmb2-prev>span i{display:block;height:5px;border-radius:3px}
+.cmb2-prev>span i:first-child{width:45%;height:7px}
+.cmb2-prev em{position:absolute;right:8px;bottom:6px;width:16px;height:16px;border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.cmb-mia{margin-top:6px;border-top:1px dashed var(--line);padding-top:8px}
+.cmb-mia summary{cursor:pointer;font-weight:700;color:var(--brand);font-size:.86rem;list-style:none}
+.cmb-mia summary::-webkit-details-marker{display:none}
+
 /* ===== Barra suprema ===== */
 .selbar{font:inherit;font-size:.85rem;padding:8px 10px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
 @media (max-width:980px){
@@ -829,7 +864,7 @@ button.ud-card{cursor:pointer;width:100%}
       <button data-s="anual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Resumen anual</button>
       <button data-s="config"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Configuración</button>
     </nav>
-    <div class="pie">CBO Finanzas · versión 4.0</div>
+    <div class="pie">CBO Finanzas · versión 4.1</div>
   </aside>
   <div class="velo" id="velo"></div>
 
@@ -1019,9 +1054,10 @@ button.ud-card{cursor:pointer;width:100%}
 
       <!-- CONFIGURACIÓN -->
       <section data-sec="config" hidden>
-        <div class="g2">
-          <section class="panel">
-            <div class="ph"><h2>Apariencia</h2></div>
+        <div class="cfg-lista">
+          <p class="cfg-grupo">Apariencia</p>
+          <details class="cfg-item" data-cfg="tema"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r="1.5"/><circle cx="17.5" cy="10.5" r="1.5"/><circle cx="8.5" cy="7.5" r="1.5"/><circle cx="6.5" cy="12.5" r="1.5"/><path d="M12 2a10 10 0 0 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4A5.6 5.6 0 0 0 22 9.8C22 5.5 17.5 2 12 2z"/></svg></i><span class="cfg-t"><b>Tema y colores</b><small class="cfg-v" id="cfgv-tema"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
+            <p class="tpl" style="margin-top:0">Temas listos</p>
             <div class="opts" id="temas">
               <button class="opt" data-t="calido"><div class="mini"><span style="background:#0D5C46"></span><span style="background:#E9DCC3"></span></div><b>Cálido</b><small>Beige tostado · predeterminado</small></button>
               <button class="opt" data-t="claro"><div class="mini"><span style="background:#0D5C46"></span><span style="background:#FFFFFF"></span></div><b>Claro</b><small>Blanco limpio</small></button>
@@ -1033,49 +1069,56 @@ button.ud-card{cursor:pointer;width:100%}
               <button class="opt" data-t="auto"><div class="mini" style="background:linear-gradient(90deg,#E9DCC3 50%,#061F18 50%)"></div><b>Automático</b><small>Según tu celular</small></button>
             </div>
             <div id="combinar"></div>
-            <div class="deco-cfg">
+          </div></details>
+          <details class="cfg-item" data-cfg="deco"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 17l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></svg></i><span class="cfg-t"><b>Decoraciones de temporada</b><small class="cfg-v" id="cfgv-deco"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
               <div class="deco-fila"><span><b>Decoraciones de temporada</b><small class="hint" id="decoTxt" style="display:block"></small></span><div class="seg" id="decoSeg" style="min-width:190px"><button type="button" data-deco="1">Automático</button><button type="button" data-deco="0">Desactivadas</button></div></div>
-              <div class="deco-fila"><span><b>Barra de abajo</b><small class="hint" style="display:block">Elige los 2 accesos junto al botón +</small></span><span style="display:flex;gap:6px;flex-wrap:wrap"><select id="barA" class="selbar"></select><select id="barB" class="selbar"></select></span></div>
-              <div class="deco-fila"><span><b>Sonidos</b><small class="hint" style="display:block">Al registrar y al llegar a la meta</small></span><div class="seg" id="sonSeg" style="min-width:190px"><button type="button" data-son="1">Activados</button><button type="button" data-son="0">Desactivados</button></div></div>
               <div class="deco-fila"><span><b>Movimiento</b><small class="hint" style="display:block">Adornos que se mecen y caen despacio</small></span><div class="seg" id="decoMovSeg" style="min-width:190px"><button type="button" data-decomov="1">Con movimiento</button><button type="button" data-decomov="0">Quietas</button></div></div>
               <p class="hint" style="margin:6px 0 0">Toca una temporada para verla (después vuelve sola a automático):</p>
               <p class="deco-aviso" id="decoPrevAviso" hidden></p>
               <div class="deco-lista" id="decoLista"></div>
-            </div>
-          </section>
-          <section class="panel">
-            <div class="ph"><h2>Transición entre pantallas</h2></div>
+          </div></details>
+          <details class="cfg-item" data-cfg="barra"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><rect x="3" y="14" width="18" height="7" rx="3"/><path d="M7 17.5h.01M12 17.5h.01M17 17.5h.01"/><path d="M12 3v7M9 7l3 3 3-3"/></svg></i><span class="cfg-t"><b>Barra de abajo</b><small class="cfg-v" id="cfgv-barra"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
+              <div class="deco-fila"><span><b>Barra de abajo</b><small class="hint" style="display:block">Elige los 2 accesos junto al botón +</small></span><span style="display:flex;gap:6px;flex-wrap:wrap"><select id="barA" class="selbar"></select><select id="barB" class="selbar"></select></span></div>
+          </div></details>
+          <details class="cfg-item" data-cfg="son"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg></i><span class="cfg-t"><b>Sonidos</b><small class="cfg-v" id="cfgv-son"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
+              <div class="deco-fila"><span><b>Sonidos</b><small class="hint" style="display:block">Al registrar y al llegar a la meta</small></span><div class="seg" id="sonSeg" style="min-width:190px"><button type="button" data-son="1">Activados</button><button type="button" data-son="0">Desactivados</button></div></div>
+          </div></details>
+          <details class="cfg-item" data-cfg="trans"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="11" height="16" rx="2"/><path d="M17 8l4 4-4 4M14 12h7"/></svg></i><span class="cfg-t"><b>Transición entre pantallas</b><small class="cfg-v" id="cfgv-trans"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
             <p class="hint" style="margin:0 0 10px">Se ve al cambiar de sección (Inicio, Movimientos, Planilla…). Toca una para probarla.</p>
             <div class="trx" id="trx"></div>
-          </section>
-          <section class="panel">
-            <div class="ph"><h2>Comprobantes firmados</h2><span class="hint" id="firmadosN"></span></div>
-            <p class="hint" style="margin:0 0 10px">Recibos de pago que el trabajador firmó en este equipo. Toca uno para descargar su PDF firmado.</p>
-            <div class="firmados" id="firmados"></div>
-          </section>
-          <section class="panel">
-            <div class="ph"><h2>Empresa</h2></div>
+          </div></details>
+          <p class="cfg-grupo">Tu empresa</p>
+          <details class="cfg-item" data-cfg="quien"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></i><span class="cfg-t"><b>Quién registra</b><small class="cfg-v" id="cfgv-quien"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
+            <p class="hint" style="margin:0 0 10px">Lo que se registre desde este celular quedará con este nombre.</p>
+            <div class="seg" id="quienSeg" role="group" aria-label="Quién registra"></div>
+          </div></details>
+          <details class="cfg-item" data-cfg="meta"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg></i><span class="cfg-t"><b>Meta y datos de la empresa</b><small class="cfg-v" id="cfgv-meta"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
             <div class="cfgrow"><label for="meta">Meta de ventas del año (S/)</label><div class="line"><input id="meta" type="number" inputmode="decimal" min="0" step="1000" style="max-width:220px"><button class="btn" id="guardarMeta" type="button">Guardar</button><span class="hint" id="metaOk"></span></div></div>
             <div class="cfgrow"><span class="hint">Razón social</span><b>Casa Bonita Oregón S.A.C.</b></div>
             <div class="cfgrow"><span class="hint">RUC · Régimen</span><b>20614484153 · MYPE Tributario</b></div>
-          </section>
-          <section class="panel">
-            <div class="ph"><h2>Conexión</h2></div>
+          </div></details>
+          <details class="cfg-item" data-cfg="firm"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><path d="M3 17c3 0 4-6 6-6s1 6 3 6 3-4 4-4 2 2 5 2"/><path d="M3 21h18"/></svg></i><span class="cfg-t"><b>Comprobantes firmados</b><small class="cfg-v" id="cfgv-firm"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
+            <p class="hint" style="margin:0 0 10px">Recibos de pago que el trabajador firmó en este equipo. Toca uno para descargar su PDF firmado.</p>
+            <div class="firmados" id="firmados"></div>
+          </div></details>
+          <details class="cfg-item" data-cfg="rep"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></i><span class="cfg-t"><b>Reporte del mes</b><small class="cfg-v" id="cfgv-rep"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
+            <p class="hint" style="margin:0 0 10px">Descarga los movimientos del mes que estás viendo para tu contador.</p>
+            <div class="rep"><button class="btn repCsv" type="button">⬇ Excel (CSV)</button><button class="btn2 repPdf" type="button">⬇ PDF / imprimir</button></div>
+          </div></details>
+          <p class="cfg-grupo">Cuenta</p>
+          <details class="cfg-item" data-cfg="con"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><path d="M7 18a4 4 0 0 1-.5-8A6 6 0 0 1 18 9a4.5 4.5 0 0 1-1 9z"/></svg></i><span class="cfg-t"><b>Conexión</b><small class="cfg-v" id="cfgv-con"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
             <div class="cfgrow"><span class="hint">Estado</span><b id="cfgEstado">—</b></div>
             <div class="cfgrow"><div class="line"><button class="btnlink recargar" type="button">↻ Actualizar datos</button><button class="btnlink" id="desconectar" type="button">Cambiar enlace o clave</button></div></div>
             <div class="cfgrow"><div class="line"><button class="btnlink" id="copiarCon" type="button">Copiar código de conexión</button><span class="hint" id="copiarConMsg"></span></div></div>
-          </section>
-          <section class="panel">
-            <div class="ph"><h2>Quién registra</h2><span class="hint" id="quienEstado"></span></div>
-            <p class="hint" style="margin:0 0 10px">Lo que se registre desde este celular quedará con este nombre.</p>
-            <div class="seg" id="quienSeg" role="group" aria-label="Quién registra"></div>
-          </section>
-          <section class="panel">
-            <div class="ph"><h2>Seguridad</h2></div>
+          </div></details>
+          <details class="cfg-item" data-cfg="seg"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></i><span class="cfg-t"><b>Seguridad</b><small class="cfg-v" id="cfgv-seg"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
             <div class="cfgrow"><span class="hint">Bloqueo con PIN</span><b id="pinEstado">Desactivado</b></div>
             <div class="cfgrow"><div class="line" id="pinBotones"></div><p class="msg" id="pinMsg" style="color:var(--muted)"></p></div>
             <p class="note">El PIN se guarda cifrado (SHA-256) solo en este equipo. Si lo olvidas, puedes quitarlo con tu clave de acceso de Google.</p>
-          </section>
+          </div></details>
+          <details class="cfg-item" data-cfg="acerca"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/></svg></i><span class="cfg-t"><b>Acerca de</b><small class="cfg-v" id="cfgv-acerca"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
+            <p class="hint" style="margin:0">CBO Finanzas 4.1. Tus datos se guardan en tu archivo de Google Sheets "CASA BONITA OREGON S.A.C.". Este celular solo guarda una copia para verlos sin internet.</p>
+          </div></details>
           <section class="panel" hidden>
             <div class="ph"><h2>Firma para comprobantes</h2><span class="hint" id="firmaEstado"></span></div>
             <p class="hint" style="margin:0 0 10px">Sale encima de la línea del EMPLEADOR en los comprobantes de pago. Firma con el dedo (o el mouse), o sube una foto de tu firma en hoja blanca.</p>
@@ -1089,15 +1132,8 @@ button.ud-card{cursor:pointer;width:100%}
             </div>
             <div class="firma-actual" id="firmaActual" hidden><span class="hint">Firma guardada:</span><img id="firmaImg" alt="Firma guardada"></div>
           </section>
-          <section class="panel">
-            <div class="ph"><h2>Reporte del mes</h2></div>
-            <p class="hint" style="margin:0 0 10px">Descarga los movimientos del mes que estás viendo para tu contador.</p>
-            <div class="rep"><button class="btn repCsv" type="button">⬇ Excel (CSV)</button><button class="btn2 repPdf" type="button">⬇ PDF / imprimir</button></div>
-          </section>
-          <section class="panel">
-            <div class="ph"><h2>Acerca de</h2></div>
-            <p class="hint" style="margin:0">CBO Finanzas 4.0. Tus datos se guardan en tu archivo de Google Sheets "CASA BONITA OREGON S.A.C.". Este celular solo guarda una copia para verlos sin internet.</p>
-          </section>
+        </div>
+      </section>
         </div>
       </section>
       <p class="hint" id="status" style="text-align:center">Conectando…</p>
@@ -1795,7 +1831,7 @@ setInterval(()=>{if(ajustes.tema==="nocheauto")aplicarTema()},5*60*1000);
 const ACENTOS=[["cbo","Verde CBO","#0D5C46","#14805F","#9CC3B1"],["bosque","Bosque","#2F5A1E","#4B8A2E","#A6DC84"],["esmeralda","Esmeralda","#0E6A4E","#17956D","#5FD3A8"],["oceano","Océano","#0B5A86","#1580C2","#6CC0F5"],["indigo","Índigo","#2F2A85","#4740C9","#8A84FF"],["vino","Vino","#7A1F3D","#A7315A","#F08AB0"],["terracota","Terracota","#8E3F22","#B4532F","#F0A27E"],["naranja","Naranja","#A8420C","#D9611B","#FFAD73"],["dorado","Dorado","#7A5A12","#A67C1C","#E8C46A"],["violeta","Violeta","#5A2A9B","#7B45D0","#C4A6FF"],["turquesa","Turquesa","#0B6B6B","#139B9B","#6FE0DB"],["grafito","Grafito","#2A2E36","#4B5262","#B3BCCC"]];
 // [id, nombre, fondo, tarjetas, texto, texto suave, líneas, suave, oscuro?]
 const FONDOS=[["beige","Beige","#E9DCC3","#F4EDE0","#2A2414","#6B604A","#D9C7A2","#E9DFCC"],["arena","Arena","#F4EDE0","#FBF7EE","#10241C","#3F544A","#E2D6BE","#E9DFCC"],["blanco","Blanco","#F3F5F2","#FFFFFF","#0F1F19","#4A5A53","#DDE3DE","#E7EEE9"],["perla","Gris perla","#E6E7EA","#FBFBFC","#1D2027","#555B67","#D2D5DB","#E9EAEE"],["menta","Menta","#DCEAE2","#F6FAF7","#10241C","#4A5F55","#CFE0D5","#E3EFE8"],["celeste","Celeste","#DDE9F3","#F5F9FC","#13202C","#4A5B6B","#CBDBE8","#E4EEF6"],["rosapalo","Rosa palo","#F3E2E2","#FFFAFA","#2A1A1C","#6C5155","#E6CFCF","#F2E3E3"],["lavanda","Lavanda","#E7E2F3","#FDFCFF","#1E1A2B","#5A5270","#D6CEE8","#ECE8F6"],["durazno","Durazno","#F7E2D0","#FFFAF5","#2B1D12","#6E5745","#EAD0B9","#F5E3D3"],["noche","Verde noche","#061F18","#0A3328","#F4EDE0","#B9C7BD","#164536","#0F3D30",1],["azulnoche","Azul noche","#081A26","#0E2738","#EAF3F7","#A9C0CC","#1B3A4F","#13324A",1],["negro","Negro","#000000","#111312","#F2F2EE","#A3ABA6","#262A28","#1A1D1B",1]];
-const COMBOS=[["beige","cbo"],["arena","cbo"],["blanco","oceano"],["celeste","indigo"],["rosapalo","vino"],["durazno","terracota"],["perla","grafito"],["lavanda","violeta"],["menta","esmeralda"],["noche","cbo"],["negro","dorado"]];
+const COMBOS=[["beige","cbo"],["arena","bosque"],["beige","dorado"],["blanco","cbo"],["blanco","oceano"],["perla","grafito"],["menta","esmeralda"],["celeste","indigo"],["celeste","turquesa"],["lavanda","violeta"],["rosapalo","vino"],["durazno","terracota"],["durazno","naranja"],["noche","cbo"],["noche","dorado"],["azulnoche","oceano"],["azulnoche","turquesa"],["negro","dorado"],["negro","esmeralda"]];
 function aplicarColores(){
   let st=document.getElementById("cboVars"); if(!st){st=document.createElement("style");st.id="cboVars";document.head.appendChild(st)}
   const F=FONDOS.find(x=>x[0]===ajustes.fondo), C=ACENTOS.find(x=>x[0]===ajustes.acento);
@@ -1806,14 +1842,17 @@ function aplicarColores(){
 }
 function pintarCombinar(){
   const F=FONDOS.find(x=>x[0]===ajustes.fondo)||FONDOS[0], C=ACENTOS.find(x=>x[0]===ajustes.acento)||ACENTOS[0], dk=!!F[8];
-  $("combinar").innerHTML=`<p class="tpl">Combina tus colores <small>(o elige un tema de arriba)</small></p>
+  const mini=(a,z)=>{const d=!!a[8], ac=d?z[4]:z[2];return `<span class="cmb2-prev" style="background:${a[2]}"><span style="background:${a[3]};border-color:${a[6]}"><i style="background:${ac}"></i><i style="background:${a[6]}"></i><i style="background:${a[6]};width:60%"></i></span><em style="background:${ac}"></em></span>`};
+  const abierto=$("combinar").querySelector("details.cmb-mia")?.open;
+  $("combinar").innerHTML=`<p class="tpl">Combinaciones de colores</p>
+  <div class="combos2">${COMBOS.map(([f,c])=>{const a=FONDOS.find(x=>x[0]===f),z=ACENTOS.find(x=>x[0]===c);return `<button type="button" class="cmb2" data-combo="${f}|${c}" aria-pressed="${ajustes.fondo===f&&ajustes.acento===c}">${mini(a,z)}<small>${a[1]} + ${z[1]}</small></button>`}).join("")}</div>
+  <details class="cmb-mia"${abierto?" open":""}><summary>Crear mi propia combinación ›</summary>
   <div class="tprev" style="background:${F[2]};color:${F[4]}"><div class="tpcard" style="background:${F[3]};border-color:${F[6]}"><span class="tpbar" style="background:${dk?C[4]:C[3]}"></span><b style="color:${dk?C[4]:C[2]}">Así se verá</b><small style="color:${F[5]}">${F[1]} + ${C[1]}</small><span class="tpbtn" style="background:${dk?C[4]:C[3]};color:${dk?F[2]:"#fff"}">Registrar</span></div></div>
-  <p class="tpl">Combinaciones sugeridas</p>
-  <div class="combos">${COMBOS.map(([f,c])=>{const a=FONDOS.find(x=>x[0]===f),z=ACENTOS.find(x=>x[0]===c);return `<button type="button" class="cmb" data-combo="${f}|${c}" aria-pressed="${ajustes.fondo===f&&ajustes.acento===c}" title="${a[1]} + ${z[1]}"><i style="background:${a[2]}"><em style="background:${a[8]?z[4]:z[2]}"></em></i></button>`}).join("")}</div>
-  <p class="tpl">1. Color predominante <small>(fondo de toda la app)</small></p>
+  <p class="tpl">1. Color de fondo</p>
   <div class="swatches">${FONDOS.map(x=>`<button type="button" class="swc" data-fondo="${x[0]}" aria-pressed="${ajustes.fondo===x[0]}"><i style="background:${x[2]};box-shadow:inset 0 0 0 1px ${x[6]}"></i><span>${x[1]}</span></button>`).join("")}</div>
-  <p class="tpl">2. Color de acento <small>(botones, barras y títulos)</small></p>
-  <div class="swatches">${ACENTOS.map(x=>`<button type="button" class="swc" data-acento="${x[0]}" aria-pressed="${ajustes.acento===x[0]}"><i style="background:linear-gradient(135deg,${x[2]} 0 55%,${x[3]} 55% 100%)"></i><span>${x[1]}</span></button>`).join("")}</div>`;
+  <p class="tpl">2. Color de acento</p>
+  <div class="swatches">${ACENTOS.map(x=>`<button type="button" class="swc" data-acento="${x[0]}" aria-pressed="${ajustes.acento===x[0]}"><i style="background:linear-gradient(135deg,${x[2]} 0 55%,${x[3]} 55% 100%)"></i><span>${x[1]}</span></button>`).join("")}</div></details>`;
+  try{pintarResumenCfg()}catch{}
 }
 $("combinar").addEventListener("click",e=>{
   const c=e.target.closest("[data-combo]"),f=e.target.closest("[data-fondo]"),a=e.target.closest("[data-acento]"); if(!c&&!f&&!a)return;
@@ -3644,6 +3683,33 @@ async function sincronizarFirmas(){
     if(nuevas){pintarFirmados();try{pintarFirmaMov()}catch{};toast(`Se recuperaron ${nuevas} firma${nuevas>1?"s":""} desde el Excel`)}
   }catch(e){}finally{setTimeout(()=>{firmasSync=false},60000)}
 }
+
+
+/* ===== Configuración: resumen de cada opción y una sola abierta a la vez ===== */
+function pintarResumenCfg(){
+  const v=(k,h)=>{const e=document.getElementById("cfgv-"+k);if(e)e.innerHTML=h};
+  const F=FONDOS.find(x=>x[0]===ajustes.fondo), C=ACENTOS.find(x=>x[0]===ajustes.acento);
+  const temaN=(document.querySelector(`#temas .opt[data-t="${ajustes.tema}"] b`)||{}).textContent||"Cálido";
+  const rs=getComputedStyle(document.documentElement), dot=c=>`<i style="background:${c}"></i>`;
+  v("tema",F&&C?`${dot(F[2])}${dot(F[8]?C[4]:C[2])} ${F[1]} + ${C[1]}`:`${dot(rs.getPropertyValue("--bg"))}${dot(rs.getPropertyValue("--brand"))} ${temaN}`);
+  const T=typeof temporadaDe==="function"?temporadaDe(window.DECO_FECHA||new Date()):null;
+  v("deco",ajustes.deco===0?"Desactivadas":`Automático${T?" · ahora "+T.n.replace(/[¡!]/g,""):""}${ajustes.decoMov===0?" · quietas":""}`);
+  const nb=k=>(BAR_DEF[k]||[""])[0].replace("Movim.","Movimientos");
+  v("barra",`${nb(ajustes.barA||"movimientos")} y ${nb(ajustes.barB||"planilla")}`);
+  v("son",ajustes.sonido===0?"Desactivados":"Activados");
+  const tr=document.querySelector('#trx [aria-pressed="true"] b'); v("trans",tr?tr.textContent:"Ninguna");
+  v("quien",quien?titulo(quien):"—");
+  v("meta",`Meta ${fmt0(ajustes.meta||0)} al año`);
+  v("firm",($("firmadosN")||{}).textContent||`${Object.keys(FIRMAS).length} firmados`);
+  v("rep","Excel o PDF del mes");
+  v("con",($("cfgEstado")||{}).textContent||"—");
+  v("seg","PIN: "+((($("pinEstado")||{}).textContent)||"Desactivado").toLowerCase());
+  v("acerca","CBO Finanzas 4.1");
+}
+document.querySelectorAll(".cfg-item").forEach(d=>d.addEventListener("toggle",()=>{if(d.open){document.querySelectorAll(".cfg-item[open]").forEach(o=>{if(o!==d)o.open=false});setTimeout(()=>d.scrollIntoView({block:"nearest",behavior:"smooth"}),60)}}));
+document.querySelector('[data-sec="config"]').addEventListener("click",()=>setTimeout(pintarResumenCfg,80));
+document.querySelector('[data-sec="config"]').addEventListener("change",()=>setTimeout(pintarResumenCfg,80));
+setTimeout(pintarResumenCfg,1200); setInterval(()=>{if(typeof seccion!=="undefined"&&seccion==="config")pintarResumenCfg()},5000);
 
 /* ===== Extras: celebración, sonidos, saludo, meta del mes, racha, logros, contadores ===== */
 let audioCtx=null;
