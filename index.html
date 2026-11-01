@@ -621,7 +621,7 @@ button.big{border:0}
       <button data-s="anual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Resumen anual</button>
       <button data-s="config"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Configuración</button>
     </nav>
-    <div class="pie">CBO Finanzas · versión 3.3</div>
+    <div class="pie">CBO Finanzas · versión 3.4</div>
   </aside>
   <div class="velo" id="velo"></div>
 
@@ -834,6 +834,11 @@ button.big{border:0}
             <div class="cfgrow"><div class="line"><button class="btnlink" id="copiarCon" type="button">Copiar código de conexión</button><span class="hint" id="copiarConMsg"></span></div></div>
           </section>
           <section class="panel">
+            <div class="ph"><h2>Quién registra</h2><span class="hint" id="quienEstado"></span></div>
+            <p class="hint" style="margin:0 0 10px">Lo que se registre desde este celular quedará con este nombre.</p>
+            <div class="seg" id="quienSeg" role="group" aria-label="Quién registra"></div>
+          </section>
+          <section class="panel">
             <div class="ph"><h2>Seguridad</h2></div>
             <div class="cfgrow"><span class="hint">Bloqueo con PIN</span><b id="pinEstado">Desactivado</b></div>
             <div class="cfgrow"><div class="line" id="pinBotones"></div><p class="msg" id="pinMsg" style="color:var(--muted)"></p></div>
@@ -859,7 +864,7 @@ button.big{border:0}
           </section>
           <section class="panel">
             <div class="ph"><h2>Acerca de</h2></div>
-            <p class="hint" style="margin:0">CBO Finanzas 3.3. Tus datos se guardan en tu archivo de Google Sheets "CASA BONITA OREGON S.A.C.". Este celular solo guarda una copia para verlos sin internet.</p>
+            <p class="hint" style="margin:0">CBO Finanzas 3.4. Tus datos se guardan en tu archivo de Google Sheets "CASA BONITA OREGON S.A.C.". Este celular solo guarda una copia para verlos sin internet.</p>
           </section>
         </div>
       </section>
@@ -991,6 +996,13 @@ button.big{border:0}
 </div>
 
 <!-- Pago a trabajador: sueldo + bono, horas extra o descuento (solo si se usan) -->
+<div class="overlay" id="ovQuien" hidden>
+  <div class="sheet" style="max-width:420px">
+    <h3>¿Quién usa este celular?</h3>
+    <p class="hint" style="margin:0 0 12px">Cada comprobante y pago que registres quedará con tu nombre, en la app y en el Excel. Se elige una sola vez (puedes cambiarlo en Más → Quién registra).</p>
+    <div style="display:grid;gap:10px" id="quienBtns"></div>
+  </div>
+</div>
 <div class="overlay" id="ovPla" hidden>
   <form class="sheet" id="fPla" novalidate>
     <h3><span id="plaTit">Pago a trabajador</span> <button type="button" class="x" data-cerrar aria-label="Cerrar">✕</button></h3>
@@ -1005,7 +1017,12 @@ button.big{border:0}
       <label>Periodo del<input id="pIni" type="date"></label>
       <label>al<input id="pFin" type="date"></label>
     </div>
-    <label for="pSueldo">Sueldo / jornal (S/)</label>
+    <div class="row2">
+      <label>Horas trabajadas<input id="pHoras" type="text" inputmode="decimal" maxlength="5" autocomplete="off" placeholder="Ej. 45"></label>
+      <label>De una semana de<input id="pHSem" type="text" inputmode="decimal" maxlength="5" autocomplete="off" placeholder="45"></label>
+    </div>
+    <p class="hint" id="pHorasInfo" style="margin:-4px 0 0"></p>
+    <label for="pSueldo">Sueldo / jornal a pagar (S/)</label>
     <div class="monto-big"><span>S/</span><input id="pSueldo" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></div>
     <button type="button" class="btnlink pla-masbtn" id="pMasBtn">+ Bono, horas extra o descuento</button>
     <div class="pla-mas" id="pMas" hidden>
@@ -1034,7 +1051,7 @@ button.big{border:0}
     <label>Apellidos y nombres<input id="tNombre" type="text" maxlength="80" autocomplete="off" placeholder="Ej. Quispe Mamani Juan"></label>
     <div class="row2">
       <label>Jornal semanal (S/)<input id="tJornal" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></label>
-      <label>Horas por semana<input id="tHoras" type="text" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="Ej. 48"></label>
+      <label>Horas por semana<input id="tHoras" type="text" inputmode="numeric" maxlength="3" autocomplete="off" placeholder="Ej. 45"></label>
     </div>
     <label>Método de pago<select id="tMetodo"><option>EFECTIVO</option><option>TRANSFERENCIA</option><option>INTERBANCARIA</option><option>YAPE</option><option>PLIN</option></select></label>
     <label id="tBancoL">Banco<select id="tBanco"><option>BCP</option><option>BBVA</option><option>INTERBANK</option><option>SCOTIABANK</option><option>BANCO DE LA NACIÓN</option><option>CAJA AREQUIPA</option><option>CAJA HUANCAYO</option><option>MIBANCO</option><option>OTRO</option></select></label>
@@ -1360,7 +1377,7 @@ function filaMov(r,acc){
   const compTxt={factura:"Factura",boleta:"Boleta",ninguno:"Sin comprobante"};
   const c=r.tipo==="ingreso"?"in":"out"; const [y,m,d]=r.fecha.split("-");
   const html=`<div class="item tap" role="button" tabindex="0" data-id="${esc(r.id)}" aria-label="Ver ${esc(r.desc||r.categoria)}, ${fmt(r.monto)}"><div class="ic ${c}"><span class="${c}">${c==="in"?"+":"−"}</span></div>
-    <div class="desc"><b>${esc(r.desc||r.categoria)}</b><small><span>${esc(r.categoria)}</span><span>${d}/${m}/${y}</span>${r.pendiente?`<span class="tag pend">⏳ Por enviar</span>`:""}${esPagoSun(r)?`<span class="tag sun">Pago SUNAT${r.numero?" · orden "+esc(r.numero):""}</span>`:`<span class="tag">${compTxt[r.comprobante||"ninguno"]}${r.serie?" "+esc(r.serie)+"-"+esc(r.numero):""}</span>`}${r.detraccion?`<span class="tag det">Detracción ${fmt(r.detMonto||0)}</span>`:""}</small></div>
+    <div class="desc"><b>${esc(r.desc||r.categoria)}</b><small><span>${esc(r.categoria)}</span><span>${d}/${m}/${y}</span>${r.por?`<span>· ${esc(nomCorto(r.por))}</span>`:""}${r.pendiente?`<span class="tag pend">⏳ Por enviar</span>`:""}${esPagoSun(r)?`<span class="tag sun">Pago SUNAT${r.numero?" · orden "+esc(r.numero):""}</span>`:`<span class="tag">${compTxt[r.comprobante||"ninguno"]}${r.serie?" "+esc(r.serie)+"-"+esc(r.numero):""}</span>`}${r.detraccion?`<span class="tag det">Detracción ${fmt(r.detMonto||0)}</span>`:""}</small></div>
     <div class="amt ${c}">${c==="in"?"+":"−"} ${fmt(r.monto)}</div>
     <span class="chev" aria-hidden="true">›</span></div>`;
   return acc?`<div class="swipe" data-id="${esc(r.id)}"><div class="acc"><button type="button" data-a="editar">✎<span>Editar</span></button><button type="button" data-a="repetir">↻<span>Repetir</span></button><button type="button" data-a="borrar">🗑<span>Borrar</span></button></div>${html}</div>`:html;
@@ -1490,6 +1507,7 @@ function abrirMov(id){
     ${p.igv?`<div class="tl"><span>Valor sin IGV · IGV</span><span class="num">${fmt(p.base)} · ${fmt(p.igv)}</span></div>`:""}
     ${r.detraccion?`<div class="tl"><span>Detracción ${r.detPct||""}%</span><span class="num">${fmt(r.detMonto||0)}</span></div>`:""}
     ${r.obra?`<div class="tl"><span>Obra</span><span>${esc(r.obra)}</span></div>`:""}
+    <div class="tl"><span>Registrado por</span><span>${r.por?esc(titulo(r.por)):"—"}</span></div>
     ${r.fotoUrl?(/^data:image\//.test(r.fotoUrl)?`<img class="foto" src="${r.fotoUrl}" alt="Foto del comprobante">`:`<a class="btn2" href="${esc(r.fotoUrl)}" target="_blank" rel="noopener" style="text-align:center">📷 Ver foto del comprobante ↗</a>`):""}`;
   $("movBorrar").classList.remove("confirm"); $("movBorrar").querySelector("span").textContent="Borrar"; $("movMsg").textContent="";
   abrirOv("ovMov");
@@ -2363,7 +2381,7 @@ async function api(accion,extra,conf){
   try{res=await fetch(c.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({clave:c.clave,accion},extra||{})),redirect:"follow",signal:ctl.signal})}
   finally{clearTimeout(to)}
   const j=await res.json();
-  if(!j.ok){const e=new Error(j.error||"Error");e.code=j.error;throw e}
+  if(!j.ok){const e=new Error(j.error==="duplicado"?"ya está registrado"+(j.por?" por "+nomCorto(j.por):""):(j.error||"Error"));e.code=j.error;e.por=j.por;throw e}
   return j;
 }
 // Modo de prueba: solo cuando el enlace apunta a 127.0.0.1 (el simulador). Guarda en este equipo y no llama a Google.
@@ -2450,6 +2468,7 @@ async function enviarCola(){
       }catch(e){
         if(esErrorRed(e)) break;              // sigue sin señal: se intentará después
         if(e.code==="clave") throw e;
+        if(e.code==="duplicado"){toast(`Ya estaba registrado${e.por?" por "+nomCorto(e.por):""}: no se guardó dos veces.`);cola.shift();guardarCola();continue}
         toast("No se pudo enviar un cambio pendiente: "+(e.message||"error"));  // dato rechazado: se descarta para no bloquear la cola
       }
       cola.shift(); guardarCola();
@@ -2495,7 +2514,39 @@ const storeGoogle={
     await cargar();
   }
 };
-store={add:r=>(esDemo()?storeDemo:storeGoogle).add(r),remove:id=>(esDemo()?storeDemo:storeGoogle).remove(id),edit:(id,r)=>(esDemo()?storeDemo:storeGoogle).edit(id,r)};
+/* ===== Quién registra (Josué / Jesús) y control de duplicados ===== */
+const PERSONAS=["JOSUÉ VILLAR","JESÚS VILLAR"];
+let quien=""; try{quien=localStorage.getItem("cbo-quien")||""}catch{}
+const nomCorto=n=>{const t=String(n||"").trim();return t?titulo(t.split(/\s+/)[0]):""};
+function pintarQuien(){
+  const seg=$("quienSeg"); if(seg) seg.innerHTML=PERSONAS.map(n=>`<button type="button" data-quien="${n}" aria-pressed="${quien===n}">${titulo(n)}</button>`).join("");
+  if($("quienEstado")) $("quienEstado").textContent=quien?"Este celular: "+titulo(quien):"Sin elegir";
+  $("quienBtns").innerHTML=PERSONAS.map(n=>`<button type="button" class="btn${n===PERSONAS[0]?" pri":""}" data-quien="${n}" style="padding:16px;font-size:1.05rem">Soy ${titulo(n)}</button>`).join("");
+}
+function elegirQuien(n){quien=n;try{localStorage.setItem("cbo-quien",n)}catch{};pintarQuien();cerrarOv("ovQuien");toast("Registrarás como "+titulo(n))}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-quien]");if(b)elegirQuien(b.dataset.quien)});
+pintarQuien(); setTimeout(()=>{if(!quien&&cfg)abrirOv("ovQuien")},1500);
+const sinCeros=v=>String(v||"").trim().replace(/^0+/,"");
+// Busca si lo que se va a guardar ya está registrado (por cualquiera de los dos)
+function dupLocal(r){
+  if(esPlanilla(r)) return rows.find(x=>esPlanilla(x)&&String(x.ruc)===String(r.ruc)&&(x.fecha===r.fecha||(r.inicio&&r.fin&&x.inicio===r.inicio&&x.fin===r.fin)));
+  if(esPagoSun(r)) return null;
+  const comp=r.comprobante||"ninguno";
+  if(comp!=="ninguno"&&r.serie&&r.numero) return rows.find(x=>!esPlanilla(x)&&x.tipo===r.tipo&&(x.comprobante||"ninguno")!=="ninguno"
+    &&String(x.serie||"").trim().toUpperCase()===String(r.serie).trim().toUpperCase()&&sinCeros(x.numero)===sinCeros(r.numero)
+    &&String(x.ruc||"").replace(/\D/g,"")===String(r.ruc||"").replace(/\D/g,""));
+  return rows.find(x=>!esPlanilla(x)&&x.tipo===r.tipo&&x.fecha===r.fecha&&Math.abs((+x.monto||0)-(+r.monto||0))<0.01&&String(x.desc||"").trim().toUpperCase()===String(r.desc||"").trim().toUpperCase());
+}
+function revisarDup(r){
+  const d=dupLocal(r); if(!d) return;
+  const [y,m,dd]=d.fecha.split("-"), por=d.por?` por ${nomCorto(d.por)}`:"";
+  const txt=`${d.desc||d.categoria} · ${fmt(d.monto)} del ${dd}/${m}/${y}`;
+  // Factura o boleta repetida: nunca se registra dos veces
+  if(!esPlanilla(r)&&(r.comprobante||"ninguno")!=="ninguno") throw Object.assign(new Error(`este comprobante ya está registrado${por} (${txt}). No se guardó de nuevo.`),{code:"dup"});
+  if(!confirm(`Ojo: ya hay un ${esPlanilla(r)?"pago a este trabajador":"movimiento igual"} registrado${por}:\n${txt}\n\n¿Registrarlo de todas formas?`)) throw Object.assign(new Error(`ya estaba registrado${por}. No se guardó de nuevo.`),{code:"dup"});
+  r.forzar=true;
+}
+store={add:r=>{revisarDup(r);if(quien&&!r.por)r.por=quien;return (esDemo()?storeDemo:storeGoogle).add(r)},remove:id=>(esDemo()?storeDemo:storeGoogle).remove(id),edit:(id,r)=>(esDemo()?storeDemo:storeGoogle).edit(id,r)};
 function abrirSetup(msg){$("setup").hidden=false;$("setupMsg").textContent=msg||"";if(cfg)$("cfgUrl").value=cfg.url||""}
 $("setupF").addEventListener("submit",async e=>{
   e.preventDefault();
@@ -2761,6 +2812,16 @@ function pintarTrab(){
   $("pTrabInfo").textContent=t?[t.cargo,t.metodo&&t.metodo.replace("INTERBANCARIA","Transferencia"),t.banco].filter(Boolean).map(titulo).join(" · "):"";
   return t;
 }
+// Pago por horas: semana completa = jornal exacto (700, 1100…); si faltó, jornal × horas trabajadas ÷ horas de la semana
+function jornalTrab(){const t=listaTrab().find(x=>String(x.dni)===$("pTrab").value);return t&&t.jornal?Number(t.jornal):0}
+function calcHoras(){
+  const j=jornalTrab(), h=numIn("pHoras"), hs=numIn("pHSem")||45;
+  if(!(h>0)||!j){$("pHorasInfo").textContent=j?`Semana completa (${hs} h): S/ ${fmtN(j)}. Escribe las horas si faltó.`:"";return}
+  const pago=h===hs?j:r2(j*h/hs);
+  $("pSueldo").value=pago.toFixed(2);
+  $("pHorasInfo").textContent=h===hs?`Semana completa: S/ ${fmtN(j)}`:`S/ ${fmtN(j)} × ${h} h ÷ ${hs} h = S/ ${fmtN(pago)}`;
+}
+const fmtN=n=>Number(n).toLocaleString("es-PE",{minimumFractionDigits:2,maximumFractionDigits:2});
 function calcPla(){const n=r2(numIn("pSueldo")+numIn("pBono")+numIn("pHex")-numIn("pDesc"));$("pNeto").textContent=fmt(Math.max(0,n));return n}
 function abrirPagoPla(r){
   closeF(); cerrarOv("ovMov"); plaEditId=r?r.id:null;
@@ -2771,18 +2832,21 @@ function abrirPagoPla(r){
     $("pTrab").value=String(r.ruc||""); $("pFecha").value=r.fecha; $("pIni").value=r.inicio||isoMas(r.fecha,-6); $("pFin").value=r.fin||r.fecha;
     $("pSueldo").value=String(r.sueldo||r.monto); $("pBono").value=r.bono||""; $("pHex").value=r.horasExtra||""; $("pDesc").value=r.descuento||"";
     $("pOper").value=r.operacion||""; $("pObra").value=r.obra||"";
-    pintarTrab();
+    const tt=pintarTrab(), hs0=(tt&&tt.horas)||45; $("pHSem").value=hs0; $("pHoras").value=r.horasTrab||(r.horas&&r.horas!==hs0?r.horas:"");
   }else{
     $("pFecha").value=hoyISO; $("pIni").value=isoMas(hoyISO,-6); $("pFin").value=hoyISO;
     ["pBono","pHex","pDesc","pOper","pObra"].forEach(k=>$(k).value="");
     const t=pintarTrab(); $("pSueldo").value=t&&t.jornal?Number(t.jornal).toFixed(2):"";
+    $("pHSem").value=t&&t.horas?t.horas:45; $("pHoras").value="";
   }
+  calcHoras();
   const extras=numIn("pBono")||numIn("pHex")||numIn("pDesc");
   $("pMas").hidden=!extras; $("pMasBtn").hidden=!!extras;
   $("plaTit").textContent=r?"Editar pago":"Pago a trabajador"; $("pMsg").textContent="";
   calcPla(); $("ovPla").hidden=false;
 }
-$("pTrab").addEventListener("change",()=>{const t=pintarTrab();if(t&&t.jornal&&!plaEditId)$("pSueldo").value=Number(t.jornal).toFixed(2);calcPla()});
+$("pTrab").addEventListener("change",()=>{const t=pintarTrab();if(t&&t.jornal&&!plaEditId){$("pSueldo").value=Number(t.jornal).toFixed(2);$("pHSem").value=t.horas||45}calcHoras();calcPla()});
+["pHoras","pHSem"].forEach(k=>$(k).addEventListener("input",()=>{if(!numIn("pHoras")){const j=jornalTrab();if(j)$("pSueldo").value=j.toFixed(2)}calcHoras();calcPla()}));
 ["pSueldo","pBono","pHex","pDesc"].forEach(k=>$(k).addEventListener("input",calcPla));
 $("pFecha").addEventListener("change",()=>{if(!plaEditId&&$("pFecha").value){$("pFin").value=$("pFecha").value;$("pIni").value=isoMas($("pFecha").value,-6)}});
 $("pMasBtn").onclick=()=>{$("pMas").hidden=false;$("pMasBtn").hidden=true;$("pBono").focus()};
@@ -2796,14 +2860,14 @@ $("fPla").addEventListener("submit",async e=>{
   if(!$("pFecha").value){$("pMsg").textContent="Elige la fecha de pago.";return}
   const r={tipo:"gasto",categoria:"Planilla / jornales",comprobante:"ninguno",monto:neto,base:0,igv:0,noGravado:neto,
     ruc:String(t.dni),desc:t.nombre,cargo:t.cargo||"",fecha:$("pFecha").value,inicio:$("pIni").value,fin:$("pFin").value,
-    sueldo:numIn("pSueldo"),bono:numIn("pBono"),horasExtra:numIn("pHex"),descuento:numIn("pDesc"),
+    sueldo:numIn("pSueldo"),bono:numIn("pBono"),horasExtra:numIn("pHex"),descuento:numIn("pDesc"),horasTrab:numIn("pHoras")||0,horasSem:numIn("pHSem")||45,
     operacion:$("pOper").value.trim(),obra:$("pObra").value.trim(),medio:t.metodo||"",estado:"PAGADO",detraccion:false,detPct:0,detMonto:0};
   $("pMsg").textContent="Guardando…"; $("pGuardar").disabled=true;
   const editando=!!plaEditId;
   try{
     if(editando) await store.edit(plaEditId,r); else await store.add(r);
     $("ovPla").hidden=true; mes=r.fecha.slice(0,7); render(); toast(editando?"Pago actualizado":"Pago registrado");
-  }catch(err){$("pMsg").textContent="No se pudo guardar. Revisa tu internet e intenta de nuevo."}
+  }catch(err){$("pMsg").textContent=err&&err.code==="dup"?err.message.charAt(0).toUpperCase()+err.message.slice(1):"No se pudo guardar. Revisa tu internet e intenta de nuevo."}
   finally{$("pGuardar").disabled=false}
 });
 $("irPagoPla").onclick=()=>abrirPagoPla();
