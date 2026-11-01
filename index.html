@@ -605,15 +605,32 @@ button.big{border:0}
 #intro{position:fixed;inset:0;z-index:9999;background:radial-gradient(circle at 100% 100%,rgba(233,220,195,.85) 0,rgba(233,220,195,0) 55%),#0D5C46;will-change:transform}
 .entra-ini{opacity:0;transform:translateY(18px)}
 
-/* ===== Decoraciones de temporada (sutiles, se pueden desactivar) ===== */
-.deco-tira{height:22px;margin:-4px 0 4px;background-repeat:repeat-x;background-position:center top;background-size:auto 22px;opacity:.9;pointer-events:none}
+/* ===== Decoraciones de temporada (en todas las pantallas; se pueden desactivar) ===== */
+.deco-tira{position:relative;height:22px;margin:-4px 0 4px;background-repeat:repeat-x;background-position:center top;background-size:auto 22px;opacity:.95;pointer-events:none;z-index:4}
+.deco-cuelga{position:absolute;top:6px;display:flex;flex-direction:column;align-items:center;transform-origin:50% 0;animation:mecer 3s ease-in-out infinite alternate}
+.deco-cuelga i{display:block;width:1px;height:var(--l);background:rgba(120,110,90,.55)}
+.deco-cuelga b{font-size:16px;line-height:1;margin-top:-1px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.15))}
+body:not(.deco-mov) .deco-cuelga{animation:none}
+@keyframes mecer{from{transform:rotate(-9deg)}to{transform:rotate(9deg)}}
 .deco-chip{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.16);color:inherit;margin-top:6px;width:max-content;max-width:100%}
 .big.ut{position:relative;overflow:hidden}
-.deco-esq{position:absolute;right:12px;top:10px;font-size:30px;line-height:1;opacity:.95;pointer-events:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.18))}
+.deco-esq{position:absolute;right:12px;top:10px;font-size:30px;line-height:1;pointer-events:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.18));transition:opacity .25s,transform .25s}
+h1.deco-h1::after{content:var(--deco-ic);display:inline-block;margin-left:8px;font-size:.8em;vertical-align:2px;transition:opacity .25s,transform .25s}
+.deco-esq.cambia,h1.deco-h1.cambia::after{opacity:0;transform:scale(.6) rotate(-20deg)}
+body.deco-mov .deco-esq{animation:flotar 3.4s ease-in-out infinite}
+body.deco-mov h1.deco-h1::after{animation:flotar 3s ease-in-out infinite}
+@keyframes flotar{0%,100%{translate:0 0}50%{translate:0 -4px}}
 .deco-cae{position:fixed;top:-40px;z-index:60;pointer-events:none;font-size:18px;opacity:.75;animation:decoCae linear forwards}
-@keyframes decoCae{to{transform:translate(var(--dx),110vh) rotate(var(--rot));opacity:.0}}
-@media (prefers-reduced-motion:reduce){.deco-cae{display:none}}
-.deco-cfg{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
+.deco-cae.lento{opacity:.38;z-index:3}
+@keyframes decoCae{to{transform:translate(var(--dx),110vh) rotate(var(--rot));opacity:0}}
+@media (prefers-reduced-motion:reduce){.deco-cae{display:none}.deco-cuelga,.deco-esq,h1.deco-h1::after{animation:none!important}}
+.deco-cfg{display:grid;gap:12px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.deco-fila{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.deco-lista{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.deco-op{display:flex;align-items:center;gap:8px;text-align:left;font:inherit;font-size:.82rem;font-weight:600;padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:var(--paper,var(--surface));color:var(--ink)}
+.deco-op span{font-size:20px}
+.deco-op[aria-pressed="true"]{border-color:var(--brand-2);box-shadow:0 0 0 2px var(--brand-2) inset}
+.deco-aviso{margin:0;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--brand-2) 14%,transparent);font-size:.85rem}
 
 .deco-tira.fuera{display:none}
 /* ===== Barra de abajo: estilos ===== */
@@ -645,9 +662,34 @@ button.big{border:0}
   body[data-barra="c"] .tabbar .mas-reg span.c{width:50px;height:50px;border-radius:50%;margin:0;background:var(--brand-ink);color:var(--brand);box-shadow:none}
   body[data-barra="c"] .tabbar .mas-reg .lb{display:none}
 }
+
+/* D · Deluxe: vidrio oscuro, indicador que se desliza, botón + con aro y brillo */
+@media (max-width:980px){
+  body[data-barra="d"] .tabbar{left:10px;right:10px;bottom:calc(12px + env(safe-area-inset-bottom,0px));padding:8px 6px;border-radius:30px;border:1px solid rgba(255,255,255,.14);
+    background:linear-gradient(180deg,color-mix(in srgb,var(--brand) 92%,#fff) 0%,var(--brand) 55%,color-mix(in srgb,var(--brand) 80%,#000) 100%);
+    box-shadow:0 18px 40px rgba(6,40,30,.38),0 2px 0 rgba(255,255,255,.12) inset;align-items:center;overflow:visible}
+  body[data-barra="d"] .tabbar .ind{position:absolute;top:8px;left:0;height:calc(100% - 16px);border-radius:22px;background:rgba(255,255,255,.95);
+    box-shadow:0 6px 16px rgba(0,0,0,.18),0 0 0 1px rgba(255,255,255,.6) inset;transition:transform .5s cubic-bezier(.34,1.56,.64,1),width .5s cubic-bezier(.34,1.56,.64,1),opacity .2s;z-index:0;pointer-events:none}
+  body[data-barra="d"] .tabbar button{position:relative;z-index:1;color:rgba(255,255,255,.72);min-height:50px;gap:3px;padding:4px 2px}
+  body[data-barra="d"] .tabbar button .lb{font-size:.62rem;letter-spacing:.01em;transition:opacity .25s,transform .25s}
+  body[data-barra="d"] .tabbar button svg{transition:transform .45s cubic-bezier(.34,1.56,.64,1)}
+  body[data-barra="d"] .tabbar button[aria-current="page"]{color:var(--brand);background:transparent}
+  body[data-barra="d"] .tabbar button[aria-current="page"] svg{transform:translateY(-1px) scale(1.12)}
+  body[data-barra="d"] .tabbar button[aria-current="page"] .lb{font-weight:800}
+  body[data-barra="d"] .tabbar .mas-reg .lb{display:none}
+  body[data-barra="d"] .tabbar .mas-reg span.c{width:62px;height:62px;border-radius:50%;margin-top:-34px;color:#fff;
+    background:linear-gradient(150deg,color-mix(in srgb,var(--brand) 35%,#7FE3B8) 0%,color-mix(in srgb,var(--brand) 55%,#2FB383) 50%,var(--brand) 100%);
+    border:5px solid var(--bg);box-shadow:0 10px 24px rgba(6,40,30,.45),0 0 0 2px color-mix(in srgb,#D4A72C 70%,transparent);animation:brilloFab 3.2s ease-in-out infinite}
+  body[data-barra="d"] .tabbar .mas-reg:active span.c{transform:scale(.9) rotate(90deg)}
+  @keyframes brilloFab{0%,100%{box-shadow:0 10px 24px rgba(6,40,30,.45),0 0 0 2px rgba(212,167,44,.55)}50%{box-shadow:0 10px 28px rgba(6,40,30,.5),0 0 0 5px rgba(212,167,44,.18)}}
+  body[data-barra="d"] .tabbar .badge{position:absolute;top:4px;left:calc(50% + 6px);min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:#E8761E;color:#fff;font-size:.62rem;font-weight:800;display:grid;place-items:center;box-shadow:0 0 0 2px var(--brand)}
+  body[data-barra="d"] .tabbar .rip{position:absolute;inset:0;margin:auto;width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.5);animation:rip .5s ease-out forwards;pointer-events:none}
+  @keyframes rip{to{transform:scale(9);opacity:0}}
+  @media (prefers-reduced-motion:reduce){body[data-barra="d"] .tabbar .ind{transition:none}body[data-barra="d"] .tabbar .mas-reg span.c{animation:none}}
+}
 </style>
 </head>
-<body>
+<body data-barra="d">
 <div id="intro" aria-hidden="true"></div>
 <div class="app" id="app">
   <aside class="side" id="side" aria-label="Menú">
@@ -662,7 +704,7 @@ button.big{border:0}
       <button data-s="anual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Resumen anual</button>
       <button data-s="config"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Configuración</button>
     </nav>
-    <div class="pie">CBO Finanzas · versión 3.5</div>
+    <div class="pie">CBO Finanzas · versión 3.6</div>
   </aside>
   <div class="velo" id="velo"></div>
 
@@ -852,7 +894,13 @@ button.big{border:0}
               <button class="opt" data-t="auto"><div class="mini" style="background:linear-gradient(90deg,#E9DCC3 50%,#061F18 50%)"></div><b>Automático</b><small>Según tu celular</small></button>
             </div>
             <div id="combinar"></div>
-            <div class="cfgrow deco-cfg"><span><b>Decoraciones de temporada</b><small class="hint" id="decoTxt" style="display:block"></small></span><div class="seg" id="decoSeg" style="min-width:170px"><button type="button" data-deco="1">Activadas</button><button type="button" data-deco="0">Desactivadas</button></div></div>
+            <div class="deco-cfg">
+              <div class="deco-fila"><span><b>Decoraciones de temporada</b><small class="hint" id="decoTxt" style="display:block"></small></span><div class="seg" id="decoSeg" style="min-width:190px"><button type="button" data-deco="1">Automático</button><button type="button" data-deco="0">Desactivadas</button></div></div>
+              <div class="deco-fila"><span><b>Movimiento</b><small class="hint" style="display:block">Adornos que se mecen y caen despacio</small></span><div class="seg" id="decoMovSeg" style="min-width:190px"><button type="button" data-decomov="1">Con movimiento</button><button type="button" data-decomov="0">Quietas</button></div></div>
+              <p class="hint" style="margin:6px 0 0">Toca una temporada para verla (después vuelve sola a automático):</p>
+              <p class="deco-aviso" id="decoPrevAviso" hidden></p>
+              <div class="deco-lista" id="decoLista"></div>
+            </div>
           </section>
           <section class="panel">
             <div class="ph"><h2>Transición entre pantallas</h2></div>
@@ -907,7 +955,7 @@ button.big{border:0}
           </section>
           <section class="panel">
             <div class="ph"><h2>Acerca de</h2></div>
-            <p class="hint" style="margin:0">CBO Finanzas 3.5. Tus datos se guardan en tu archivo de Google Sheets "CASA BONITA OREGON S.A.C.". Este celular solo guarda una copia para verlos sin internet.</p>
+            <p class="hint" style="margin:0">CBO Finanzas 3.6. Tus datos se guardan en tu archivo de Google Sheets "CASA BONITA OREGON S.A.C.". Este celular solo guarda una copia para verlos sin internet.</p>
           </section>
         </div>
       </section>
@@ -1488,7 +1536,6 @@ function chart(){
 /* ===== Navegación ===== */
 const animar=(el,cls)=>{if(!el)return;el.classList.remove("entra","mes-sig","mes-ant");void el.offsetWidth;el.classList.add(cls)};
 function ir(s){
-  {const t=document.getElementById("decoTira");if(t)t.classList.toggle("fuera",s!=="inicio")}
   if(s!==seccion) screenFx(s, ultimoToque);
   const cambio=s!==seccion; seccion=s; document.querySelectorAll("[data-sec]").forEach(x=>x.hidden=x.dataset.sec!==s);
   document.querySelectorAll("#nav button").forEach(b=>b.setAttribute("aria-current",b.dataset.s===s?"page":"false"));
@@ -3119,54 +3166,108 @@ if("serviceWorker" in navigator){
   window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>r.update()).catch(()=>{}));
 }
 
-/* ===== Decoraciones de temporada ===== */
+/* ===== Decoraciones de temporada (en todas las pantallas, con movimiento suave) ===== */
 const DECO_SVG={
   banderines:(a,b)=>`<svg xmlns='http://www.w3.org/2000/svg' width='44' height='22'><path d='M0 2 Q22 8 44 2' stroke='%23888' stroke-width='1' fill='none'/><path d='M3 3 L13 3 L8 16Z' fill='${a}'/><path d='M17 5 L27 5 L22 18Z' fill='${b}'/><path d='M31 4 L41 4 L36 17Z' fill='${a}'/></svg>`,
   luces:(a,b)=>`<svg xmlns='http://www.w3.org/2000/svg' width='48' height='22'><path d='M0 3 Q24 12 48 3' stroke='%23596' stroke-width='1.2' fill='none'/><ellipse cx='10' cy='11' rx='3' ry='4.5' fill='${a}'/><ellipse cx='24' cy='13' rx='3' ry='4.5' fill='${b}'/><ellipse cx='38' cy='11' rx='3' ry='4.5' fill='%23F2C14E'/></svg>`,
   picado:(a,b)=>`<svg xmlns='http://www.w3.org/2000/svg' width='40' height='22'><path d='M0 1 H40' stroke='%23888' stroke-width='1'/><path d='M2 1 H18 V15 L14 19 L10 15 L6 19 L2 15Z' fill='${a}'/><circle cx='10' cy='8' r='2.2' fill='white' opacity='.7'/><path d='M22 1 H38 V15 L34 19 L30 15 L26 19 L22 15Z' fill='${b}'/><circle cx='30' cy='8' r='2.2' fill='white' opacity='.7'/></svg>`,
-  puntos:(a,b)=>`<svg xmlns='http://www.w3.org/2000/svg' width='36' height='22'><circle cx='9' cy='11' r='3' fill='${a}'/><circle cx='27' cy='11' r='2' fill='${b}'/></svg>`
+  puntos:(a,b)=>`<svg xmlns='http://www.w3.org/2000/svg' width='36' height='22'><path d='M0 6 Q18 14 36 6' stroke='%23999' stroke-width='.8' fill='none'/><circle cx='9' cy='10' r='3' fill='${a}'/><circle cx='27' cy='10' r='2.2' fill='${b}'/></svg>`
 };
+// Cada temporada tiene varios adornos: los que cuelgan, los que flotan y los de la esquina van cambiando
+const TEMPORADAS=[
+  {k:"anio",n:"¡Feliz Año Nuevo!",ic:["🎆","🥂","✨","🎉","🕛"],cae:["✨","⭐","🎉","🎊"],cuelga:["⭐","✨","🎈"],t:"puntos",c:["%23D4A72C","%23F2D27A"]},
+  {k:"valentin",n:"Feliz San Valentín",ic:["💕","💘","🌹","💌","🧸"],cae:["💗","💕","💖","🌹"],cuelga:["💗","💌","💕"],t:"puntos",c:["%23E05780","%23F4A6BD"]},
+  {k:"santa",n:"Semana Santa",ic:["🕊️","🌿","🌸","🐣"],cae:["🌿","🌸","🕊️"],cuelga:["🕊️","🌸"],t:"puntos",c:["%236B8E4E","%23A8C686"]},
+  {k:"madre",n:"Feliz Día de la Madre",ic:["💐","🌷","💖","🌸","🎀"],cae:["🌷","🌸","💮","💖"],cuelga:["🌸","🎀","🌷"],t:"puntos",c:["%23E07A9A","%23F7C6D3"]},
+  {k:"padre",n:"Feliz Día del Padre",ic:["👔","🛠️","🏆","⚽","☕"],cae:["⭐","⚽","🏆"],cuelga:["⭐","🏅"],t:"puntos",c:["%232F5D8A","%2390B4D9"]},
+  {k:"inti",n:"Inti Raymi · San Juan",ic:["☀️","🌽","🍃"],cae:["☀️","🍃","🌽"],cuelga:["☀️","🍃"],t:"banderines",c:["%23E8A317","%23C0392B"]},
+  {k:"patrias",n:"¡Felices Fiestas Patrias!",ic:["🇵🇪","🦙","🎆","🐎","🌽"],cae:["🇵🇪","🎉","✨"],cuelga:["🇵🇪","🎉"],t:"banderines",c:["%23D91023","%23FFFFFF"]},
+  {k:"rosa",n:"Santa Rosa de Lima",ic:["🌹","🌺","🕊️"],cae:["🌹","🌺","🌸"],cuelga:["🌹","🕊️"],t:"puntos",c:["%23C2185B","%23F48FB1"]},
+  {k:"milagros",n:"Mes del Señor de los Milagros",ic:["💜","🕯️","🍯","🌸"],cae:["💜","🌸","✨"],cuelga:["💜","🕯️"],t:"banderines",c:["%236A1B9A","%23FFFFFF"]},
+  {k:"halloween",n:"Halloween · Canción Criolla",ic:["🎃","👻","🦇","🕸️","🎸","🍬"],cae:["🎃","🦇","🍂","👻","🍬"],cuelga:["🕷️","🦇","🎃"],t:"banderines",c:["%23E8761E","%23333333"]},
+  {k:"muertos",n:"Día de los Muertos",ic:["💀","🌼","🕯️","🌺","🍞"],cae:["🌼","🕯️","🌺","🦋"],cuelga:["💀","🌼","🕯️"],t:"picado",c:["%23E8761E","%238E44AD"]},
+  {k:"navidad",n:"¡Feliz Navidad!",ic:["🎄","🎁","⛄","🔔","🍪","🦌"],cae:["❄️","⭐","❄️","🎁"],cuelga:["🔔","⭐","🎁","🍬"],t:"luces",c:["%23D62828","%232E9C5F"]}
+];
+const TMP=k=>TEMPORADAS.find(x=>x.k===k);
 const pascua=y=>{const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mes=Math.floor((h+l-7*m+114)/31),dia=((h+l-7*m+114)%31)+1;return new Date(y,mes-1,dia)};
 const nDomingo=(y,mes,n)=>{const d=new Date(y,mes,1);d.setDate(1+((7-d.getDay())%7)+7*(n-1));return d};
 function temporadaDe(f){
   const y=f.getFullYear(), en=(m1,d1,m2,d2)=>f>=new Date(y,m1,d1)&&f<=new Date(y,m2,d2,23,59);
   const P=pascua(y), ramos=new Date(P); ramos.setDate(P.getDate()-7);
   const madre=nDomingo(y,4,2), padre=nDomingo(y,5,3), padre0=new Date(padre); padre0.setDate(padre.getDate()-6);
-  const L=[
-    [en(0,1,0,10),{n:"¡Feliz Año Nuevo!",ic:"✨",cae:["✨","⭐"],t:"puntos",c:["%23D4A72C","%23F2D27A"]}],
-    [en(1,7,1,14),{n:"Feliz San Valentín",ic:"💕",cae:["💗","💕"],t:"puntos",c:["%23E05780","%23F4A6BD"]}],
-    [f>=ramos&&f<=new Date(P.getFullYear(),P.getMonth(),P.getDate(),23,59),{n:"Semana Santa",ic:"🌿",cae:["🌿"],t:"puntos",c:["%236B8E4E","%23A8C686"]}],
-    [en(4,1,4,madre.getDate()),{n:"Feliz Día de la Madre",ic:"🌷",cae:["🌷","🌸"],t:"puntos",c:["%23E07A9A","%23F7C6D3"]}],
-    [f>=padre0&&f<=new Date(y,5,padre.getDate(),23,59),{n:"Feliz Día del Padre",ic:"👔",cae:["⭐"],t:"puntos",c:["%232F5D8A","%2390B4D9"]}],
-    [en(6,1,6,31),{n:"¡Felices Fiestas Patrias!",ic:"🇵🇪",cae:["🇵🇪"],t:"banderines",c:["%23D91023","%23FFFFFF"]}],
-    [en(7,24,7,30),{n:"Santa Rosa de Lima",ic:"🌹",cae:["🌹"],t:"puntos",c:["%23C2185B","%23F48FB1"]}],
-    [en(9,1,9,27),{n:"Mes del Señor de los Milagros",ic:"💜",cae:[],t:"puntos",c:["%236A1B9A","%23B39DDB"]}],
-    [en(9,28,9,31),{n:"Halloween · Canción Criolla",ic:"🎃",cae:["🎃","🦇","🍂"],t:"banderines",c:["%23E8761E","%23333333"]}],
-    [en(10,1,10,7),{n:"Día de los Muertos",ic:"💀",cae:["🌼","🕯️"],t:"picado",c:["%23E8761E","%238E44AD"]}],
-    [en(11,1,11,31),{n:"¡Feliz Navidad!",ic:"🎄",cae:["❄️","⭐"],t:"luces",c:["%23D62828","%232E9C5F"]}]
-  ];
-  const x=L.find(([ok])=>ok); return x?x[1]:null;
+  const L=[[en(0,1,0,10),"anio"],[en(1,7,1,14),"valentin"],[f>=ramos&&f<=new Date(P.getFullYear(),P.getMonth(),P.getDate(),23,59),"santa"],
+    [en(4,1,4,madre.getDate()),"madre"],[f>=padre0&&f<=new Date(y,5,padre.getDate(),23,59),"padre"],[en(5,20,5,24),"inti"],[en(6,1,6,31),"patrias"],
+    [en(7,24,7,30),"rosa"],[en(9,1,9,27),"milagros"],[en(9,28,9,31),"halloween"],[en(10,1,10,7),"muertos"],[en(11,1,11,31),"navidad"]];
+  const x=L.find(([ok])=>ok); return x?TMP(x[1]):null;
+}
+let decoPrev=null, decoIcT=null, decoAmbT=null;
+const rnd=(a,b)=>a+Math.random()*(b-a), uno=arr=>arr[Math.floor(Math.random()*arr.length)];
+const decoMov=()=>ajustes.decoMov!==0&&!matchMedia("(prefers-reduced-motion: reduce)").matches;
+function caer(T,n,lento){
+  for(let i=0;i<n;i++){const e=document.createElement("span");e.className="deco-cae"+(lento?" lento":"");e.textContent=uno(T.cae);
+    const dur=lento?rnd(11,17):rnd(4,7);e.style.left=rnd(0,96)+"vw";e.style.animationDuration=dur+"s";e.style.animationDelay=(lento?rnd(0,6):rnd(0,2.5))+"s";
+    e.style.setProperty("--dx",rnd(-50,50)+"px");e.style.setProperty("--rot",rnd(-200,200)+"deg");e.style.fontSize=(lento?rnd(13,19):rnd(14,24))+"px";
+    document.body.appendChild(e);setTimeout(()=>e.remove(),(dur+7)*1000)}
 }
 function aplicarDeco(animar){
-  const on=ajustes.deco!==0, T=on?temporadaDe(window.DECO_FECHA||new Date()):null;
+  const on=ajustes.deco!==0, auto=temporadaDe(window.DECO_FECHA||new Date());
+  const T=decoPrev?TMP(decoPrev):(on?auto:null);
   document.querySelectorAll("#decoSeg [data-deco]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.deco===(on?1:0))));
-  const hoyT=temporadaDe(window.DECO_FECHA||new Date());
-  if($("decoTxt")) $("decoTxt").textContent=hoyT?`Ahora: ${hoyT.n} ${hoyT.ic}`:"Cambian solas según la fecha";
-  const tira=$("decoTira"), ut=$("bigUt");
-  tira.hidden=!T; ut.querySelectorAll(".deco-esq,.deco-chip").forEach(x=>x.remove());
+  document.querySelectorAll("#decoMovSeg [data-decomov]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.decomov===(ajustes.decoMov!==0?1:0))));
+  if($("decoTxt")) $("decoTxt").textContent=auto?`Hoy toca: ${auto.n} ${auto.ic[0]}`:"Hoy no hay temporada: cambian solas según la fecha";
+  if($("decoLista")) $("decoLista").innerHTML=TEMPORADAS.map(x=>`<button type="button" class="deco-op" data-prev="${x.k}" aria-pressed="${decoPrev===x.k}"><span>${x.ic[0]}</span>${esc(x.n.replace(/[¡!]/g,""))}</button>`).join("");
+  const pv=$("decoPrevAviso"); if(pv){pv.hidden=!decoPrev; if(decoPrev) pv.innerHTML=`👀 Vista previa: <b>${esc(T.n)}</b> <button type="button" class="btnlink" data-prev="">Volver a automático</button>`}
+  const tira=$("decoTira"), ut=$("bigUt"), h1=$("titulo");
+  tira.hidden=!T; tira.innerHTML=""; ut.querySelectorAll(".deco-esq,.deco-chip").forEach(x=>x.remove()); h1.classList.remove("deco-h1");
+  clearInterval(decoIcT); clearInterval(decoAmbT); document.querySelectorAll(".deco-cae").forEach(x=>x.remove());
+  document.body.classList.toggle("deco-mov",!!T&&decoMov());
   if(!T) return;
   tira.style.backgroundImage=`url("data:image/svg+xml,${DECO_SVG[T.t](T.c[0],T.c[1]).replace(/"/g,"'").replace(/#/g,"%23")}")`;
-  ut.insertAdjacentHTML("beforeend",`<span class="deco-esq" aria-hidden="true">${T.ic}</span><span class="deco-chip">${T.n}</span>`);
-  if(animar&&T.cae.length&&!sessionStorage.getItem("deco-cae")){
-    try{sessionStorage.setItem("deco-cae","1")}catch{}
-    for(let i=0;i<14;i++){const e=document.createElement("span");e.className="deco-cae";e.textContent=T.cae[i%T.cae.length];
-      e.style.left=Math.random()*96+"vw";e.style.animationDuration=(4+Math.random()*3)+"s";e.style.animationDelay=(Math.random()*2.5)+"s";
-      e.style.setProperty("--dx",(Math.random()*60-30)+"px");e.style.setProperty("--rot",(Math.random()*240-120)+"deg");e.style.fontSize=(14+Math.random()*10)+"px";
-      document.body.appendChild(e);setTimeout(()=>e.remove(),10000)}
-  }
+  // Adornos que cuelgan de la tira y se mecen
+  const nC=Math.max(4,Math.round(innerWidth/85));
+  for(let i=0;i<nC;i++){const c=document.createElement("span");c.className="deco-cuelga";c.style.left=((i+.5)/nC*100+rnd(-4,4))+"%";
+    c.style.setProperty("--l",rnd(10,26)+"px");c.style.animationDelay=rnd(0,2)+"s";c.style.animationDuration=rnd(2.6,4)+"s";c.innerHTML=`<i></i><b>${T.cuelga[i%T.cuelga.length]}</b>`;tira.appendChild(c)}
+  // Ícono junto al título (en todas las pantallas) y en la tarjeta de utilidad: van cambiando
+  h1.classList.add("deco-h1"); h1.style.setProperty("--deco-ic",`"${T.ic[0]}"`);
+  ut.insertAdjacentHTML("beforeend",`<span class="deco-esq" aria-hidden="true">${T.ic[0]}</span><span class="deco-chip">${T.n}</span>`);
+  let k=0; decoIcT=setInterval(()=>{k=(k+1)%T.ic.length;document.querySelectorAll(".deco-esq,h1.deco-h1").forEach(el=>{el.classList.add("cambia");setTimeout(()=>{if(el.tagName==="H1")el.style.setProperty("--deco-ic",`"${T.ic[k]}"`);else el.textContent=T.ic[k];el.classList.remove("cambia")},260)})},4500);
+  if(!decoMov()) return;
+  // Lluvia al abrir (una vez por sesión) y luego pocos adornos flotando lento, en todas las pantallas
+  if((animar&&!sessionStorage.getItem("deco-cae"))||decoPrev){try{sessionStorage.setItem("deco-cae","1")}catch{};caer(T,16,false)}
+  caer(T,3,true); decoAmbT=setInterval(()=>{if(!document.hidden&&document.querySelectorAll(".deco-cae.lento").length<6)caer(T,2,true)},5000);
 }
-document.addEventListener("click",e=>{const b=e.target.closest("[data-deco]");if(!b)return;ajustes.deco=+b.dataset.deco;guardarLS("cbo-ajustes",ajustes);aplicarDeco(false)});
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-deco],[data-decomov],[data-prev]"); if(!b) return;
+  if(b.dataset.deco!==undefined){ajustes.deco=+b.dataset.deco;decoPrev=null;guardarLS("cbo-ajustes",ajustes)}
+  else if(b.dataset.decomov!==undefined){ajustes.decoMov=+b.dataset.decomov;guardarLS("cbo-ajustes",ajustes)}
+  else decoPrev=b.dataset.prev||null;
+  aplicarDeco(false);
+});
 setTimeout(()=>aplicarDeco(true),900);
+
+/* ===== Barra Deluxe: indicador deslizante, onda al tocar, vibración y aviso de pendientes ===== */
+(function(){
+  const tb=document.getElementById("tabbar"); if(!tb) return;
+  const ind=document.createElement("span"); ind.className="ind"; tb.prepend(ind);
+  function mover(){
+    if(document.body.dataset.barra!=="d"){ind.style.opacity=0;return}
+    const a=tb.querySelector('[data-tab][aria-current="page"]'); if(!a){ind.style.opacity=0;return}
+    const r=a.getBoundingClientRect(), p=tb.getBoundingClientRect(), w=r.width-2;
+    ind.style.opacity=1; ind.style.width=w+"px"; ind.style.transform=`translateX(${r.left-p.left+(r.width-w)/2}px)`;
+  }
+  new MutationObserver(mover).observe(tb,{subtree:true,attributes:true,attributeFilter:["aria-current"]});
+  new MutationObserver(mover).observe(document.body,{attributes:true,attributeFilter:["data-barra"]});
+  addEventListener("resize",mover); setTimeout(mover,300);
+  tb.addEventListener("pointerdown",e=>{
+    if(document.body.dataset.barra!=="d") return; const b=e.target.closest("button"); if(!b) return;
+    try{navigator.vibrate&&navigator.vibrate(8)}catch{}
+    const r=document.createElement("span"); r.className="rip"; b.appendChild(r); setTimeout(()=>r.remove(),520);
+  });
+  // Aviso naranja en Movimientos si hay registros por enviar
+  setInterval(()=>{const m=tb.querySelector('[data-tab="movimientos"]'); if(!m) return; let bd=m.querySelector(".badge");
+    const n=(typeof cola!=="undefined"&&cola.length)||0; if(!n){if(bd)bd.remove();return}
+    if(!bd){bd=document.createElement("span");bd.className="badge";m.appendChild(bd)} bd.textContent=n>9?"9+":n;},1500);
+})();
 </script>
 </body>
 </html>
