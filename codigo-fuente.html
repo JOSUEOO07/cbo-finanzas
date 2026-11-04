@@ -12,47 +12,19 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="CBO Finanzas">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Geist:wght@400..700&display=swap">
 <style>
-/* Paleta CBO (igual que casabonitaoregon.github.io): verde bosque #0D5C46 / #0A3328 → arena #F4EDE0 / beige #E9DCC3 */
-:root{
-  --bg:#F4EDE0; --surface:#FBF7EE; --ink:#10241C; --muted:#3F544A; --line:#E2D6BE;
-  --brand:#0D5C46; --brand-2:#14805F; --brand-ink:#F4EDE0; --soft:#E9DFCC; --fab-ink:#F4EDE0;
-  --in:#14805F; --out:#A2452F; --in-bg:#D6E6D9; --out-bg:#F2DDD2; --warn:#7E5D12; --warn-bg:#EEDFB9;
-  --display:"Archivo",ui-sans-serif,system-ui,sans-serif;
-  --body:"Archivo",ui-sans-serif,system-ui,sans-serif;
-  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
-  --ease:cubic-bezier(.22,1,.36,1);
-  color-scheme:light;
+/* Diseño 2026: tema oscuro único. Las paletas de Ajustes solo cambian --brand y --brand-2 */
+:root,:root[data-theme]{
+  --bg:#0B0D10; --surface:#151A20; --ink:#EEF1F4; --muted:#9AA4AE; --line:#262D35;
+  --brand:#B4622F; --brand-2:#F0A06C; --brand-ink:#F6F7F9; --soft:#1C2229; --fab-ink:#0B0D10;
+  --in:#5FD39E; --out:#F07A66; --in-bg:#11291F; --out-bg:#2E1A16; --warn:#F2C14E; --warn-bg:#2B2614;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Geist",ui-sans-serif,system-ui,sans-serif;
+  --mono:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --ease:cubic-bezier(.22,1,.36,1); --spring:cubic-bezier(.34,1.56,.64,1);
+  color-scheme:dark;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme]){
-  --bg:#061F18; --surface:#0A3328; --ink:#F4EDE0; --muted:#B9C7BD; --line:#164536;
-  --brand:#0D5C46; --brand-2:#9CC3B1; --brand-ink:#F4EDE0; --soft:#0F3D30; --fab-ink:#061F18;
-  --in:#9CC3B1; --out:#E8866A; --in-bg:#11402F; --out-bg:#3A251E; --warn:#F2C14E; --warn-bg:#33301A; color-scheme:dark}}
-:root[data-theme="oscuro"]{
-  --bg:#061F18; --surface:#0A3328; --ink:#F4EDE0; --muted:#B9C7BD; --line:#164536;
-  --brand:#0D5C46; --brand-2:#9CC3B1; --brand-ink:#F4EDE0; --soft:#0F3D30; --fab-ink:#061F18;
-  --in:#9CC3B1; --out:#E8866A; --in-bg:#11402F; --out-bg:#3A251E; --warn:#F2C14E; --warn-bg:#33301A; color-scheme:dark}
-:root[data-theme="calido"]{
-  --bg:#E9DCC3; --surface:#F4EDE0; --ink:#2A2414; --muted:#6B604A; --line:#D9B77A;
-  --brand:#0D5C46; --brand-2:#0A3328; --brand-ink:#F4EDE0; --soft:#E9DFCC; --fab-ink:#F4EDE0;
-  --in:#0D5C46; --out:#9C4A2E; --in-bg:#D7DDBE; --out-bg:#EFD6C4; --warn:#7A5510; --warn-bg:#E8D29E; color-scheme:light}
-:root[data-theme="claro"]{
-  --bg:#F3F5F2; --surface:#FFFFFF; --ink:#0F1F19; --muted:#4A5A53; --line:#DDE3DE;
-  --brand:#0D5C46; --brand-2:#14805F; --brand-ink:#FFFFFF; --soft:#E7EEE9; --fab-ink:#FFFFFF;
-  --in:#14805F; --out:#B23A2B; --in-bg:#DDEFE4; --out-bg:#F8E1DC; --warn:#7A5A0E; --warn-bg:#F6E9C2; color-scheme:light}
-:root[data-theme="negro"]{
-  --bg:#000000; --surface:#111312; --ink:#F2F2EE; --muted:#A3ABA6; --line:#262A28;
-  --brand:#0D5C46; --brand-2:#6FD3A8; --brand-ink:#F4EDE0; --soft:#1A1D1B; --fab-ink:#000000;
-  --in:#6FD3A8; --out:#FF8A70; --in-bg:#0E2A1F; --out-bg:#2E1712; --warn:#F5C451; --warn-bg:#2A2410; color-scheme:dark}
-:root[data-theme="terracota"]{
-  --bg:#F1E2D3; --surface:#FBF3EA; --ink:#2B1A12; --muted:#6E5546; --line:#E2C8B2;
-  --brand:#8E3F22; --brand-2:#B4532F; --brand-ink:#FBF3EA; --soft:#EBD6C4; --fab-ink:#FBF3EA;
-  --in:#2F6B45; --out:#A8331F; --in-bg:#DCE6D3; --out-bg:#F2D5C8; --warn:#7A4E0E; --warn-bg:#EED8A8; color-scheme:light}
-:root[data-theme="oceano"]{
-  --bg:#081A26; --surface:#0E2738; --ink:#EAF3F7; --muted:#A9C0CC; --line:#1B3A4F;
-  --brand:#0F5E7A; --brand-2:#7CC7E0; --brand-ink:#EAF3F7; --soft:#13324A; --fab-ink:#081A26;
-  --in:#7FD6B0; --out:#F2967E; --in-bg:#0F3A33; --out-bg:#3A2420; --warn:#F2C96B; --warn-bg:#2C2A1A; color-scheme:dark}
 
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
@@ -1011,6 +983,41 @@ button.ud-card{cursor:pointer;width:100%}
 .inv-tab td small{display:block;color:var(--muted);font-size:.74rem}
 @media (prefers-reduced-motion:reduce){.inv-cat,.inv-it,.inv-piso i b{transition:none}}
 
+
+/* ===== Diseño 2026: tema oscuro, letras nuevas, flujo del dinero, paletas y transiciones ===== */
+body{background:var(--bg);font-family:var(--body);letter-spacing:-.005em}
+h1,h2,h3,.bar h1{font-family:var(--display);letter-spacing:-.02em}
+.num,.kpi .v{font-family:var(--display);letter-spacing:-.02em}
+.ud-card{border-radius:22px;border:1px solid var(--line);background:var(--surface)}
+.ud-flujo{padding:16px 14px 12px;margin-top:10px;background:linear-gradient(160deg,var(--surface),var(--bg))}
+.fl-h{display:flex;justify-content:space-between;align-items:baseline}
+.fl-h b{font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:-.02em}
+.fl-h small{color:var(--muted);font-size:12px}
+.fl-sub{color:var(--muted);font-size:12.5px;margin:4px 0 8px}
+.fl-sub b{color:var(--ink)}
+.fl-svg{width:100%;height:auto;display:block}
+.fl-svg text{font-family:var(--body);font-size:9.5px;font-weight:600;fill:var(--muted)}
+.fl-svg text.v{font-family:var(--display);font-size:11px;font-weight:700;fill:var(--ink)}
+.fl-svg text.v.q{fill:var(--brand-2)}
+@media (prefers-reduced-motion:no-preference){.fl-l{animation:flAp .9s var(--ease) both .15s}}
+@keyframes flAp{from{opacity:0}}
+.pals{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:8px}
+.pal{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--soft);border-radius:12px;padding:8px;font:inherit;font-size:12.5px;font-weight:600;color:var(--ink);cursor:pointer;transition:border-color .2s,transform .2s var(--ease)}
+.pal:active{transform:scale(.96)}
+.pal i{width:22px;height:22px;border-radius:7px;flex:none}
+.pal[aria-pressed="true"]{border-color:var(--brand-2);box-shadow:0 0 0 1px var(--brand-2) inset}
+.cfg-v i{display:inline-block;width:9px;height:9px;border-radius:3px;vertical-align:0}
+@media (prefers-reduced-motion:no-preference){
+  [data-sec].vin-der{animation:vinDer .45s var(--ease) both}
+  [data-sec].vin-izq{animation:vinIzq .45s var(--ease) both}
+  [data-sec].vin-der>*,[data-sec].vin-izq>*{animation:vinCas .55s var(--ease) both}
+  [data-sec].vin-der>*:nth-child(2),[data-sec].vin-izq>*:nth-child(2){animation-delay:.04s}
+  [data-sec].vin-der>*:nth-child(3),[data-sec].vin-izq>*:nth-child(3){animation-delay:.08s}
+  [data-sec].vin-der>*:nth-child(n+4),[data-sec].vin-izq>*:nth-child(n+4){animation-delay:.12s}
+}
+@keyframes vinDer{from{opacity:0;transform:translateX(36px)}}
+@keyframes vinIzq{from{opacity:0;transform:translateX(-36px)}}
+@keyframes vinCas{from{opacity:0;transform:translateY(14px)}}
 </style>
 </head>
 <body data-barra="d">
@@ -1036,14 +1043,14 @@ button.ud-card{cursor:pointer;width:100%}
   <div class="main">
     <header class="bar">
       <button class="hamb" id="hamb" aria-label="Abrir menú"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-      <h1 id="titulo">Inicio</h1><div class="logo-h" id="logoH" aria-label="Casa Bonita Oregón"><img id="logoHImg" alt=""><span><b>Casa Bonita</b><small>Oregón S.A.C.</small></span></div><button type="button" class="tema-h" id="temaH" hidden aria-label="Adorno de temporada"></button>
+      <h1 id="titulo">Inicio</h1><div class="logo-h" id="logoH" aria-label="Casa Bonita Oregón"><img id="logoHImg" alt=""><span><b>Casa Bonita</b><small>Oregón S.A.C.</small></span></div>
       <div class="monthsel" id="monthsel">
         <button id="prev" aria-label="Mes anterior">‹</button>
         <span id="mesLbl"></span>
         <button id="next" aria-label="Mes siguiente">›</button>
       </div>
     </header>
-    <div class="deco-tira" id="decoTira" hidden></div>
+    
 
     <main class="content">
       <p class="aviso-g cola-aviso" id="colaAviso" hidden></p>
@@ -1052,6 +1059,7 @@ button.ud-card{cursor:pointer;width:100%}
         <div class="ud" id="ud">
           <div class="ud-sal" id="udSal"></div>
           <div class="ud-hero" id="udHero"></div>
+          <div class="ud-card ud-flujo" id="udFlujo"></div>
           <button type="button" class="ud-card ud-sunf" id="udSun"></button>
           <button type="button" class="ud-card ud-metab" id="udMeta"></button>
           <div class="ud-ins" id="udIns"></div>
@@ -1224,36 +1232,15 @@ button.ud-card{cursor:pointer;width:100%}
       <section data-sec="config" hidden>
         <div class="cfg-lista">
           <p class="cfg-grupo">Apariencia</p>
-          <details class="cfg-item" data-cfg="tema"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r="1.5"/><circle cx="17.5" cy="10.5" r="1.5"/><circle cx="8.5" cy="7.5" r="1.5"/><circle cx="6.5" cy="12.5" r="1.5"/><path d="M12 2a10 10 0 0 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4A5.6 5.6 0 0 0 22 9.8C22 5.5 17.5 2 12 2z"/></svg></i><span class="cfg-t"><b>Tema y colores</b><small class="cfg-v" id="cfgv-tema"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
-            <p class="tpl" style="margin-top:0">Temas listos</p>
-            <div class="opts" id="temas">
-              <button class="opt" data-t="calido"><div class="mini"><span style="background:#0D5C46"></span><span style="background:#E9DCC3"></span></div><b>Cálido</b><small>Beige tostado · predeterminado</small></button>
-              <button class="opt" data-t="claro"><div class="mini"><span style="background:#0D5C46"></span><span style="background:#FFFFFF"></span></div><b>Claro</b><small>Blanco limpio</small></button>
-              <button class="opt" data-t="terracota"><div class="mini"><span style="background:#8E3F22"></span><span style="background:#F1E2D3"></span></div><b>Terracota</b><small>Ladrillo y arcilla</small></button>
-              <button class="opt" data-t="oscuro"><div class="mini"><span style="background:#0D5C46"></span><span style="background:#061F18"></span></div><b>Oscuro</b><small>Verde noche</small></button>
-              <button class="opt" data-t="oceano"><div class="mini"><span style="background:#0F5E7A"></span><span style="background:#081A26"></span></div><b>Océano</b><small>Azul profundo</small></button>
-              <button class="opt" data-t="negro"><div class="mini"><span style="background:#6FD3A8"></span><span style="background:#000000"></span></div><b>Negro</b><small>Ahorra batería</small></button>
-              <button class="opt" data-t="nocheauto"><div class="mini" style="background:linear-gradient(90deg,#E9DCC3 50%,#061F18 50%)"></div><b>Noche automática</b><small>Oscuro de 7 p. m. a 6 a. m.</small></button>
-              <button class="opt" data-t="auto"><div class="mini" style="background:linear-gradient(90deg,#E9DCC3 50%,#061F18 50%)"></div><b>Automático</b><small>Según tu celular</small></button>
-            </div>
-            <div id="combinar"></div>
-          </div></details>
-          <details class="cfg-item" data-cfg="deco"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 17l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></svg></i><span class="cfg-t"><b>Decoraciones de temporada</b><small class="cfg-v" id="cfgv-deco"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
-              <div class="deco-fila"><span><b>Decoraciones de temporada</b><small class="hint" id="decoTxt" style="display:block"></small></span><div class="seg" id="decoSeg" style="min-width:190px"><button type="button" data-deco="1">Automático</button><button type="button" data-deco="0">Desactivadas</button></div></div>
-              <div class="deco-fila"><span><b>Movimiento</b><small class="hint" style="display:block">Adornos que se mecen y caen despacio</small></span><div class="seg" id="decoMovSeg" style="min-width:190px"><button type="button" data-decomov="1">Con movimiento</button><button type="button" data-decomov="0">Quietas</button></div></div>
-              <p class="hint" style="margin:6px 0 0">Toca una temporada para verla (después vuelve sola a automático):</p>
-              <p class="deco-aviso" id="decoPrevAviso" hidden></p>
-              <div class="deco-lista" id="decoLista"></div>
+          <details class="cfg-item" data-cfg="tema"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r="1.5"/><circle cx="17.5" cy="10.5" r="1.5"/><circle cx="8.5" cy="7.5" r="1.5"/><circle cx="6.5" cy="12.5" r="1.5"/><path d="M12 2a10 10 0 0 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4A5.6 5.6 0 0 0 22 9.8C22 5.5 17.5 2 12 2z"/></svg></i><span class="cfg-t"><b>Colores de la app</b><small class="cfg-v" id="cfgv-tema"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
+            <p class="hint" style="margin:0 0 10px">El fondo siempre es oscuro. Elige el color principal:</p>
+            <div class="pals" id="paletas"></div>
           </div></details>
           <details class="cfg-item" data-cfg="barra"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><rect x="3" y="14" width="18" height="7" rx="3"/><path d="M7 17.5h.01M12 17.5h.01M17 17.5h.01"/><path d="M12 3v7M9 7l3 3 3-3"/></svg></i><span class="cfg-t"><b>Barra de abajo</b><small class="cfg-v" id="cfgv-barra"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
               <div class="deco-fila"><span><b>Barra de abajo</b><small class="hint" style="display:block">Elige los 2 accesos junto al botón +</small></span><span style="display:flex;gap:6px;flex-wrap:wrap"><select id="barA" class="selbar"></select><select id="barB" class="selbar"></select></span></div>
           </div></details>
           <details class="cfg-item" data-cfg="son"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg></i><span class="cfg-t"><b>Sonidos</b><small class="cfg-v" id="cfgv-son"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
               <div class="deco-fila"><span><b>Sonidos</b><small class="hint" style="display:block">Al registrar y al llegar a la meta</small></span><div class="seg" id="sonSeg" style="min-width:190px"><button type="button" data-son="1">Activados</button><button type="button" data-son="0">Desactivados</button></div></div>
-          </div></details>
-          <details class="cfg-item" data-cfg="trans"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="11" height="16" rx="2"/><path d="M17 8l4 4-4 4M14 12h7"/></svg></i><span class="cfg-t"><b>Transición entre pantallas</b><small class="cfg-v" id="cfgv-trans"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
-            <p class="hint" style="margin:0 0 10px">Se ve al cambiar de sección (Inicio, Movimientos, Planilla…). Toca una para probarla.</p>
-            <div class="trx" id="trx"></div>
           </div></details>
           <p class="cfg-grupo">Tu empresa</p>
           <details class="cfg-item" data-cfg="quien"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></i><span class="cfg-t"><b>Quién registra</b><small class="cfg-v" id="cfgv-quien"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
@@ -1901,8 +1888,7 @@ $("chart").addEventListener("click",e=>{const h=e.target.closest(".hit");if(!h)r
 const animar=(el,cls)=>{if(!el)return;el.classList.remove("entra","mes-sig","mes-ant");void el.offsetWidth;el.classList.add(cls)};
 function ir(s){
   document.body.classList.toggle("en-inicio",s==="inicio");
-  if(s!==seccion) screenFx(s, ultimoToque);
-  const cambio=s!==seccion; seccion=s; document.querySelectorAll("[data-sec]").forEach(x=>x.hidden=x.dataset.sec!==s);
+  const cambio=s!==seccion, antes=seccion; seccion=s; document.querySelectorAll("[data-sec]").forEach(x=>x.hidden=x.dataset.sec!==s);
   document.querySelectorAll("#nav button").forEach(b=>b.setAttribute("aria-current",b.dataset.s===s?"page":"false"));
   const enMas=!["inicio",...[...document.querySelectorAll("#tabbar [data-tab]")].map(b=>b.dataset.tab)].includes(s);
   document.querySelectorAll("#tabbar [data-tab]").forEach(b=>b.setAttribute("aria-current",(b.dataset.tab===s||(b.dataset.tab==="mas"&&enMas))?"page":"false"));
@@ -1910,7 +1896,7 @@ function ir(s){
   $("app").classList.remove("abierto");document.body.classList.remove("menu"); try{history.replaceState(null,"","#"+s)}catch{}
   if(s==="obras") try{renderObras()}catch(e){console.error(e)}
   if(s==="inventario") try{invRender();invCargar()}catch(e){console.error(e)}
-  if(cambio&&fxType()!=="none"&&fxType()!=="choreo"&&fxType()!=="morph") {/* la transición elegida ya anima */}
+  if(cambio) entrarSeccion(s,antes);
   window.scrollTo(0,0);
 }
 document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>ir(b.dataset.s));
@@ -1986,250 +1972,35 @@ $("movBorrar").onclick=async()=>{
 };
 
 /* ===== Configuración ===== */
+/* Paletas de color (el fondo es siempre oscuro): [id, nombre, color de relleno, color de acento] */
+const PALETAS=[["cobre","Cobre","#B4622F","#F0A06C"],["acero","Acero eléctrico","#1F6FA3","#6CC8F2"],["esmeralda","Esmeralda","#0F7A5A","#3FE0A8"],
+  ["cbo","Verde CBO","#0D5C46","#7FD3B0"],["oceano","Océano","#0F4C81","#7FB8F0"],["turquesa","Turquesa","#0B6E73","#5FE3DC"],
+  ["cielo","Cielo","#0369A1","#7DD3FC"],["indigo","Índigo","#3730A3","#A5A0FF"],["violeta","Violeta","#5B2A9B","#C49BFF"],
+  ["rubi","Rubí","#8E1F35","#F2788F"],["vino","Vino","#6B1D2F","#E68AA0"],["coral","Coral","#A23B32","#FF8E7A"],
+  ["naranja","Naranja","#B4470F","#FF9A5C"],["oro","Oro","#8A6A12","#E8C25A"],["lima","Lima","#4D6B12","#B6E35A"],
+  ["bosque","Bosque","#2F5A1E","#8FD46B"],["grafito","Grafito","#3A434D","#C9D3DC"],["plata","Plata","#4B5563","#E5E7EB"]];
 function aplicarTema(){
-  const hNow=new Date().getHours(), tema=ajustes.tema==="nocheauto"?(hNow>=19||hNow<6?"oscuro":"calido"):ajustes.tema;
-  if(tema==="auto") document.documentElement.removeAttribute("data-theme");
-  else document.documentElement.setAttribute("data-theme",tema);
-  document.querySelectorAll("#temas .opt").forEach(b=>b.setAttribute("aria-pressed",b.dataset.t===ajustes.tema));
-  const fondo=getComputedStyle(document.documentElement).getPropertyValue("--brand").trim()||"#14532D";
-  document.querySelector('meta[name="theme-color"]').setAttribute("content",fondo);
+  document.documentElement.setAttribute("data-theme","oscuro");
+  const P=PALETAS.find(x=>x[0]===ajustes.paleta)||PALETAS[0];
+  let st=document.getElementById("cboVars"); if(!st){st=document.createElement("style");st.id="cboVars";document.head.appendChild(st)}
+  st.textContent=`:root:root{--brand:${P[2]};--brand-2:${P[3]}}`;
+  document.querySelector('meta[name="theme-color"]').setAttribute("content","#0B0D10");
+  const box=$("paletas"); if(box) box.innerHTML=PALETAS.map(([k,n,a,b])=>`<button type="button" class="pal" data-pal="${k}" aria-pressed="${k===P[0]}"><i style="background:linear-gradient(135deg,${a} 0 50%,${b} 50% 100%)"></i><span>${n}</span></button>`).join("");
 }
-document.querySelectorAll("#temas .opt").forEach(b=>b.onclick=()=>{ajustes.tema=b.dataset.t;guardarLS("cbo-ajustes",ajustes);aplicarTema()});
+$("paletas").addEventListener("click",e=>{const b=e.target.closest("[data-pal]");if(!b)return;ajustes.paleta=b.dataset.pal;guardarLS("cbo-ajustes",ajustes);aplicarTema();try{pintarFlujo()}catch{}});
 $("meta").value=ajustes.meta;
 $("guardarMeta").onclick=()=>{const v=parseFloat($("meta").value);if(!(v>=0)){$("metaOk").textContent="Escribe un monto válido.";return}ajustes.meta=v;guardarLS("cbo-ajustes",ajustes);$("metaOk").textContent="Guardado";render()};
 aplicarTema();
-setInterval(()=>{if(ajustes.tema==="nocheauto")aplicarTema()},5*60*1000);
 
 
-/* ===== v35: colores combinables (predominante + acento) ===== */
-const ACENTOS=[["cbo","Verde CBO","#0D5C46","#14805F","#9CC3B1"],["bosque","Bosque","#2F5A1E","#4B8A2E","#A6DC84"],["esmeralda","Esmeralda","#0E6A4E","#17956D","#5FD3A8"],["oceano","Océano","#0B5A86","#1580C2","#6CC0F5"],["indigo","Índigo","#2F2A85","#4740C9","#8A84FF"],["vino","Vino","#7A1F3D","#A7315A","#F08AB0"],["terracota","Terracota","#8E3F22","#B4532F","#F0A27E"],["naranja","Naranja","#A8420C","#D9611B","#FFAD73"],["dorado","Dorado","#7A5A12","#A67C1C","#E8C46A"],["violeta","Violeta","#5A2A9B","#7B45D0","#C4A6FF"],["turquesa","Turquesa","#0B6B6B","#139B9B","#6FE0DB"],["grafito","Grafito","#2A2E36","#4B5262","#B3BCCC"]];
-// [id, nombre, fondo, tarjetas, texto, texto suave, líneas, suave, oscuro?]
-const FONDOS=[["beige","Beige","#E9DCC3","#F4EDE0","#2A2414","#6B604A","#D9C7A2","#E9DFCC"],["arena","Arena","#F4EDE0","#FBF7EE","#10241C","#3F544A","#E2D6BE","#E9DFCC"],["blanco","Blanco","#F3F5F2","#FFFFFF","#0F1F19","#4A5A53","#DDE3DE","#E7EEE9"],["perla","Gris perla","#E6E7EA","#FBFBFC","#1D2027","#555B67","#D2D5DB","#E9EAEE"],["menta","Menta","#DCEAE2","#F6FAF7","#10241C","#4A5F55","#CFE0D5","#E3EFE8"],["celeste","Celeste","#DDE9F3","#F5F9FC","#13202C","#4A5B6B","#CBDBE8","#E4EEF6"],["rosapalo","Rosa palo","#F3E2E2","#FFFAFA","#2A1A1C","#6C5155","#E6CFCF","#F2E3E3"],["lavanda","Lavanda","#E7E2F3","#FDFCFF","#1E1A2B","#5A5270","#D6CEE8","#ECE8F6"],["durazno","Durazno","#F7E2D0","#FFFAF5","#2B1D12","#6E5745","#EAD0B9","#F5E3D3"],["noche","Verde noche","#061F18","#0A3328","#F4EDE0","#B9C7BD","#164536","#0F3D30",1],["azulnoche","Azul noche","#081A26","#0E2738","#EAF3F7","#A9C0CC","#1B3A4F","#13324A",1],["negro","Negro","#000000","#111312","#F2F2EE","#A3ABA6","#262A28","#1A1D1B",1]];
-const COMBOS=[["beige","cbo"],["arena","bosque"],["beige","dorado"],["blanco","cbo"],["blanco","oceano"],["perla","grafito"],["menta","esmeralda"],["celeste","indigo"],["celeste","turquesa"],["lavanda","violeta"],["rosapalo","vino"],["durazno","terracota"],["durazno","naranja"],["noche","cbo"],["noche","dorado"],["azulnoche","oceano"],["azulnoche","turquesa"],["negro","dorado"],["negro","esmeralda"]];
-function aplicarColores(){
-  let st=document.getElementById("cboVars"); if(!st){st=document.createElement("style");st.id="cboVars";document.head.appendChild(st)}
-  const F=FONDOS.find(x=>x[0]===ajustes.fondo), C=ACENTOS.find(x=>x[0]===ajustes.acento);
-  if(!F||!C){st.textContent="";return}
-  const dk=!!F[8], b=C[2], b2=dk?C[4]:C[3];
-  st.textContent=`:root:root{--bg:${F[2]};--surface:${F[3]};--ink:${F[4]};--muted:${F[5]};--line:${F[6]};--soft:${F[7]};--brand:${b};--brand-2:${b2};--brand-ink:${dk?F[4]:"#FFFFFF"};--fab-ink:${dk?F[2]:"#FFFFFF"};color-scheme:${dk?"dark":"light"}}`;
-  document.querySelector('meta[name="theme-color"]').setAttribute("content",b);
+/* ===== Transición entre secciones: se desliza hacia el lado al que vas y las tarjetas entran en cascada ===== */
+const ORDEN_SEC=["inicio","movimientos","sunat","terceros","planilla","obras","inventario","anual","config"];
+function entrarSeccion(nueva,anterior){
+  const el=document.querySelector(`[data-sec="${nueva}"]`); if(!el||matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const der=ORDEN_SEC.indexOf(nueva)>=ORDEN_SEC.indexOf(anterior);
+  el.classList.remove("vin-der","vin-izq"); void el.offsetWidth; el.classList.add(der?"vin-der":"vin-izq");
+  setTimeout(()=>el.classList.remove("vin-der","vin-izq"),900);
 }
-function pintarCombinar(){
-  const F=FONDOS.find(x=>x[0]===ajustes.fondo)||FONDOS[0], C=ACENTOS.find(x=>x[0]===ajustes.acento)||ACENTOS[0], dk=!!F[8];
-  const mini=(a,z)=>{const d=!!a[8], ac=d?z[4]:z[2];return `<span class="cmb2-prev" style="background:${a[2]}"><span style="background:${a[3]};border-color:${a[6]}"><i style="background:${ac}"></i><i style="background:${a[6]}"></i><i style="background:${a[6]};width:60%"></i></span><em style="background:${ac}"></em></span>`};
-  const abierto=$("combinar").querySelector("details.cmb-mia")?.open;
-  $("combinar").innerHTML=`<p class="tpl">Combinaciones de colores</p>
-  <div class="combos2">${COMBOS.map(([f,c])=>{const a=FONDOS.find(x=>x[0]===f),z=ACENTOS.find(x=>x[0]===c);return `<button type="button" class="cmb2" data-combo="${f}|${c}" aria-pressed="${ajustes.fondo===f&&ajustes.acento===c}">${mini(a,z)}<small>${a[1]} + ${z[1]}</small></button>`}).join("")}</div>
-  <details class="cmb-mia"${abierto?" open":""}><summary>Crear mi propia combinación ›</summary>
-  <div class="tprev" style="background:${F[2]};color:${F[4]}"><div class="tpcard" style="background:${F[3]};border-color:${F[6]}"><span class="tpbar" style="background:${dk?C[4]:C[3]}"></span><b style="color:${dk?C[4]:C[2]}">Así se verá</b><small style="color:${F[5]}">${F[1]} + ${C[1]}</small><span class="tpbtn" style="background:${dk?C[4]:C[3]};color:${dk?F[2]:"#fff"}">Registrar</span></div></div>
-  <p class="tpl">1. Color de fondo</p>
-  <div class="swatches">${FONDOS.map(x=>`<button type="button" class="swc" data-fondo="${x[0]}" aria-pressed="${ajustes.fondo===x[0]}"><i style="background:${x[2]};box-shadow:inset 0 0 0 1px ${x[6]}"></i><span>${x[1]}</span></button>`).join("")}</div>
-  <p class="tpl">2. Color de acento</p>
-  <div class="swatches">${ACENTOS.map(x=>`<button type="button" class="swc" data-acento="${x[0]}" aria-pressed="${ajustes.acento===x[0]}"><i style="background:linear-gradient(135deg,${x[2]} 0 55%,${x[3]} 55% 100%)"></i><span>${x[1]}</span></button>`).join("")}</div></details>`;
-  try{pintarResumenCfg()}catch{}
-}
-$("combinar").addEventListener("click",e=>{
-  const c=e.target.closest("[data-combo]"),f=e.target.closest("[data-fondo]"),a=e.target.closest("[data-acento]"); if(!c&&!f&&!a)return;
-  if(c){[ajustes.fondo,ajustes.acento]=c.dataset.combo.split("|")}
-  if(f){ajustes.fondo=f.dataset.fondo; if(!ajustes.acento)ajustes.acento="cbo"}
-  if(a){ajustes.acento=a.dataset.acento; if(!ajustes.fondo)ajustes.fondo="beige"}
-  const F=FONDOS.find(x=>x[0]===ajustes.fondo); ajustes.tema=F&&F[8]?"oscuro":"calido";   // base clara u oscura para lo que no cambia
-  guardarLS("cbo-ajustes",ajustes); aplicarTema(); aplicarColores(); pintarCombinar();
-  document.querySelectorAll("#temas .opt").forEach(b=>b.setAttribute("aria-pressed","false"));
-});
-// elegir un tema de los de arriba quita la combinación personalizada
-document.querySelectorAll("#temas .opt").forEach(b=>b.addEventListener("click",()=>{delete ajustes.fondo;delete ajustes.acento;guardarLS("cbo-ajustes",ajustes);aplicarColores();pintarCombinar()}));
-aplicarColores(); pintarCombinar();
-if(ajustes.fondo&&ajustes.acento) document.querySelectorAll("#temas .opt").forEach(b=>b.setAttribute("aria-pressed","false"));
-
-/* ===== v35: transiciones entre pantallas (por defecto ninguna) ===== */
-let ultimoToque=null;
-document.addEventListener("pointerdown",e=>{ultimoToque=e.target.closest&&e.target.closest("button,a,[role=button]")||null},true);
-/* Transición de desintegración: la pantalla actual completa se deshace en partículas que se lleva el viento
-   y deja ver la nueva. Se dibuja la pantalla en un canvas (sin librerías) y se anima con un búfer de píxeles. */
-const Dust = {busy: false};
-function dustSnap(W, H, dpr) {
-  const c = document.createElement('canvas'); c.width = Math.round(W * dpr); c.height = Math.round(H * dpr);
-  const g = c.getContext('2d'); g.scale(dpr, dpr);
-  const cs0 = getComputedStyle(document.body); g.fillStyle = cs0.backgroundColor && cs0.backgroundColor !== 'rgba(0, 0, 0, 0)' ? cs0.backgroundColor : getComputedStyle(document.documentElement).getPropertyValue('--bg') || '#efe5d1'; g.fillRect(0, 0, W, H);
-  const alpha = col => { const m = /rgba?\(([^)]+)\)/.exec(col || ''); if (!m) return 0; const p = m[1].split(',').map(x => parseFloat(x)); return p.length > 3 ? p[3] : 1; };
-  const rr = (x, y, w, h, r) => { g.beginPath(); if (g.roundRect && r > 0) g.roundRect(x, y, w, h, Math.min(r, w / 2, h / 2)); else g.rect(x, y, w, h); };
-  const late = [];
-  const box = (el, cs, r) => {
-    const rad = parseFloat(cs.borderTopLeftRadius) || 0, bi = cs.backgroundImage;
-    if (bi && bi.includes('gradient')) {
-      const cols = bi.match(/rgba?\([^)]+\)/g) || [];
-      if (cols.length) { const gr = g.createLinearGradient(r.left, r.top, r.right, r.bottom); cols.forEach((cc, i) => gr.addColorStop(cols.length > 1 ? i / (cols.length - 1) : 0, cc)); g.fillStyle = gr; rr(r.left, r.top, r.width, r.height, rad); g.fill(); }
-    } else if (alpha(cs.backgroundColor) > 0) { g.fillStyle = cs.backgroundColor; rr(r.left, r.top, r.width, r.height, rad); g.fill(); }
-    const bw = parseFloat(cs.borderTopWidth) || 0;
-    if (bw > 0 && alpha(cs.borderTopColor) > 0 && cs.borderTopStyle !== 'none') { g.strokeStyle = cs.borderTopColor; g.lineWidth = bw; rr(r.left + bw / 2, r.top + bw / 2, r.width - bw, r.height - bw, rad); g.stroke(); }
-  };
-  const text = (node, cs, clip) => {
-    const t = node.nodeValue; if (!t || !t.trim()) return;
-    const rg = document.createRange(); rg.selectNodeContents(node); const rects = [...rg.getClientRects()].filter(q => q.width > 0);
-    if (!rects.length) return;
-    g.fillStyle = cs.color; g.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`; g.textBaseline = 'middle';
-    if (rects.length === 1) { const q = rects[0]; g.fillText(t.replace(/\s+/g, ' ').trim(), q.left, q.top + q.height / 2, q.width + 2); }
-    else { // varias líneas: el texto se reparte por líneas de forma aproximada
-      const words = t.replace(/\s+/g, ' ').trim().split(' '); let wi = 0;
-      rects.forEach(q => { let line = ''; while (wi < words.length && g.measureText(line + words[wi]).width <= q.width + 4) line += words[wi++] + ' '; if (!line && wi < words.length) line = words[wi++]; g.fillText(line.trim(), q.left, q.top + q.height / 2, q.width + 2); });
-    }
-  };
-  const walk = (el, clip, deferFixed) => {
-    if (el.nodeType === 3) { if (clip) { g.save(); g.beginPath(); g.rect(clip.left, clip.top, clip.right - clip.left, clip.bottom - clip.top); g.clip(); } text(el, getComputedStyle(el.parentElement), clip); if (clip) g.restore(); return; }
-    if (el.nodeType !== 1 || el.id === 'dustcv' || /^(SCRIPT|STYLE|LINK|META|TEMPLATE|NOSCRIPT)$/.test(el.tagName) || el.hidden) return;
-    const cs = getComputedStyle(el); if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity === 0) return;
-    if (deferFixed && cs.position === 'fixed') { late.push(el); return; }
-    const r = el.getBoundingClientRect();
-    if (clip) { g.save(); g.beginPath(); g.rect(clip.left, clip.top, clip.right - clip.left, clip.bottom - clip.top); g.clip(); }
-    if (r.width && r.height && r.bottom > 0 && r.top < H && r.right > 0 && r.left < W) {
-      if (el.tagName === 'IMG') { g.fillStyle = 'rgba(120,110,90,.35)'; g.beginPath(); g.arc(r.left + r.width / 2, r.top + r.height / 2, Math.min(r.width, r.height) / 2, 0, 7); g.fill(); }
-      else if (el.tagName === 'svg' || el.tagName === 'SVG') { const isLogo = el.classList.contains('logo'); g.fillStyle = isLogo ? getComputedStyle(document.documentElement).getPropertyValue('--brand').trim() || '#0d5c46' : cs.color; g.globalAlpha = isLogo ? 1 : .55; rr(r.left + r.width * .18, r.top + r.height * .18, r.width * .64, r.height * .64, isLogo ? r.width * .25 : 3); g.fill(); g.globalAlpha = 1; }
-      else box(el, cs, r);
-      if ((el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') && el.value) { g.fillStyle = cs.color; g.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`; g.textBaseline = 'middle'; g.fillText(el.value, r.left + (parseFloat(cs.paddingLeft) || 4), r.top + r.height / 2, r.width - 8); }
-      if (el.tagName === 'SELECT' && el.selectedOptions[0]) { g.fillStyle = cs.color; g.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`; g.textBaseline = 'middle'; g.fillText(el.selectedOptions[0].text, r.left + 6, r.top + r.height / 2, r.width - 20); }
-    }
-    if (clip) g.restore();
-    if (/^(svg|SVG|INPUT|TEXTAREA|SELECT|IMG|CANVAS)$/.test(el.tagName)) return;
-    let c2 = clip;
-    if (cs.overflowX !== 'visible' || cs.overflowY !== 'visible') { const k = {left: r.left, top: r.top, right: r.right, bottom: r.bottom}; c2 = clip ? {left: Math.max(clip.left, k.left), top: Math.max(clip.top, k.top), right: Math.min(clip.right, k.right), bottom: Math.min(clip.bottom, k.bottom)} : k; if (c2.right <= c2.left || c2.bottom <= c2.top) return; }
-    for (const ch of el.childNodes) walk(ch, c2, deferFixed);
-  };
-  walk(document.body, null, true);
-  late.forEach(el => walk(el, null, false));
-  return c;
-}
-function dustRun(snap, W, H) {
-  // partículas: muestreo de la pantalla a baja resolución (unas 22 mil en total)
-  const st = Math.max(3, Math.ceil(Math.sqrt(W * H / 22000))), cw = Math.ceil(W / st), chh = Math.ceil(H / st);
-  const small = document.createElement('canvas'); small.width = cw; small.height = chh; const sg = small.getContext('2d'); sg.imageSmoothingEnabled = true; sg.drawImage(snap, 0, 0, cw, chh);
-  const px = new Uint32Array(sg.getImageData(0, 0, cw, chh).data.buffer);
-  const n = cw * chh, P = {x: new Float32Array(n), y: new Float32Array(n), c: px, d: new Float32Array(n), vx: new Float32Array(n), vy: new Float32Array(n), ph: new Float32Array(n)};
-  for (let j = 0, k = 0; j < chh; j++) for (let i = 0; i < cw; i++, k++) { P.x[k] = i * st; P.y[k] = j * st; P.d[k] = i / cw * .5 + Math.random() * .14; P.vx[k] = 60 + Math.random() * 190; P.vy[k] = -(20 + Math.random() * 130); P.ph[k] = Math.random() * 6.28; }
-  const cv = document.createElement('canvas'); cv.id = 'dustcv'; cv.width = snap.width; cv.height = snap.height; cv.setAttribute('aria-hidden', 'true');
-  cv.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:9999;pointer-events:none';
-  document.body.appendChild(cv);
-  const g = cv.getContext('2d'), buf = document.createElement('canvas'); buf.width = W; buf.height = H;
-  const bg = buf.getContext('2d'), img = bg.createImageData(W, H), out = new Uint32Array(img.data.buffer), sx = cv.width / W;
-  const MS = 1250, t0 = performance.now();
-  const frame = now => {
-    const t = Math.min(1, (now - t0) / MS);
-    g.clearRect(0, 0, cv.width, cv.height);
-    // lo que aún no empieza a deshacerse se ve nítido
-    const front = Math.max(0, (t - .14) / .5) * W;
-    if (front < W) g.drawImage(snap, front * sx, 0, cv.width - front * sx, cv.height, front * sx, 0, cv.width - front * sx, cv.height);
-    out.fill(0);
-    for (let k = 0; k < n; k++) {
-      if (P.x[k] >= front) continue;
-      const lt = (t - P.d[k]) / (1 - P.d[k] * .8); if (lt >= 1) continue;
-      const e = lt > 0 ? lt * lt : 0, a = lt > 0 ? 1 - lt : 1;
-      const x0 = (P.x[k] + P.vx[k] * e * 1.7 + Math.sin(P.ph[k] + lt * 6) * 7 * Math.max(0, lt)) | 0, y0 = (P.y[k] + P.vy[k] * e * 1.5) | 0;
-      const sz = Math.max(1, (st * (1 - Math.max(0, lt) * .45)) | 0), col = P.c[k], al = ((col >>> 24) * a) | 0;
-      if (!al) continue; const cc = (col & 0x00ffffff) | (al << 24);
-      for (let yy = y0; yy < y0 + sz; yy++) { if (yy < 0 || yy >= H) continue; const row = yy * W; for (let xx = x0; xx < x0 + sz; xx++) if (xx >= 0 && xx < W) out[row + xx] = cc; }
-    }
-    bg.putImageData(img, 0, 0); g.imageSmoothingEnabled = false; g.drawImage(buf, 0, 0, cv.width, cv.height);
-    if (t < 1) requestAnimationFrame(frame); else { cv.remove(); Dust.busy = false; }
-  };
-  frame(t0);
-}
-
-/* Transiciones entre pantallas: el usuario elige en Más (o "Ninguna") */
-const FX_LIST = [['none', 'Ninguna', 'Cambio directo, sin animación (predeterminado)'], ['dust', 'Desintegración', 'La pantalla se deshace en partículas'], ['choreo', 'Coreografía escalonada', 'Las tarjetas entran en cascada (estilo Apple)'], ['morph', 'Botón que se transforma', 'El botón crece hasta ser la pantalla (estilo Google)'], ['page', 'Pasar la página', 'La hoja se dobla como un libro contable'], ['glass', 'Cristal que se rompe', 'Fragmentos que caen girando'], ['ink', 'Tinta', 'Una mancha verde abre la nueva pantalla'], ['wave', 'Onda expansiva', 'Anillos de luz desde el botón'], ['rain', 'Lluvia de números', 'Caen cifras contables y aparece la nueva'], ['origami', 'Origami', 'La pantalla se pliega en franjas'], ['fade', 'Fundido', 'Se desvanece suavemente']];
-function fxType() { return FX_LIST.some(x => x[0] === ajustes.tr) ? ajustes.tr : 'none'; }
-const fxE = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-function fxCanvas(snap) {
-  const cv = document.createElement('canvas'); cv.id = 'dustcv'; cv.width = snap.width; cv.height = snap.height; cv.setAttribute('aria-hidden', 'true');
-  cv.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:9999;pointer-events:none'; document.body.appendChild(cv);
-  const g = cv.getContext('2d'), k = cv.width / innerWidth; g.setTransform(k, 0, 0, k, 0, 0); return {cv, g, k};
-}
-function fxLoop(ms, draw, done) { const t0 = performance.now(); const fr = now => { const t = Math.min(1, (now - t0) / ms); draw(t); if (t < 1) requestAnimationFrame(fr); else done(); }; requestAnimationFrame(fr); draw(0); }
-function fxEnter(delay = 0) { setTimeout(() => { const v = document.querySelector('[data-sec]:not([hidden])'); if (!v || !v.animate) return; [...v.children].slice(0, 12).forEach((el, i) => el.animate([{opacity: 0, transform: 'translateY(26px) scale(.97)'}, {opacity: 1, transform: 'none'}], {duration: 520, delay: i * 60, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'backwards'})); }, delay); }
-function screenFx(to, src, force) {
-  const ty = fxType();
-  if (ty === 'none' || Dust.busy || (!force && to === seccion) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const W = innerWidth, H = innerHeight; let snap;
-  try { snap = dustSnap(W, H, Math.min(2, devicePixelRatio || 1)); } catch (e) { console.warn('fx', e); return; }
-  Dust.busy = true; const off = () => { Dust.busy = false; };
-  if (ty === 'dust') { dustRun(snap, W, H); setTimeout(off, 1300); return; }
-  const r = src && src.getBoundingClientRect ? src.getBoundingClientRect() : {left: W / 2, top: H / 2, width: 0, height: 0, right: W / 2, bottom: H / 2};
-  const ox = r.left + r.width / 2, oy = r.top + r.height / 2, big = Math.hypot(Math.max(ox, W - ox), Math.max(oy, H - oy)) + 30;
-  const {cv, g, k} = fxCanvas(snap), done = () => { cv.remove(); off(); };
-  const img = (sx, sy, sw, sh, dx, dy, dw, dh) => { if (sw > 0 && sh > 0) g.drawImage(snap, sx * k, sy * k, sw * k, sh * k, dx, dy, dw, dh); };
-  const brand = getComputedStyle(document.documentElement).getPropertyValue('--brand').trim() || '#0d5c46';
-  const brand2 = getComputedStyle(document.documentElement).getPropertyValue('--brand-2').trim() || '#14805f';
-  const clear = () => g.clearRect(0, 0, W, H);
-  if (ty === 'fade') return fxLoop(380, t => { clear(); g.globalAlpha = 1 - fxE(t); img(0, 0, W, H, 0, 0, W, H); g.globalAlpha = 1; }, done);
-  if (ty === 'choreo') { fxEnter(160); return fxLoop(300, t => { clear(); g.globalAlpha = 1 - t; img(0, 0, W, H, -18 * t, -10 * t, W, H); g.globalAlpha = 1; }, done); }
-  if (ty === 'morph') {
-    const box = document.createElement('div'); box.style.cssText = `position:fixed;z-index:10000;pointer-events:none;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;border-radius:14px;background:linear-gradient(135deg,${brand},${brand2});box-shadow:0 20px 40px rgba(0,0,0,.25)`; document.body.appendChild(box);
-    box.animate([{left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px', borderRadius: '14px'}, {left: '0px', top: '0px', width: W + 'px', height: H + 'px', borderRadius: '0px'}], {duration: 420, easing: 'cubic-bezier(.3,0,.1,1)', fill: 'forwards'});
-    setTimeout(() => { cv.remove(); box.animate([{opacity: 1}, {opacity: 0}], {duration: 320, fill: 'forwards'}); fxEnter(0); setTimeout(() => { box.remove(); off(); }, 340); }, 430);
-    return fxLoop(430, t => { clear(); g.globalAlpha = 1 - t * .5; img(0, 0, W, H, W * .03 * t, H * .03 * t, W * (1 - .06 * t), H * (1 - .06 * t)); g.globalAlpha = 1; }, () => {});
-  }
-  if (ty === 'page') return fxLoop(950, t => {
-    clear(); const f = W * (1 - fxE(t)), w = W - f, l = 2 * f - W;
-    img(0, 0, f, H, 0, 0, f, H);
-    if (w > 0 && t < .99) {
-      g.save(); g.beginPath(); g.rect(Math.max(0, l), 0, f - Math.max(0, l), H); g.clip();
-      g.shadowColor = 'rgba(40,25,5,.35)'; g.shadowBlur = 24; g.fillStyle = '#f3e9d3'; g.fillRect(l, 0, w, H); g.shadowBlur = 0;
-      g.globalAlpha = .12; g.save(); g.translate(2 * f, 0); g.scale(-1, 1); img(f, 0, w, H, f, 0, w, H); g.restore(); g.globalAlpha = 1;
-      const gr = g.createLinearGradient(l, 0, f, 0); gr.addColorStop(0, 'rgba(120,95,50,.35)'); gr.addColorStop(.55, 'rgba(245,236,216,.5)'); gr.addColorStop(.92, 'rgba(255,252,242,.9)'); gr.addColorStop(1, 'rgba(190,165,120,.6)'); g.fillStyle = gr; g.fillRect(l, 0, w, H); g.restore();
-      const cs = g.createLinearGradient(f, 0, f + 60, 0); cs.addColorStop(0, 'rgba(40,25,5,.35)'); cs.addColorStop(1, 'rgba(40,25,5,0)'); g.fillStyle = cs; g.fillRect(f, 0, 60, H);
-    }
-  }, done);
-  if (ty === 'glass') {
-    const C = W > 700 ? 7 : 4, Rw = W > 700 ? 5 : 7, P = [];
-    for (let j = 0; j <= Rw; j++) { P.push([]); for (let i = 0; i <= C; i++) P[j].push([i * W / C + (i > 0 && i < C ? (Math.random() - .5) * W / C * .5 : 0), j * H / Rw + (j > 0 && j < Rw ? (Math.random() - .5) * H / Rw * .5 : 0)]); }
-    const T = []; for (let j = 0; j < Rw; j++) for (let i = 0; i < C; i++) { const a = P[j][i], b = P[j][i + 1], c = P[j + 1][i + 1], d = P[j + 1][i]; (Math.random() < .5 ? [[a, b, c], [a, c, d]] : [[a, b, d], [b, c, d]]).forEach(tr => { const mx = (tr[0][0] + tr[1][0] + tr[2][0]) / 3, my = (tr[0][1] + tr[1][1] + tr[2][1]) / 3; T.push({tr, mx, my, dl: Math.hypot(mx - ox, my - oy) / big * .18, vx: (mx - W / 2) * .5 + (Math.random() - .5) * 120, vy: H * (.9 + Math.random() * .5), rot: (Math.random() - .5) * 4, sq: Math.random() * 6}); }); }
-    return fxLoop(1250, t => {
-      clear();
-      T.forEach(s => { const lt = Math.max(0, (t - .12 - s.dl) / (.88 - s.dl)); if (lt >= 1) return; const e = lt * lt;
-        g.save(); g.globalAlpha = 1 - lt * .7; g.translate(s.mx + s.vx * e + (t < .12 ? (s.mx - ox) * .02 * t / .12 : (s.mx - ox) * .02), s.my + s.vy * e + (t < .12 ? (s.my - oy) * .02 * t / .12 : (s.my - oy) * .02)); g.rotate(s.rot * e); g.scale(1, Math.cos(s.sq * e)); g.translate(-s.mx, -s.my);
-        g.beginPath(); s.tr.forEach((p, i) => i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1])); g.closePath(); g.save(); g.clip(); img(0, 0, W, H, 0, 0, W, H); g.restore();
-        g.strokeStyle = 'rgba(255,255,255,.85)'; g.lineWidth = 1.2; g.stroke(); g.restore(); });
-    }, done);
-  }
-  if (ty === 'ink' || ty === 'wave') {
-    const seeds = Array.from({length: 7}, () => [Math.random() * 6.28, 1 + Math.random() * 4]);
-    const ms = ty === 'ink' ? 950 : 850;
-    return fxLoop(ms, t => {
-      clear(); img(0, 0, W, H, 0, 0, W, H); const e = fxE(t), rad = e * (big + 60);
-      g.beginPath();
-      for (let i = 0; i <= 72; i++) { const a = i / 72 * 6.283; let m = 1; if (ty === 'ink') seeds.forEach(([p, f]) => { m += Math.sin(a * f * 2 + p + t * 3) * .05; }); const rr = rad * m; i ? g.lineTo(ox + Math.cos(a) * rr, oy + Math.sin(a) * rr) : g.moveTo(ox + Math.cos(a) * rr, oy + Math.sin(a) * rr); }
-      g.closePath(); g.globalCompositeOperation = 'destination-out'; g.fill(); g.globalCompositeOperation = 'source-over';
-      if (ty === 'ink') { g.lineWidth = 18 * (1 - t) + 2; g.strokeStyle = brand; g.globalAlpha = .85 * (1 - t * .6); g.stroke(); g.globalAlpha = 1; }
-      else { g.shadowColor = 'rgba(201,164,106,.9)'; g.shadowBlur = 24; g.lineWidth = 4; g.strokeStyle = '#c9a46a'; g.globalAlpha = 1 - t * .5; g.stroke(); g.shadowBlur = 0;
-        for (let i = 1; i <= 3; i++) { const rr = rad + i * 36 * (1 - t) + i * 10; g.beginPath(); g.arc(ox, oy, rr, 0, 6.283); g.lineWidth = 3 - i * .6; g.strokeStyle = i % 2 ? brand2 : '#c9a46a'; g.globalAlpha = (1 - t) * (1 - i * .22); g.stroke(); }
-        g.globalAlpha = 1; }
-    }, done);
-  }
-  if (ty === 'rain') {
-    const cw = W > 700 ? 16 : 13, n = Math.ceil(W / cw), cols = Array.from({length: n}, (_, i) => ({d: Math.random() * .25 + Math.abs(i - n / 2) / n * .15, sp: 1.1 + Math.random() * .5})), ch = '0123456789S/.,-+';
-    return fxLoop(1150, t => {
-      clear(); g.font = `bold ${cw - 1}px ui-monospace,Menlo,monospace`; g.textBaseline = 'top';
-      cols.forEach((c, i) => { const p = Math.max(0, Math.min(1.3, (t - c.d) * c.sp / .75)), hy = p * (H + 120) - 60, cut = Math.max(0, Math.min(H, hy - 40));
-        img(i * cw, cut, cw, H - cut, i * cw, cut, cw, H - cut);
-        for (let q = 0; q < 14; q++) { const yy = hy - q * (cw + 3); if (yy < -20 || yy > H) continue; g.globalAlpha = Math.max(0, 1 - q / 14) * (t > .85 ? (1 - t) / .15 : 1); g.fillStyle = q === 0 ? '#fff4cf' : q < 3 ? '#c9a46a' : brand2; g.fillText(ch[(Math.random() * ch.length) | 0], i * cw + 1, yy); } g.globalAlpha = 1; });
-    }, done);
-  }
-  if (ty === 'origami') {
-    const N = 6, h = H / N;
-    return fxLoop(950, t => {
-      clear();
-      for (let i = 0; i < N; i++) { const p = Math.max(0, Math.min(1, (t - (N - 1 - i) * .08) / .55)); if (p >= 1) continue; const c = Math.cos(p * Math.PI / 2), up = (N - 1 - i) * h * .25 * p, hh = h * c, y0 = i * h - up + (i % 2 ? 0 : h - hh);
-        img(0, i * h, W, h, 0, y0, W, hh); g.fillStyle = `rgba(30,20,5,${.5 * p})`; g.fillRect(0, y0, W, hh); }
-    }, done);
-  }
-  done();
-}
-
-
-function pintarTrx(){$("trx").innerHTML=FX_LIST.map(([k,n,d])=>`<button type="button" class="trb" data-trx="${k}" aria-pressed="${k===fxType()}"><b>${n}</b><small>${d}</small></button>`).join("")}
-$("trx").addEventListener("click",e=>{const b=e.target.closest("[data-trx]");if(!b)return;ajustes.tr=b.dataset.trx;guardarLS("cbo-ajustes",ajustes);
-  if(ajustes.tr==="none"){pintarTrx();toast("Sin transición");return}
-  const y=scrollY; screenFx("config",b,true); pintarTrx(); window.scrollTo(0,y);});
-pintarTrx();
 
 /* ===== v35: firma electrónica del trabajador en el comprobante de pago ===== */
 // Se guarda en este equipo (IndexedDB) junto con la fecha y hora; el PDF firmado se puede descargar cuando quieras.
@@ -3545,88 +3316,6 @@ if("serviceWorker" in navigator){
   window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>r.update()).catch(()=>{}));
 }
 
-/* ===== Decoraciones de temporada (en todas las pantallas, con movimiento suave) ===== */
-const DECO_SVG={
-  banderines:(a,b)=>`<svg xmlns='http://www.w3.org/2000/svg' width='44' height='22'><path d='M0 2 Q22 8 44 2' stroke='%23888' stroke-width='1' fill='none'/><path d='M3 3 L13 3 L8 16Z' fill='${a}'/><path d='M17 5 L27 5 L22 18Z' fill='${b}'/><path d='M31 4 L41 4 L36 17Z' fill='${a}'/></svg>`,
-  luces:(a,b)=>`<svg xmlns='http://www.w3.org/2000/svg' width='48' height='22'><path d='M0 3 Q24 12 48 3' stroke='%23596' stroke-width='1.2' fill='none'/><ellipse cx='10' cy='11' rx='3' ry='4.5' fill='${a}'/><ellipse cx='24' cy='13' rx='3' ry='4.5' fill='${b}'/><ellipse cx='38' cy='11' rx='3' ry='4.5' fill='%23F2C14E'/></svg>`,
-  picado:(a,b)=>`<svg xmlns='http://www.w3.org/2000/svg' width='40' height='22'><path d='M0 1 H40' stroke='%23888' stroke-width='1'/><path d='M2 1 H18 V15 L14 19 L10 15 L6 19 L2 15Z' fill='${a}'/><circle cx='10' cy='8' r='2.2' fill='white' opacity='.7'/><path d='M22 1 H38 V15 L34 19 L30 15 L26 19 L22 15Z' fill='${b}'/><circle cx='30' cy='8' r='2.2' fill='white' opacity='.7'/></svg>`,
-  puntos:(a,b)=>`<svg xmlns='http://www.w3.org/2000/svg' width='36' height='22'><path d='M0 6 Q18 14 36 6' stroke='%23999' stroke-width='.8' fill='none'/><circle cx='9' cy='10' r='3' fill='${a}'/><circle cx='27' cy='10' r='2.2' fill='${b}'/></svg>`
-};
-// Cada temporada tiene varios adornos: los que cuelgan, los que flotan y los de la esquina van cambiando
-const TEMPORADAS=[
-  {k:"anio",n:"¡Feliz Año Nuevo!",ic:["🎆","🥂","✨","🎉","🕛"],cae:["✨","⭐","🎉","🎊"],cuelga:["⭐","✨","🎈"],t:"puntos",c:["%23D4A72C","%23F2D27A"]},
-  {k:"valentin",n:"Feliz San Valentín",ic:["💕","💘","🌹","💌","🧸"],cae:["💗","💕","💖","🌹"],cuelga:["💗","💌","💕"],t:"puntos",c:["%23E05780","%23F4A6BD"]},
-  {k:"santa",n:"Semana Santa",ic:["🕊️","🌿","🌸","🐣"],cae:["🌿","🌸","🕊️"],cuelga:["🕊️","🌸"],t:"puntos",c:["%236B8E4E","%23A8C686"]},
-  {k:"madre",n:"Feliz Día de la Madre",ic:["💐","🌷","💖","🌸","🎀"],cae:["🌷","🌸","💮","💖"],cuelga:["🌸","🎀","🌷"],t:"puntos",c:["%23E07A9A","%23F7C6D3"]},
-  {k:"padre",n:"Feliz Día del Padre",ic:["👔","🛠️","🏆","⚽","☕"],cae:["⭐","⚽","🏆"],cuelga:["⭐","🏅"],t:"puntos",c:["%232F5D8A","%2390B4D9"]},
-  {k:"inti",n:"Inti Raymi · San Juan",ic:["☀️","🌽","🍃"],cae:["☀️","🍃","🌽"],cuelga:["☀️","🍃"],t:"banderines",c:["%23E8A317","%23C0392B"]},
-  {k:"patrias",n:"¡Felices Fiestas Patrias!",ic:["🇵🇪","🦙","🎆","🐎","🌽"],cae:["🇵🇪","🎉","✨"],cuelga:["🇵🇪","🎉"],t:"banderines",c:["%23D91023","%23FFFFFF"]},
-  {k:"rosa",n:"Santa Rosa de Lima",ic:["🌹","🌺","🕊️"],cae:["🌹","🌺","🌸"],cuelga:["🌹","🕊️"],t:"puntos",c:["%23C2185B","%23F48FB1"]},
-  {k:"milagros",n:"Mes del Señor de los Milagros",ic:["💜","🕯️","🍯","🌸"],cae:["💜","🌸","✨"],cuelga:["💜","🕯️"],t:"banderines",c:["%236A1B9A","%23FFFFFF"]},
-  {k:"halloween",n:"Halloween · Canción Criolla",ic:["🎃","👻","🦇","🕸️","🎸","🍬"],cae:["🎃","🦇","🍂","👻","🍬"],cuelga:["🕷️","🦇","🎃"],t:"banderines",c:["%23E8761E","%23333333"]},
-  {k:"muertos",n:"Día de los Muertos",ic:["💀","🌼","🕯️","🌺","🍞"],cae:["🌼","🕯️","🌺","🦋"],cuelga:["💀","🌼","🕯️"],t:"picado",c:["%23E8761E","%238E44AD"]},
-  {k:"navidad",n:"¡Feliz Navidad!",ic:["🎄","🎁","⛄","🔔","🍪","🦌"],cae:["❄️","⭐","❄️","🎁"],cuelga:["🔔","⭐","🎁","🍬"],t:"luces",c:["%23D62828","%232E9C5F"]}
-];
-const TMP=k=>TEMPORADAS.find(x=>x.k===k);
-const pascua=y=>{const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),mes=Math.floor((h+l-7*m+114)/31),dia=((h+l-7*m+114)%31)+1;return new Date(y,mes-1,dia)};
-const nDomingo=(y,mes,n)=>{const d=new Date(y,mes,1);d.setDate(1+((7-d.getDay())%7)+7*(n-1));return d};
-function temporadaDe(f){
-  // Cada decoración empieza una semana antes de su fecha y termina ese mismo día; el resto del año, sin decoración.
-  // Si se cruzan dos, gana la fecha más cercana.
-  const y=f.getFullYear(), n12=d=>{const x=new Date(d);x.setHours(12,0,0,0);return x}, hoy=n12(f).getTime(), DIA=864e5;
-  const P=pascua(y);
-  const F=[[n12(new Date(y+1,0,1)),"anio",6],[n12(new Date(y,0,1)),"anio",0],[n12(new Date(y,1,14)),"valentin",7],[n12(P),"santa",7],
-    [n12(nDomingo(y,4,2)),"madre",7],[n12(nDomingo(y,5,3)),"padre",7],[n12(new Date(y,5,24)),"inti",7],[n12(new Date(y,6,28)),"patrias",7],
-    [n12(new Date(y,7,30)),"rosa",7],[n12(new Date(y,9,18)),"milagros",7],[n12(new Date(y,9,31)),"halloween",7],[n12(new Date(y,10,2)),"muertos",1],[n12(new Date(y,11,25)),"navidad",7]];
-  const c=F.map(([d,k,antes])=>({k,falta:Math.round((d.getTime()-hoy)/DIA),antes})).filter(x=>x.falta>=0&&x.falta<=x.antes).sort((a,b)=>a.falta-b.falta)[0];
-  return c?TMP(c.k):null;
-}
-let decoPrev=null, decoIcT=null, decoAmbT=null;
-const rnd=(a,b)=>a+Math.random()*(b-a), uno=arr=>arr[Math.floor(Math.random()*arr.length)];
-const decoMov=()=>ajustes.decoMov!==0&&!matchMedia("(prefers-reduced-motion: reduce)").matches;
-function caer(T,n,lento){
-  for(let i=0;i<n;i++){const e=document.createElement("span");e.className="deco-cae"+(lento?" lento":"");e.textContent=uno(T.cae);
-    const dur=lento?rnd(11,17):rnd(4,7);e.style.left=rnd(0,96)+"vw";e.style.animationDuration=dur+"s";e.style.animationDelay=(lento?rnd(0,6):rnd(0,2.5))+"s";
-    e.style.setProperty("--dx",rnd(-50,50)+"px");e.style.setProperty("--rot",rnd(-200,200)+"deg");e.style.fontSize=(lento?rnd(13,19):rnd(14,24))+"px";
-    document.body.appendChild(e);setTimeout(()=>e.remove(),(dur+7)*1000)}
-}
-function aplicarDeco(animar){
-  const on=ajustes.deco!==0, auto=temporadaDe(window.DECO_FECHA||new Date());
-  const T=decoPrev?TMP(decoPrev):(on?auto:null);
-  document.querySelectorAll("#decoSeg [data-deco]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.deco===(on?1:0))));
-  document.querySelectorAll("#decoMovSeg [data-decomov]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.decomov===(ajustes.decoMov!==0?1:0))));
-  if($("decoTxt")) $("decoTxt").textContent=auto?`Hoy toca: ${auto.n} ${auto.ic[0]}`:"Hoy no hay temporada: cambian solas según la fecha";
-  if($("decoLista")) $("decoLista").innerHTML=TEMPORADAS.map(x=>`<button type="button" class="deco-op" data-prev="${x.k}" aria-pressed="${decoPrev===x.k}"><span>${x.ic[0]}</span>${esc(x.n.replace(/[¡!]/g,""))}</button>`).join("");
-  const pv=$("decoPrevAviso"); if(pv){pv.hidden=!decoPrev; if(decoPrev) pv.innerHTML=`👀 Vista previa: <b>${esc(T.n)}</b> <button type="button" class="btnlink" data-prev="">Volver a automático</button>`}
-  const tira=$("decoTira"), ut=$("udHero")||$("bigUt"), h1=$("titulo");
-  tira.hidden=!T; tira.innerHTML=""; document.querySelectorAll(".deco-esq,.deco-chip").forEach(x=>x.remove()); h1.classList.remove("deco-h1");
-  clearInterval(decoIcT); clearInterval(decoAmbT); document.querySelectorAll(".deco-cae").forEach(x=>x.remove());
-  document.body.classList.toggle("deco-mov",!!T&&decoMov());
-  try{pintarAdorno(T)}catch{}
-  if(!T) return;
-  tira.style.backgroundImage=`url("data:image/svg+xml,${DECO_SVG[T.t](T.c[0],T.c[1]).replace(/"/g,"'").replace(/#/g,"%23")}")`;
-  // Adornos que cuelgan de la tira y se mecen
-  const nC=Math.max(4,Math.round(innerWidth/85));
-  for(let i=0;i<nC;i++){const c=document.createElement("span");c.className="deco-cuelga";c.style.left=((i+.5)/nC*100+rnd(-4,4))+"%";
-    c.style.setProperty("--l",rnd(10,26)+"px");c.style.animationDelay=rnd(0,2)+"s";c.style.animationDuration=rnd(2.6,4)+"s";c.innerHTML=`<i></i><b>${T.cuelga[i%T.cuelga.length]}</b>`;tira.appendChild(c)}
-  // Ícono junto al título (en todas las pantallas) y en la tarjeta de utilidad: van cambiando
-  h1.classList.add("deco-h1"); h1.style.setProperty("--deco-ic",`"${T.ic[0]}"`);
-  ut.insertAdjacentHTML("beforeend",`<span class="deco-esq" aria-hidden="true">${T.ic[0]}</span><span class="deco-chip">${T.n}</span>`);
-  let k=0; decoIcT=setInterval(()=>{k=(k+1)%T.ic.length;document.querySelectorAll(".deco-esq,h1.deco-h1").forEach(el=>{el.classList.add("cambia");setTimeout(()=>{if(el.tagName==="H1")el.style.setProperty("--deco-ic",`"${T.ic[k]}"`);else el.textContent=T.ic[k];el.classList.remove("cambia")},260)})},4500);
-  if(!decoMov()) return;
-  // Lluvia al abrir (una vez por sesión) y luego pocos adornos flotando lento, en todas las pantallas
-  if((animar&&!sessionStorage.getItem("deco-cae"))||decoPrev){try{sessionStorage.setItem("deco-cae","1")}catch{};caer(T,16,false)}
-  caer(T,3,true); decoAmbT=setInterval(()=>{if(!document.hidden&&document.querySelectorAll(".deco-cae.lento").length<6)caer(T,2,true)},5000);
-}
-document.addEventListener("click",e=>{
-  const b=e.target.closest("[data-deco],[data-decomov],[data-prev]"); if(!b) return;
-  if(b.dataset.deco!==undefined){ajustes.deco=+b.dataset.deco;decoPrev=null;guardarLS("cbo-ajustes",ajustes)}
-  else if(b.dataset.decomov!==undefined){ajustes.decoMov=+b.dataset.decomov;guardarLS("cbo-ajustes",ajustes)}
-  else decoPrev=b.dataset.prev||null;
-  aplicarDeco(false);
-});
-setTimeout(()=>aplicarDeco(true),900);
-
 /* ===== Barra Deluxe: indicador deslizante, onda al tocar, vibración y aviso de pendientes ===== */
 (function(){
   const tb=document.getElementById("tabbar"); if(!tb) return;
@@ -3866,16 +3555,11 @@ async function sincronizarFirmas(){
 /* ===== Configuración: resumen de cada opción y una sola abierta a la vez ===== */
 function pintarResumenCfg(){
   const v=(k,h)=>{const e=document.getElementById("cfgv-"+k);if(e)e.innerHTML=h};
-  const F=FONDOS.find(x=>x[0]===ajustes.fondo), C=ACENTOS.find(x=>x[0]===ajustes.acento);
-  const temaN=(document.querySelector(`#temas .opt[data-t="${ajustes.tema}"] b`)||{}).textContent||"Cálido";
-  const rs=getComputedStyle(document.documentElement), dot=c=>`<i style="background:${c}"></i>`;
-  v("tema",F&&C?`${dot(F[2])}${dot(F[8]?C[4]:C[2])} ${F[1]} + ${C[1]}`:`${dot(rs.getPropertyValue("--bg"))}${dot(rs.getPropertyValue("--brand"))} ${temaN}`);
-  const T=typeof temporadaDe==="function"?temporadaDe(window.DECO_FECHA||new Date()):null;
-  v("deco",ajustes.deco===0?"Desactivadas":`Automático${T?" · ahora "+T.n.replace(/[¡!]/g,""):""}${ajustes.decoMov===0?" · quietas":""}`);
+  const P=PALETAS.find(x=>x[0]===ajustes.paleta)||PALETAS[0];
+  v("tema",`<i style="background:${P[3]}"></i> ${P[1]}`);
   const nb=k=>(BAR_DEF[k]||[""])[0].replace("Movim.","Movimientos");
   v("barra",`${nb(ajustes.barA||"movimientos")} y ${nb(ajustes.barB||"planilla")}`);
   v("son",ajustes.sonido===0?"Desactivados":"Activados");
-  const tr=document.querySelector('#trx [aria-pressed="true"] b'); v("trans",tr?tr.textContent:"Ninguna");
   v("quien",quien?titulo(quien):"—");
   v("meta",`Meta ${fmt0(ajustes.meta||0)} al año`);
   v("firm",($("firmadosN")||{}).textContent||`${Object.keys(FIRMAS).length} firmados`);
@@ -3890,34 +3574,44 @@ document.querySelector('[data-sec="config"]').addEventListener("change",()=>setT
 setTimeout(pintarResumenCfg,1200); setInterval(()=>{if(typeof seccion!=="undefined"&&seccion==="config")pintarResumenCfg()},5000);
 
 
-/* ===== Adornos animados de cada temporada (dibujados, sin emojis) ===== */
-const ADORNO={
- navidad:`<svg viewBox="0 0 64 64"><g class="bob"><rect x="28" y="50" width="8" height="9" rx="1.5" fill="#7A4A26"/><path d="M32 8 L50 30 H41 L54 46 H10 L23 30 H14 Z" fill="#1F7A4D"/><path d="M32 8 L50 30 H41 L54 46 H32 Z" fill="#17643F"/>
-  <circle class="bl" cx="24" cy="38" r="2.6" fill="#E84545"/><circle class="bl" style="animation-delay:.3s" cx="38" cy="40" r="2.6" fill="#F2C14E"/><circle class="bl" style="animation-delay:.6s" cx="30" cy="27" r="2.4" fill="#4FA8E0"/><circle class="bl" style="animation-delay:.9s" cx="40" cy="31" r="2.2" fill="#E84545"/><circle class="bl" style="animation-delay:.45s" cx="45" cy="43" r="2.2" fill="#F2C14E"/>
-  <path d="M18 41 Q32 46 47 38" stroke="#F6E3A9" stroke-width="1.2" fill="none"/><path class="tw" d="M32 1l2.3 4.8 5.2.6-3.8 3.6 1 5.2-4.7-2.6-4.7 2.6 1-5.2-3.8-3.6 5.2-.6z" fill="#F2C14E"/></g></svg>`,
- halloween:`<svg viewBox="0 0 64 64"><g class="fly"><path d="M44 8 q4 -5 8 0 q4 -5 8 0 q-4 1 -8 5 q-4 -4 -8 -5z" fill="#2B2B2B"/></g><g class="bob"><path d="M31 18 q1 -6 6 -8" stroke="#4E7A2E" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="22" cy="40" rx="12" ry="16" fill="#D9661E"/><ellipse cx="42" cy="40" rx="12" ry="16" fill="#D9661E"/><ellipse cx="32" cy="40" rx="12" ry="17" fill="#E8812E"/>
-  <g class="flk" fill="#FFD25A"><path d="M22 36 l5 -6 5 6z"/><path d="M36 36 l5 -6 5 6z" transform="translate(-4 0)"/><path d="M20 46 q12 9 24 0 q-3 6 -12 6 q-9 0 -12 -6z"/></g></g></svg>`,
- muertos:`<svg viewBox="0 0 64 64"><g class="spin"><g fill="#F2A21E">${[0,45,90,135,180,225,270,315].map(a=>`<ellipse cx="46" cy="32" rx="3.4" ry="6" transform="rotate(${a} 46 40)"/>`).join("")}</g><circle cx="46" cy="40" r="4" fill="#E8761E"/></g>
-  <rect x="12" y="30" width="14" height="26" rx="2" fill="#F6EEDC" stroke="#D9C7A2"/><rect x="18.5" y="25" width="1.2" height="6" fill="#333"/><path class="flame" d="M19 10 C25 18 25 24 19 26 C13 24 13 18 19 10Z" fill="#F7B733"/><path class="flame" d="M19 16 C22 20 22 23 19 24.5 C16 23 16 20 19 16Z" fill="#FFF3B0"/></svg>`,
- milagros:`<svg viewBox="0 0 64 64"><rect x="25" y="28" width="14" height="28" rx="2" fill="#8E44AD"/><rect x="25" y="34" width="14" height="3" fill="#D9C2EC"/><rect x="31.4" y="22" width="1.2" height="7" fill="#333"/><path class="flame" d="M32 6 C38 14 38 20 32 23 C26 20 26 14 32 6Z" fill="#F7B733"/><path class="flame" d="M32 12 C35 16 35 19 32 21 C29 19 29 16 32 12Z" fill="#FFF3B0"/><circle class="flk" cx="32" cy="16" r="13" fill="#F7B733" opacity=".15"/></svg>`,
- patrias:`<svg viewBox="0 0 64 64"><rect x="10" y="6" width="3" height="54" rx="1.5" fill="#8A6A3A"/><circle cx="11.5" cy="6" r="3" fill="#D4A72C"/><g class="wave"><rect x="13" y="9" width="13" height="26" fill="#D91023"/><rect x="26" y="9" width="13" height="26" fill="#FFFFFF"/><rect x="39" y="9" width="13" height="26" fill="#D91023"/><rect x="13" y="9" width="39" height="26" fill="none" stroke="#0002"/></g></svg>`,
- valentin:`<svg viewBox="0 0 64 64"><path class="rise" d="M48 30 c-2 -3 -6 -1 -4 2 l4 4 l4 -4 c2 -3 -2 -5 -4 -2z" fill="#F4A6BD"/><path class="rise" style="animation-delay:1.2s" d="M14 34 c-2 -3 -6 -1 -4 2 l4 4 l4 -4 c2 -3 -2 -5 -4 -2z" fill="#F4A6BD"/>
-  <path class="beat" d="M32 54 C10 40 10 22 21 19 C27 17 31 21 32 25 C33 21 37 17 43 19 C54 22 54 40 32 54Z" fill="#E05780"/><path d="M22 26 q2 -4 6 -3" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".7"/></svg>`,
- anio:`<svg viewBox="0 0 64 64"><g class="burst"><g stroke="#F2C14E" stroke-width="2.4" stroke-linecap="round">${[0,45,90,135,180,225,270,315].map(a=>`<path d="M22 22 l0 -12" transform="rotate(${a} 22 22)"/>`).join("")}</g></g>
-  <g class="burst" style="animation-delay:1.1s"><g stroke="#E05780" stroke-width="2.2" stroke-linecap="round">${[0,60,120,180,240,300].map(a=>`<path d="M44 34 l0 -11" transform="rotate(${a} 44 34)"/>`).join("")}</g></g><circle class="tw" cx="30" cy="52" r="2.5" fill="#4FA8E0"/></svg>`,
- madre:`<svg viewBox="0 0 64 64"><g class="sway"><path d="M32 60 V30" stroke="#3E8E4E" stroke-width="3"/><path d="M32 46 q-10 -2 -12 -10 q9 1 12 8z" fill="#4CAF50"/><path d="M22 14 q2 14 10 16 q8 -2 10 -16 q-5 4 -6 6 q-2 -8 -4 -10 q-2 2 -4 10 q-1 -2 -6 -6z" fill="#E07A9A"/></g></svg>`,
- rosa:`<svg viewBox="0 0 64 64"><g class="sway"><path d="M32 60 V28" stroke="#2E7D32" stroke-width="3"/><path d="M32 44 q10 -2 12 -9 q-9 1 -12 7z" fill="#43A047"/><circle cx="32" cy="20" r="11" fill="#C2185B"/><path d="M26 18 q6 -6 12 0 q-3 6 -6 6 q-4 0 -6 -6z" fill="#E91E63"/><path d="M29 17 q3 -3 6 0" stroke="#880E4F" stroke-width="1.6" fill="none"/></g></svg>`,
- padre:`<svg viewBox="0 0 64 64"><g class="bob"><path d="M20 10 h24 v12 a12 12 0 0 1 -24 0z" fill="#D4A72C"/><path d="M20 14 h-6 a6 6 0 0 0 7 9 M44 14 h6 a6 6 0 0 1 -7 9" stroke="#D4A72C" stroke-width="3" fill="none"/><rect x="29" y="33" width="6" height="10" fill="#B8860B"/><rect x="22" y="43" width="20" height="6" rx="2" fill="#7A5A12"/>
-  <path class="shine" d="M26 12 l4 0 l-6 16 l-4 0z" fill="#fff" opacity=".7"/></g></svg>`,
- santa:`<svg viewBox="0 0 64 64"><g class="fly"><path d="M14 36 q14 -6 30 2 q6 -2 10 -8 l2 4 q-4 4 -10 6 q-10 10 -26 4z" fill="#FFFFFF" stroke="#C9D3DA"/><path class="flap" d="M30 34 q-6 -14 4 -22 q4 10 2 22z" fill="#FFFFFF" stroke="#C9D3DA"/><circle cx="50" cy="31" r="1.4" fill="#333"/><path d="M54 30 l5 1 -5 2z" fill="#E8A317"/></g></svg>`,
- inti:`<svg viewBox="0 0 64 64"><g class="spin"><g fill="#F2C14E">${[0,30,60,90,120,150,180,210,240,270,300,330].map(a=>`<path d="M32 4 l3 9 h-6z" transform="rotate(${a} 32 32)"/>`).join("")}</g></g><circle cx="32" cy="32" r="13" fill="#E8A317"/><circle cx="27" cy="30" r="1.6" fill="#7A4A10"/><circle cx="37" cy="30" r="1.6" fill="#7A4A10"/><path d="M27 36 q5 4 10 0" stroke="#7A4A10" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`
-};
-function pintarAdorno(T){
-  const el=$("temaH"); if(!el) return;
-  const svg=T&&ADORNO[T.k]; el.hidden=!svg; el.innerHTML=svg||""; el.title=T?T.n.replace(/[¡!]/g,""):"";
+
+/* ===== Flujo del dinero del mes: clientes → total → a dónde se fue ===== */
+function pintarFlujo(){
+  const box=$("udFlujo"); if(!box) return;
+  const lista=delMes(mes), S=sumas(lista), t=impuestos(mes);
+  const corto=n=>{n=String(n||"");return n.length>14?n.slice(0,13)+"…":n};
+  const k1=n=>n>=1000?(n/1000).toFixed(n>=10000?0:1).replace(".0","")+"k":String(Math.round(n));
+  if(!S.sI&&!S.sG){box.innerHTML=`<div class="fl-h"><b>¿A dónde se fue tu plata?</b></div><div class="empty" style="padding:12px 0">Aún no hay movimientos en ${lblMes(mes)}.</div>`;return}
+  // Entradas: los 3 mejores clientes y el resto
+  const cli=agrupar(S.ing); let ent=cli.slice(0,3).map(x=>[corto(x.n),x.t]);
+  const restoC=cli.slice(3).reduce((a,x)=>a+x.t,0); if(restoC>0) ent.push(["Otros",restoC]);
+  // Salidas: gastos por categoría (3 mayores y el resto), SUNAT y lo que queda
+  const cat={}; S.gas.forEach(r=>{const c=r.categoria||"Otros gastos";cat[c]=(cat[c]||0)+r.monto});
+  const cats=Object.entries(cat).sort((a,b)=>b[1]-a[1]); const COL=["var(--out)","#7AA7E0","#B39DDB","#8E9AA5"];
+  let sal=cats.slice(0,3).map(([c,v],i)=>[corto(c.split(" / ")[0]),v,COL[i]]);
+  const restoG=cats.slice(3).reduce((a,x)=>a+x[1],0); if(restoG>0) sal.push(["Otros gastos",restoG,COL[3]]);
+  if(t.tot>0) sal.push(["SUNAT",t.tot,"#6FA8F2"]);
+  const queda=S.sI-S.sG-t.tot; if(queda>0) sal.push(["Te queda",queda,"var(--brand-2)"]);
+  if(!ent.length) ent=[["Sin ingresos",0.0001]];
+  const W=320,H=200,top=8,gap=7,totE=ent.reduce((a,x)=>a+x[1],0),totS=sal.reduce((a,x)=>a+x[1],0),tot=Math.max(totE,totS);
+  const usable=H-gap*Math.max(ent.length,sal.length,1),k=usable/tot,xL=82,xM=152,xR=230,w=7;
+  let svg="",defs="",yl=top,ym=top+gap;
+  const banda=(x0,y0,h0,x1,y1,h1,f)=>{const c=(x0+x1)/2;return `<path class="fl-l" d="M${x0} ${y0} C${c} ${y0} ${c} ${y1} ${x1} ${y1} L${x1} ${y1+h1} C${c} ${y1+h1} ${c} ${y0+h0} ${x0} ${y0+h0}Z" fill="${f}"/>`};
+  defs+=`<linearGradient id="flI" x1="0" x2="1"><stop offset="0" stop-color="var(--in)" stop-opacity=".8"/><stop offset="1" stop-color="var(--brand-2)" stop-opacity=".55"/></linearGradient>`;
+  const mid=totE*k;
+  ent.forEach(([n,v])=>{const h=Math.max(v*k,2);svg+=banda(xL+w,yl,h,xM,ym,h,"url(#flI)")+`<rect x="${xL}" y="${yl}" width="${w}" height="${h}" rx="2" fill="var(--in)"/>`
+    +`<text x="${xL-6}" y="${yl+h/2-2}" text-anchor="end">${esc(n)}</text><text class="v" x="${xL-6}" y="${yl+h/2+10}" text-anchor="end">${k1(v)}</text>`;yl+=h+gap;ym+=v*k});
+  svg+=`<rect x="${xM}" y="${top+gap}" width="9" height="${Math.max(mid,4)}" rx="3" fill="var(--ink)" opacity=".85"/>`;
+  let yr=top,ym2=top+gap,ult=-99;
+  sal.forEach(([n,v,c],i)=>{const h=Math.max(v*k,2);defs+=`<linearGradient id="flO${i}" x1="0" x2="1"><stop offset="0" stop-color="var(--brand-2)" stop-opacity=".45"/><stop offset="1" stop-color="${c}" stop-opacity=".9"/></linearGradient>`;
+    svg+=banda(xM+9,ym2,h,xR,yr,h,`url(#flO${i})`)+`<rect x="${xR}" y="${yr}" width="${w}" height="${h}" rx="2" fill="${c}"/>`;
+    const y=Math.max(yr+h/2,ult+24);ult=y;
+    svg+=`<text x="${xR+w+6}" y="${y-2}">${esc(n)}</text><text class="v${n==="Te queda"?" q":""}" x="${xR+w+6}" y="${y+10}">${k1(v)}</text>`;yr+=h+gap;ym2+=v*k});
+  box.innerHTML=`<div class="fl-h"><b>¿A dónde se fue tu plata?</b><small>${lblMes(mes)}</small></div>
+    <p class="fl-sub">Entraron <b>${fmt(S.sI)}</b> · salieron <b>${fmt(S.sG+t.tot)}</b></p>
+    <svg class="fl-svg" viewBox="0 0 ${W} ${Math.max(yr,yl)+4}" role="img" aria-label="Flujo del dinero de ${lblMes(mes)}"><defs>${defs}</defs>${svg}</svg>
+    ${queda<=0?`<p class="fl-sub" style="color:var(--out)">Este mes saliste ${fmt(-queda)} más de lo que entró.</p>`:""}`;
 }
-$("temaH").addEventListener("click",()=>{const el=$("temaH");el.classList.remove("salta");void el.offsetWidth;el.classList.add("salta");try{navigator.vibrate&&navigator.vibrate(8)}catch{};
-  const T=typeof decoPrev!=="undefined"&&decoPrev?TMP(decoPrev):temporadaDe(window.DECO_FECHA||new Date()); if(T&&decoMov()) caer(T,10,false)});
 
 /* ===== Extras: celebración, sonidos, saludo, meta del mes, racha, logros, contadores ===== */
 let audioCtx=null;
@@ -4009,12 +3703,12 @@ function animarNumeros(){
     if(numPrev[id]!==undefined&&numPrev[id]!==v&&performance.now()>2500) contarNum(el,numPrev[id]); numPrev[id]=v});
 }
 const _renderBase=render;
-render=function(){const r=_renderBase.apply(this,arguments);try{pintarExtras()}catch(e){console.warn(e)}try{pintarUD()}catch(e){console.warn(e)}try{animarNumeros()}catch(e){}return r};
+render=function(){const r=_renderBase.apply(this,arguments);try{pintarFlujo()}catch(e){console.warn(e)}try{pintarExtras()}catch(e){console.warn(e)}try{pintarUD()}catch(e){console.warn(e)}try{animarNumeros()}catch(e){}return r};
 document.addEventListener("click",e=>{const b=e.target.closest("[data-son]");if(!b)return;ajustes.sonido=+b.dataset.son;guardarLS("cbo-ajustes",ajustes);pintarSon();if(ajustes.sonido)sonar("registro")});
 function pintarSon(){document.querySelectorAll("#sonSeg [data-son]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.son===(ajustes.sonido===0?0:1))))}
 pintarSon();
 $("metaMes").onclick=()=>{ir("config");setTimeout(()=>{const m=$("meta");if(m){m.scrollIntoView({block:"center"});m.focus()}},350)};
-setTimeout(()=>{try{pintarExtras()}catch{}try{pintarUD()}catch(e){console.warn(e)}},30);
+setTimeout(()=>{try{pintarExtras()}catch{}try{pintarUD()}catch(e){console.warn(e)}try{pintarFlujo()}catch(e){console.warn(e)}},30);
 /* ===== Inventario de obra: catálogo (una foto por tipo; todas las medidas que se venden en Perú se eligen al registrar) ===== */
 const INV_M=(()=>{
   const X=(a,b,s=" × ")=>a.flatMap(x=>b.map(y=>x+s+y));
