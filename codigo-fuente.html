@@ -892,6 +892,125 @@ button.ud-card{cursor:pointer;width:100%}
   .ud-hero{grid-column:1;grid-row:span 2}.ud-ins{flex-wrap:wrap}.ud-insc{flex:1 1 45%}
 }
 @media (prefers-reduced-motion:reduce){#udSvg .ln,#udSvg .ar{animation:none;stroke-dashoffset:0;opacity:1}}
+/* ===== Inventario de obra =====
+   Idea: cada pieza vive en una "placa" blanca como en el catálogo del proveedor; el material se reconoce por su franja de color
+   (PPR verde, PVC gris, bronce dorado, galvanizado plata). Los títulos de rubro usan Archivo angosta y pesada, como rotulado de tubería. */
+:root{--plato:#FFFFFF;--plato-l:#E6DCC8;--gas-a:#0F5A45;--gas-b:#0A3D2F;--ele-a:#2C2A24;--ele-b:#17150F;--ele-luz:#E2B33C}
+.inv{display:grid;gap:16px;min-width:0}
+.inv-obra{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 16px}
+.inv-obra-sel{display:grid;gap:4px;min-width:0;flex:1 1 240px}
+.inv-obra-sel span{font-size:.8rem;color:var(--muted);font-weight:600}
+.inv-obra-sel select{font:inherit;font-weight:700;font-size:1.05rem;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0;width:100%}
+.inv-obra-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.inv-mod{font-size:.75rem;font-weight:700;padding:5px 10px;border-radius:99px}
+.inv-mod.tc{background:var(--in-bg);color:var(--in)}.inv-mod.cl{background:var(--warn-bg);color:var(--warn)}
+.inv-pis{font-size:.8rem;color:var(--muted);font-weight:600}
+.inv-cats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:620px){.inv-cats{grid-template-columns:1fr}}
+.inv-cat{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 46%;align-items:end;gap:12px;min-height:178px;border:0;border-radius:22px;padding:16px;text-align:left;color:#F6F1E4;overflow:hidden;cursor:pointer;transition:transform .2s var(--ease)}
+.inv-cat:active{transform:scale(.985)}
+.inv-cat-gas{background:linear-gradient(155deg,var(--gas-a),var(--gas-b))}
+.inv-cat-ele{background:linear-gradient(155deg,var(--ele-a),var(--ele-b))}
+.inv-cat-ele:after{content:"";position:absolute;right:-30px;top:-30px;width:160px;height:160px;border-radius:50%;background:radial-gradient(closest-side,rgba(226,179,60,.35),transparent);pointer-events:none}
+.inv-cat-tx{display:grid;gap:4px;align-self:end;position:relative;z-index:1}
+.inv-cat-tx b{font-family:var(--display);font-stretch:72%;font-weight:800;font-size:clamp(1.7rem,6vw,2.2rem);line-height:.95;letter-spacing:-.01em}
+.inv-cat-tx small{font-size:.85rem;opacity:.82;line-height:1.3}
+.inv-cat-tx em{font-style:normal;font-size:.78rem;font-weight:700;margin-top:6px;opacity:.9;font-variant-numeric:tabular-nums}
+.inv-cat-ele .inv-cat-tx em{color:var(--ele-luz)}
+.inv-plato{grid-column:2;grid-row:1;display:grid;grid-template-columns:1fr 1fr;gap:4px;background:var(--plato);border-radius:14px;padding:6px;aspect-ratio:1;max-width:100%;box-shadow:0 10px 24px rgba(0,0,0,.28);transform:rotate(3deg);position:relative;z-index:1}
+.inv-cat-ele .inv-plato{transform:rotate(-3deg)}
+.inv-plato img{width:100%;height:100%;object-fit:contain;aspect-ratio:1;border-radius:8px}
+.inv-res .inv-big{font-family:var(--display);font-weight:800;font-size:1.9rem;margin:0 0 12px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.inv-pisos{display:grid;gap:8px}
+.inv-piso{display:grid;grid-template-columns:96px minmax(0,1fr) auto;align-items:center;gap:10px;font-size:.88rem}
+.inv-piso span{font-weight:600}
+.inv-piso i{height:10px;border-radius:6px;background:var(--soft);overflow:hidden}
+.inv-piso i b{display:block;height:100%;border-radius:6px;background:var(--brand-2);min-width:2px;transition:width .5s var(--ease)}
+.inv-piso em{font-style:normal;font-weight:700;font-variant-numeric:tabular-nums;min-width:64px;text-align:right}
+.inv-movs,.inv-hist{display:grid}
+.inv-mov{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.inv-mov:first-child{border-top:0}
+.inv-hist .inv-mov:first-of-type{border-top:0}
+.inv-th{width:44px;height:44px;border-radius:10px;background:var(--plato);border:1px solid var(--plato-l);display:grid;place-items:center;overflow:hidden}
+.inv-th img{width:100%;height:100%;object-fit:contain}
+.inv-mtx{min-width:0;display:grid;gap:2px}
+.inv-mtx b{font-size:.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.inv-mtx small{font-size:.78rem;color:var(--muted)}
+.inv-t{font-weight:700}.inv-t.entra{color:var(--in)}.inv-t.usa{color:var(--brand)}.inv-t.sobra{color:var(--warn)}
+.inv-del{border:0;background:transparent;color:var(--muted);border-radius:8px;padding:6px 8px;font-size:.8rem;font-weight:700}
+.inv-del.conf{background:var(--out-bg);color:var(--out)}
+.inv-vacio{color:var(--muted);text-align:center;padding:18px 8px;margin:0}
+/* Catálogo */
+.inv-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.inv-top h2{margin:0;font-family:var(--display);font-stretch:72%;font-weight:800;font-size:2rem;letter-spacing:-.01em;line-height:1;flex:1 1 auto;min-width:0}
+.inv-back{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--brand);display:grid;place-items:center;flex:0 0 auto}
+.inv-back svg{width:20px;height:20px}
+.inv-buscar{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 12px}
+.inv-buscar svg{width:18px;height:18px;color:var(--muted);flex:0 0 auto}
+.inv-buscar input{border:0;background:transparent;font:inherit;padding:11px 0;width:100%;color:var(--ink);min-width:0}
+.inv-buscar input:focus{outline:none}.inv-buscar:focus-within{border-color:var(--brand-2)}
+.inv-mats{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.inv-mats::-webkit-scrollbar{display:none}
+.inv-mats .chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;font-weight:600}
+.inv-mats .chip i{width:10px;height:10px;border-radius:3px;background:var(--mat)}
+.inv-mats .chip[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.inv-gt{display:flex;align-items:center;gap:8px;margin:6px 0 -4px;font-size:1rem;font-weight:700}
+.inv-gt:before{content:"";width:22px;height:8px;border-radius:4px;background:var(--mat)}
+.inv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px}
+@media (max-width:420px){.inv-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.inv-it{position:relative;display:grid;gap:3px;align-content:start;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:8px 8px 12px;color:var(--ink);overflow:hidden;cursor:pointer;transition:border-color .15s,transform .15s var(--ease)}
+.inv-it:after{content:"";position:absolute;left:0;right:0;bottom:0;height:4px;background:var(--mat)}
+.inv-it:active{transform:scale(.97)}
+.inv-it:hover{border-color:var(--mat)}
+.inv-ph{display:grid;place-items:center;aspect-ratio:1;background:var(--plato);border-radius:11px;overflow:hidden;margin-bottom:5px}
+.inv-ph img{width:100%;height:100%;object-fit:contain}
+.inv-sin{display:grid;justify-items:center;gap:4px;color:#9A9384}
+.inv-sin svg{width:30px;height:30px}.inv-sin small{font-size:.72rem;font-weight:600}
+.inv-it b{font-size:.86rem;line-height:1.2}
+.inv-it small{font-size:.74rem;color:var(--muted)}
+.inv-it em{position:absolute;top:12px;left:12px;font-style:normal;font-size:.7rem;font-weight:800;background:var(--brand);color:var(--brand-ink);padding:3px 7px;border-radius:99px;font-variant-numeric:tabular-nums}
+/* Hoja de pieza */
+#invSheet{gap:14px}
+.inv-hd{display:grid;grid-template-columns:104px minmax(0,1fr) auto;gap:12px;align-items:start}
+.inv-big-ph{width:104px;height:104px;border-radius:16px;background:var(--plato);border:1px solid var(--plato-l);display:grid;place-items:center;overflow:hidden;box-shadow:inset 0 -5px 0 var(--mat)}
+.inv-big-ph img{width:100%;height:100%;object-fit:contain}
+.inv-hd-tx{display:grid;gap:5px;min-width:0}
+.inv-hd-tx h3{margin:0;font-family:var(--display);font-weight:700;font-size:1.2rem;line-height:1.15}
+.inv-hd-tx small{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:.8rem}
+.inv-hd-tx small i{width:10px;height:10px;border-radius:3px;background:var(--mat)}
+.inv-foto-btn{display:inline-flex;align-items:center;gap:6px;justify-self:start;cursor:pointer}
+.inv-foto-btn svg{width:16px;height:16px}
+.inv-seg{grid-template-columns:repeat(3,1fr)}
+.inv-seg button{font-size:.8rem;line-height:1.15;padding:9px 4px}
+.inv-f{display:grid;gap:6px;min-width:0}
+.inv-lbl,.inv-obra-sel span{font-size:.8rem;font-weight:600;color:var(--muted);text-transform:none;letter-spacing:0}
+.inv-foto-btn{text-transform:none;letter-spacing:0}
+.inv-f input:not([type=checkbox]){font:inherit;font-size:1rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:11px 12px;width:100%;min-width:0}
+.inv-meds{display:flex;flex-wrap:wrap;gap:6px}
+.inv-med{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:8px 10px;font-weight:600;font-size:.86rem;display:inline-flex;align-items:center;gap:6px;font-variant-numeric:tabular-nums}
+.inv-med em{font-style:normal;font-size:.7rem;font-weight:800;background:var(--in-bg);color:var(--in);border-radius:99px;padding:2px 6px}
+.inv-med[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.inv-med[aria-pressed="true"] em{background:rgba(255,255,255,.2);color:inherit}
+.inv-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.inv-cant{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;gap:6px}
+.inv-cant button{border:1px solid var(--line);background:var(--surface);border-radius:12px;font-size:1.3rem;font-weight:700;color:var(--brand)}
+.inv-cant input{text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+.inv-ck{display:inline-flex;align-items:center;gap:6px;font-size:.9rem;margin-right:12px}
+.inv-err{margin:0;color:var(--out);font-weight:600;font-size:.88rem}
+.inv-guardar{width:100%;padding:14px;font-size:1rem}
+.inv-nota-cl{margin:-4px 0 0}
+#invObraSheet .seg button{font-size:.82rem;line-height:1.2}
+/* Por piso */
+.inv-obragrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}
+@media (max-width:420px){.inv-obragrid{grid-template-columns:minmax(0,1fr)}}
+.inv-pbt{font-weight:800;font-variant-numeric:tabular-nums}
+.inv-tab{width:100%;border-collapse:collapse;font-size:.86rem}
+.inv-tab th{text-align:right;font-size:.75rem;color:var(--muted);font-weight:700;padding:6px 6px;border-bottom:1px solid var(--line)}
+.inv-tab th:first-child,.inv-tab td:first-child{text-align:left}
+.inv-tab td{padding:8px 6px;border-bottom:1px dashed var(--line);text-align:right;font-variant-numeric:tabular-nums;vertical-align:top}
+.inv-tab td small{display:block;color:var(--muted);font-size:.74rem}
+@media (prefers-reduced-motion:reduce){.inv-cat,.inv-it,.inv-piso i b{transition:none}}
+
 </style>
 </head>
 <body data-barra="d">
@@ -906,10 +1025,11 @@ button.ud-card{cursor:pointer;width:100%}
       <button data-s="terceros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.5"/><path d="M15 15c3 0 6 1.5 6 4.5"/></svg>Clientes y proveedores</button>
       <button data-s="planilla"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M8 6V4h8v2M3 12h18"/></svg>Planilla</button>
       <button data-s="obras"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V10l7-5 7 5v11M9 21v-6h6v6"/></svg>Obras</button>
+      <button data-s="inventario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-5 9 5v10l-9 5-9-5z"/><path d="M3 9l9 5 9-5M12 14v10"/></svg>Inventario</button>
       <button data-s="anual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Resumen anual</button>
       <button data-s="config"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Configuración</button>
     </nav>
-    <div class="pie">CBO Finanzas · versión 4.4</div>
+    <div class="pie">CBO Finanzas · versión 4.5</div>
   </aside>
   <div class="velo" id="velo"></div>
 
@@ -1084,6 +1204,9 @@ button.ud-card{cursor:pointer;width:100%}
         <p class="note">Utilidad neta de cada obra = ingresos − gastos (materiales, planilla, etc.) − IGV que le toca (IGV de ventas − IGV de compras con factura) − renta 1%. Es referencial: los impuestos se declaran por mes, no por obra.</p>
       </section>
 
+      <!-- INVENTARIO DE OBRA -->
+      <section data-sec="inventario" hidden><div class="inv" id="invApp"></div></section>
+
       <section data-sec="anual" hidden>
         <div class="g2" style="margin-bottom:16px">
           <section class="panel"><div class="ph"><h2>Utilidad mes a mes</h2><span class="hint" id="anUtTot"></span></div><svg class="chart" id="anUt" viewBox="0 0 560 220" role="img" aria-label="Utilidad de cada mes del año"></svg></section>
@@ -1162,7 +1285,7 @@ button.ud-card{cursor:pointer;width:100%}
             <p class="note">El PIN se guarda cifrado (SHA-256) solo en este equipo. Si lo olvidas, puedes quitarlo con tu clave de acceso de Google.</p>
           </div></details>
           <details class="cfg-item" data-cfg="acerca"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/></svg></i><span class="cfg-t"><b>Acerca de</b><small class="cfg-v" id="cfgv-acerca"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
-            <p class="hint" style="margin:0">CBO Finanzas 4.4. Tus datos se guardan en tu archivo de Google Sheets "CASA BONITA OREGON S.A.C.". Este celular solo guarda una copia para verlos sin internet.</p>
+            <p class="hint" style="margin:0">CBO Finanzas 4.5. Tus datos se guardan en tu archivo de Google Sheets "CASA BONITA OREGON S.A.C.". Este celular solo guarda una copia para verlos sin internet.</p>
           </div></details>
           <section class="panel" hidden>
             <div class="ph"><h2>Firma para comprobantes</h2><span class="hint" id="firmaEstado"></span></div>
@@ -1398,6 +1521,7 @@ button.ud-card{cursor:pointer;width:100%}
       <button type="button" data-ir="terceros"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="9" r="2.5"/><path d="M15 15c3 0 6 1.5 6 4.5"/></svg><span>Clientes y proveedores<small>Quién te paga y a quién le compras</small></span></button>
       <button type="button" data-ir="planilla"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M8 6V4h8v2M3 12h18"/></svg><span>Planilla<small>Pagos a trabajadores</small></span></button>
       <button type="button" data-ir="obras"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V10l7-5 7 5v11M9 21v-6h6v6"/></svg><span>Ganancia por obra<small>Cuánto dejó cada obra</small></span></button>
+      <button type="button" data-ir="inventario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-5 9 5v10l-9 5-9-5z"/><path d="M3 9l9 5 9-5M12 14v10"/></svg><span>Inventario de obra<small>Material por obra y por piso</small></span></button>
       <button type="button" data-ir="anual"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Resumen anual<small>Mes a mes, todo el año</small></span></button>
       <button type="button" class="repCsv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg><span>Reporte del mes en Excel<small>Archivo CSV para tu contador</small></span></button>
       <button type="button" class="repPdf"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></svg><span>Reporte del mes en PDF<small>Vista para imprimir o guardar</small></span></button>
@@ -1406,6 +1530,10 @@ button.ud-card{cursor:pointer;width:100%}
     </div>
   </div>
 </div>
+
+<!-- Inventario: hoja de una pieza y datos de la obra -->
+<div class="overlay" id="ovInv" hidden><div class="sheet" id="invSheet"></div></div>
+<div class="overlay" id="ovInvObra" hidden><div class="sheet" id="invObraSheet"></div></div>
 
 <!-- Hoja de un movimiento -->
 <div class="overlay" id="ovMov" hidden>
@@ -1501,7 +1629,7 @@ const pagadoSun=per=>rows.filter(r=>esPagoSun(r)&&r.serie===per&&!/Planilla|Mult
 // Cronograma SUNAT 2026, RUC terminado en 3 (periodo → fecha de vencimiento)
 const VENCE={"2025-12":"2026-01-21","2026-01":"2026-02-18","2026-02":"2026-03-18","2026-03":"2026-04-21","2026-04":"2026-05-20","2026-05":"2026-06-17","2026-06":"2026-07-17","2026-07":"2026-08-20","2026-08":"2026-09-17","2026-09":"2026-10-20","2026-10":"2026-11-18","2026-11":"2026-12-21","2026-12":"2027-01-20"};
 const MESES=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
-const TITULOS={inicio:"Inicio",movimientos:"Movimientos",sunat:"Impuestos SUNAT",terceros:"Clientes y proveedores",planilla:"Planilla",anual:"Resumen anual",obras:"Ganancia por obra",config:"Configuración"};
+const TITULOS={inicio:"Inicio",movimientos:"Movimientos",sunat:"Impuestos SUNAT",terceros:"Clientes y proveedores",planilla:"Planilla",anual:"Resumen anual",obras:"Ganancia por obra",inventario:"Inventario de obra",config:"Configuración"};
 const $=id=>document.getElementById(id);
 const r2=n=>Math.round(n*100)/100;
 const fmt=n=>"S/ "+(Math.abs(n)<0.005?0:n).toLocaleString("es-PE",{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -1778,9 +1906,10 @@ function ir(s){
   document.querySelectorAll("#nav button").forEach(b=>b.setAttribute("aria-current",b.dataset.s===s?"page":"false"));
   const enMas=!["inicio",...[...document.querySelectorAll("#tabbar [data-tab]")].map(b=>b.dataset.tab)].includes(s);
   document.querySelectorAll("#tabbar [data-tab]").forEach(b=>b.setAttribute("aria-current",(b.dataset.tab===s||(b.dataset.tab==="mas"&&enMas))?"page":"false"));
-  $("titulo").textContent=TITULOS[s]; $("monthsel").hidden=s==="config";
+  $("titulo").textContent=TITULOS[s]; $("monthsel").hidden=s==="config"||s==="inventario";
   $("app").classList.remove("abierto");document.body.classList.remove("menu"); try{history.replaceState(null,"","#"+s)}catch{}
   if(s==="obras") try{renderObras()}catch(e){console.error(e)}
+  if(s==="inventario") try{invRender();invCargar()}catch(e){console.error(e)}
   if(cambio&&fxType()!=="none"&&fxType()!=="choreo"&&fxType()!=="morph") {/* la transición elegida ya anima */}
   window.scrollTo(0,0);
 }
@@ -2339,7 +2468,7 @@ if(window.visualViewport){
 document.addEventListener("focusin",e=>{const t=e.target;if(t.closest&&t.closest(".sheet")&&/INPUT|SELECT|TEXTAREA/.test(t.tagName))setTimeout(()=>t.scrollIntoView({block:"center",behavior:"smooth"}),320)});
 $("fab").onclick=()=>openF(); $("close").onclick=closeF;
 $("ov").addEventListener("click",e=>{if(e.target===$("ov"))closeF()});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("escaner").hidden)cerrarEscaner();else if(!$("ov").hidden)closeF();["ovMas","ovMov"].forEach(cerrarOv);$("app").classList.remove("abierto")}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("escaner").hidden)cerrarEscaner();else if(!$("ov").hidden)closeF();["ovMas","ovMov","ovInv","ovInvObra"].forEach(cerrarOv);$("app").classList.remove("abierto")}});
 $("f").addEventListener("submit",async e=>{
   e.preventDefault();
   if(!validarPaso(paso))return;
@@ -2741,6 +2870,7 @@ async function cargar(){
     const h=new Date().toLocaleTimeString("es-PE",{hour:"2-digit",minute:"2-digit"});
     $("status").textContent="Conectado con tu archivo de Google · "+h; $("cfgEstado").textContent="Conectado · actualizado "+h;
     setTimeout(()=>{try{sincronizarFirmas()}catch{}},800);
+    setTimeout(()=>{try{invCargar()}catch{}},1500);
   }catch(e){
     if(e.code==="clave"){abrirSetup("La clave no es correcta.");}
     else{rows=conCola(servidorRows);render();$("status").textContent="Sin conexión. Mostrando los últimos datos guardados en este equipo.";$("cfgEstado").textContent="Sin conexión"}
@@ -3752,7 +3882,7 @@ function pintarResumenCfg(){
   v("rep","Excel o PDF del mes");
   v("con",($("cfgEstado")||{}).textContent||"—");
   v("seg","PIN: "+((($("pinEstado")||{}).textContent)||"Desactivado").toLowerCase());
-  v("acerca","CBO Finanzas 4.4");
+  v("acerca","CBO Finanzas 4.5");
 }
 document.querySelectorAll(".cfg-item").forEach(d=>d.addEventListener("toggle",()=>{if(d.open){document.querySelectorAll(".cfg-item[open]").forEach(o=>{if(o!==d)o.open=false});setTimeout(()=>d.scrollIntoView({block:"nearest",behavior:"smooth"}),60)}}));
 document.querySelector('[data-sec="config"]').addEventListener("click",()=>setTimeout(pintarResumenCfg,80));
@@ -3885,6 +4015,365 @@ function pintarSon(){document.querySelectorAll("#sonSeg [data-son]").forEach(b=>
 pintarSon();
 $("metaMes").onclick=()=>{ir("config");setTimeout(()=>{const m=$("meta");if(m){m.scrollIntoView({block:"center"});m.focus()}},350)};
 setTimeout(()=>{try{pintarExtras()}catch{}try{pintarUD()}catch(e){console.warn(e)}},30);
+/* ===== Inventario de obra: catálogo (una foto por tipo; las medidas se eligen al registrar) ===== */
+const INV_M=(()=>{
+  const PVA=['½"','¾"','1"','1¼"','1½"','2"','2½"','3"','4"'], PVA6=PVA.slice(0,6);
+  const DES=['1½"','2"','3"','4"','6"'], DES3=['2"','3"','4"'];
+  const PPR=['20 mm (½")','25 mm (¾")','32 mm (1")','40 mm (1¼")','50 mm (1½")','63 mm (2")','75 mm (2½")','90 mm (3")','110 mm (4")'], PPR6=PPR.slice(0,6);
+  const MET=['½"','¾"','1"','1¼"','1½"','2"','2½"','3"','4"'], MET6=MET.slice(0,6);
+  const CPV=['½"','¾"','1"'];
+  const RAG=['¾" × ½"','1" × ½"','1" × ¾"','1¼" × 1"','1½" × 1"','2" × 1"','2" × 1½"'];
+  const RDE=['3" × 2"','4" × 2"','4" × 3"','6" × 4"'];
+  const RPP=['25 × 20 mm','32 × 20 mm','32 × 25 mm','40 × 32 mm','50 × 40 mm','63 × 50 mm'];
+  const RPR=['20 mm × ½"','25 mm × ¾"','32 mm × 1"','40 mm × 1¼"','50 mm × 1½"','63 mm × 2"'];
+  const SAP=['⅝"','¾"','1"','1¼"','1½"','2"'];
+  const EST=['Estándar'];
+  return {PVA,PVA6,DES,DES3,PPR,PPR6,MET,MET6,CPV,RAG,RDE,RPP,RPR,SAP,EST};
+})();
+// [id, nombre, foto (n.° del PDF, 0 = sin foto), medidas, unidad]
+const INV_CAT=(()=>{const M=INV_M,u="und";return [
+ {id:"gas",n:"Gasfitería",sub:"Agua, desagüe y sanitarios",fotos:[36,15,53,72],grupos:[
+  {id:"pvca",n:"PVC agua",c:"#8E989D",items:[
+   ["tubo","Tubo PVC agua (5 m)",1,M.PVA,"tubo"],["codo90","Codo 90°",2,M.PVA,u],["codo45","Codo 45°",3,M.PVA,u],["tee","Tee",4,M.PVA,u],
+   ["teer","Tee reducida",16,M.RAG,u],["union","Unión",5,M.PVA,u],["uniu","Unión universal",6,M.PVA6,u],["red","Reducción",7,M.RAG,u],
+   ["upr","Adaptador UPR (rosca)",8,M.PVA6,u],["tapm","Tapón macho",9,M.PVA6,u],["taph","Tapón hembra",10,M.PVA6,u],["niple","Niple",11,M.PVA6,u]]},
+  {id:"pvcd",n:"PVC desagüe",c:"#6F8189",items:[
+   ["tubo","Tubo PVC desagüe (3 m)",12,M.DES,"tubo"],["codo90","Codo 90°",15,M.DES,u],["codo45","Codo 45°",14,M.DES,u],
+   ["codov","Codo 90° con ventilación",13,['3" × 2"','4" × 2"'],u],["tee","Tee",17,M.DES,u],["teer","Tee reducida",18,M.RDE,u],
+   ["tees","Tee sanitaria",0,['2"','3"','4"','3" × 2"','4" × 2"'],u],["yee","Yee",20,M.DES,u],["yeer","Yee reducida",19,M.RDE,u],
+   ["yeed","Yee doble",22,M.DES3,u],["yeedr","Yee doble reducida",21,['4" × 2"','4" × 3"'],u],["cruz","Cruz sanitaria",23,['4"','4" × 2"','4" × 3"'],u],
+   ["red","Reducción",24,M.RDE,u],["union","Unión",25,M.DES,u],["tapon","Tapón",26,M.DES,u],["regr","Registro roscado",27,M.DES3,u],
+   ["sumid","Sumidero",28,['2"','3"'],u],["regc","Registro cromado",29,M.DES3,u],["trampa","Trampa P",30,['1½"','2"'],u],
+   ["somb","Sombrero de ventilación",32,M.DES3,u],["caja","Caja de registro",33,['10" × 20"','12" × 24"','18" × 24"','24" × 24"'],u],
+   ["tapar","Tapa de registro",0,['10" × 20"','12" × 24"','18" × 24"','24" × 24"'],u],["canal","Rejilla de piso / canaleta",34,['50 cm','1 m'],u]]},
+  {id:"ppr",n:"PPR",c:"#2E9A57",items:[
+   ["tubo","Tubo PPR (4 m)",35,M.PPR,"tubo"],["codo90","Codo 90°",36,M.PPR,u],["codo45","Codo 45°",37,M.PPR,u],["tee","Tee",38,M.PPR,u],
+   ["teer","Tee reducida",39,M.RPP,u],["red","Reducción",40,M.RPP,u],["union","Unión",41,M.PPR,u],["uniu","Unión universal",42,M.PPR6,u],
+   ["unim","Unión mixta (rosca metálica)",43,M.RPR.slice(0,4),u],["adm","Adaptador macho",44,M.RPR,u],["adh","Adaptador hembra",45,M.RPR,u],
+   ["codoh","Codo con rosca hembra",46,['20 mm × ½"','25 mm × ½"','25 mm × ¾"'],u],["teeh","Tee con rosca hembra",47,['20 mm × ½"','25 mm × ½"','25 mm × ¾"'],u],
+   ["tapon","Tapón",48,M.PPR6,u],["tapm","Tapón macho roscado",49,['½"','¾"','1"'],u],["llesf","Llave esférica PPR",50,M.PPR.slice(0,5),u],
+   ["llpaso","Llave de paso PPR",51,M.PPR.slice(0,5),u],["llemp","Llave empotrada PPR",52,['20 mm (½")','25 mm (¾")'],u],["cruce","Cruce / sobrepaso",0,M.PPR.slice(0,3),u]]},
+  {id:"cpvc",n:"CPVC",c:"#C9B27C",items:[
+   ["tubo","Tubo CPVC (3 m)",0,M.CPV,"tubo"],["codo","Codo 90°",0,M.CPV,u],["tee","Tee",0,M.CPV,u],["union","Unión",0,M.CPV,u],["adap","Adaptador",0,M.CPV,u]]},
+  {id:"bro",n:"Bronce",c:"#B8892C",items:[
+   ["llesf","Llave esférica",53,M.MET.slice(0,7),u],["comp","Válvula de compuerta",54,M.MET,u],["check","Válvula check",55,M.MET,u],
+   ["flot","Válvula flotadora",56,['½"','¾"','1"'],u],["pie","Válvula de pie",57,['1"','1¼"','1½"','2"'],u],["inc","Válvula angular contra incendio",58,['1½"','2½"'],u],
+   ["angular","Llave angular de abasto",0,['½" × ½"','½" × ⅜"'],u],["codo","Codo",59,M.MET6,u],["tee","Tee",60,M.MET6,u],["uniu","Unión universal",61,M.MET6,u],
+   ["niple","Niple largo",62,['½" × 2"','½" × 4"','¾" × 2"','¾" × 4"','1" × 2"','1" × 4"'],u],["niplec","Niple hexagonal",63,M.MET.slice(0,5),u],
+   ["bush","Bushing / reducción",64,M.RAG,u],["tapon","Tapón",65,M.MET6,u],["grifo","Grifo de jardín",66,['½"','¾"'],u]]},
+  {id:"gal",n:"Galvanizado",c:"#9AA6AE",items:[
+   ["tubo","Tubo galvanizado (6.4 m)",67,M.MET,"tubo"],["codo90","Codo 90°",68,M.MET,u],["codo45","Codo 45°",69,M.MET,u],["tee","Tee",70,M.MET,u],
+   ["teer","Tee reducida",0,M.RAG,u],["cruz","Cruz",0,M.MET6,u],["union","Unión",71,M.MET,u],["uniu","Unión universal",72,M.MET6,u],
+   ["niple","Niple",73,M.MET,u],["bush","Bushing / reducción",74,M.RAG,u],["tapm","Tapón macho",75,M.MET,u],["taph","Tapón hembra",76,M.MET,u]]},
+  {id:"peg",n:"Pegamentos y sellos",c:"#D07A2D",items:[
+   ["pvc","Pegamento PVC",77,['1/32 gal','1/16 gal','1/8 gal','1/4 gal','1 gal'],"frasco"],["limp","Limpiador PVC",78,['1/16 gal','1/8 gal','1/4 gal','1 gal'],"frasco"],
+   ["cpvc","Pegamento CPVC",79,['1/16 gal','1/8 gal','1/4 gal'],"frasco"],["teflon","Cinta teflón",80,['½" × 10 m','¾" × 10 m','¾" × 50 m'],"rollo"],
+   ["pegat","Soldadura en frío Pegatanke",81,['Chico','Grande'],u],["sika","Sellador Sikaflex",82,['300 ml'],u],
+   ["abraz","Abrazadera colgante",83,['½"','¾"','1"','2"','3"','4"'],u],["canamo","Cáñamo / estopa",0,['Rollo'],u],["pasta","Pasta selladora de roscas",0,['Tubo'],u]]},
+  {id:"ino",n:"Inodoro",c:"#7FA7B8",items:[
+   ["inodoro","Inodoro",84,['Una pieza','Dos piezas'],u],["asiento","Asiento de inodoro",0,['Estándar','Cierre lento'],u],["desc","Válvula de descarga",85,M.EST,u],
+   ["llen","Válvula de llenado",86,M.EST,u],["abasto","Tubo de abasto",87,['⅞" × ½" · 30 cm','⅞" × ½" · 40 cm','½" × ½" · 30 cm','½" × ½" · 40 cm'],u],
+   ["cera","Anillo de cera",88,M.EST,u],["pernos","Pernos de anclaje",89,['Juego'],u],["brida","Brida de inodoro",0,['4"'],u]]},
+  {id:"lav",n:"Lavatorio y lavadero",c:"#8FB3A2",items:[
+   ["sob","Lavatorio de sobreponer",90,M.EST,u],["ped","Lavatorio con pedestal",91,M.EST,u],["grif","Grifería de lavatorio",92,['Monomando','Dos llaves'],u],
+   ["des","Desagüe de lavatorio",93,['1¼"'],u],["tramp","Trampa de lavatorio",94,['1¼"','1½"'],u],["lavad","Lavadero de cocina",95,['1 poza','2 pozas'],u],
+   ["gcoc","Grifería de cocina",96,['De mesa','De pared'],u],["canast","Canastilla de lavadero",0,['3½"'],u]]},
+  {id:"duc",n:"Ducha",c:"#6C9DC4",items:[
+   ["set","Juego de ducha empotrado",97,M.EST,u],["reg","Regadera",98,['20 cm','25 cm','30 cm'],u],["brazo","Brazo de ducha",99,['30 cm','40 cm'],u],
+   ["mezc","Mezcladora monomando",100,M.EST,u],["telef","Ducha teléfono",101,M.EST,u],["elec","Ducha eléctrica",0,['5500 W'],u]]},
+  {id:"tan",n:"Tanques y equipos",c:"#3E8FC9",items:[
+   ["tanque","Tanque elevado",102,['600 L','1100 L','2500 L'],u],["cist","Cisterna prefabricada",103,['1200 L','2800 L','5000 L'],u],
+   ["bomba","Electrobomba",104,['½ HP','1 HP','1½ HP','2 HP'],u],["flotel","Flotador eléctrico",105,M.EST,u],["terma","Terma eléctrica",106,['30 L','50 L','80 L','100 L'],u],
+   ["medidor","Medidor de agua",107,['½"','¾"'],u],["mang","Manguera",108,['½"','¾"'],"m"],["prueba","Bomba de prueba hidráulica",109,['Manual'],u],["tapac","Tapa de cisterna",0,['60 × 60 cm'],u]]}
+ ]},
+ {id:"ele",n:"Electricidad",sub:"Cables, tubería, cajas y tableros",fotos:[110,139,128,145],grupos:[
+  {id:"cab",n:"Cables",c:"#C2462F",items:[
+   ["nh80","Cable NH-80 / THW",110,['1.5 mm²','2.5 mm² (14 AWG)','4 mm² (12 AWG)','6 mm² (10 AWG)','10 mm² (8 AWG)','16 mm² (6 AWG)','25 mm² (4 AWG)'],"m"],
+   ["mell","Cable mellizo",111,['2 × 18 AWG','2 × 16 AWG','2 × 14 AWG','2 × 12 AWG'],"m"],["nlt","Cable vulcanizado NLT / NMT",112,['2 × 16 AWG','2 × 14 AWG','3 × 14 AWG','3 × 12 AWG','3 × 10 AWG'],"m"],
+   ["tierra","Cable TW-80 tierra",113,['2.5 mm²','4 mm²','6 mm²','10 mm²','16 mm²'],"m"],["desnudo","Cable de cobre desnudo",0,['10 mm²','16 mm²','25 mm²'],"m"],
+   ["utp","Cable UTP",114,['Cat 5e','Cat 6'],"m"],["coax","Cable coaxial",115,['RG6','RG59'],"m"]]},
+  {id:"tub",n:"Tubería",c:"#7C878C",items:[
+   ["sap","Tubo PVC SAP (3 m)",116,M.SAP,"tubo"],["sel","Tubo PVC SEL (3 m)",117,['⅝"','¾"','1"'],"tubo"],["curva","Curva SAP",118,M.SAP,u],
+   ["union","Unión SAP",119,M.SAP,u],["conec","Conector / campana",120,M.SAP,u],["corrug","Tubo corrugado",121,['½"','¾"','1"'],"m"],
+   ["canal","Canaleta",122,['13 × 7 mm','20 × 12 mm','32 × 12 mm','40 × 25 mm'],"tira"],["grapa","Grapa para tubo",0,['⅝"','¾"','1"'],u]]},
+  {id:"caj",n:"Cajas",c:"#4F6F8F",items:[
+   ["rectp","Caja rectangular PVC",123,['4" × 2" × 1½"'],u],["rectm","Caja rectangular metálica",124,['4" × 2" × 1½"'],u],["octp","Caja octogonal PVC",125,['4" × 1½"'],u],
+   ["octm","Caja octogonal metálica",126,['4" × 1½"'],u],["cuad","Caja cuadrada / de pase",127,['4" × 4"','6" × 6"','10" × 10"'],u],["ciega","Tapa ciega",0,['Rectangular','Octogonal','Cuadrada'],u]]},
+  {id:"int",n:"Interruptores y tomas",c:"#A9A08C",items:[
+   ["simple","Interruptor simple",128,M.EST,u],["doble","Interruptor doble",129,M.EST,u],["triple","Interruptor triple",130,M.EST,u],["conm","Interruptor conmutador",128,M.EST,u],
+   ["tdob","Tomacorriente doble",131,M.EST,u],["ttie","Tomacorriente con tierra",132,M.EST,u],["ttv","Toma de TV",133,M.EST,u],["timbre","Pulsador de timbre",134,M.EST,u],
+   ["dimmer","Dimmer",0,M.EST,u],["rj45","Toma de data RJ45",0,M.EST,u],["sensor","Sensor de movimiento",0,M.EST,u],["enchufe","Enchufe",0,M.EST,u],
+   ["clav","Clavija industrial",135,['16 A · 2P+T','32 A · 2P+T','16 A · 3P+T','32 A · 3P+T'],u],["tind","Tomacorriente industrial",136,['16 A · 2P+T','32 A · 2P+T','16 A · 3P+T','32 A · 3P+T'],u],
+   ["deriv","Derivador industrial",137,['16 A','32 A'],u]]},
+  {id:"tab",n:"Tablero y protección",c:"#5E6A73",items:[
+   ["tablero","Tablero de distribución",138,['4 polos','8 polos','12 polos','18 polos','24 polos'],u],
+   ["termo","Interruptor termomagnético",139,['1 × 16 A','1 × 20 A','2 × 16 A','2 × 20 A','2 × 25 A','2 × 32 A','2 × 40 A','2 × 50 A','2 × 63 A','3 × 32 A','3 × 63 A'],u],
+   ["dif","Interruptor diferencial",140,['2 × 25 A · 30 mA','2 × 40 A · 30 mA','2 × 63 A · 30 mA','4 × 40 A · 30 mA'],u],["temp","Temporizador digital",141,M.EST,u],
+   ["peine","Peine de conexión",142,['1 polo','2 polos','3 polos'],u],["varilla","Varilla de cobre",143,['⅝" × 1.8 m','⅝" × 2.4 m','¾" × 2.4 m'],u],
+   ["convar","Conector de varilla",144,['⅝"','¾"'],u],["cuchilla","Interruptor de cuchilla",0,['2 × 30 A','2 × 60 A','3 × 60 A'],u],
+   ["contac","Contactor",0,['9 A','12 A','18 A','25 A'],u],["barra","Barra de tierra",0,['6 puntos','12 puntos'],u],["bento","Bentonita / cemento conductivo",0,['Bolsa 30 kg'],u]]},
+  {id:"ilu",n:"Iluminación",c:"#D9A93A",items:[
+   ["foco","Foco LED",145,['7 W','9 W','12 W','15 W','18 W','24 W'],u],["dicro","Dicroico LED GU10",146,['5 W','7 W'],u],["refl","Reflector LED",147,['30 W','50 W','100 W','150 W','200 W'],u],
+   ["emerg","Luminaria de emergencia",148,M.EST,u],["panel","Panel LED empotrable",0,['12 W','18 W','24 W'],u],["tuboled","Tubo LED",0,['9 W','18 W'],u],["socket","Socket / portalámparas",0,['E27'],u]]},
+  {id:"con",n:"Consumibles",c:"#3C3F44",items:[
+   ["aisl","Cinta aislante",149,['Negra','Colores'],"rollo"],["vulc","Cinta vulcanizante",150,M.EST,"rollo"],["cint","Cintillos",151,['10 cm','15 cm','20 cm','30 cm','40 cm'],"bolsa"],
+   ["wago","Conector rápido Wago",152,['2 vías','3 vías','5 vías'],u],["born","Bornera / regleta",153,['6 mm²','10 mm²','16 mm²'],u],["term","Terminales",154,['Kit','Ojo','Horquilla','Pin'],u],
+   ["tarugo","Tarugos con tornillo",155,['6 mm','8 mm','10 mm'],"bolsa"],["guia","Guía pasacables",156,['15 m','20 m','30 m'],u]]}
+ ]}
+];})();
+// Índice rápido: "gas.ppr.codo90" → {cat, grupo, id, n, f, m, u}
+const INV_IDX={};
+INV_CAT.forEach(c=>c.grupos.forEach(g=>g.items.forEach(([id,n,f,m,u])=>{const k=c.id+"."+g.id+"."+id;INV_IDX[k]={k,cat:c,g,id,n,f,m,u}})));
+
+/* ===== Inventario de obra =====
+   Movimientos: "entra" (llega material a la obra), "usa" (se instala en un piso), "sobra" (se devuelve o se lleva).
+   Saldo en obra = entra − usa − sobra. Las fotos y los movimientos se guardan en hojas ocultas de tu Excel. */
+const INV_K="cbo-inv", INV_VER="cbo-inv-ver", INV_FOT="cbo-inv-fotos", INV_FOTV="cbo-inv-fotos-ver", INV_OBRA="cbo-inv-obra", INV_COLA="cbo-inv-cola";
+let invData=leerLS(INV_K,{movs:[],obras:[]})||{movs:[],obras:[]}, invFotos=leerLS(INV_FOT,{})||{}, invCola=leerLS(INV_COLA,[])||[];
+let invObra=leerLS(INV_OBRA,""), invVista="home", invGrupo="", invQ="", invItemAbierto=null, invForm={tipo:"usa",medida:"",cant:"",piso:"",precio:"",nota:""};
+const INV_TIPOS={entra:"Entra a la obra",usa:"Se usa en un piso",sobra:"Sobra o se devuelve"};
+const INV_VERBO={entra:"Entraron",usa:"Se usaron",sobra:"Sobraron"};
+const escA=t=>esc(t).replace(/"/g,"&quot;");
+const invNum=n=>Number(n||0).toLocaleString("es-PE",{maximumFractionDigits:2});
+const invU=(u,n)=>u==="und"?"":(" "+(u==="m"?"m":u+(Math.abs(n)===1?"":(u==="m"?"":"s"))));
+const invCfg=o=>invData.obras.find(x=>x.obra.toUpperCase()===String(o||"").toUpperCase());
+const invTodoCosto=()=>((invCfg(invObra)||{}).modalidad||"todo")==="todo";
+function invPisos(o){const c=invCfg(o);const p=(c&&c.pisos)?c.pisos.split(",").map(s=>s.trim()).filter(Boolean):["1","2","3"];return p}
+function pisoLbl(p){if(/^\d+$/.test(p)){const n=+p;return n+(n===1||n===3?".er":".º")+" piso"}return p}
+function invFoto(it){return invFotos[it.k]||(it.f?invFotos["f"+it.f]:"")||""}
+function invMovsObra(){const O=String(invObra||"").toUpperCase();return invData.movs.concat(invCola.filter(c=>c.accion==="invMov").map(c=>Object.assign({pend:1},c.mov))).filter(m=>String(m.obra).toUpperCase()===O&&!invCola.some(c=>c.accion==="invBorrar"&&c.id===m.id))}
+function invSaldo(movs,k,med){let s=0;movs.forEach(m=>{if(m.item!==k||(med!=null&&m.medida!==med))return;s+=m.tipo==="entra"?m.cant:-m.cant});return s}
+function invPrecio(movs,k,med){const L=movs.filter(m=>m.item===k&&m.medida===med&&m.precio>0).sort((a,b)=>b.ts-a.ts);return L.length?L[0].precio:0}
+
+/* ----- Conexión ----- */
+async function invApi(accion,extra){
+  if(esDemo()||!cfg) return {ok:true,demo:true};
+  return api(accion,extra);
+}
+async function invEnviarCola(){
+  if(esDemo()||!cfg||!navigator.onLine) return;
+  while(invCola.length){const c=invCola[0];
+    try{await api(c.accion,c.accion==="invMov"?{mov:c.mov}:c.accion==="invBorrar"?{id:c.id}:c.accion==="invObra"?{obra:c.obra}:{item:c.item,data:c.data})}
+    catch(e){if(esErrorRed(e))return; }
+    invCola.shift();guardarLS(INV_COLA,invCola)}
+}
+let invCargando=false;
+async function invCargar(forzar){
+  if(invCargando||!cfg||esDemo()) return; invCargando=true;
+  try{
+    await invEnviarCola();
+    const j=await api("invDatos",!forzar&&leerLS(INV_VER,"")?{ver:leerLS(INV_VER,"")}:{});
+    if(!j.sinCambios){invData={movs:j.movs||[],obras:j.obras||[]};guardarLS(INV_K,invData)}
+    guardarLS(INV_VER,j.ver||"");
+    if(!Object.keys(invFotos).length||leerLS(INV_FOTV,"")!==j.verFotos){
+      const f=await api("invFotos");invFotos=f.fotos||{};try{localStorage.setItem(INV_FOT,JSON.stringify(invFotos))}catch{}guardarLS(INV_FOTV,f.verFotos||j.verFotos||"")}
+    if(seccion==="inventario") invRender();
+  }catch(e){}finally{invCargando=false}
+}
+async function invGuardar(accion,datos){
+  // Se ve al instante en la app; si no hay señal queda en cola y se envía después
+  const c=Object.assign({accion},datos);
+  if(accion==="invObra"){const i=invData.obras.findIndex(x=>x.obra.toUpperCase()===datos.obra.obra.toUpperCase());if(i>=0)invData.obras[i]=datos.obra;else invData.obras.push(datos.obra);guardarLS(INV_K,invData)}
+  if(esDemo()){if(accion==="invMov"){invData.movs.push(datos.mov)}if(accion==="invBorrar"){invData.movs=invData.movs.filter(m=>m.id!==datos.id)}guardarLS(INV_K,invData);return true}
+  try{await invApi(accion,accion==="invMov"?{mov:datos.mov}:accion==="invBorrar"?{id:datos.id}:accion==="invObra"?{obra:datos.obra}:{item:datos.item,data:datos.data});
+    if(accion==="invMov"){invData.movs.push(datos.mov)}if(accion==="invBorrar"){invData.movs=invData.movs.filter(m=>m.id!==datos.id)}
+    guardarLS(INV_K,invData);return true}
+  catch(e){if(esErrorRed(e)){invCola.push(c);guardarLS(INV_COLA,invCola);return true}toast("No se guardó: "+e.message);return false}
+}
+
+/* ----- Pantallas ----- */
+function invRender(){
+  const el=$("invApp"); if(!el) return;
+  if(invVista.startsWith("cat:")) return invRenderCat(el, invVista.slice(4));
+  if(invVista==="obra") return invRenderObra(el);
+  invRenderHome(el);
+}
+const IC={
+  back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+  cam:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
+  edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>',
+  lupa:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg>'
+};
+function invObrasLista(){
+  const s=new Map(); invData.obras.forEach(o=>s.set(o.obra.toUpperCase(),o.obra));
+  try{obrasConocidas().forEach(o=>{if(!s.has(o.n.toUpperCase()))s.set(o.n.toUpperCase(),o.n)})}catch{}
+  return [...s.values()];
+}
+function invRenderHome(el){
+  const obras=invObrasLista(); if(!invObra&&obras.length){invObra=obras[0];guardarLS(INV_OBRA,invObra)}
+  const c=invCfg(invObra), movs=invMovsObra(), tc=invTodoCosto();
+  const usados=movs.filter(m=>m.tipo==="usa"), costo=usados.reduce((s,m)=>s+m.cant*(m.precio||invPrecio(movs,m.item,m.medida)),0);
+  const pisos=invPisos(invObra), porPiso=pisos.map(p=>{const L=usados.filter(m=>m.piso===p);return {p,n:L.reduce((s,m)=>s+m.cant,0),s:L.reduce((s,m)=>s+m.cant*(m.precio||invPrecio(movs,m.item,m.medida)),0)}});
+  const maxP=Math.max(1,...porPiso.map(x=>tc?x.s:x.n));
+  const enObra=new Set(); movs.forEach(m=>enObra.add(m.item));
+  const conSaldo=[...enObra].filter(k=>invSaldo(movs,k)>0.0001);
+  const tarjeta=cat=>{const n=cat.grupos.reduce((s,g)=>s+g.items.length,0), sal=conSaldo.filter(k=>k.startsWith(cat.id+".")).length;
+    return `<button type="button" class="inv-cat inv-cat-${cat.id}" data-invcat="${cat.id}"><span class="inv-plato">${cat.fotos.map(f=>`<img alt="" src="${invFotos["f"+f]||""}" ${invFotos["f"+f]?"":"hidden"}>`).join("")}</span>
+      <span class="inv-cat-tx"><b>${cat.n}</b><small>${cat.sub}</small><em>${n} piezas${sal?` · ${sal} con saldo en obra`:""}</em></span></button>`};
+  el.innerHTML=`
+  <div class="inv-obra">
+    <label class="inv-obra-sel"><span>Obra</span><select id="invObraSel">${obras.length?obras.map(o=>`<option value="${escA(o)}" ${o.toUpperCase()===String(invObra).toUpperCase()?"selected":""}>${esc(o)}</option>`).join(""):'<option value="">Aún no hay obras</option>'}</select></label>
+    <div class="inv-obra-meta">${invObra?`<span class="inv-mod ${tc?"tc":"cl"}">${tc?"A todo costo":"Material del cliente"}</span><span class="inv-pis">${pisos.length} niveles</span>`:""}
+      <button type="button" class="btnlink" id="invObraCfg">${c?"Editar obra":invObra?"Configurar obra":"+ Nueva obra"}</button>${invObra?'<button type="button" class="btnlink" id="invObraNueva">+ Nueva</button>':""}</div>
+  </div>
+  <div class="inv-cats">${INV_CAT.map(tarjeta).join("")}</div>
+  ${invObra?`<section class="panel inv-res" id="invRes">
+    <div class="ph"><h2>${tc?"Material usado en la obra":"Piezas usadas en la obra"}</h2><button type="button" class="btnlink" id="invVerObra">Ver por piso y material ›</button></div>
+    <p class="inv-big">${tc?fmt(costo):invNum(usados.reduce((s,m)=>s+m.cant,0))+" piezas"}</p>
+    <div class="inv-pisos">${porPiso.map(x=>`<div class="inv-piso"><span>${esc(pisoLbl(x.p))}</span><i><b style="width:${Math.round((tc?x.s:x.n)/maxP*100)}%"></b></i><em>${tc?fmt0(x.s):invNum(x.n)}</em></div>`).join("")}</div>
+  </section>
+  <section class="panel"><div class="ph"><h2>Últimos movimientos</h2><span class="hint">${movs.length?movs.length+" en esta obra":""}</span></div>
+    <div class="inv-movs">${invFilasMov(movs.slice().sort((a,b)=>b.ts-a.ts).slice(0,8))||'<p class="hint inv-vacio">Todavía no hay material registrado en esta obra. Entra a Gasfitería o Electricidad, toca una pieza y registra lo que llega.</p>'}</div>
+  </section>`:'<p class="inv-vacio">Crea tu primera obra para empezar a llevar el material.</p>'}`;
+  const sel=$("invObraSel"); if(sel) sel.onchange=()=>{invObra=sel.value;guardarLS(INV_OBRA,invObra);invRender()};
+  el.querySelectorAll("[data-invcat]").forEach(b=>b.onclick=()=>{invVista="cat:"+b.dataset.invcat;invGrupo="";invQ="";invRender();window.scrollTo(0,0)});
+  const cf=$("invObraCfg"); if(cf) cf.onclick=()=>invAbrirObra(invObra?invObra:"");
+  const nv=$("invObraNueva"); if(nv) nv.onclick=()=>invAbrirObra("");
+  const vo=$("invVerObra"); if(vo) vo.onclick=()=>{invVista="obra";invRender();window.scrollTo(0,0)};
+  invEventosMov(el);
+}
+function invFilasMov(L){
+  return L.map(m=>{const it=INV_IDX[m.item]||{n:m.item,u:"und",g:{n:"",c:"#999"}},f=it.k?invFoto(it):"";
+    return `<div class="inv-mov"><span class="inv-th">${f?`<img alt="" src="${f}">`:""}</span>
+      <span class="inv-mtx"><b>${esc(it.n)} ${esc(m.medida||"")}</b><small><span class="inv-t ${m.tipo}">${INV_VERBO[m.tipo]||m.tipo} ${invNum(m.cant)}${invU(it.u,m.cant)}</span>${m.tipo==="usa"&&m.piso?" · "+esc(pisoLbl(m.piso)):""} · ${esc(String(m.fecha||"").split("-").reverse().slice(0,2).join("/"))}${m.por?" · "+esc(nomCorto(m.por)):""}${m.pend?" · por enviar":""}</small></span>
+      <button type="button" class="inv-del" data-invdel="${escA(m.id)}" aria-label="Borrar este movimiento">✕</button></div>`}).join("");
+}
+function invEventosMov(el){
+  el.querySelectorAll("[data-invdel]").forEach(b=>b.onclick=()=>{
+    if(b.dataset.conf){invGuardar("invBorrar",{id:b.dataset.invdel}).then(()=>{toast("Movimiento borrado");invRender();if(invItemAbierto)invPintarItem()});return}
+    b.dataset.conf="1";b.textContent="¿Borrar?";b.classList.add("conf");setTimeout(()=>{if(b.isConnected){delete b.dataset.conf;b.textContent="✕";b.classList.remove("conf")}},3500)});
+}
+function invRenderCat(el,catId){
+  const cat=INV_CAT.find(c=>c.id===catId), movs=invMovsObra(), q=invQ.trim().toLowerCase();
+  const grupos=cat.grupos.filter(g=>!invGrupo||g.id===invGrupo);
+  const tile=(g,it)=>{const k=cat.id+"."+g.id+"."+it[0], I=INV_IDX[k], f=invFoto(I), s=invSaldo(movs,k);
+    if(q&&!(I.n+" "+g.n).toLowerCase().includes(q)) return "";
+    return `<button type="button" class="inv-it" data-invit="${k}" style="--mat:${g.c}">
+      <span class="inv-ph">${f?`<img alt="" loading="lazy" src="${f}">`:`<span class="inv-sin">${IC.cam}<small>Sin foto</small></span>`}</span>
+      <b>${esc(I.n)}</b><small>${I.m.length>1?I.m.length+" medidas":esc(I.m[0])}</small>${s>0.0001?`<em>${invNum(s)} en obra</em>`:""}</button>`};
+  const cuerpo=grupos.map(g=>{const t=g.items.map(it=>tile(g,it)).join("");return t?`<h3 class="inv-gt" style="--mat:${g.c}">${g.n}</h3><div class="inv-grid">${t}</div>`:""}).join("");
+  el.innerHTML=`
+  <div class="inv-top"><button type="button" class="inv-back" id="invBack" aria-label="Volver">${IC.back}</button><h2>${cat.n}</h2><span class="hint">${esc(invObra||"")}</span></div>
+  <label class="inv-buscar">${IC.lupa}<input id="invQ" type="search" placeholder="Buscar pieza, ej. codo, tee, cable" value="${escA(invQ)}" autocomplete="off"></label>
+  <div class="inv-mats swipe" role="group" aria-label="Material"><button type="button" class="chip" data-invg="" aria-pressed="${!invGrupo}">Todo</button>${cat.grupos.map(g=>`<button type="button" class="chip" data-invg="${g.id}" aria-pressed="${invGrupo===g.id}" style="--mat:${g.c}"><i></i>${g.n}</button>`).join("")}</div>
+  ${cuerpo||'<p class="inv-vacio">No hay piezas con ese nombre.</p>'}`;
+  $("invBack").onclick=()=>{invVista="home";invRender();window.scrollTo(0,0)};
+  const qi=$("invQ"); qi.oninput=()=>{invQ=qi.value;const p=qi.selectionStart;invRender();const n=$("invQ");n.focus();try{n.setSelectionRange(p,p)}catch{}};
+  el.querySelectorAll("[data-invg]").forEach(b=>b.onclick=()=>{invGrupo=b.dataset.invg;invRender()});
+  el.querySelectorAll("[data-invit]").forEach(b=>b.onclick=()=>invAbrirItem(b.dataset.invit));
+}
+function invRenderObra(el){
+  const movs=invMovsObra(), tc=invTodoCosto(), pisos=invPisos(invObra), usados=movs.filter(m=>m.tipo==="usa");
+  const bloque=p=>{const L=usados.filter(m=>m.piso===p), g={};
+    L.forEach(m=>{const key=m.item+"|"+m.medida;const x=g[key]||(g[key]={m,c:0,s:0});x.c+=m.cant;x.s+=m.cant*(m.precio||invPrecio(movs,m.item,m.medida))});
+    const filas=Object.values(g).sort((a,b)=>b.s-a.s||b.c-a.c);
+    const tot=filas.reduce((s,x)=>s+(tc?x.s:x.c),0);
+    return `<section class="panel inv-pb"><div class="ph"><h2>${esc(pisoLbl(p))}</h2><span class="inv-pbt">${tc?fmt(tot):invNum(tot)+" piezas"}</span></div>
+      ${filas.length?`<div class="scroll"><table class="inv-tab"><thead><tr><th>Material</th><th>Cant.</th>${tc?"<th>Precio</th><th>Total</th>":""}</tr></thead><tbody>${filas.map(x=>{const it=INV_IDX[x.m.item]||{n:x.m.item,u:"und",g:{n:""}};return `<tr><td>${esc(it.n)} <small>${esc(x.m.medida)} · ${esc(it.g.n)}</small></td><td>${invNum(x.c)}${invU(it.u,x.c)}</td>${tc?`<td>${fmtN(x.c?x.s/x.c:0)}</td><td>${fmtN(x.s)}</td>`:""}</tr>`}).join("")}</tbody></table></div>`:'<p class="hint">Aún no se registra material usado en este nivel.</p>'}</section>`};
+  // Saldo que queda en la obra
+  const sal={}; movs.forEach(m=>{const key=m.item+"|"+m.medida;sal[key]=(sal[key]||0)+(m.tipo==="entra"?m.cant:-m.cant)});
+  const quedan=Object.entries(sal).filter(([,v])=>v>0.0001).map(([k,v])=>{const [item,med]=k.split("|");return {it:INV_IDX[item]||{n:item,u:"und",g:{n:""}},med,v}});
+  el.innerHTML=`
+  <div class="inv-top"><button type="button" class="inv-back" id="invBack" aria-label="Volver">${IC.back}</button><h2>${esc(invObra)}</h2><span class="inv-mod ${tc?"tc":"cl"}">${tc?"A todo costo":"Material del cliente"}</span></div>
+  <div class="inv-obragrid">${pisos.map(bloque).join("")}
+  <section class="panel"><div class="ph"><h2>Queda en la obra</h2><span class="hint">${quedan.length} piezas</span></div>
+    ${quedan.length?`<div class="scroll"><table class="inv-tab"><thead><tr><th>Material</th><th>Saldo</th></tr></thead><tbody>${quedan.map(x=>`<tr><td>${esc(x.it.n)} <small>${esc(x.med)} · ${esc(x.it.g.n)}</small></td><td>${invNum(x.v)}${invU(x.it.u,x.v)}</td></tr>`).join("")}</tbody></table></div>`:'<p class="hint">No queda material registrado en la obra.</p>'}</section></div>`;
+  $("invBack").onclick=()=>{invVista="home";invRender();window.scrollTo(0,0)};
+}
+
+/* ----- Hoja de una pieza ----- */
+function invAbrirItem(k){
+  if(!invObra){toast("Primero crea o elige una obra");invAbrirObra("");return}
+  invItemAbierto=k; const I=INV_IDX[k];
+  invForm={tipo:invForm.tipo||"usa",medida:I.m.length===1?I.m[0]:"",cant:"",piso:invForm.piso||"",precio:"",nota:""};
+  invPintarItem(); abrirOv("ovInv");
+}
+function invPintarItem(){
+  const k=invItemAbierto, I=INV_IDX[k], f=invFoto(I), movs=invMovsObra(), tc=invTodoCosto(), F=invForm;
+  if(F.medida&&!F.precio&&tc){const p=invPrecio(movs,k,F.medida);if(p)F.precio=String(p)}
+  const pisos=invPisos(invObra), hist=movs.filter(m=>m.item===k).sort((a,b)=>b.ts-a.ts);
+  $("invSheet").innerHTML=`
+  <div class="inv-hd" style="--mat:${I.g.c}">
+    <span class="inv-big-ph">${f?`<img alt="" src="${f}">`:`<span class="inv-sin">${IC.cam}<small>Sin foto</small></span>`}</span>
+    <div class="inv-hd-tx"><h3>${esc(I.n)}</h3><small><i></i>${esc(I.g.n)} · ${esc(I.cat.n)}</small>
+      <label class="btnlink inv-foto-btn">${IC.cam}${f?"Cambiar foto":"Agregar foto"}<input type="file" accept="image/*" id="invFotoIn" hidden></label></div>
+    <button type="button" class="x" data-cerrar-inv aria-label="Cerrar">✕</button>
+  </div>
+  <div class="seg inv-seg" role="group" aria-label="Qué pasó con el material">${Object.entries(INV_TIPOS).map(([t,n])=>`<button type="button" data-invtipo="${t}" aria-pressed="${F.tipo===t}">${n}</button>`).join("")}</div>
+  <div class="inv-f"><span class="inv-lbl">Medida</span><div class="inv-meds">${I.m.map(m=>{const s=invSaldo(movs,k,m);return `<button type="button" class="inv-med" data-invmed="${escA(m)}" aria-pressed="${F.medida===m}">${esc(m)}${s>0.0001?`<em>${invNum(s)}</em>`:""}</button>`}).join("")}</div></div>
+  ${F.tipo==="usa"?`<div class="inv-f"><span class="inv-lbl">Piso</span><div class="inv-meds">${pisos.map(p=>`<button type="button" class="inv-med" data-invpiso="${escA(p)}" aria-pressed="${F.piso===p}">${esc(pisoLbl(p))}</button>`).join("")}</div></div>`:""}
+  <div class="inv-row">
+    <label class="inv-f"><span class="inv-lbl">Cantidad${I.u!=="und"?" ("+(I.u==="m"?"metros":I.u+"s")+")":""}</span><span class="inv-cant"><button type="button" data-invmas="-1" aria-label="Menos">−</button><input id="invCant" inputmode="decimal" value="${escA(F.cant)}" placeholder="0"><button type="button" data-invmas="1" aria-label="Más">+</button></span></label>
+    ${tc&&F.tipo!=="sobra"?`<label class="inv-f"><span class="inv-lbl">Precio c/u (S/)</span><input id="invPrecio" inputmode="decimal" value="${escA(F.precio)}" placeholder="0.00"></label>`:""}
+  </div>
+  <label class="inv-f"><span class="inv-lbl">Nota (opcional)</span><input id="invNota" maxlength="80" value="${escA(F.nota)}" placeholder="${F.tipo==="usa"?"Ej. baño principal y cocina":"Ej. lo trajo el proveedor"}"></label>
+  ${!tc?'<p class="hint inv-nota-cl">Obra con material del cliente: solo se cuentan cantidades.</p>':""}
+  <p class="inv-err" id="invErr" hidden></p>
+  <button type="button" class="btn inv-guardar" id="invOk">${F.tipo==="entra"?"Registrar entrada":F.tipo==="usa"?"Registrar lo usado":"Registrar sobrante"}</button>
+  ${hist.length?`<div class="inv-hist"><span class="inv-lbl">En esta obra</span>${invFilasMov(hist.slice(0,12))}</div>`:""}`;
+  const S=$("invSheet");
+  S.querySelector("[data-cerrar-inv]").onclick=()=>{cerrarOv("ovInv");invItemAbierto=null;invRender()};
+  const lee=()=>{F.cant=($("invCant")||{}).value||"";F.precio=($("invPrecio")||{}).value||F.precio;F.nota=($("invNota")||{}).value||""};
+  S.querySelectorAll("[data-invtipo]").forEach(b=>b.onclick=()=>{lee();F.tipo=b.dataset.invtipo;invPintarItem()});
+  S.querySelectorAll("[data-invmed]").forEach(b=>b.onclick=()=>{lee();F.medida=b.dataset.invmed;F.precio="";invPintarItem()});
+  S.querySelectorAll("[data-invpiso]").forEach(b=>b.onclick=()=>{lee();F.piso=b.dataset.invpiso;invPintarItem()});
+  S.querySelectorAll("[data-invmas]").forEach(b=>b.onclick=()=>{const i=$("invCant");const v=Math.max(0,(parseFloat(i.value.replace(",","."))||0)+(+b.dataset.invmas));i.value=v||"";F.cant=i.value});
+  $("invFotoIn").onchange=e=>invSubirFoto(e.target.files[0]);
+  $("invOk").onclick=async()=>{
+    lee(); const cant=parseFloat(String(F.cant).replace(",",".")), precio=parseFloat(String(F.precio).replace(",","."))||0, err=$("invErr");
+    const falta=!F.medida?"Elige la medida.":!(cant>0)?"Escribe la cantidad.":F.tipo==="usa"&&!F.piso?"Elige el piso.":"";
+    if(falta){err.textContent=falta;err.hidden=false;return}
+    if(F.tipo!=="entra"){const s=invSaldo(movs,k,F.medida);if(cant>s+0.0001&&!$("invOk").dataset.forzar){err.textContent=`En la obra solo hay ${invNum(Math.max(0,s))} registrados de esta medida. Si igual quieres guardarlo, toca de nuevo.`;err.hidden=false;$("invOk").dataset.forzar="1";return}}
+    const mov={id:"i"+Date.now()+Math.floor(Math.random()*1000),fecha:hoyISO,obra:invObra,tipo:F.tipo,item:k,medida:F.medida,piso:F.tipo==="usa"?F.piso:"",cant,precio:invTodoCosto()&&F.tipo!=="sobra"?precio:0,nota:F.nota,por:quien,ts:Date.now()};
+    $("invOk").disabled=true;
+    if(await invGuardar("invMov",{mov})){toast(`${INV_VERBO[F.tipo]} ${invNum(cant)}${invU(I.u,cant)} · ${I.n} ${F.medida}`);F.cant="";F.nota="";invPintarItem();invRender()}
+    else $("invOk").disabled=false;
+  };
+  invEventosMov(S);
+}
+async function invSubirFoto(file){
+  if(!file) return;
+  try{
+    const img=await new Promise((ok,mal)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=mal;i.src=URL.createObjectURL(file)});
+    const L=384, r=Math.min(1,L/Math.max(img.width,img.height)), c=document.createElement("canvas");c.width=Math.round(img.width*r);c.height=Math.round(img.height*r);
+    const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(img,0,0,c.width,c.height);
+    let data=c.toDataURL("image/webp",.8); if(!data.startsWith("data:image/webp")) data=c.toDataURL("image/jpeg",.82);
+    invFotos[invItemAbierto]=data; try{localStorage.setItem(INV_FOT,JSON.stringify(invFotos))}catch{}
+    await invGuardar("invFoto",{item:invItemAbierto,data}); toast("Foto guardada"); invPintarItem(); invRender();
+  }catch(e){toast("No se pudo leer esa imagen")}
+}
+
+/* ----- Obra: nombre, modalidad y pisos ----- */
+function invAbrirObra(nombre){
+  const c=invCfg(nombre)||{obra:nombre,modalidad:"todo",pisos:"1,2,3"};
+  const P=(c.pisos||"").split(",").map(s=>s.trim()), num=P.filter(p=>/^\d+$/.test(p)).length||3;
+  $("invObraSheet").innerHTML=`
+  <h3>${nombre?"Editar obra":"Nueva obra"} <button type="button" class="x" data-cerrar aria-label="Cerrar">✕</button></h3>
+  <label class="inv-f"><span class="inv-lbl">Nombre de la obra</span><input id="ioNom" list="ioObras" maxlength="60" value="${escA(c.obra||"")}" placeholder="Ej. Vivienda Multifamiliar Barranco" ${nombre?"readonly":""}></label>
+  <datalist id="ioObras">${(()=>{try{return obrasConocidas().map(o=>`<option value="${escA(o.n)}">`).join("")}catch{return ""}})()}</datalist>
+  <div class="inv-f"><span class="inv-lbl">¿Quién pone el material?</span><div class="seg" role="group"><button type="button" data-iomod="todo" aria-pressed="${c.modalidad!=="cliente"}">A todo costo (lo compro yo)</button><button type="button" data-iomod="cliente" aria-pressed="${c.modalidad==="cliente"}">Material del cliente o proveedor</button></div></div>
+  <div class="inv-row"><label class="inv-f"><span class="inv-lbl">Número de pisos</span><input id="ioPisos" type="number" min="1" max="30" value="${num}"></label>
+    <div class="inv-f"><span class="inv-lbl">También</span><label class="inv-ck"><input type="checkbox" id="ioSot" ${P.includes("Sótano")?"checked":""}> Sótano</label><label class="inv-ck"><input type="checkbox" id="ioAzo" ${P.includes("Azotea")?"checked":""}> Azotea</label><label class="inv-ck"><input type="checkbox" id="ioCis" ${P.includes("Cisterna")?"checked":""}> Cisterna</label></div></div>
+  <p class="inv-err" id="ioErr" hidden></p>
+  <button type="button" class="btn" id="ioOk">Guardar obra</button>`;
+  let mod=c.modalidad==="cliente"?"cliente":"todo";
+  const S=$("invObraSheet");
+  S.querySelectorAll("[data-iomod]").forEach(b=>b.onclick=()=>{mod=b.dataset.iomod;S.querySelectorAll("[data-iomod]").forEach(x=>x.setAttribute("aria-pressed",x===b))});
+  S.querySelector("[data-cerrar]").onclick=()=>cerrarOv("ovInvObra");
+  $("ioOk").onclick=async()=>{
+    const nom=$("ioNom").value.trim(), n=Math.min(30,Math.max(1,parseInt($("ioPisos").value)||1));
+    if(!nom){$("ioErr").textContent="Escribe el nombre de la obra.";$("ioErr").hidden=false;return}
+    const pisos=[...($("ioSot").checked?["Sótano"]:[]),...Array.from({length:n},(_,i)=>String(i+1)),...($("ioAzo").checked?["Azotea"]:[]),...($("ioCis").checked?["Cisterna"]:[])].join(",");
+    await invGuardar("invObra",{obra:{obra:nom,modalidad:mod,pisos}});
+    invObra=nom;guardarLS(INV_OBRA,invObra);cerrarOv("ovInvObra");toast("Obra guardada");invRender();
+  };
+  abrirOv("ovInvObra");
+}
+$("ovInv").addEventListener("click",e=>{if(e.target===$("ovInv")){cerrarOv("ovInv");invItemAbierto=null;invRender()}});
+$("ovInvObra").addEventListener("click",e=>{if(e.target===$("ovInvObra"))cerrarOv("ovInvObra")});
+window.addEventListener("online",()=>{invEnviarCola()});
+if(typeof seccion!=="undefined"&&seccion==="inventario") try{invRender()}catch(e){console.error(e)}
+
 </script>
 </body>
 </html>
