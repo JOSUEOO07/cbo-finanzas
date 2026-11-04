@@ -4204,7 +4204,7 @@ function invRenderHome(el){
   const c=invCfg(invObra), movs=invMovsObra(), tc=invTodoCosto();
   const usados=movs.filter(m=>m.tipo==="usa"), costo=usados.reduce((s,m)=>s+m.cant*(m.precio||invPrecio(movs,m.item,m.medida)),0);
   const pisos=invPisos(invObra), porPiso=pisos.map(p=>{const L=usados.filter(m=>m.piso===p);return {p,n:L.reduce((s,m)=>s+m.cant,0),s:L.reduce((s,m)=>s+m.cant*(m.precio||invPrecio(movs,m.item,m.medida)),0)}});
-  const maxP=Math.max(1,...porPiso.map(x=>tc?x.s:x.n));
+  const maxP=Math.max(1,...porPiso.map(x=>x.n));
   const enObra=new Set(); movs.forEach(m=>enObra.add(m.item));
   const conSaldo=[...enObra].filter(k=>invSaldo(movs,k)>0.0001);
   const tarjeta=cat=>{const n=cat.grupos.reduce((s,g)=>s+g.items.length,0), sal=conSaldo.filter(k=>k.startsWith(cat.id+".")).length;
@@ -4218,9 +4218,9 @@ function invRenderHome(el){
   </div>
   <div class="inv-cats">${INV_CAT.map(tarjeta).join("")}</div>
   ${invObra?`<section class="panel inv-res" id="invRes">
-    <div class="ph"><h2>${tc?"Material usado en la obra":"Piezas usadas en la obra"}</h2><button type="button" class="btnlink" id="invVerObra">Ver por piso y material ›</button></div>
-    <p class="inv-big">${tc?fmt(costo):invNum(usados.reduce((s,m)=>s+m.cant,0))+" piezas"}</p>
-    <div class="inv-pisos">${porPiso.map(x=>`<div class="inv-piso"><span>${esc(pisoLbl(x.p))}</span><i><b style="width:${Math.round((tc?x.s:x.n)/maxP*100)}%"></b></i><em>${tc?fmt0(x.s):invNum(x.n)}</em></div>`).join("")}</div>
+    <div class="ph"><h2>Material usado en la obra</h2><button type="button" class="btnlink" id="invVerObra">Ver por piso y material ›</button></div>
+    <p class="inv-big">${invNum(usados.reduce((s,m)=>s+m.cant,0))} piezas</p>
+    <div class="inv-pisos">${porPiso.map(x=>`<div class="inv-piso"><span>${esc(pisoLbl(x.p))}</span><i><b style="width:${Math.round(x.n/maxP*100)}%"></b></i><em>${invNum(x.n)}</em></div>`).join("")}</div>
   </section>
   <section class="panel"><div class="ph"><h2>Últimos movimientos</h2><span class="hint">${movs.length?movs.length+" en esta obra":""}</span></div>
     <div class="inv-movs">${invFilasMov(movs.slice().sort((a,b)=>b.ts-a.ts).slice(0,8))||'<p class="hint inv-vacio">Todavía no hay material registrado en esta obra. Entra a Gasfitería o Electricidad, toca una pieza y registra lo que llega.</p>'}</div>
@@ -4266,10 +4266,10 @@ function invRenderObra(el){
   const movs=invMovsObra(), tc=invTodoCosto(), pisos=invPisos(invObra), usados=movs.filter(m=>m.tipo==="usa");
   const bloque=p=>{const L=usados.filter(m=>m.piso===p), g={};
     L.forEach(m=>{const key=m.item+"|"+m.medida;const x=g[key]||(g[key]={m,c:0,s:0});x.c+=m.cant;x.s+=m.cant*(m.precio||invPrecio(movs,m.item,m.medida))});
-    const filas=Object.values(g).sort((a,b)=>b.s-a.s||b.c-a.c);
-    const tot=filas.reduce((s,x)=>s+(tc?x.s:x.c),0);
-    return `<section class="panel inv-pb"><div class="ph"><h2>${esc(pisoLbl(p))}</h2><span class="inv-pbt">${tc?fmt(tot):invNum(tot)+" piezas"}</span></div>
-      ${filas.length?`<div class="scroll"><table class="inv-tab"><thead><tr><th>Material</th><th>Cant.</th>${tc?"<th>Precio</th><th>Total</th>":""}</tr></thead><tbody>${filas.map(x=>{const it=INV_IDX[x.m.item]||{n:x.m.item,u:"und",g:{n:""}};return `<tr><td>${esc(it.n)} <small>${esc(x.m.medida)} · ${esc(it.g.n)}</small></td><td>${invNum(x.c)}${invU(it.u,x.c)}</td>${tc?`<td>${fmtN(x.c?x.s/x.c:0)}</td><td>${fmtN(x.s)}</td>`:""}</tr>`}).join("")}</tbody></table></div>`:'<p class="hint">Aún no se registra material usado en este nivel.</p>'}</section>`};
+    const filas=Object.values(g).sort((a,b)=>b.c-a.c);
+    const tot=filas.reduce((s,x)=>s+x.c,0);
+    return `<section class="panel inv-pb"><div class="ph"><h2>${esc(pisoLbl(p))}</h2><span class="inv-pbt">${invNum(tot)} piezas</span></div>
+      ${filas.length?`<div class="scroll"><table class="inv-tab"><thead><tr><th>Material</th><th>Cant.</th></tr></thead><tbody>${filas.map(x=>{const it=INV_IDX[x.m.item]||{n:x.m.item,u:"und",g:{n:""}};return `<tr><td>${esc(it.n)} <small>${esc(x.m.medida)} · ${esc(it.g.n)}</small></td><td>${invNum(x.c)}${invU(it.u,x.c)}</td></tr>`}).join("")}</tbody></table></div>`:'<p class="hint">Aún no se registra material usado en este nivel.</p>'}</section>`};
   // Saldo que queda en la obra
   const sal={}; movs.forEach(m=>{const key=m.item+"|"+m.medida;sal[key]=(sal[key]||0)+(m.tipo==="entra"?m.cant:-m.cant)});
   const quedan=Object.entries(sal).filter(([,v])=>v>0.0001).map(([k,v])=>{const [item,med]=k.split("|");return {it:INV_IDX[item]||{n:item,u:"und",g:{n:""}},med,v}});
@@ -4304,10 +4304,8 @@ function invPintarItem(){
   ${F.tipo==="usa"?`<div class="inv-f"><span class="inv-lbl">Piso</span><div class="inv-meds">${pisos.map(p=>`<button type="button" class="inv-med" data-invpiso="${escA(p)}" aria-pressed="${F.piso===p}">${esc(pisoLbl(p))}</button>`).join("")}</div></div>`:""}
   <div class="inv-row">
     <label class="inv-f"><span class="inv-lbl">Cantidad${I.u!=="und"?" ("+(I.u==="m"?"metros":I.u+"s")+")":""}</span><span class="inv-cant"><button type="button" data-invmas="-1" aria-label="Menos">−</button><input id="invCant" inputmode="decimal" value="${escA(F.cant)}" placeholder="0"><button type="button" data-invmas="1" aria-label="Más">+</button></span></label>
-    ${tc&&F.tipo!=="sobra"?`<label class="inv-f"><span class="inv-lbl">Precio c/u (S/)</span><input id="invPrecio" inputmode="decimal" value="${escA(F.precio)}" placeholder="0.00"></label>`:""}
   </div>
   <label class="inv-f"><span class="inv-lbl">Nota (opcional)</span><input id="invNota" maxlength="80" value="${escA(F.nota)}" placeholder="${F.tipo==="usa"?"Ej. baño principal y cocina":"Ej. lo trajo el proveedor"}"></label>
-  ${!tc?'<p class="hint inv-nota-cl">Obra con material del cliente: solo se cuentan cantidades.</p>':""}
   <p class="inv-err" id="invErr" hidden></p>
   <button type="button" class="btn inv-guardar" id="invOk">${F.tipo==="entra"?"Registrar entrada":F.tipo==="usa"?"Registrar lo usado":"Registrar sobrante"}</button>
   ${hist.length?`<div class="inv-hist"><span class="inv-lbl">En esta obra</span>${invFilasMov(hist.slice(0,12))}</div>`:""}`;
@@ -4324,7 +4322,7 @@ function invPintarItem(){
     const falta=!F.medida?"Elige la medida.":!(cant>0)?"Escribe la cantidad.":F.tipo==="usa"&&!F.piso?"Elige el piso.":"";
     if(falta){err.textContent=falta;err.hidden=false;return}
     if(F.tipo!=="entra"){const s=invSaldo(movs,k,F.medida);if(cant>s+0.0001&&!$("invOk").dataset.forzar){err.textContent=`En la obra solo hay ${invNum(Math.max(0,s))} registrados de esta medida. Si igual quieres guardarlo, toca de nuevo.`;err.hidden=false;$("invOk").dataset.forzar="1";return}}
-    const mov={id:"i"+Date.now()+Math.floor(Math.random()*1000),fecha:hoyISO,obra:invObra,tipo:F.tipo,item:k,medida:F.medida,piso:F.tipo==="usa"?F.piso:"",cant,precio:invTodoCosto()&&F.tipo!=="sobra"?precio:0,nota:F.nota,por:quien,ts:Date.now()};
+    const mov={id:"i"+Date.now()+Math.floor(Math.random()*1000),fecha:hoyISO,obra:invObra,tipo:F.tipo,item:k,medida:F.medida,piso:F.tipo==="usa"?F.piso:"",cant,precio:0,nota:F.nota,por:quien,ts:Date.now()};
     $("invOk").disabled=true;
     if(await invGuardar("invMov",{mov})){toast(`${INV_VERBO[F.tipo]} ${invNum(cant)}${invU(I.u,cant)} · ${I.n} ${F.medida}`);F.cant="";F.nota="";invPintarItem();invRender()}
     else $("invOk").disabled=false;
