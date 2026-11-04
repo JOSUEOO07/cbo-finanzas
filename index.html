@@ -1264,7 +1264,7 @@ h1,h2,h3,.bar h1{font-family:var(--display);letter-spacing:-.02em}
           <details class="cfg-item" data-cfg="con"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><path d="M7 18a4 4 0 0 1-.5-8A6 6 0 0 1 18 9a4.5 4.5 0 0 1-1 9z"/></svg></i><span class="cfg-t"><b>Conexión</b><small class="cfg-v" id="cfgv-con"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
             <div class="cfgrow"><span class="hint">Estado</span><b id="cfgEstado">—</b></div>
             <div class="cfgrow"><div class="line"><button class="btnlink recargar" type="button">↻ Actualizar datos</button><button class="btnlink" id="desconectar" type="button">Cambiar enlace o clave</button></div></div>
-            <div class="cfgrow"><div class="line"><button class="btnlink" id="copiarCon" type="button">Copiar código de conexión</button><span class="hint" id="copiarConMsg"></span></div></div>
+            <div class="cfgrow"><div class="line"><button class="btnlink" id="compartirAcceso" type="button">Compartir acceso por WhatsApp</button><button class="btnlink" id="copiarCon" type="button">Copiar código de conexión</button><span class="hint" id="copiarConMsg"></span></div></div>
           </div></details>
           <details class="cfg-item" data-cfg="seg"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></i><span class="cfg-t"><b>Seguridad</b><small class="cfg-v" id="cfgv-seg"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
             <div class="cfgrow"><span class="hint">Bloqueo con PIN</span><b id="pinEstado">Desactivado</b></div>
@@ -2607,6 +2607,9 @@ document.addEventListener("visibilitychange",()=>{if(document.visibilityState===
 /* ===== Conexión privada con tu Google Sheets ===== */
 const CFG_K="cbo-config", CACHE_K="cbo-cache";
 let cfg=leerLS(CFG_K,null);
+// Enlace de acceso: quien abre la app con #conectar=CBO1:... queda conectado sin escribir enlace ni clave
+try{const m=location.hash.match(/conectar=(CBO1%3A[^&]+|CBO1:[^&]+)/);if(m){const t=decodeURIComponent(m[1]),o=JSON.parse(decodeURIComponent(escape(atob(t.slice(5)))));
+  if(o.url&&o.clave){cfg={url:o.url,clave:o.clave};guardarLS(CFG_K,cfg)}history.replaceState(null,"",location.pathname+"#inicio")}}catch(e){console.warn("enlace de acceso",e)}
 async function api(accion,extra,conf){
   const c=conf||cfg;
   // Con señal débil la petición puede quedarse colgada: se corta a los 30 s y cuenta como "sin internet"
@@ -2805,6 +2808,12 @@ $("setupF").addEventListener("submit",async e=>{
 /* Código de conexión: guarda enlace y clave en un texto para recuperarlos sin buscarlos (queda solo en manos del dueño) */
 const aCodigo=c=>"CBO1:"+btoa(unescape(encodeURIComponent(JSON.stringify({url:c.url,clave:c.clave}))));
 const deCodigo=t=>{const s=String(t||"").trim();if(!s.startsWith("CBO1:"))throw new Error("formato");const o=JSON.parse(decodeURIComponent(escape(atob(s.slice(5)))));if(!o.url||!o.clave)throw new Error("formato");return o};
+$("compartirAcceso").onclick=()=>{
+  if(!cfg||!cfg.clave){toast("Primero conecta la app");return}
+  const enlace=location.origin+location.pathname+"#conectar="+encodeURIComponent(aCodigo(cfg));
+  const txt="Entra a CBO Finanzas con este enlace (ya queda conectada, no pide clave). Solo para personal de confianza: "+enlace;
+  window.open("https://wa.me/?text="+encodeURIComponent(txt),"_blank");
+};
 $("copiarCon").onclick=async()=>{
   if(!cfg||!cfg.url){$("copiarConMsg").textContent="Primero conecta la app.";return}
   const cod=aCodigo(cfg);
