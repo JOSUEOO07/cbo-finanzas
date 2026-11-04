@@ -1996,7 +1996,7 @@ aplicarTema();
 /* ===== Transición entre secciones: se desliza hacia el lado al que vas y las tarjetas entran en cascada ===== */
 const ORDEN_SEC=["inicio","movimientos","sunat","terceros","planilla","obras","inventario","anual","config"];
 function entrarSeccion(nueva,anterior){
-  const el=document.querySelector(`[data-sec="${nueva}"]`); if(!el||matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const el=document.querySelector(`[data-sec="${nueva}"]`); if(!anterior||!el||matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const der=ORDEN_SEC.indexOf(nueva)>=ORDEN_SEC.indexOf(anterior);
   el.classList.remove("vin-der","vin-izq"); void el.offsetWidth; el.classList.add(der?"vin-der":"vin-izq");
   setTimeout(()=>el.classList.remove("vin-der","vin-izq"),900);
@@ -2839,7 +2839,8 @@ bloquearSiHayPin();
 /* Transición de entrada: cortina de la marca (sin logo), las tarjetas suben y las cifras se cuentan */
 (function entrada(){
   const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if(reduce||!document.body.animate){const i=$("intro");if(i)i.remove();return}
+  let yaVista=false; try{yaVista=sessionStorage.getItem("cbo-sin-intro")==="1";sessionStorage.removeItem("cbo-sin-intro")}catch{}
+  if(reduce||yaVista||!document.body.animate){const i=$("intro");if(i)i.remove();return}
   const piezas=[...document.querySelectorAll('[data-sec="inicio"] .big, [data-sec="inicio"] .panel, .bar')].slice(0,8);
   piezas.forEach(p=>p.classList.add("entra-ini"));
   const contar=el=>{if(!el)return;const s=el.querySelector("small");const txt=el.textContent.replace(/^S\//,"");const neg=txt.includes("−");const fin=parseInt(txt.replace(/[^\d]/g,""))||0;if(!fin)return;
@@ -3321,7 +3322,7 @@ botonWA("movCPWa",false); botonWA("movCPWa2",true);
 if("serviceWorker" in navigator){
   // Busca la versión nueva en cada apertura y recarga una sola vez cuando llega
   const habia=!!navigator.serviceWorker.controller; let recargado=false;
-  navigator.serviceWorker.addEventListener("controllerchange",()=>{if(habia&&!recargado){recargado=true;location.reload()}});
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{if(habia&&!recargado){recargado=true;try{sessionStorage.setItem("cbo-sin-intro","1")}catch{}location.reload()}});
   window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>r.update()).catch(()=>{}));
 }
 

@@ -1,5 +1,5 @@
 # Mapa de CBO Finanzas
-Actualizado: 04/11/2026 · caché: cbo-finanzas-v56-oscuro
+Actualizado: 04/11/2026 · caché: cbo-finanzas-v57-oscuro
 
 ## Archivos
 - codigo-fuente.html: versión editable (4091 líneas). index.html es la copia que se publica: editar codigo-fuente.html y copiarlo a index.html.
