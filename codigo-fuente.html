@@ -94,7 +94,7 @@ body.menu .fab{display:none}
 .kpis.anio .v{font-size:clamp(1rem,1.8vw,1.3rem)}
 .kpi.sunat{background:var(--warn-bg);border-color:transparent}
 .kpi.sunat .k,.kpi.sunat .v{color:var(--warn)}
-.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
 .span2{grid-column:span 2}
 [data-sec]{min-width:0}
 .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;align-items:start}
@@ -417,6 +417,7 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
 
 /* Pago a SUNAT */
 @media (max-width:520px){#f [data-paso="4"] .row2{grid-template-columns:minmax(0,1fr)}}
+#catOtraBox{grid-column:1;grid-row:2}
 .pagosun-link{justify-self:stretch;margin-top:2px;text-align:left;white-space:normal;line-height:1.35;padding:10px 12px;background:var(--warn-bg);color:var(--warn);border-color:transparent}
 .lbl-s{font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .opts-s{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
@@ -689,7 +690,6 @@ body.deco-mov h1.deco-h1::after{animation:flotar 3s ease-in-out infinite}
 .ud-tl{display:flex;justify-content:space-between;gap:8px;padding:7px 0;font-size:.84rem;border-bottom:1px dashed var(--line)}.ud-tl:last-child{border:0}.ud-tl b{font-variant-numeric:tabular-nums}
 .ud-k4{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.ud-k4 div{background:var(--bg);border-radius:14px;padding:9px 10px}.ud-k4 span{display:block;font-size:.62rem;letter-spacing:.08em;font-weight:800;color:var(--muted);text-transform:uppercase}.ud-k4 b{font-size:.95rem;font-variant-numeric:tabular-nums}
 @media (min-width:700px){.ud-duo2{grid-template-columns:1fr 1fr}}
-@media (min-width:1100px){.ud{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}.ud-sal{grid-column:1/-1}.ud-hero{grid-column:1;grid-row:span 3}.ud-duo2,.ud-logros{grid-column:1/-1}}
 
 
 
@@ -781,6 +781,7 @@ body.deco-mov .tema-h .bob{animation:tBob 2.4s ease-in-out infinite}
 
 /* ===== Barra suprema ===== */
 .selbar{font:inherit;font-size:.85rem;padding:8px 10px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+@media (max-width:600px){.cfg-body .deco-fila>span:last-child{flex:1 1 100%}.cfg-body .selbar{flex:1 1 130px;min-width:0}}
 @media (max-width:980px){
   body[data-barra="d"] .tabbar{transition:transform .35s cubic-bezier(.22,1,.36,1),opacity .25s}
   body.barra-oculta[data-barra="d"] .tabbar{transform:translateY(140%);opacity:0}
@@ -858,11 +859,22 @@ button.ud-card{cursor:pointer;width:100%}
 #udSvg .hit{fill:transparent;cursor:pointer}#udSvg .hit.sel{fill:color-mix(in srgb,var(--brand-2) 10%,transparent)}
 .ud-tip{margin-top:6px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--brand-2) 10%,transparent);font-size:.8rem;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
 .ud-minib{height:6px;border-radius:9px;background:color-mix(in srgb,var(--brand) 10%,transparent);margin-top:8px;overflow:hidden}.ud-minib i{display:block;height:100%;border-radius:9px;background:linear-gradient(90deg,#2FB383,var(--brand));transition:width 1s}
+/* Inicio en computadora (v61): cuadrícula por zonas, sin huecos. Cada fila estira sus tarjetas a la misma altura.
+   Utilidad + SUNAT a la izquierda miden casi lo mismo que el flujo del dinero a la derecha. */
 @media (min-width:1100px){
-  .ud{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start}
+  .ud{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:stretch;
+    grid-template-areas:"sal sal" "hero flujo" "sun flujo" "meta ins" "chart act" "duo duo"}
+  .ud-sal{grid-area:sal}.ud-hero{grid-area:hero}#udFlujo{grid-area:flujo;margin-top:0}#udSun{grid-area:sun}
+  #udMeta{grid-area:meta}#udIns{grid-area:ins}#udChart{grid-area:chart}#udAct{grid-area:act}.ud-duo2{grid-area:duo}
+  .ud:has(#udIns[hidden]) #udMeta,.ud:has(#udMeta[hidden]) #udIns{grid-column:1/-1}
   .ud-hdr,.ud-dice,.ud-semana{grid-column:1/-1}
-  .ud-hero{grid-column:1;grid-row:span 2}.ud-ins{flex-wrap:wrap}.ud-insc{flex:1 1 45%}
+  .ud-hero{display:flex;flex-direction:column}.ud-hero .ud-trio{margin-top:auto;padding-top:12px}
+  #udSun{align-content:space-between}#udMeta{align-content:center}
+  .ud-ins{flex-wrap:wrap;overflow:visible;margin:0;padding:0}.ud-insc{flex:1 1 45%}
+  #udFlujo,#udChart,#udAct{display:flex;flex-direction:column}#udFlujo .fl-svg{margin:auto 0;max-height:330px}#udFlujo>.empty{margin:auto 0;text-align:center}
+  .ud-duo2{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}.ud-duo2>.ud-card{height:100%}
 }
+@media (min-width:600px) and (max-width:1099px){#udFlujo .fl-svg{max-height:360px}}
 @media (prefers-reduced-motion:reduce){#udSvg .ln,#udSvg .ar{animation:none;stroke-dashoffset:0;opacity:1}}
 /* ===== Inventario de obra =====
    Idea: cada pieza vive en una "placa" blanca como en el catálogo del proveedor; el material se reconoce por su franja de color
@@ -1020,6 +1032,48 @@ h1,h2,h3,.bar h1{font-family:var(--display);letter-spacing:-.02em}
 @keyframes vinDer{from{opacity:0;transform:translateX(36px)}}
 @keyframes vinIzq{from{opacity:0;transform:translateX(-36px)}}
 @keyframes vinCas{from{opacity:0;transform:translateY(14px)}}
+/* ===== Adornos de temporada en el logo (v61): pedido expreso de Josué. Se activan 7 días antes de cada fiesta.
+   Se dibujan con SVG encima o alrededor del logo (sin tapar el nombre). Solo se mueven transform/opacity. ===== */
+.adw{position:relative;display:inline-block;flex:none;line-height:0}
+.adorno{position:absolute;inset:0;pointer-events:none;z-index:2}
+.adorno svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.adorno .a-cae{animation:adCae 3.6s linear infinite}
+@keyframes adCae{0%{transform:translateY(-12px);opacity:0}12%{opacity:.95}85%{opacity:.8}100%{transform:translateY(50px);opacity:0}}
+.adorno .a-flota{animation:adFlota 3.2s ease-in-out infinite}
+@keyframes adFlota{50%{transform:translateY(-1.5px)}}
+.adorno .a-mece{transform-box:fill-box;transform-origin:50% 100%;animation:adMece 3.4s ease-in-out infinite}
+.adorno .a-pendulo{transform-box:fill-box;transform-origin:50% 0;animation:adMece 2.6s ease-in-out infinite}
+@keyframes adMece{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+.adorno .a-brilla{transform-box:fill-box;transform-origin:center;animation:adBrilla 1.8s ease-in-out infinite}
+@keyframes adBrilla{0%,100%{opacity:.45;transform:scale(.85)}50%{opacity:1;transform:scale(1.15)}}
+.adorno .a-gira{transform-box:fill-box;transform-origin:center;animation:adGira 16s linear infinite}
+@keyframes adGira{to{transform:rotate(360deg)}}
+.adorno .a-estalla{transform-box:fill-box;transform-origin:center;animation:adEstalla 2.4s ease-out infinite}
+@keyframes adEstalla{0%{transform:scale(.15);opacity:0}15%{opacity:1}70%{opacity:.9}100%{transform:scale(1.15);opacity:0}}
+.adorno .a-serp{stroke-dasharray:7 4;animation:adSerp 2.2s linear infinite}
+@keyframes adSerp{to{stroke-dashoffset:-22}}
+.adorno .a-sube{animation:adSube 3s ease-in infinite}
+@keyframes adSube{0%{transform:translateY(4px);opacity:0}25%{opacity:1}100%{transform:translateY(-20px);opacity:0}}
+.adorno .a-martillo{transform-box:fill-box;transform-origin:50% 100%;animation:adMartillo 1.6s ease-in-out infinite}
+@keyframes adMartillo{0%,60%,100%{transform:rotate(18deg)}75%{transform:rotate(-28deg)}85%{transform:rotate(22deg)}}
+.adorno .a-ondea{transform-box:fill-box;transform-origin:0 50%;animation:adOndea 1.8s ease-in-out infinite}
+@keyframes adOndea{0%,100%{transform:skewY(0) scaleX(1)}50%{transform:skewY(-8deg) scaleX(.93)}}
+.adorno .a-vuela{animation:adVuela 7s ease-in-out infinite}
+@keyframes adVuela{0%,100%{transform:translate(0,0)}25%{transform:translate(16px,-5px)}50%{transform:translate(30px,2px)}75%{transform:translate(12px,6px)}}
+.adorno .a-ala{transform-box:fill-box;transform-origin:center;animation:adAla .35s ease-in-out infinite alternate}
+@keyframes adAla{to{transform:scaleY(.35)}}
+.adorno .a-aleteo{transform-box:fill-box;transform-origin:center;animation:adAleteo .3s ease-in-out infinite alternate}
+@keyframes adAleteo{to{transform:scaleX(.3)}}
+.adorno .a-mariposa{animation:adMariposa 9s ease-in-out infinite}
+@keyframes adMariposa{0%,100%{transform:translate(0,0)}25%{transform:translate(22px,-6px)}50%{transform:translate(36px,4px)}75%{transform:translate(16px,9px)}}
+.adorno .a-llama{transform-box:fill-box;transform-origin:50% 100%;animation:adLlama .9s ease-in-out infinite alternate}
+@keyframes adLlama{0%{transform:scale(.9,.85);opacity:.85}100%{transform:scale(1.05,1.12);opacity:1}}
+.adorno .d2{animation-delay:-.8s}.adorno .d3{animation-delay:-1.6s}
+.adw.salta .adorno{animation:adSalta .6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes adSalta{0%,100%{transform:none;filter:none}35%{transform:translateY(-5px) scale(1.06);filter:brightness(1.35) drop-shadow(0 0 5px rgba(255,230,150,.75))}}
+.ador-prev{display:flex;align-items:center;gap:10px;padding:16px 14px 12px;border-radius:14px;background:var(--brand);color:var(--brand-ink)}
+.ador-prev img{width:52px;display:block}.ador-prev b{display:block;font-family:var(--display);font-size:1rem;line-height:1.15}.ador-prev small{opacity:.75;font-size:.75rem}
+@media (prefers-reduced-motion:reduce){.adorno *,.adw.salta .adorno{animation:none!important}}
 </style>
 </head>
 <body data-barra="d">
@@ -1244,6 +1298,11 @@ h1,h2,h3,.bar h1{font-family:var(--display);letter-spacing:-.02em}
           <details class="cfg-item" data-cfg="son"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg></i><span class="cfg-t"><b>Sonidos</b><small class="cfg-v" id="cfgv-son"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
               <div class="deco-fila"><span><b>Sonidos</b><small class="hint" style="display:block">Al registrar y al llegar a la meta</small></span><div class="seg" id="sonSeg" style="min-width:190px"><button type="button" data-son="1">Activados</button><button type="button" data-son="0">Desactivados</button></div></div>
           </div></details>
+          <details class="cfg-item" data-cfg="ador"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><path d="M12 3l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4-3.9-3.8 5.4-.8z"/></svg></i><span class="cfg-t"><b>Adornos de temporada</b><small class="cfg-v" id="cfgv-ador"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
+              <div class="deco-fila"><span><b>Adornos de temporada</b><small class="hint" style="display:block">En el logo, desde 7 días antes de cada fiesta</small></span><div class="seg" id="adorSeg" style="min-width:190px"><button type="button" data-ador="1">Activados</button><button type="button" data-ador="0">Desactivados</button></div></div>
+              <div class="deco-fila"><span><b>Ver cómo se ve</b><small class="hint" style="display:block">Solo es una vista previa: no cambia la fecha</small></span><span style="display:flex"><select id="adorVer" class="selbar" aria-label="Ver cómo se ve un adorno"></select></span></div>
+              <div class="ador-prev" id="adorPrev"><img id="adorPrevImg" alt=""><span><b>Casa Bonita Oregón</b><small>Así se ve arriba a la izquierda</small></span></div>
+          </div></details>
           <p class="cfg-grupo">Tu empresa</p>
           <details class="cfg-item" data-cfg="quien"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></i><span class="cfg-t"><b>Quién registra</b><small class="cfg-v" id="cfgv-quien"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
             <p class="hint" style="margin:0 0 10px">Lo que se registre desde este celular quedará con este nombre.</p>
@@ -1359,6 +1418,7 @@ h1,h2,h3,.bar h1{font-family:var(--display);letter-spacing:-.02em}
     <div class="paso" data-paso="4" hidden>
       <div class="row2">
         <label>Categoría<select id="cat"></select></label>
+        <label id="catOtraBox" hidden>Escribe la categoría<input id="catOtra" maxlength="40" autocomplete="off" placeholder="Ej. Bebidas para la obra"></label>
         <label>Fecha<input id="fecha" type="date"></label>
       </div>
       <div class="chips-fecha"><button type="button" class="chip" data-d="0">Hoy</button><button type="button" class="chip" data-d="-1">Ayer</button></div>
@@ -1608,9 +1668,15 @@ h1,h2,h3,.bar h1{font-family:var(--display);letter-spacing:-.02em}
 <script>
 const IGV=0.18, UIT=5500, LIM_UIT=300;
 const CATS={
-  ingreso:["Venta de servicio","Servicio a todo costo","Solo mano de obra","Otros ingresos"],
-  gasto:["Compra de materiales","Materiales de gasfitería","Materiales eléctricos","Herramientas y equipos","Seguros","Servicios de terceros","Transporte y fletes","Combustible","Alquiler","Luz, agua, internet","Otros gastos"]
+  ingreso:["Venta de servicio","Servicio a todo costo","Solo mano de obra","Venta de materiales","Adelanto de obra","Valorización de obra","Mantenimiento","Otros ingresos"],
+  gasto:["Compra de materiales","Materiales de gasfitería","Materiales eléctricos","Cemento y agregados","Pintura y acabados","Herramientas y equipos","Alquiler de equipos y maquinaria","Combustible","Pasajes y movilidad","Transporte y fletes","Comida y bebidas (refrigerios)","Viáticos y hospedaje","Seguros (SCTR, etc.)","Servicios de terceros / subcontratos","EPP y seguridad","Útiles de oficina","Teléfono e internet","Luz y agua","Alquiler de local o almacén","Mantenimiento de vehículo","Trámites, licencias y notaría","Comisiones bancarias","Publicidad","Otros gastos"]
 };
+// Categorías: las de la lista + las que ya se usaron en registros (antiguas o escritas con "Otra"), y al final "Otra (escribir…)"
+const CAT_OTRA="__otra__";
+function catsUsadas(t){const base=CATS[t]||[],v=new Set();rows.forEach(r=>{const c=String(r.categoria||"").trim();if(r.tipo===t&&c&&c!=="Planilla / jornales"&&c!=="Pago a SUNAT"&&!base.includes(c))v.add(c)});return [...v].sort((a,b)=>a.localeCompare(b,"es"))}
+function catsDe(t){return [...(CATS[t]||[]),...catsUsadas(t)]}
+function catElegida(){if($("cat").value!==CAT_OTRA)return $("cat").value;let c=$("catOtra").value.trim().replace(/\s+/g," ");if(!c)return "";c=c.charAt(0).toUpperCase()+c.slice(1);return catsDe(fTipo).find(x=>x.toLowerCase()===c.toLowerCase())||c}
+function verCatOtra(){const o=$("cat").value===CAT_OTRA;$("catOtraBox").hidden=!o;return o}
 // Pagos a SUNAT: no son gasto (la utilidad ya descuenta lo que se debe); solo marcan el mes como pagado
 const CAT_SUN="Pago a SUNAT";
 const esPagoSun=r=>r.categoria===CAT_SUN;
@@ -2071,7 +2137,7 @@ function syncForm(){
   document.querySelector('#segComp [data-v="boleta"]').hidden=sinBoleta;
   $("segComp").classList.toggle("three",!sinBoleta);
   seg("segTipo",fTipo); seg("segComp",fComp);
-  const prev=$("cat").value; $("cat").innerHTML=CATS[fTipo].map(c=>`<option>${c}</option>`).join(""); if(CATS[fTipo].includes(prev))$("cat").value=prev;
+  const prev=$("cat").value, usadas=catsUsadas(fTipo); $("cat").innerHTML=CATS[fTipo].map(c=>`<option>${esc(c)}</option>`).join("")+(usadas.length?`<optgroup label="Tus categorías">${usadas.map(c=>`<option>${esc(c)}</option>`).join("")}</optgroup>`:"")+`<option value="${CAT_OTRA}">Otra (escribir…)</option>`; if(prev===CAT_OTRA||catsDe(fTipo).includes(prev))$("cat").value=prev; verCatOtra();
   $("lblCli").firstChild.textContent=fTipo==="ingreso"?"Cliente / obra":"Proveedor / detalle";
   $("pasoCliLbl").textContent=fTipo==="ingreso"?"Cliente":"Proveedor";
   $("hintCli").textContent=fTipo==="ingreso"?"Escribe y elige de tus clientes ya registrados: el RUC se llena solo.":"Escribe y elige de tus proveedores ya registrados: el RUC se llena solo.";
@@ -2114,8 +2180,10 @@ function validarPaso(n){
   if(n===2&&fComp!=="ninguno"&&!nroValido($("nro").value)){$("msg").textContent="Escribe la serie y el número del comprobante (ej. F001-1234). Es obligatorio.";$("nro").focus();return false}
   if(n===3&&fComp!=="ninguno"&&!rucValido($("ruc").value)){$("msg").textContent=`Escribe el RUC del ${fTipo==="ingreso"?"cliente":"proveedor"} (11 números). Es obligatorio.`;$("ruc").focus();return false}
   if(n===4&&!$("fecha").value){$("msg").textContent="Elige una fecha.";return false}
+  if(n===4&&$("cat").value===CAT_OTRA&&!catElegida()){$("msg").textContent="Escribe la categoría (ej. Bebidas para la obra).";$("catOtra").focus();return false}
   return true;
 }
+$("cat").addEventListener("change",()=>{if(verCatOtra())setTimeout(()=>$("catOtra").focus(),30)});
 $("pasos").onclick=e=>{const b=e.target.closest("button");if(!b)return;const n=+b.dataset.p;if(n>paso){for(let k=paso;k<n;k++)if(!validarPaso(k))return}irPaso(n)};
 $("btnAtras").onclick=()=>{if(paso===1)closeF();else irPaso(paso-1)};
 $("segTipo").onclick=e=>{const b=e.target.closest("button");if(b){fTipo=b.dataset.v;syncForm()}};
@@ -2143,7 +2211,7 @@ function mostrarSug(){
   $("sug").hidden=false; $("desc").setAttribute("aria-expanded","true");
 }
 function ocultarSug(){$("sug").hidden=true;$("desc").setAttribute("aria-expanded","false")}
-function elegirSug(i){const x=sugLista[i];if(!x)return;$("desc").value=x.desc;if(x.ruc){$("ruc").value=x.ruc;$("ruc").dataset.auto=x.ruc}if(x.obra&&!$("obra").value.trim())$("obra").value=x.obra;if(CATS[fTipo].includes(x.cat))$("cat").value=x.cat;ocultarSug();syncForm()}
+function elegirSug(i){const x=sugLista[i];if(!x)return;$("desc").value=x.desc;if(x.ruc){$("ruc").value=x.ruc;$("ruc").dataset.auto=x.ruc}if(x.obra&&!$("obra").value.trim())$("obra").value=x.obra;if(catsDe(fTipo).includes(x.cat))$("cat").value=x.cat;ocultarSug();syncForm()}
 // Si el nombre escrito ya está registrado, su RUC se completa solo (si es nuevo, se escribe a mano)
 const normNom=s=>sinTildes(s).replace(/[^a-z0-9]/g,"");
 function autoRuc(){
@@ -2152,7 +2220,7 @@ function autoRuc(){
   if(!x){if(R.dataset.auto&&R.value===R.dataset.auto){R.value="";info.hidden=true}delete R.dataset.auto;return}
   if(!R.value.trim()||R.dataset.auto===R.value){R.value=x.ruc;R.dataset.auto=x.ruc;info.className="ruc-info ok";info.textContent=`✓ RUC de ${x.desc}, ya registrado`;info.hidden=false}
   if(x.obra&&!$("obra").value.trim())$("obra").value=x.obra;
-  if(CATS[fTipo].includes(x.cat))$("cat").value=x.cat;
+  if(catsDe(fTipo).includes(x.cat))$("cat").value=x.cat;
   syncForm();
 }
 $("desc").addEventListener("input",mostrarSug);
@@ -2198,7 +2266,7 @@ $("obra").addEventListener("keydown",e=>{
 $("sugObra").addEventListener("mousedown",e=>e.preventDefault());
 $("sugObra").addEventListener("click",e=>{const b=e.target.closest("[data-i]");if(b)elegirSugObra(+b.dataset.i)});
 // Si escribe un RUC conocido y aún no hay nombre, se completa el nombre
-$("ruc").addEventListener("input",()=>{const v=$("ruc").value.trim();$("rucInfo").hidden=true;if(v.length<8||$("desc").value.trim())return;const x=terceros(fTipo).find(t=>t.ruc===v);if(x){$("desc").value=x.desc;if(CATS[fTipo].includes(x.cat))$("cat").value=x.cat;return}buscarNombreRuc(v)});
+$("ruc").addEventListener("input",()=>{const v=$("ruc").value.trim();$("rucInfo").hidden=true;if(v.length<8||$("desc").value.trim())return;const x=terceros(fTipo).find(t=>t.ruc===v);if(x){$("desc").value=x.desc;if(catsDe(fTipo).includes(x.cat))$("cat").value=x.cat;return}buscarNombreRuc(v)});
 /* Nombre automático: si el RUC es nuevo, se pide la razón social a SUNAT (a través de tu Apps Script) */
 let rucBuscando="";
 async function buscarNombreRuc(v,alTerminar){
@@ -2225,7 +2293,7 @@ async function buscarNombreRuc(v,alTerminar){
 
 function limpiarForm(){
   $("monto").value="";$("desc").value="";$("ruc").value="";delete $("ruc").dataset.auto;$("nro").value="";delete $("det").dataset.touched;$("det").checked=false;$("detPct").value="4";
-  qrIgv=null;$("avisoQR").hidden=true;$("rucInfo").hidden=true;$("obra").value="";quitarFoto();
+  qrIgv=null;$("avisoQR").hidden=true;$("rucInfo").hidden=true;$("obra").value="";quitarFoto();$("catOtra").value="";
 }
 function cargarEnForm(r,conFecha){
   fTipo=r.tipo==="gasto"?"gasto":"ingreso"; fComp=r.comprobante||"ninguno";
@@ -2233,7 +2301,7 @@ function cargarEnForm(r,conFecha){
   $("nro").value=r.serie?`${r.serie}-${r.numero||""}`:(r.numero||"");
   $("obra").value=r.obra||"";
   $("det").checked=!!r.detraccion; $("det").dataset.touched="1"; $("detPct").value=String(r.detPct===12?12:4);
-  syncForm(); if(CATS[fTipo].includes(r.categoria))$("cat").value=r.categoria;
+  syncForm(); if(catsDe(fTipo).includes(r.categoria))$("cat").value=r.categoria;
   $("fecha").value=conFecha?r.fecha:(mes===hoyISO.slice(0,7)?hoyISO:mes+"-01");
   if(fComp!=="ninguno"&&typeof r.igv==="number") qrIgv={total:r.monto,igv:r.igv};
 }
@@ -2265,7 +2333,7 @@ $("f").addEventListener("submit",async e=>{
   const det=fTipo==="ingreso"&&fComp==="factura"&&$("det").checked;
   const p=partesForm(monto); const nroTxt=fComp==="ninguno"?"":$("nro").value.trim(); const [serie,...nn]=nroTxt.split("-");
   const r={tipo:fTipo,comprobante:fComp,monto,base:p.base,igv:p.igv,noGravado:p.noG,ruc:$("ruc").value.trim(),serie:nn.length?serie:"",numero:nn.length?nn.join("-"):(serie||""),
-    estado:fEditOrig&&fEditOrig.estado?fEditOrig.estado:"PAGADO",desc:$("desc").value.trim(),categoria:$("cat").value,fecha:$("fecha").value,
+    estado:fEditOrig&&fEditOrig.estado?fEditOrig.estado:"PAGADO",desc:$("desc").value.trim(),categoria:catElegida(),fecha:$("fecha").value,
     detraccion:det,detPct:det?+$("detPct").value:0,detMonto:det?Math.round(monto*$("detPct").value/100):0};
   if(fEditOrig&&fEditOrig.cargo) r.cargo=fEditOrig.cargo;
   if(soportaExtra()) r.obra=$("obra").value.trim();
@@ -2377,7 +2445,7 @@ function aplicarQR(texto){
   if(q.fecha) $("fecha").value=q.fecha;
   qrIgv={total:q.total,igv:q.igv};
   if(!$("det").dataset.touched)$("det").checked=fTipo==="ingreso"&&q.total>700;
-  syncForm(); if(previo&&CATS[fTipo].includes(previo.cat))$("cat").value=previo.cat;
+  syncForm(); if(previo&&catsDe(fTipo).includes(previo.cat))$("cat").value=previo.cat;
   $("avisoQR").textContent=`QR leído: ${q.tipoNombre} ${q.serie}-${q.numero} por ${fmt(q.total)}${previo?" de "+previo.desc:""}. Revisa los datos y toca Guardar.`+(q.tipo==="07"?" Ojo: es una nota de crédito.":"");
   $("avisoQR").hidden=false;
   irPaso(previo?4:3);
@@ -2488,7 +2556,7 @@ function aplicarTexto(q){
   if(q.fecha)$("fecha").value=q.fecha;
   qrIgv=q.igv>0&&q.total>0?{total:q.total,igv:q.igv}:null;
   if(!$("det").dataset.touched)$("det").checked=fTipo==="ingreso"&&q.total>700;
-  syncForm(); if(previo&&CATS[fTipo].includes(previo.cat))$("cat").value=previo.cat;
+  syncForm(); if(previo&&catsDe(fTipo).includes(previo.cat))$("cat").value=previo.cat;
   const falta=[!(q.total>0)&&"monto",fComp!=="ninguno"&&!q.serie&&"serie-número",fComp!=="ninguno"&&!q.rucTercero&&"RUC",!q.fecha&&"fecha"].filter(Boolean);
   $("avisoQR").textContent=`Leído de la foto: ${COMP_TXT[fComp]}${q.serie?" "+q.serie+"-"+q.numero:""}${q.total?" por "+fmt(q.total):""}${previo?" de "+previo.desc:""}. `
     +(falta.length?`No pude leer: ${falta.join(", ")}. Complétalo a mano.`:"Revisa que los datos coincidan con el comprobante y toca Guardar.");
@@ -3356,7 +3424,8 @@ if("serviceWorker" in navigator){
   }
   new MutationObserver(mover).observe(tb,{subtree:true,attributes:true,attributeFilter:["aria-current"]});
   new MutationObserver(mover).observe(document.body,{attributes:true,attributeFilter:["data-barra"]});
-  addEventListener("resize",mover); setTimeout(mover,300);
+  addEventListener("resize",mover); [300,900,1800,3500].forEach(t=>setTimeout(mover,t)); addEventListener("load",mover);
+  tb.addEventListener("transitionend",e=>{if(e.target===tb)mover()}); tb.addEventListener("animationend",mover);
   tb.addEventListener("pointerdown",e=>{
     if(document.body.dataset.barra!=="d") return; const b=e.target.closest("button"); if(!b) return;
     try{navigator.vibrate&&navigator.vibrate(8)}catch{}
@@ -3588,6 +3657,7 @@ function pintarResumenCfg(){
   const nb=k=>(BAR_DEF[k]||[""])[0].replace("Movim.","Movimientos");
   v("barra",`${nb(ajustes.barA||"movimientos")} y ${nb(ajustes.barB||"planilla")}`);
   v("son",ajustes.sonido===0?"Desactivados":"Activados");
+  if(typeof adorResumen==="function") v("ador",adorResumen());
   v("quien",quien?titulo(quien):"—");
   v("meta",`Meta ${fmt0(ajustes.meta||0)} al año`);
   v("firm",($("firmadosN")||{}).textContent||`${Object.keys(FIRMAS).length} firmados`);
@@ -3735,6 +3805,84 @@ render=function(){const r=_renderBase.apply(this,arguments);try{pintarFlujo()}ca
 document.addEventListener("click",e=>{const b=e.target.closest("[data-son]");if(!b)return;ajustes.sonido=+b.dataset.son;guardarLS("cbo-ajustes",ajustes);pintarSon();if(ajustes.sonido)sonar("registro")});
 function pintarSon(){document.querySelectorAll("#sonSeg [data-son]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.son===(ajustes.sonido===0?0:1))))}
 pintarSon();
+/* ===== Adornos de temporada en el logo (v61): una fiesta peruana por mes, activa desde 7 días antes hasta el día.
+   Ajustes → Apariencia → Adornos de temporada (ajustes.adornos: 0 = apagados) y "Ver cómo se ve" (solo vista previa). ===== */
+function adPascua(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),n=h+l-7*m+114;return new Date(y,Math.floor(n/31)-1,n%31+1)}
+function adDomingo(y,m,n){const d=new Date(y,m,1);return new Date(y,m,1+(7-d.getDay())%7+7*(n-1))}
+// [clave, nombre, mes, fecha del año, días que sigue después del día]
+const ADOR_F=[
+  ["anio","Año Nuevo",1,y=>new Date(y,0,1),0],
+  ["carnaval","Carnaval",2,y=>{const p=adPascua(y);return new Date(p.getFullYear(),p.getMonth(),p.getDate()-47)},0],
+  ["mujer","Día de la Mujer",3,y=>new Date(y,2,8),0],
+  ["santa","Semana Santa",4,y=>adPascua(y),0],
+  ["trabajo","Día del Trabajo",5,y=>new Date(y,4,1),0],
+  ["madre","Día de la Madre",5,y=>adDomingo(y,4,2),0],
+  ["padre","Día del Padre",6,y=>adDomingo(y,5,3),0],
+  ["inti","Inti Raymi y San Juan",6,y=>new Date(y,5,24),0],
+  ["patrias","Fiestas Patrias",7,y=>new Date(y,6,28),1],
+  ["rosa","Santa Rosa de Lima",8,y=>new Date(y,7,30),0],
+  ["primavera","Día de la Primavera",9,y=>new Date(y,8,23),0],
+  ["halloween","Halloween y Canción Criolla",10,y=>new Date(y,9,31),0],
+  ["santos","Todos los Santos",11,y=>new Date(y,10,1),1],
+  ["navidad","Navidad",12,y=>new Date(y,11,25),0]
+];
+function adorHoy(h){h=h||new Date();const t=new Date(h.getFullYear(),h.getMonth(),h.getDate());let mejor=null,dm=99;
+  for(const y of [t.getFullYear(),t.getFullYear()+1])for(const f of ADOR_F){const dias=Math.round((f[3](y)-t)/864e5);if(dias<=7&&dias>=-f[4]&&Math.abs(dias)<dm){dm=Math.abs(dias);mejor=f}}
+  return mejor}
+const AD={
+  cae:(xs,c,r)=>xs.map((x,i)=>`<circle class="a-cae" style="animation-delay:${(i*.85).toFixed(2)}s;animation-duration:${(3.2+i%3*.7).toFixed(1)}s" cx="${x}" cy="0" r="${r||1.3}" fill="${Array.isArray(c)?c[i%c.length]:c}"/>`).join(""),
+  confeti:(xs,cs)=>xs.map((x,i)=>`<rect class="a-cae" style="animation-delay:${(i*.6).toFixed(2)}s;animation-duration:${(2.8+i%3*.6).toFixed(1)}s" x="${x}" y="0" width="2.2" height="1.3" rx=".3" fill="${cs[i%cs.length]}"/>`).join(""),
+  flor:(x,y,r,c,cc)=>`<g transform="translate(${x} ${y})">${[0,72,144,216,288].map(a=>`<ellipse rx="${(r*.55).toFixed(2)}" ry="${r}" cy="${(-r*.8).toFixed(2)}" fill="${c}" transform="rotate(${a})"/>`).join("")}<circle r="${(r*.55).toFixed(2)}" fill="${cc}"/></g>`,
+  rayos:(n,r1,r2)=>Array.from({length:n},(_,i)=>{const a=i/n*Math.PI*2;return `<line x1="${(Math.cos(a)*r1).toFixed(1)}" y1="${(Math.sin(a)*r1).toFixed(1)}" x2="${(Math.cos(a)*r2).toFixed(1)}" y2="${(Math.sin(a)*r2).toFixed(1)}"/>`}).join(""),
+  corazon:(x,y,s,c)=>`<path transform="translate(${x} ${y}) scale(${s})" d="M0 3C-4 0-4-3-2-3.6C-1-4 0-3 0-2.2C0-3 1-4 2-3.6C4-3 4 0 0 3Z" fill="${c}"/>`,
+  sube:(x,y,c,d)=>`<g class="a-sube" style="animation-delay:${d}s">${AD.corazon(x,y,.8,c)}</g>`,
+  estrella:(x,y,c,cls)=>`<g transform="translate(${x} ${y})"><path class="a-brilla ${cls||""}" d="M0-2.6l.8 1.8 1.8.8-1.8.8-.8 1.8-.8-1.8-1.8-.8 1.8-.8z" fill="${c}"/></g>`,
+  murcielago:(x,y,s,d)=>`<g transform="translate(${x} ${y}) scale(${s})"><g class="a-vuela" style="animation-delay:${d}s"><g class="a-ala"><path d="M-8 0Q-6-4-3-2Q-2-4 0-1.5Q2-4 3-2Q6-4 8 0Q5-1 4 1.5Q2 0 0 2Q-2 0-4 1.5Q-5-1-8 0Z" fill="#1A1424" stroke="#B9A6FF" stroke-width=".6"/></g></g></g>`,
+  rosa:(x,y,r)=>`<g transform="translate(${x} ${y})"><path d="M${-r} ${r*.5}q-3 1-4.5 4q3.4.2 4.5-4z" fill="#3E9B4F"/><circle r="${r}" fill="#E23D6B"/><path d="M-1.5.5a1.6 1.6 0 1 1 3 .2a2.8 2.8 0 1 1-4.8-1.8" stroke="#9E1240" stroke-width=".8" fill="none"/></g>`,
+  vela:(x,y,h,cls)=>`<g transform="translate(${x} ${y})"><circle class="a-brilla ${cls}" cy="-3" r="4.5" fill="#FFB547" opacity=".35"/><rect x="-1.8" y="0" width="3.6" height="${h}" rx="1" fill="#F4ECD8"/><path class="a-llama ${cls}" d="M0-5.5C1.9-2.8 1.9-.9 0 0C-1.9-.9-1.9-2.8 0-5.5Z" fill="#FFB547"/></g>`,
+  palma:(t,cls)=>`<g transform="${t}"><g class="a-mece ${cls||""}"><path d="M0 0C2-8 6-16 12-22" stroke="#4E9F3D" stroke-width="1.4" fill="none"/><path d="M2-5l-5-2M2-5l4-4M4-10l-5-3M4-10l5-3M7-15l-4-4M7-15l5-2M10-19l-3-4M10-19l4-1" stroke="#7CCB62" stroke-width="1.3" stroke-linecap="round"/></g></g>`
+};
+const ADOR_ART={
+  anio:()=>`<g transform="translate(10 -5)"><g class="a-estalla" stroke="#FFD54A" stroke-width="1.3" stroke-linecap="round">${AD.rayos(10,3,8)}</g></g><g transform="translate(50 -3)"><g class="a-estalla d2" stroke="#FF7AB6" stroke-width="1.3" stroke-linecap="round">${AD.rayos(10,3,8)}</g></g><g transform="translate(31 -12)"><g class="a-estalla d3" stroke="#7FE3FF" stroke-width="1.1" stroke-linecap="round">${AD.rayos(8,2,6)}</g></g>${AD.estrella(57,41,"#FFD54A")}${AD.estrella(3,40,"#FFF","d2")}`,
+  carnaval:()=>`<path class="a-serp" d="M-4 4q5-7 10 0t10 0 10 0 10 0 10 0 10 0" stroke="#FF5A8A" stroke-width="1.8" fill="none" stroke-linecap="round"/><path class="a-serp d2" d="M-2-3q5 6 10 0t10 0 10 0 10 0 10 0 10 0" stroke="#3EC6FF" stroke-width="1.6" fill="none" stroke-linecap="round"/><path class="a-serp d3" d="M2-9q5-6 10 0t10 0 10 0 10 0 10 0" stroke="#FFD54A" stroke-width="1.5" fill="none" stroke-linecap="round"/>${AD.confeti([4,14,26,38,50,58],["#FF5A8A","#3EC6FF","#FFD54A","#7BE495"])}`,
+  mujer:()=>`<g class="a-mece">${AD.flor(53,41,4,"#B57EDC","#FFD54A")}${AD.flor(46,45,3,"#E89AC7","#FFF")}</g>${AD.sube(50,30,"#E06FAE",0)}${AD.sube(57,28,"#B57EDC",1.4)}`,
+  santa:()=>`${AD.palma("translate(3 47) rotate(-18)")}${AD.palma("translate(57 47) rotate(18) scale(-1 1)","d2")}${AD.estrella(30,-8,"#FFE9A8")}${AD.estrella(20,-4,"#FFF","d2")}${AD.estrella(41,-5,"#FFF","d3")}`,
+  trabajo:()=>`<g class="a-flota"><g transform="translate(8 -10)"><path d="M2 14C2 4 9-1 16-1S30 4 30 14Z" fill="#F2B705"/><rect x="-1" y="13" width="34" height="3.6" rx="1.8" fill="#D99A00"/><rect x="14" y="-1.6" width="4" height="12" rx="2" fill="#FFD84D"/></g></g><g transform="translate(54 33)"><g class="a-martillo"><rect x="-1.2" y="0" width="2.4" height="13" rx="1" fill="#A86B32"/><rect x="-5" y="-3" width="10" height="4" rx="1" fill="#9AA5B1"/></g></g>`,
+  madre:()=>`<g class="a-mece">${AD.flor(53,41,4,"#FF6B9A","#FFE08A")}${AD.flor(46,45,3.2,"#FFB3C7","#FFF")}${AD.flor(59,45,3,"#E2445C","#FFE08A")}</g>${AD.sube(49,31,"#FF6B9A",0)}${AD.sube(56,29,"#FF9EBB",1.2)}${AD.sube(52,33,"#E2445C",2.1)}`,
+  padre:()=>`<g transform="translate(54 29)"><g class="a-pendulo"><path d="M-2.5 0h5l-1 3h-3z" fill="#1E4E8C"/><path d="M-1.5 3h3l2.5 11-4 4-4-4z" fill="#2F6FBF"/><path d="M-1 6l3 2M-1.6 9.5l3.6 2.4M-2 13l3.5 2.3" stroke="#BFD7FF" stroke-width=".7"/></g></g>${AD.estrella(6,-4,"#FFD54A")}${AD.estrella(16,-8,"#FFF","d2")}`,
+  inti:()=>`<g transform="translate(8 -3)"><g class="a-gira" stroke="#FFB300" stroke-width="1.6" stroke-linecap="round">${AD.rayos(12,8.5,12.5)}</g><circle r="7" fill="#FFC928" stroke="#F29F05" stroke-width="1"/><circle cx="-2.3" cy="-1" r=".9" fill="#8A4B00"/><circle cx="2.3" cy="-1" r=".9" fill="#8A4B00"/><path d="M-2.6 2.2q2.6 2.2 5.2 0" stroke="#8A4B00" stroke-width=".9" fill="none" stroke-linecap="round"/></g>`,
+  patrias:()=>`<line x1="3" y1="10" x2="3" y2="-16" stroke="#E6E6E6" stroke-width="1.2" stroke-linecap="round"/><circle cx="3" cy="-16.6" r="1.3" fill="#FFD54A"/><g transform="translate(3.6 -15.5)"><g class="a-ondea"><rect width="7" height="12" fill="#D91023"/><rect x="7" width="7" height="12" fill="#FFF"/><rect x="14" width="7" height="12" fill="#D91023"/></g></g><g transform="translate(55 40)"><path d="M-2 4l-2.4 7 2.8-1.6L0 11zM2 4l2.4 7-2.8-1.6L0 11z" fill="#D91023"/><g class="a-gira"><circle r="5.6" fill="#D91023"/><circle r="4.6" fill="none" stroke="#FFF" stroke-width="1.4" stroke-dasharray="1.2 1.2"/><circle r="2.2" fill="#FFF"/><circle r="1.1" fill="#D91023"/></g></g>`,
+  rosa:()=>`<g class="a-mece">${AD.rosa(52,41,3.6)}${AD.rosa(58,45,2.8)}</g>${AD.cae([8,20,32,44],["#FF8FB1","#E23D6B"],1.1)}`,
+  primavera:()=>`<g class="a-mece">${AD.flor(4,44,3.4,"#FFD23F","#F28C28")}</g><g class="a-mece d2">${AD.flor(56,43,3.6,"#FF8FB1","#FFE08A")}</g><g transform="translate(12 -6)"><g class="a-mariposa"><g class="a-aleteo"><path d="M0 0C-4-5-8-3-6 1C-5 3-2 2 0 0ZM0 0C4-5 8-3 6 1C5 3 2 2 0 0Z" fill="#7FD3FF"/><path d="M0 0C-3 2-5 5-2 5C-1 5 0 3 0 0ZM0 0C3 2 5 5 2 5C1 5 0 3 0 0Z" fill="#B39DFF"/></g><rect x="-.5" y="-2" width="1" height="6" rx=".5" fill="#2B2B2B"/></g></g>`,
+  halloween:()=>`${AD.murcielago(12,-6,.9,0)}${AD.murcielago(30,-12,.7,-2.5)}<g transform="translate(53 41)"><g class="a-flota"><ellipse rx="7.5" ry="6" fill="#F07B1A"/><ellipse rx="3.6" ry="6" fill="#F59331"/><path d="M0-6c0-2 1-3 2.5-3.4" stroke="#3E7D2E" stroke-width="1.4" fill="none" stroke-linecap="round"/><g class="a-brilla" fill="#FFE27A"><path d="M-4-1.5l1.6-1.8 1.4 1.8zM1-1.5l1.6-1.8 1.4 1.8zM-4 1.5q4 3 8 0l-1.4.6-1-1-1 1-1.2-1-1 1z"/></g></g></g>`,
+  santos:()=>`${AD.vela(50,36,12,"")}${AD.vela(57,39,9,"d2")}<g class="a-mece">${AD.flor(4,44,3.4,"#F7931E","#C0392B")}</g>`,
+  navidad:()=>`${AD.cae([6,18,30,42,54],"#FFF")}<g class="a-flota"><g transform="translate(17 -4) rotate(-12 13 6)"><path d="M3 6C5-5 15-11 27-8C22-4 21 1 22 6Z" fill="#D7263D"/><path d="M9 1C13-6 19-9 26-8" stroke="#8E1023" stroke-width="1.1" fill="none" opacity=".55"/><rect x="1" y="4" width="23" height="5" rx="2.5" fill="#F7F7F7"/><circle class="a-brilla" cx="28" cy="-8" r="3.1" fill="#FFF"/></g></g><g class="a-mece"><path d="M53 22L60 32H57L62 40H58L64 47H42L48 40H44L49 32H46Z" fill="#1E8E4E" stroke="#0E5C31" stroke-width=".6"/><rect x="51.5" y="47" width="3" height="3.5" fill="#7A4A1E"/><circle class="a-brilla" cx="50" cy="42" r="1.1" fill="#FF5A5A"/><circle class="a-brilla d2" cx="56" cy="36" r="1.1" fill="#FFD54A"/><circle class="a-brilla d3" cx="57" cy="44" r="1.1" fill="#6EC6FF"/>${AD.estrella(53,19.5,"#FFD54A")}</g>`
+};
+let adorVista="";
+const adorNombreMes=f=>{const m=MESES[f[2]-1];return m.charAt(0).toUpperCase()+m.slice(1)};
+function adorResumen(){if(ajustes.adornos===0)return "Desactivados";const f=adorHoy();return "Activados"+(f?" · "+f[1]:"")}
+function pintarAdornos(){
+  const on=ajustes.adornos!==0, f=on?(adorVista?ADOR_F.find(x=>x[0]===adorVista):adorHoy()):null, k=f?f[0]:"";
+  document.querySelectorAll(".adw").forEach(w=>{const a=w.querySelector(".adorno");if(!a||a.dataset.k===k)return;a.dataset.k=k;
+    a.innerHTML=k?`<svg viewBox="0 0 60 48" aria-hidden="true" focusable="false">${ADOR_ART[k]()}</svg>`:"";w.title=f?f[1]:""});
+  document.querySelectorAll("#adorSeg [data-ador]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.ador===(on?1:0))));
+  const s=$("adorVer"); if(s){s.disabled=!on;s.value=adorVista}
+  const v=$("cfgv-ador"); if(v) v.textContent=adorResumen();
+}
+(function(){
+  const logo=($("marcaLogo")||{}).src; if($("adorPrevImg")&&logo) $("adorPrevImg").src=logo;
+  ["marcaLogo","logoHImg","adorPrevImg"].forEach(id=>{const im=$(id);if(!im||im.parentElement.classList.contains("adw"))return;
+    const w=document.createElement("span");w.className="adw";im.before(w);w.append(im);
+    const a=document.createElement("span");a.className="adorno";a.setAttribute("aria-hidden","true");w.append(a)});
+  const quieto=matchMedia("(prefers-reduced-motion: reduce)");
+  document.querySelectorAll("#side .marca,#logoH,#adorPrev").forEach(z=>{const go=()=>{const w=z.querySelector(".adw");if(quieto.matches||!w||!w.querySelector(".adorno").dataset.k)return;
+    w.classList.remove("salta");void w.offsetWidth;w.classList.add("salta");clearTimeout(w._t);w._t=setTimeout(()=>w.classList.remove("salta"),700)};z.addEventListener("pointerenter",go);z.addEventListener("pointerdown",go)});
+  document.addEventListener("animationend",e=>{if(e.animationName==="adSalta"){const w=e.target.closest(".adw");if(w)w.classList.remove("salta")}});
+  document.addEventListener("click",e=>{const b=e.target.closest("[data-ador]");if(!b)return;ajustes.adornos=+b.dataset.ador;if(!ajustes.adornos)adorVista="";guardarLS("cbo-ajustes",ajustes);pintarAdornos()});
+  const s=$("adorVer");
+  if(s){s.innerHTML=`<option value="">Automático (según la fecha)</option>`+ADOR_F.map(f=>`<option value="${f[0]}">${adorNombreMes(f)} · ${f[1]}</option>`).join("");s.onchange=()=>{adorVista=s.value;pintarAdornos()}}
+  pintarAdornos(); setInterval(pintarAdornos,36e5);
+})();
 $("metaMes").onclick=()=>{ir("config");setTimeout(()=>{const m=$("meta");if(m){m.scrollIntoView({block:"center"});m.focus()}},350)};
 setTimeout(()=>{try{pintarExtras()}catch{}try{pintarUD()}catch(e){console.warn(e)}try{pintarFlujo()}catch(e){console.warn(e)}},30);
 /* ===== Inventario de obra: catálogo (una foto por tipo; todas las medidas que se venden en Perú se eligen al registrar) ===== */
