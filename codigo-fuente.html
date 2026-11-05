@@ -449,7 +449,7 @@ body.escribiendo .tabbar,body.escribiendo .fab{display:none!important}
   .tabbar button[aria-current="page"]{color:var(--brand-2)}
   .tabbar button[aria-current="page"] svg{transform:translateY(-1px)}
   .tabbar .mas-reg{align-self:center}
-  .tabbar .mas-reg span.c{width:56px;height:56px;border-radius:18px;background:var(--brand);color:var(--brand-ink);display:grid;place-items:center;margin-top:-26px;box-shadow:0 8px 20px rgba(13,92,70,.35);transition:transform .15s var(--ease)}
+  .tabbar .mas-reg span.c{width:56px;height:56px;border-radius:18px;background:var(--brand);color:var(--brand-ink);display:grid;place-items:center;margin-top:-26px;box-shadow:0 8px 20px rgba(0,0,0,.35);transition:transform .15s var(--ease)}
   .tabbar .mas-reg:active span.c{transform:scale(.94)}
   .tabbar .mas-reg{color:var(--ink)}
   .fab{display:none}
@@ -617,7 +617,7 @@ body.deco-mov h1.deco-h1::after{animation:flotar 3s ease-in-out infinite}
 @media (max-width:980px){
   body[data-barra="d"] .tabbar{left:10px;right:10px;bottom:calc(12px + env(safe-area-inset-bottom,0px));padding:8px 6px;border-radius:30px;border:1px solid rgba(255,255,255,.14);
     background:linear-gradient(180deg,color-mix(in srgb,var(--brand) 92%,#fff) 0%,var(--brand) 55%,color-mix(in srgb,var(--brand) 80%,#000) 100%);
-    box-shadow:0 18px 40px rgba(6,40,30,.38),0 2px 0 rgba(255,255,255,.12) inset;align-items:center;overflow:visible}
+    box-shadow:0 18px 40px rgba(0,0,0,.38),0 2px 0 rgba(255,255,255,.12) inset;align-items:center;overflow:visible}
   body[data-barra="d"] .tabbar .ind{position:absolute;top:8px;left:0;height:calc(100% - 16px);border-radius:22px;background:rgba(255,255,255,.95);
     box-shadow:0 6px 16px rgba(0,0,0,.18),0 0 0 1px rgba(255,255,255,.6) inset;transition:transform .5s cubic-bezier(.34,1.56,.64,1),width .5s cubic-bezier(.34,1.56,.64,1),opacity .2s;z-index:0;pointer-events:none}
   body[data-barra="d"] .tabbar button{position:relative;z-index:1;color:rgba(255,255,255,.72);min-height:50px;gap:3px;padding:4px 2px}
@@ -628,10 +628,10 @@ body.deco-mov h1.deco-h1::after{animation:flotar 3s ease-in-out infinite}
   body[data-barra="d"] .tabbar button[aria-current="page"] .lb{font-weight:800}
   body[data-barra="d"] .tabbar .mas-reg .lb{display:none}
   body[data-barra="d"] .tabbar .mas-reg span.c{width:62px;height:62px;border-radius:50%;margin-top:-34px;color:#fff;
-    background:linear-gradient(150deg,color-mix(in srgb,var(--brand) 35%,#7FE3B8) 0%,color-mix(in srgb,var(--brand) 55%,#2FB383) 50%,var(--brand) 100%);
-    border:5px solid var(--bg);box-shadow:0 10px 24px rgba(6,40,30,.45),0 0 0 2px color-mix(in srgb,#D4A72C 70%,transparent);animation:brilloFab 3.2s ease-in-out infinite}
+    background:linear-gradient(150deg,color-mix(in srgb,var(--brand-2) 80%,#fff) 0%,var(--brand-2) 40%,var(--brand) 100%);
+    border:5px solid var(--bg);box-shadow:0 10px 24px rgba(0,0,0,.45),0 0 0 2px color-mix(in srgb,var(--brand-2) 70%,transparent);animation:brilloFab 3.2s ease-in-out infinite}
   body[data-barra="d"] .tabbar .mas-reg:active span.c{transform:scale(.9) rotate(90deg)}
-  @keyframes brilloFab{0%,100%{box-shadow:0 10px 24px rgba(6,40,30,.45),0 0 0 2px rgba(212,167,44,.55)}50%{box-shadow:0 10px 28px rgba(6,40,30,.5),0 0 0 5px rgba(212,167,44,.18)}}
+  @keyframes brilloFab{0%,100%{box-shadow:0 10px 24px rgba(0,0,0,.45),0 0 0 2px color-mix(in srgb,var(--brand-2) 60%,transparent)}50%{box-shadow:0 10px 28px rgba(0,0,0,.5),0 0 0 5px color-mix(in srgb,var(--brand-2) 22%,transparent)}}
   body[data-barra="d"] .tabbar .badge{position:absolute;top:4px;left:calc(50% + 6px);min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:#E8761E;color:#fff;font-size:.62rem;font-weight:800;display:grid;place-items:center;box-shadow:0 0 0 2px var(--brand)}
   body[data-barra="d"] .tabbar .rip{position:absolute;inset:0;margin:auto;width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.5);animation:rip .5s ease-out forwards;pointer-events:none}
   @keyframes rip{to{transform:scale(9);opacity:0}}
@@ -2047,7 +2047,13 @@ const PALETAS=[["cobre","Cobre","#B4622F","#F0A06C"],["acero","Acero eléctrico"
   ["cielo","Cielo","#0369A1","#7DD3FC"],["indigo","Índigo","#3730A3","#A5A0FF"],["violeta","Violeta","#5B2A9B","#C49BFF"],
   ["rubi","Rubí","#8E1F35","#F2788F"],["vino","Vino","#6B1D2F","#E68AA0"],["coral","Coral","#A23B32","#FF8E7A"],
   ["naranja","Naranja","#B4470F","#FF9A5C"],["oro","Oro","#8A6A12","#E8C25A"],["lima","Lima","#4D6B12","#B6E35A"],
-  ["bosque","Bosque","#2F5A1E","#8FD46B"],["grafito","Grafito","#3A434D","#C9D3DC"],["plata","Plata","#4B5563","#E5E7EB"]];
+  ["bosque","Bosque","#2F5A1E","#8FD46B"],["grafito","Grafito","#3A434D","#C9D3DC"],["plata","Plata","#4B5563","#E5E7EB"],
+  ["medianoche","Azul medianoche","#1E3A8A","#93B4FF"],["cobalto","Cobalto","#1D4ED8","#8AB4FF"],["zafiro","Zafiro","#0C4A6E","#67C6F5"],
+  ["petroleo","Petróleo","#134E4A","#5EEAD4"],["jade","Jade","#047857","#6EE7B7"],["menta","Menta","#0F766E","#99F6E4"],
+  ["oliva","Oliva","#4D5B1F","#C5D86D"],["mostaza","Mostaza","#7A5800","#F5C542"],["ambar","Ámbar","#92400E","#FBBF24"],
+  ["terracota","Terracota","#9A3412","#FDA47A"],["chocolate","Chocolate","#5C3A21","#D6A77A"],["durazno","Durazno","#9C4A2F","#FFB59A"],
+  ["rosa","Rosa","#9D174D","#F9A8D4"],["fucsia","Fucsia","#86198F","#F0ABFC"],["ciruela","Ciruela","#581C87","#D8B4FE"],
+  ["lavanda","Lavanda","#5B4B8A","#C4B5FD"],["pizarra","Pizarra","#334155","#A5B4CC"],["arena","Arena","#6B5B3E","#E3D3A8"]];
 function aplicarTema(){
   document.documentElement.setAttribute("data-theme","oscuro");
   const P=PALETAS.find(x=>x[0]===ajustes.paleta)||PALETAS.find(x=>x[0]==="grafito");

@@ -1,5 +1,5 @@
 # Mapa de CBO Finanzas
-Actualizado: 05/11/2026 · caché: cbo-finanzas-v65-barra-teclado
+Actualizado: 05/11/2026 · caché: cbo-finanzas-v66-colores
 
 ## Archivos
 - codigo-fuente.html: versión editable (4287 líneas). index.html es la copia que se publica: editar codigo-fuente.html y copiarlo a index.html.
@@ -46,7 +46,7 @@ Actualizado: 05/11/2026 · caché: cbo-finanzas-v65-barra-teclado
 - Bloque 'Adornos de temporada' al final del <style>: .adw (envoltura del logo), .adorno (SVG encima), animaciones ad*, .ador-prev (vista previa en Configuración).
 
 ## Reglas del dueño
-- Fondo siempre oscuro; colores se eligen en Ajustes → Colores de la app (18 paletas). Grafito es la paleta por defecto.
+- Fondo siempre oscuro; colores se eligen en Ajustes → Colores de la app (36 paletas). Grafito es la paleta por defecto.
 - Adornos de temporada (pedido expreso de Josué, 05/11/2026): en el logo de arriba a la izquierda (.marca en computadora, .logo-h en celular), una fiesta peruana por mes, desde 7 días antes hasta el día. Se activan/desactivan en Configuración → Apariencia → Adornos de temporada (ajustes.adornos, activado por defecto) y "Ver cómo se ve" solo es vista previa (no cambia la fecha). Sin selector de transiciones.
 - El formulario de registro (botón +) se mantiene como estaba; solo se ampliaron las categorías y la opción "Otra (escribir…)".
 - Categorías: la lista CATS + las ya usadas en registros (grupo "Tus categorías", así se siguen viendo las antiguas) + "Otra (escribir…)" que guarda lo escrito como categoría. "Planilla / jornales" y "Pago a SUNAT" no aparecen en la lista (son automáticas).
@@ -69,3 +69,4 @@ Actualizado: 05/11/2026 · caché: cbo-finanzas-v65-barra-teclado
 - Inventario: cada entrada, uso o salida tiene fecha (por defecto hoy; botones Hoy/Ayer/Anteayer; no se acepta fecha futura). El historial se ordena por esa fecha (invOrden).
 - Inventario: la fecha empieza siempre con la de hoy y se puede cambiar (sin botones rápidos). La obra muestra la lista de obras guardadas al tocar el campo (invSugObra).
 - Barra de abajo: se esconde mientras se escribe con el teclado (clase body.escribiendo) y vuelve al cerrarlo. "Inventario" se puede elegir como acceso de la barra.
+- Paletas: 36 (se agregaron 18). El botón + de la barra de abajo usa solo los colores de la paleta (antes tenía verde y dorado fijos).
