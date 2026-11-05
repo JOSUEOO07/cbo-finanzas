@@ -1,5 +1,5 @@
 # Mapa de CBO Finanzas
-Actualizado: 04/11/2026 · caché: cbo-finanzas-v58-oscuro
+Actualizado: 04/11/2026 · caché: cbo-finanzas-v60-obras
 
 ## Archivos
 - codigo-fuente.html: versión editable (4091 líneas). index.html es la copia que se publica: editar codigo-fuente.html y copiarlo a index.html.
@@ -41,7 +41,12 @@ Actualizado: 04/11/2026 · caché: cbo-finanzas-v58-oscuro
 - Bloque 'Diseño 2026' al final del <style>: flujo del dinero (.fl-*), paletas (.pal), transición entre secciones (.vin-der/.vin-izq).
 
 ## Reglas del dueño
-- Fondo siempre oscuro; colores se eligen en Ajustes → Colores de la app (18 paletas).
+- Fondo siempre oscuro; colores se eligen en Ajustes → Colores de la app (18 paletas). Grafito es la paleta por defecto.
 - Sin decoraciones de temporada ni selector de transiciones.
 - El formulario de registro (botón +) se mantiene como estaba.
 - Siempre permitir agregar trabajador, cliente y proveedor nuevos; no quitar funciones.
+- Logo de arriba (.logo-h, celular en Inicio): solo el logo blanco, sin recuadro de color.
+- Registro: si el cliente/proveedor ya está registrado, su RUC se completa solo (autoRuc). Si es nuevo, se escribe a mano.
+- Quién registra: todo lo registrado hasta el 04/11/2026 es de JOSUÉ VILLAR (porHistorico). Desde ahí, cada equipo: celular de Josué con ?soy=josue, los demás JESÚS VILLAR.
+- Inventario: al usar material se elige "hasta qué piso" llega la obra (hasta 99) y el piso en una lista. Con más de 8 pisos, el resumen muestra solo los pisos con material.
+- Inventario: la hoja de cada pieza muestra y deja cambiar la obra; al sacar material se elige si se devuelve o pasa a otra obra (traslado: sale de una y entra a la otra).

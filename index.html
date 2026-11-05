@@ -695,7 +695,7 @@ body.deco-mov h1.deco-h1::after{animation:flotar 3s ease-in-out infinite}
 
 /* Logo de la empresa arriba (celular, en Inicio) */
 .logo-h{display:none;align-items:center;gap:10px;min-width:0}
-.logo-h img{width:42px;height:42px;border-radius:13px;object-fit:contain;padding:5px;background:var(--brand);box-shadow:0 4px 10px rgba(13,92,70,.25)}
+.logo-h img{width:42px;height:42px;object-fit:contain;padding:0;background:none;box-shadow:none}
 .logo-h span{display:grid;line-height:1.1}.logo-h b{font-size:1.05rem;letter-spacing:-.01em;color:var(--ink)}.logo-h small{font-size:.7rem;color:var(--muted);font-weight:700;letter-spacing:.04em}
 @media (max-width:980px){body.en-inicio #titulo{display:none}body.en-inicio .logo-h{display:flex}}
 
@@ -955,6 +955,8 @@ button.ud-card{cursor:pointer;width:100%}
 .inv-seg{grid-template-columns:repeat(3,1fr)}
 .inv-seg button{font-size:.8rem;line-height:1.15;padding:9px 4px}
 .inv-f{display:grid;gap:6px;min-width:0}
+.inv-obra-pieza{display:grid;gap:4px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--soft)}
+.inv-obra-pieza select{font-weight:700}
 .inv-lbl,.inv-obra-sel span{font-size:.8rem;font-weight:600;color:var(--muted);text-transform:none;letter-spacing:0}
 .inv-foto-btn{text-transform:none;letter-spacing:0}
 .inv-f input:not([type=checkbox]){font:inherit;font-size:1rem;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:11px 12px;width:100%;min-width:0}
@@ -1627,7 +1629,7 @@ const leerLS=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.p
 const guardarLS=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 let mes=hoyISO.slice(0,7), filtro="todos", rows=[], store=null, pendingDel=null, seccion="inicio", periodoTer="mes";
 let fTipo="ingreso", fComp="factura";
-let ajustes=Object.assign({tema:"calido",meta:300000},leerLS("cbo-ajustes",{}));
+let ajustes=Object.assign({tema:"calido",meta:300000,paleta:"grafito"},leerLS("cbo-ajustes",{})); // Grafito es la paleta por defecto
 // v4: el tema predeterminado pasa a "Cálido" aunque antes se hubiera guardado "auto"
 if(!ajustes.v4){if(ajustes.tema==="auto")ajustes.tema="calido";ajustes.v4=1;guardarLS("cbo-ajustes",ajustes)}
 function esc(s){const d=document.createElement("div");d.textContent=s??"";return d.innerHTML}
@@ -1981,7 +1983,7 @@ const PALETAS=[["cobre","Cobre","#B4622F","#F0A06C"],["acero","Acero eléctrico"
   ["bosque","Bosque","#2F5A1E","#8FD46B"],["grafito","Grafito","#3A434D","#C9D3DC"],["plata","Plata","#4B5563","#E5E7EB"]];
 function aplicarTema(){
   document.documentElement.setAttribute("data-theme","oscuro");
-  const P=PALETAS.find(x=>x[0]===ajustes.paleta)||PALETAS[0];
+  const P=PALETAS.find(x=>x[0]===ajustes.paleta)||PALETAS.find(x=>x[0]==="grafito");
   let st=document.getElementById("cboVars"); if(!st){st=document.createElement("style");st.id="cboVars";document.head.appendChild(st)}
   st.textContent=`:root:root{--brand:${P[2]};--brand-2:${P[3]}}`;
   document.querySelector('meta[name="theme-color"]').setAttribute("content","#0B0D10");
@@ -2141,8 +2143,21 @@ function mostrarSug(){
   $("sug").hidden=false; $("desc").setAttribute("aria-expanded","true");
 }
 function ocultarSug(){$("sug").hidden=true;$("desc").setAttribute("aria-expanded","false")}
-function elegirSug(i){const x=sugLista[i];if(!x)return;$("desc").value=x.desc;if(x.ruc)$("ruc").value=x.ruc;if(x.obra&&!$("obra").value.trim())$("obra").value=x.obra;if(CATS[fTipo].includes(x.cat))$("cat").value=x.cat;ocultarSug();syncForm()}
+function elegirSug(i){const x=sugLista[i];if(!x)return;$("desc").value=x.desc;if(x.ruc){$("ruc").value=x.ruc;$("ruc").dataset.auto=x.ruc}if(x.obra&&!$("obra").value.trim())$("obra").value=x.obra;if(CATS[fTipo].includes(x.cat))$("cat").value=x.cat;ocultarSug();syncForm()}
+// Si el nombre escrito ya está registrado, su RUC se completa solo (si es nuevo, se escribe a mano)
+const normNom=s=>sinTildes(s).replace(/[^a-z0-9]/g,"");
+function autoRuc(){
+  const d=normNom($("desc").value), R=$("ruc"), info=$("rucInfo");
+  const L=d.length>=3?terceros(fTipo):[], x=L.find(t=>t.ruc&&t.tipo===fTipo&&normNom(t.desc)===d)||L.find(t=>t.ruc&&normNom(t.desc)===d);
+  if(!x){if(R.dataset.auto&&R.value===R.dataset.auto){R.value="";info.hidden=true}delete R.dataset.auto;return}
+  if(!R.value.trim()||R.dataset.auto===R.value){R.value=x.ruc;R.dataset.auto=x.ruc;info.className="ruc-info ok";info.textContent=`✓ RUC de ${x.desc}, ya registrado`;info.hidden=false}
+  if(x.obra&&!$("obra").value.trim())$("obra").value=x.obra;
+  if(CATS[fTipo].includes(x.cat))$("cat").value=x.cat;
+  syncForm();
+}
 $("desc").addEventListener("input",mostrarSug);
+$("desc").addEventListener("input",autoRuc);
+$("desc").addEventListener("change",autoRuc);
 $("desc").addEventListener("focus",mostrarSug);
 $("desc").addEventListener("blur",()=>setTimeout(ocultarSug,150));
 $("desc").addEventListener("keydown",e=>{
@@ -2209,7 +2224,7 @@ async function buscarNombreRuc(v,alTerminar){
 }
 
 function limpiarForm(){
-  $("monto").value="";$("desc").value="";$("ruc").value="";$("nro").value="";delete $("det").dataset.touched;$("det").checked=false;$("detPct").value="4";
+  $("monto").value="";$("desc").value="";$("ruc").value="";delete $("ruc").dataset.auto;$("nro").value="";delete $("det").dataset.touched;$("det").checked=false;$("detPct").value="4";
   qrIgv=null;$("avisoQR").hidden=true;$("rucInfo").hidden=true;$("obra").value="";quitarFoto();
 }
 function cargarEnForm(r,conFecha){
@@ -2637,7 +2652,7 @@ async function cargar(){
     if(j.sinCambios){rows=conCola(servidorRows);render()}
     else{
       if(Array.isArray(j.trabajadores)){trabajadores=j.trabajadores;guardarLS("cbo-trab",trabajadores)}
-      servidorRows=j.registros.filter(r=>typeof r.monto==="number"&&r.fecha);
+      servidorRows=j.registros.filter(r=>typeof r.monto==="number"&&r.fecha).map(porHistorico);
       guardarLS(CACHE_K,servidorRows); rows=conCola(servidorRows); render();
     }
     if(j.ver) guardarLS("cbo-ver",j.ver);
@@ -2655,7 +2670,10 @@ async function cargar(){
    Si no hay señal, cada cambio (agregar, editar, borrar, foto) se guarda en una cola en este equipo,
    se ve en la app con la etiqueta "Por enviar" y se envía solo, en orden, cuando vuelve la conexión. */
 const COLA_K="cbo-cola";
-let cola=leerLS(COLA_K,[]), servidorRows=leerLS(CACHE_K,[]), enviando=false;
+// Hasta el 04/11/2026 todos los comprobantes los registró Josué Villar; desde ahí, cada equipo registra con su nombre
+const CORTE_POR="2026-11-04", CORTE_POR_MS=new Date("2026-11-05T00:00:00-05:00").getTime();
+function porHistorico(r){const antes=r.creado?(+r.creado<CORTE_POR_MS):(String(r.fecha||"")<=CORTE_POR);if(!r.por||antes)r.por="JOSUÉ VILLAR";return r}
+let cola=leerLS(COLA_K,[]), servidorRows=leerLS(CACHE_K,[]).map(porHistorico), enviando=false;
 const guardarCola=()=>{guardarLS(COLA_K,cola);pintarCola()};
 // Error de red (sin señal, tiempo agotado) frente a error del servidor (clave, datos inválidos)
 // Ojo: el corte por tiempo (AbortError) trae un "code" numérico del navegador; solo los errores del servidor traen code de texto
@@ -3565,7 +3583,7 @@ async function sincronizarFirmas(){
 /* ===== Configuración: resumen de cada opción y una sola abierta a la vez ===== */
 function pintarResumenCfg(){
   const v=(k,h)=>{const e=document.getElementById("cfgv-"+k);if(e)e.innerHTML=h};
-  const P=PALETAS.find(x=>x[0]===ajustes.paleta)||PALETAS[0];
+  const P=PALETAS.find(x=>x[0]===ajustes.paleta)||PALETAS.find(x=>x[0]==="grafito");
   v("tema",`<i style="background:${P[3]}"></i> ${P[1]}`);
   const nb=k=>(BAR_DEF[k]||[""])[0].replace("Movim.","Movimientos");
   v("barra",`${nb(ajustes.barA||"movimientos")} y ${nb(ajustes.barB||"planilla")}`);
@@ -3928,6 +3946,7 @@ function invRenderHome(el){
   const usados=movs.filter(m=>m.tipo==="usa"), costo=usados.reduce((s,m)=>s+m.cant*(m.precio||invPrecio(movs,m.item,m.medida)),0);
   const pisos=invPisos(invObra), porPiso=pisos.map(p=>{const L=usados.filter(m=>m.piso===p);return {p,n:L.reduce((s,m)=>s+m.cant,0),s:L.reduce((s,m)=>s+m.cant*(m.precio||invPrecio(movs,m.item,m.medida)),0)}});
   const maxP=Math.max(1,...porPiso.map(x=>x.n));
+  const porPisoVer=porPiso.length>8?porPiso.filter(x=>x.n>0):porPiso;
   const enObra=new Set(); movs.forEach(m=>enObra.add(m.item));
   const conSaldo=[...enObra].filter(k=>invSaldo(movs,k)>0.0001);
   const tarjeta=cat=>{const n=cat.grupos.reduce((s,g)=>s+g.items.length,0), sal=conSaldo.filter(k=>k.startsWith(cat.id+".")).length;
@@ -3943,7 +3962,7 @@ function invRenderHome(el){
   ${invObra?`<section class="panel inv-res" id="invRes">
     <div class="ph"><h2>Material usado en la obra</h2><button type="button" class="btnlink" id="invVerObra">Ver por piso y material ›</button></div>
     <p class="inv-big">${invNum(usados.reduce((s,m)=>s+m.cant,0))} piezas</p>
-    <div class="inv-pisos">${porPiso.map(x=>`<div class="inv-piso"><span>${esc(pisoLbl(x.p))}</span><i><b style="width:${Math.round(x.n/maxP*100)}%"></b></i><em>${invNum(x.n)}</em></div>`).join("")}</div>
+    <div class="inv-pisos">${porPisoVer.length?"":`<p class="hint">Aún no se registra material usado por piso.</p>`}${porPisoVer.map(x=>`<div class="inv-piso"><span>${esc(pisoLbl(x.p))}</span><i><b style="width:${Math.round(x.n/maxP*100)}%"></b></i><em>${invNum(x.n)}</em></div>`).join("")}</div>
   </section>
   <section class="panel"><div class="ph"><h2>Últimos movimientos</h2><span class="hint">${movs.length?movs.length+" en esta obra":""}</span></div>
     <div class="inv-movs">${invFilasMov(movs.slice().sort((a,b)=>b.ts-a.ts).slice(0,8))||'<p class="hint inv-vacio">Todavía no hay material registrado en esta obra. Entra a Gasfitería o Electricidad, toca una pieza y registra lo que llega.</p>'}</div>
@@ -3998,7 +4017,7 @@ function invRenderObra(el){
   const quedan=Object.entries(sal).filter(([,v])=>v>0.0001).map(([k,v])=>{const [item,med]=k.split("|");return {it:INV_IDX[item]||{n:item,u:"und",g:{n:""}},med,v}});
   el.innerHTML=`
   <div class="inv-top"><button type="button" class="inv-back" id="invBack" aria-label="Volver">${IC.back}</button><h2>${esc(invObra)}</h2><span class="inv-mod ${tc?"tc":"cl"}">${tc?"A todo costo":"Material del cliente"}</span></div>
-  <div class="inv-obragrid">${pisos.map(bloque).join("")}
+  <div class="inv-obragrid">${(pisos.length>8?pisos.filter(p=>usados.some(m=>m.piso===p)):pisos).map(bloque).join("")}
   <section class="panel"><div class="ph"><h2>Queda en la obra</h2><span class="hint">${quedan.length} piezas</span></div>
     ${quedan.length?`<div class="scroll"><table class="inv-tab"><thead><tr><th>Material</th><th>Saldo</th></tr></thead><tbody>${quedan.map(x=>`<tr><td>${esc(x.it.n)} <small>${esc(x.med)} · ${esc(x.it.g.n)}</small></td><td>${invNum(x.v)}${invU(x.it.u,x.v)}</td></tr>`).join("")}</tbody></table></div>`:'<p class="hint">No queda material registrado en la obra.</p>'}</section></div>`;
   $("invBack").onclick=()=>{invVista="home";invRender();window.scrollTo(0,0)};
@@ -4008,7 +4027,7 @@ function invRenderObra(el){
 function invAbrirItem(k){
   if(!invObra){toast("Primero crea o elige una obra");invAbrirObra("");return}
   invItemAbierto=k; const I=INV_IDX[k];
-  invForm={medQ:"",tipo:invForm.tipo||"usa",medida:I.m.length===1?I.m[0]:"",cant:"",piso:invForm.piso||"",precio:"",nota:""};
+  invForm={medQ:"",tipo:invForm.tipo||"usa",medida:I.m.length===1?I.m[0]:"",cant:"",piso:invForm.piso||"",precio:"",nota:"",destino:""};
   invPintarItem(); abrirOv("ovInv");
 }
 function invPintarItem(){
@@ -4022,9 +4041,15 @@ function invPintarItem(){
       <label class="btnlink inv-foto-btn">${IC.cam}${f?"Cambiar foto":"Agregar foto"}<input type="file" accept="image/*" id="invFotoIn" hidden></label></div>
     <button type="button" class="x" data-cerrar-inv aria-label="Cerrar">✕</button>
   </div>
+  <div class="inv-obra-pieza"><label class="inv-f"><span class="inv-lbl">Obra</span><select id="invObraItem">${invObrasLista().map(o=>`<option value="${escA(o)}" ${o.toUpperCase()===String(invObra).toUpperCase()?"selected":""}>${esc(o)}</option>`).join("")}</select></label>
+    <small class="hint">Todo lo que registres aquí queda en esta obra.</small></div>
   <div class="seg inv-seg" role="group" aria-label="Qué pasó con el material">${Object.entries(INV_TIPOS).map(([t,n])=>`<button type="button" data-invtipo="${t}" aria-pressed="${F.tipo===t}">${n}</button>`).join("")}</div>
   <div class="inv-f"><span class="inv-lbl">Medida${I.m.length>12?` · ${I.m.length} opciones`:""}</span>${I.m.length>12?'<input id="invMedQ" type="search" placeholder="Filtrar, ej. 1/2, 40 cm, 2P" autocomplete="off">':""}<div class="inv-meds" id="invMeds">${I.m.map(m=>{const s=invSaldo(movs,k,m);return `<button type="button" class="inv-med" data-invmed="${escA(m)}" aria-pressed="${F.medida===m}">${esc(m)}${s>0.0001?`<em>${invNum(s)}</em>`:""}</button>`}).join("")}</div></div>
-  ${F.tipo==="usa"?`<div class="inv-f"><span class="inv-lbl">Piso</span><div class="inv-meds">${pisos.map(p=>`<button type="button" class="inv-med" data-invpiso="${escA(p)}" aria-pressed="${F.piso===p}">${esc(pisoLbl(p))}</button>`).join("")}</div></div>`:""}
+  ${F.tipo==="usa"?`<div class="inv-row">
+    <label class="inv-f"><span class="inv-lbl">La obra tiene hasta el piso</span><input id="invHasta" type="number" inputmode="numeric" min="1" max="99" value="${pisos.filter(p=>/^\d+$/.test(p)).length||1}"></label>
+    <label class="inv-f"><span class="inv-lbl">Piso donde se usó</span><select id="invPisoSel"><option value="">Elige el piso</option>${pisos.map(p=>`<option value="${escA(p)}" ${F.piso===p?"selected":""}>${esc(pisoLbl(p))}</option>`).join("")}</select></label>
+  </div>`:""}
+  ${F.tipo==="sobra"?`<label class="inv-f"><span class="inv-lbl">¿A dónde va lo que sale?</span><select id="invDestino"><option value="">Se devuelve o va al almacén</option>${invObrasLista().filter(o=>o.toUpperCase()!==String(invObra).toUpperCase()).map(o=>`<option value="${escA(o)}" ${F.destino===o?"selected":""}>Pasa a la obra: ${esc(o)}</option>`).join("")}</select></label>`:""}
   <div class="inv-row">
     <label class="inv-f"><span class="inv-lbl">Cantidad${I.u!=="und"?" ("+(I.u==="m"?"metros":I.u+"s")+")":""}</span><span class="inv-cant"><button type="button" data-invmas="-1" aria-label="Menos">−</button><input id="invCant" inputmode="decimal" value="${escA(F.cant)}" placeholder="0"><button type="button" data-invmas="1" aria-label="Más">+</button></span></label>
   </div>
@@ -4037,7 +4062,16 @@ function invPintarItem(){
   const lee=()=>{F.cant=($("invCant")||{}).value||"";F.precio=($("invPrecio")||{}).value||F.precio;F.nota=($("invNota")||{}).value||""};
   S.querySelectorAll("[data-invtipo]").forEach(b=>b.onclick=()=>{lee();F.tipo=b.dataset.invtipo;invPintarItem()});
   S.querySelectorAll("[data-invmed]").forEach(b=>b.onclick=()=>{lee();F.medida=b.dataset.invmed;F.precio="";invPintarItem()});
-  S.querySelectorAll("[data-invpiso]").forEach(b=>b.onclick=()=>{lee();F.piso=b.dataset.invpiso;invPintarItem()});
+  const ps=$("invPisoSel"); if(ps) ps.onchange=()=>{F.piso=ps.value};
+  // Cambiar de obra dentro de la hoja: el saldo, los pisos y el historial pasan a ser de esa obra
+  const oi=$("invObraItem"); if(oi) oi.onchange=()=>{lee();invObra=oi.value;guardarLS(INV_OBRA,invObra);F.piso="";F.destino="";F.precio="";invPintarItem();invRender()};
+  const de=$("invDestino"); if(de) de.onchange=()=>{F.destino=de.value};
+  // Cambiar "hasta qué piso" guarda la obra con todos sus pisos (respeta sótano, azotea y cisterna)
+  const ph=$("invHasta"); if(ph) ph.onchange=async()=>{lee();const n=Math.min(99,Math.max(1,parseInt(ph.value)||1));ph.value=n;
+    const c=invCfg(invObra)||{obra:invObra,modalidad:"todo",pisos:""}, P=String(c.pisos||"").split(",").map(x=>x.trim());
+    const pisos=[...(P.includes("Sótano")?["Sótano"]:[]),...Array.from({length:n},(_,i)=>String(i+1)),...(P.includes("Azotea")?["Azotea"]:[]),...(P.includes("Cisterna")?["Cisterna"]:[])].join(",");
+    if(F.piso&&/^\d+$/.test(F.piso)&&+F.piso>n)F.piso="";
+    await invGuardar("invObra",{obra:{obra:invObra,modalidad:c.modalidad==="cliente"?"cliente":"todo",pisos}});toast(`La obra queda hasta el piso ${n}`);invPintarItem()};
   S.querySelectorAll("[data-invmas]").forEach(b=>b.onclick=()=>{const i=$("invCant");const v=Math.max(0,(parseFloat(i.value.replace(",","."))||0)+(+b.dataset.invmas));i.value=v||"";F.cant=i.value});
   $("invFotoIn").onchange=e=>invSubirFoto(e.target.files[0]);
   const mq=$("invMedQ"); if(mq){mq.value=F.medQ||"";setTimeout(()=>mq.oninput(),0)} if(mq) mq.oninput=()=>{F.medQ=mq.value;const q=mq.value.toLowerCase().replace(/1\/2/g,"½").replace(/3\/4/g,"¾").replace(/3\/8/g,"⅜").replace(/7\/8/g,"⅞").replace(/5\/8/g,"⅝").replace(/1\/4/g,"¼").trim();S.querySelectorAll("#invMeds [data-invmed]").forEach(b=>{b.hidden=!!q&&!b.dataset.invmed.toLowerCase().includes(q)&&b.getAttribute("aria-pressed")!=="true"})};
@@ -4046,9 +4080,13 @@ function invPintarItem(){
     const falta=!F.medida?"Elige la medida.":!(cant>0)?"Escribe la cantidad.":F.tipo==="usa"&&!F.piso?"Elige el piso.":"";
     if(falta){err.textContent=falta;err.hidden=false;return}
     if(F.tipo!=="entra"){const s=invSaldo(movs,k,F.medida);if(cant>s+0.0001&&!$("invOk").dataset.forzar){err.textContent=`En la obra solo hay ${invNum(Math.max(0,s))} registrados de esta medida. Si igual quieres guardarlo, toca de nuevo.`;err.hidden=false;$("invOk").dataset.forzar="1";return}}
-    const mov={id:"i"+Date.now()+Math.floor(Math.random()*1000),fecha:hoyISO,obra:invObra,tipo:F.tipo,item:k,medida:F.medida,piso:F.tipo==="usa"?F.piso:"",cant,precio:0,nota:F.nota,por:quien,ts:Date.now()};
+    const dest=F.tipo==="sobra"?(F.destino||""):"", origen=invObra;
+    const mov={id:"i"+Date.now()+Math.floor(Math.random()*1000),fecha:hoyISO,obra:origen,tipo:F.tipo,item:k,medida:F.medida,piso:F.tipo==="usa"?F.piso:"",cant,precio:0,nota:(dest?`Pasa a ${dest}. `:"")+F.nota,por:quien,ts:Date.now()};
     $("invOk").disabled=true;
-    if(await invGuardar("invMov",{mov})){toast(`${INV_VERBO[F.tipo]} ${invNum(cant)}${invU(I.u,cant)} · ${I.n} ${F.medida}`);F.cant="";F.nota="";invPintarItem();invRender()}
+    let ok=await invGuardar("invMov",{mov});
+    // Traslado: lo que sale de una obra entra a la otra
+    if(ok&&dest){const ent=Object.assign({},mov,{id:"i"+Date.now()+Math.floor(Math.random()*1000)+1,obra:dest,tipo:"entra",piso:"",nota:`Viene de ${origen}. `+F.nota,ts:Date.now()+1});ok=await invGuardar("invMov",{mov:ent})}
+    if(ok){toast(dest?`Pasaron ${invNum(cant)}${invU(I.u,cant)} de ${origen} a ${dest}`:`${INV_VERBO[F.tipo]} ${invNum(cant)}${invU(I.u,cant)} · ${I.n} ${F.medida} · ${origen}`);F.cant="";F.nota="";F.destino="";invPintarItem();invRender()}
     else $("invOk").disabled=false;
   };
   invEventosMov(S);
@@ -4074,7 +4112,7 @@ function invAbrirObra(nombre){
   <label class="inv-f"><span class="inv-lbl">Nombre de la obra</span><input id="ioNom" list="ioObras" maxlength="60" value="${escA(c.obra||"")}" placeholder="Ej. Vivienda Multifamiliar Barranco" ${nombre?"readonly":""}></label>
   <datalist id="ioObras">${(()=>{try{return obrasConocidas().map(o=>`<option value="${escA(o.n)}">`).join("")}catch{return ""}})()}</datalist>
   <div class="inv-f"><span class="inv-lbl">¿Quién pone el material?</span><div class="seg" role="group"><button type="button" data-iomod="todo" aria-pressed="${c.modalidad!=="cliente"}">A todo costo (lo compro yo)</button><button type="button" data-iomod="cliente" aria-pressed="${c.modalidad==="cliente"}">Material del cliente o proveedor</button></div></div>
-  <div class="inv-row"><label class="inv-f"><span class="inv-lbl">Número de pisos</span><input id="ioPisos" type="number" min="1" max="30" value="${num}"></label>
+  <div class="inv-row"><label class="inv-f"><span class="inv-lbl">¿Hasta qué piso llega la obra?</span><input id="ioPisos" type="number" inputmode="numeric" min="1" max="99" value="${num}"></label>
     <div class="inv-f"><span class="inv-lbl">También</span><label class="inv-ck"><input type="checkbox" id="ioSot" ${P.includes("Sótano")?"checked":""}> Sótano</label><label class="inv-ck"><input type="checkbox" id="ioAzo" ${P.includes("Azotea")?"checked":""}> Azotea</label><label class="inv-ck"><input type="checkbox" id="ioCis" ${P.includes("Cisterna")?"checked":""}> Cisterna</label></div></div>
   <p class="inv-err" id="ioErr" hidden></p>
   <button type="button" class="btn" id="ioOk">Guardar obra</button>`;
@@ -4083,7 +4121,7 @@ function invAbrirObra(nombre){
   S.querySelectorAll("[data-iomod]").forEach(b=>b.onclick=()=>{mod=b.dataset.iomod;S.querySelectorAll("[data-iomod]").forEach(x=>x.setAttribute("aria-pressed",x===b))});
   S.querySelector("[data-cerrar]").onclick=()=>cerrarOv("ovInvObra");
   $("ioOk").onclick=async()=>{
-    const nom=$("ioNom").value.trim(), n=Math.min(30,Math.max(1,parseInt($("ioPisos").value)||1));
+    const nom=$("ioNom").value.trim(), n=Math.min(99,Math.max(1,parseInt($("ioPisos").value)||1));
     if(!nom){$("ioErr").textContent="Escribe el nombre de la obra.";$("ioErr").hidden=false;return}
     const pisos=[...($("ioSot").checked?["Sótano"]:[]),...Array.from({length:n},(_,i)=>String(i+1)),...($("ioAzo").checked?["Azotea"]:[]),...($("ioCis").checked?["Cisterna"]:[])].join(",");
     await invGuardar("invObra",{obra:{obra:nom,modalidad:mod,pisos}});
