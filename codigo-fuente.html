@@ -4126,7 +4126,7 @@ function invRenderHome(el){
     <div class="inv-pisos">${porPisoVer.length?"":`<p class="hint">Aún no se registra material usado por piso.</p>`}${porPisoVer.map(x=>`<div class="inv-piso"><span>${esc(pisoLbl(x.p))}</span><i><b style="width:${Math.round(x.n/maxP*100)}%"></b></i><em>${invNum(x.n)}</em></div>`).join("")}</div>
   </section>
   <section class="panel"><div class="ph"><h2>Últimos movimientos</h2><span class="hint">${movs.length?movs.length+" en esta obra":""}</span></div>
-    <div class="inv-movs">${invFilasMov(movs.slice().sort((a,b)=>b.ts-a.ts).slice(0,8))||'<p class="hint inv-vacio">Todavía no hay material registrado en esta obra. Entra a Gasfitería o Electricidad, toca una pieza y registra lo que llega.</p>'}</div>
+    <div class="inv-movs">${invFilasMov(movs.slice().sort(invOrden).slice(0,8))||'<p class="hint inv-vacio">Todavía no hay material registrado en esta obra. Entra a Gasfitería o Electricidad, toca una pieza y registra lo que llega.</p>'}</div>
   </section>`:'<p class="inv-vacio">Crea tu primera obra para empezar a llevar el material.</p>'}`;
   const sel=$("invObraSel"); if(sel){sel.onchange=()=>invUsarObra(sel.value,()=>invRender());sel.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();sel.blur()}};sel.onfocus=()=>sel.select()}
   el.querySelectorAll("[data-invcat]").forEach(b=>b.onclick=()=>{invVista="cat:"+b.dataset.invcat;invGrupo="";invQ="";invRender();window.scrollTo(0,0)});
@@ -4135,6 +4135,7 @@ function invRenderHome(el){
   const vo=$("invVerObra"); if(vo) vo.onclick=()=>{invVista="obra";invRender();window.scrollTo(0,0)};
   invEventosMov(el);
 }
+const invOrden=(a,b)=>String(b.fecha||"").localeCompare(String(a.fecha||""))||(b.ts||0)-(a.ts||0);
 function invFilasMov(L){
   return L.map(m=>{const it=INV_IDX[m.item]||{n:m.item,u:"und",g:{n:"",c:"#999"}},f=it.k?invFoto(it):"";
     return `<div class="inv-mov"><span class="inv-th">${f?`<img alt="" src="${f}">`:""}</span>
@@ -4188,13 +4189,13 @@ function invRenderObra(el){
 function invAbrirItem(k){
   if(!invObra){toast("Primero crea o elige una obra");invAbrirObra("");return}
   invItemAbierto=k; const I=INV_IDX[k];
-  invForm={medQ:"",tipo:invForm.tipo||"usa",medida:I.m.length===1?I.m[0]:"",cant:"",piso:invForm.piso||"",precio:"",nota:"",destino:""};
+  invForm={medQ:"",tipo:invForm.tipo||"usa",medida:I.m.length===1?I.m[0]:"",cant:"",piso:invForm.piso||"",precio:"",nota:"",destino:"",fecha:invForm.fecha||hoyISO};
   invPintarItem(); abrirOv("ovInv");
 }
 function invPintarItem(){
   const k=invItemAbierto, I=INV_IDX[k], f=invFoto(I), movs=invMovsObra(), tc=invTodoCosto(), F=invForm;
   if(F.medida&&!F.precio&&tc){const p=invPrecio(movs,k,F.medida);if(p)F.precio=String(p)}
-  const pisos=invPisos(invObra), hist=movs.filter(m=>m.item===k).sort((a,b)=>b.ts-a.ts);
+  const pisos=invPisos(invObra), hist=movs.filter(m=>m.item===k).sort(invOrden);
   $("invSheet").innerHTML=`
   <div class="inv-hd" style="--mat:${I.g.c}">
     <span class="inv-big-ph">${f?`<img alt="" src="${f}">`:`<span class="inv-sin">${IC.cam}<small>Sin foto</small></span>`}</span>
@@ -4212,6 +4213,10 @@ function invPintarItem(){
   </div>`:""}
   ${F.tipo==="sobra"?`<label class="inv-f"><span class="inv-lbl">¿A dónde va lo que sale?</span><select id="invDestino"><option value="">Se devuelve o va al almacén</option>${invObrasLista().filter(o=>o.toUpperCase()!==String(invObra).toUpperCase()).map(o=>`<option value="${escA(o)}" ${F.destino===o?"selected":""}>Pasa a la obra: ${esc(o)}</option>`).join("")}</select></label>`:""}
   <div class="inv-row">
+    <label class="inv-f"><span class="inv-lbl">Fecha en que ${F.tipo==="entra"?"entró":F.tipo==="usa"?"se usó":"salió"}</span><input id="invFecha" type="date" max="${hoyISO}" value="${escA(F.fecha||hoyISO)}"></label>
+    <div class="inv-f"><span class="inv-lbl">Rápido</span><div class="inv-meds"><button type="button" class="inv-med" data-invdia="0" aria-pressed="${(F.fecha||hoyISO)===hoyISO}">Hoy</button><button type="button" class="inv-med" data-invdia="-1" aria-pressed="${F.fecha===isoMas(hoyISO,-1)}">Ayer</button><button type="button" class="inv-med" data-invdia="-2" aria-pressed="${F.fecha===isoMas(hoyISO,-2)}">Anteayer</button></div></div>
+  </div>
+  <div class="inv-row">
     <label class="inv-f"><span class="inv-lbl">Cantidad${I.u!=="und"?" ("+(I.u==="m"?"metros":I.u+"s")+")":""}</span><span class="inv-cant"><button type="button" data-invmas="-1" aria-label="Menos">−</button><input id="invCant" inputmode="decimal" value="${escA(F.cant)}" placeholder="0"><button type="button" data-invmas="1" aria-label="Más">+</button></span></label>
   </div>
   <label class="inv-f"><span class="inv-lbl">Nota (opcional)</span><input id="invNota" maxlength="80" value="${escA(F.nota)}" placeholder="${F.tipo==="usa"?"Ej. baño principal y cocina":"Ej. lo trajo el proveedor"}"></label>
@@ -4220,10 +4225,11 @@ function invPintarItem(){
   ${hist.length?`<div class="inv-hist"><span class="inv-lbl">En esta obra</span>${invFilasMov(hist.slice(0,12))}</div>`:""}`;
   const S=$("invSheet");
   S.querySelector("[data-cerrar-inv]").onclick=()=>{cerrarOv("ovInv");invItemAbierto=null;invRender()};
-  const lee=()=>{F.cant=($("invCant")||{}).value||"";F.precio=($("invPrecio")||{}).value||F.precio;F.nota=($("invNota")||{}).value||""};
+  const lee=()=>{F.fecha=($("invFecha")||{}).value||F.fecha||hoyISO;F.cant=($("invCant")||{}).value||"";F.precio=($("invPrecio")||{}).value||F.precio;F.nota=($("invNota")||{}).value||""};
   S.querySelectorAll("[data-invtipo]").forEach(b=>b.onclick=()=>{lee();F.tipo=b.dataset.invtipo;invPintarItem()});
   S.querySelectorAll("[data-invmed]").forEach(b=>b.onclick=()=>{lee();F.medida=b.dataset.invmed;F.precio="";invPintarItem()});
   const ps=$("invPisoSel"); if(ps) ps.onchange=()=>{F.piso=ps.value};
+  S.querySelectorAll("[data-invdia]").forEach(b=>b.onclick=()=>{lee();F.fecha=isoMas(hoyISO,+b.dataset.invdia);invPintarItem()});
   // Cambiar de obra dentro de la hoja: el saldo, los pisos y el historial pasan a ser de esa obra
   const oi=$("invObraItem"); if(oi){oi.onchange=()=>{lee();invUsarObra(oi.value,()=>{F.piso="";F.destino="";F.precio="";invPintarItem();invRender()})};oi.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();oi.blur()}};oi.onfocus=()=>oi.select()}
   const de=$("invDestino"); if(de) de.onchange=()=>{F.destino=de.value};
@@ -4238,16 +4244,16 @@ function invPintarItem(){
   const mq=$("invMedQ"); if(mq){mq.value=F.medQ||"";setTimeout(()=>mq.oninput(),0)} if(mq) mq.oninput=()=>{F.medQ=mq.value;const q=mq.value.toLowerCase().replace(/1\/2/g,"½").replace(/3\/4/g,"¾").replace(/3\/8/g,"⅜").replace(/7\/8/g,"⅞").replace(/5\/8/g,"⅝").replace(/1\/4/g,"¼").trim();S.querySelectorAll("#invMeds [data-invmed]").forEach(b=>{b.hidden=!!q&&!b.dataset.invmed.toLowerCase().includes(q)&&b.getAttribute("aria-pressed")!=="true"})};
   $("invOk").onclick=async()=>{
     lee(); const cant=parseFloat(String(F.cant).replace(",",".")), precio=parseFloat(String(F.precio).replace(",","."))||0, err=$("invErr");
-    const falta=!F.medida?"Elige la medida.":!(cant>0)?"Escribe la cantidad.":F.tipo==="usa"&&!F.piso?"Elige el piso.":"";
+    const falta=!F.medida?"Elige la medida.":!(cant>0)?"Escribe la cantidad.":F.tipo==="usa"&&!F.piso?"Elige el piso.":!/^\d{4}-\d{2}-\d{2}$/.test(F.fecha||"")?"Elige la fecha.":F.fecha>hoyISO?"La fecha no puede ser después de hoy.":"";
     if(falta){err.textContent=falta;err.hidden=false;return}
     if(F.tipo!=="entra"){const s=invSaldo(movs,k,F.medida);if(cant>s+0.0001&&!$("invOk").dataset.forzar){err.textContent=`En la obra solo hay ${invNum(Math.max(0,s))} registrados de esta medida. Si igual quieres guardarlo, toca de nuevo.`;err.hidden=false;$("invOk").dataset.forzar="1";return}}
     const dest=F.tipo==="sobra"?(F.destino||""):"", origen=invObra;
-    const mov={id:"i"+Date.now()+Math.floor(Math.random()*1000),fecha:hoyISO,obra:origen,tipo:F.tipo,item:k,medida:F.medida,piso:F.tipo==="usa"?F.piso:"",cant,precio:0,nota:(dest?`Pasa a ${dest}. `:"")+F.nota,por:quien,ts:Date.now()};
+    const mov={id:"i"+Date.now()+Math.floor(Math.random()*1000),fecha:F.fecha||hoyISO,obra:origen,tipo:F.tipo,item:k,medida:F.medida,piso:F.tipo==="usa"?F.piso:"",cant,precio:0,nota:(dest?`Pasa a ${dest}. `:"")+F.nota,por:quien,ts:Date.now()};
     $("invOk").disabled=true;
     let ok=await invGuardar("invMov",{mov});
     // Traslado: lo que sale de una obra entra a la otra
     if(ok&&dest){const ent=Object.assign({},mov,{id:"i"+Date.now()+Math.floor(Math.random()*1000)+1,obra:dest,tipo:"entra",piso:"",nota:`Viene de ${origen}. `+F.nota,ts:Date.now()+1});ok=await invGuardar("invMov",{mov:ent})}
-    if(ok){toast(dest?`Pasaron ${invNum(cant)}${invU(I.u,cant)} de ${origen} a ${dest}`:`${INV_VERBO[F.tipo]} ${invNum(cant)}${invU(I.u,cant)} · ${I.n} ${F.medida} · ${origen}`);F.cant="";F.nota="";F.destino="";invPintarItem();invRender()}
+    if(ok){const cuando=mov.fecha===hoyISO?"":` · el ${mov.fecha.split("-").reverse().join("/")}`;toast((dest?`Pasaron ${invNum(cant)}${invU(I.u,cant)} de ${origen} a ${dest}`:`${INV_VERBO[F.tipo]} ${invNum(cant)}${invU(I.u,cant)} · ${I.n} ${F.medida} · ${origen}`)+cuando);F.cant="";F.nota="";F.destino="";invPintarItem();invRender()}
     else $("invOk").disabled=false;
   };
   invEventosMov(S);
