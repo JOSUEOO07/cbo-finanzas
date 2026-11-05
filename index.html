@@ -3907,7 +3907,7 @@ const INV_M=(()=>{
   const EST=['Estándar'];
   return {X,PVA,PVA4,DES,DES4,PPR,MET,MET6,CPV,RAG,RDE,RPP,RPR,NIP,SAP,GAL,ABA,TERMO,DIF,EST};
 })();
-// [id, nombre, foto (n.° del PDF, 0 = sin foto), medidas, unidad]
+// [id, nombre, foto (n.° del PDF; 201+ = foto incluida en fotos-inv/; 0 = sin foto y no se muestra), medidas, unidad]
 const INV_CAT=(()=>{const M=INV_M,u="und";return [
  {id:"gas",n:"Gasfitería",sub:"Agua, desagüe y sanitarios",fotos:[36,15,53,72],grupos:[
   {id:"pvca",n:"PVC agua",c:"#8E989D",items:[
@@ -3927,7 +3927,7 @@ const INV_CAT=(()=>{const M=INV_M,u="und";return [
    ["somb","Sombrero de ventilación",32,['2"','3"','4"'],u],["caja","Caja de registro",33,['10" × 20"','12" × 24"','18" × 24"','24" × 24"'],u],
    ["tapar","Tapa de registro",0,['10" × 20"','12" × 24"','18" × 24"','24" × 24"'],u],["canal","Rejilla de piso / canaleta",34,['50 cm','1 m'],u]]},
   {id:"ppr",n:"PPR",c:"#2E9A57",items:[
-   ["tubo","Tubo PPR PN10 agua fría (4 m)",35,M.PPR,"tubo"],["tubo16","Tubo PPR PN16 (4 m)",35,M.PPR,"tubo"],["tubo20","Tubo PPR PN20 agua caliente (4 m)",35,M.PPR,"tubo"],["tubo25","Tubo PPR PN25 con fibra (4 m)",35,M.PPR,"tubo"],
+   ["tubo","Tubo PPR PN10 agua fría (4 m)",35,M.PPR,"tubo"],["tubo16","Tubo PPR PN16 agua caliente (4 m)",35,M.PPR,"tubo"],["tubo20","Tubo PPR PN20 agua caliente (4 m)",35,M.PPR,"tubo"],["tubo25","Tubo PPR PN25 con fibra (4 m)",35,M.PPR,"tubo"],
    ["codo90","Codo 90°",36,M.PPR,u],["codo45","Codo 45°",37,M.PPR,u],["tee","Tee",38,M.PPR,u],["teer","Tee reducida",39,M.RPP,u],["red","Reducción",40,M.RPP,u],
    ["union","Unión",41,M.PPR,u],["uniu","Unión universal",42,M.PPR.slice(0,6),u],["unim","Unión universal mixta (rosca metálica)",43,M.RPR.slice(0,7),u],
    ["adm","Adaptador macho",44,M.RPR,u],["adh","Adaptador hembra",45,M.RPR,u],["codoh","Codo con rosca hembra",46,['20 mm × ½"','20 mm × ¾"','25 mm × ½"','25 mm × ¾"','32 mm × 1"'],u],
@@ -3935,8 +3935,9 @@ const INV_CAT=(()=>{const M=INV_M,u="und";return [
    ["tapon","Tapón",48,M.PPR.slice(0,6),u],["tapm","Tapón macho roscado",49,['½"','¾"','1"'],u],["llesf","Llave esférica PPR",50,M.PPR.slice(0,7),u],
    ["llpaso","Llave de paso PPR",51,M.PPR.slice(0,6),u],["llemp","Llave empotrada PPR",52,['20 mm (½")','25 mm (¾")','32 mm (1")'],u],["cruce","Cruce / sobrepaso",0,M.PPR.slice(0,3),u]]},
   {id:"cpvc",n:"CPVC",c:"#C9B27C",items:[
-   ["tubo","Tubo CPVC (3 m)",0,M.CPV,"tubo"],["codo","Codo 90°",0,M.CPV,u],["codo45","Codo 45°",0,M.CPV,u],["tee","Tee",0,M.CPV,u],["union","Unión",0,M.CPV,u],
-   ["red","Reducción",0,['¾" × ½"','1" × ½"','1" × ¾"'],u],["adap","Adaptador macho",0,M.CPV.slice(0,4),u],["adaph","Adaptador hembra",0,M.CPV.slice(0,4),u],["tapon","Tapón",0,M.CPV.slice(0,3),u]]},
+   ["tubo","Tubo CPVC (3 m)",201,M.CPV,"tubo"],["codo","Codo 90°",202,M.CPV,u],["codo45","Codo 45°",203,M.CPV,u],["tee","Tee",204,M.CPV,u],["union","Unión",205,M.CPV,u],
+   ["uniu","Unión universal",210,M.CPV.slice(0,4),u],["red","Reducción",206,['¾" × ½"','1" × ½"','1" × ¾"'],u],["adap","Adaptador macho",207,M.CPV.slice(0,4),u],["adaph","Adaptador hembra",208,M.CPV.slice(0,4),u],
+   ["adahm","Adaptador hembra con rosca metálica",211,M.CPV.slice(0,4),u],["tapon","Tapón",209,M.CPV.slice(0,3),u]]},
   {id:"bro",n:"Bronce",c:"#B8892C",items:[
    ["llesf","Llave esférica",53,M.MET,u],["comp","Válvula de compuerta",54,M.MET,u],["check","Válvula check",55,M.MET,u],["flot","Válvula flotadora",56,['½"','¾"','1"','1¼"','1½"','2"'],u],
    ["pie","Válvula de pie (canastilla)",57,['¾"','1"','1¼"','1½"','2"','2½"','3"','4"'],u],["inc","Válvula angular contra incendio",58,['1½"','2½"'],u],
@@ -3953,7 +3954,7 @@ const INV_CAT=(()=>{const M=INV_M,u="und";return [
    ["teflon","Cinta teflón",80,['½" × 10 m','½" × 12 m','¾" × 10 m','¾" × 12 m','¾" × 15 m','¾" × 50 m','1" × 12 m','1" × 50 m'],"rollo"],
    ["pegat","Soldadura en frío Pegatanke",81,['Chico','Mediano','Grande'],u],["sika","Sellador Sikaflex",82,['300 ml','600 ml'],u],["silic","Silicona",0,['85 ml','280 ml','300 ml'],u],
    ["abraz","Abrazadera colgante",83,['½"','¾"','1"','1¼"','1½"','2"','3"','4"','6"'],u],["canamo","Cáñamo / estopa",0,['Madeja chica','Madeja grande'],u],
-   ["pasta","Pasta selladora de roscas",0,['Tubo chico','Tubo grande','Lata'],u]]},
+   ["pasta","Pasta selladora / formador de empaquetaduras",212,['Tubo chico','Tubo grande','Lata'],u]]},
   {id:"ino",n:"Inodoro",c:"#7FA7B8",items:[
    ["inodoro","Inodoro",84,['Una pieza','Dos piezas','Fluxómetro'],u],["asiento","Asiento de inodoro",0,['Estándar','Alargado','Cierre lento'],u],
    ["desc","Válvula de descarga",85,['2"','3"'],u],["llen","Válvula de llenado",86,['Universal','Lateral'],u],["abasto","Tubo de abasto",87,M.ABA,u],
@@ -3969,7 +3970,7 @@ const INV_CAT=(()=>{const M=INV_M,u="und";return [
   {id:"tan",n:"Tanques y equipos",c:"#3E8FC9",items:[
    ["tanque","Tanque elevado",102,['250 L','450 L','600 L','1100 L','2500 L'],u],["cist","Cisterna prefabricada",103,['1200 L','2800 L','5000 L','10000 L'],u],
    ["bomba","Electrobomba",104,['½ HP','¾ HP','1 HP','1½ HP','2 HP','3 HP'],u],["flotel","Flotador eléctrico",105,M.EST,u],["terma","Terma eléctrica",106,['30 L','50 L','65 L','80 L','100 L','120 L'],u],
-   ["medidor","Medidor de agua",107,['½"','¾"','1"'],u],["mang","Manguera",108,['½"','⅝"','¾"'],"m"],["prueba","Bomba de prueba hidráulica",109,M.EST,u],["tapac","Tapa de cisterna",0,['60 × 60 cm','80 × 80 cm'],u]]}
+   ["medidor","Medidor de agua",107,['½"','¾"','1"'],u],["mang","Manguera",108,['½"','⅝"','¾"'],"m"],["prueba","Bomba de prueba hidráulica",109,M.EST,u],["tapac","Tapa de cisterna",213,['60 × 60 cm','80 × 80 cm'],u]]}
  ]},
  {id:"ele",n:"Electricidad",sub:"Cables, tubería, cajas y tableros",fotos:[110,139,128,145],grupos:[
   {id:"cab",n:"Cables",c:"#C2462F",items:[
@@ -3977,7 +3978,7 @@ const INV_CAT=(()=>{const M=INV_M,u="und";return [
    ["thw","Cable THW / THHN",110,['14 AWG','12 AWG','10 AWG','8 AWG','6 AWG','4 AWG','2 AWG','1/0 AWG'],"m"],
    ["mell","Cable mellizo",111,['2 × 20 AWG','2 × 18 AWG','2 × 16 AWG','2 × 14 AWG','2 × 12 AWG','2 × 10 AWG'],"m"],
    ["nlt","Cable vulcanizado NLT / NMT",112,['2 × 18 AWG','2 × 16 AWG','2 × 14 AWG','2 × 12 AWG','2 × 10 AWG','3 × 16 AWG','3 × 14 AWG','3 × 12 AWG','3 × 10 AWG','4 × 14 AWG','4 × 12 AWG'],"m"],
-   ["tierra","Cable TW-80 tierra",113,['2.5 mm²','4 mm²','6 mm²','10 mm²','16 mm²','25 mm²'],"m"],["desnudo","Cable de cobre desnudo",0,['6 mm²','10 mm²','16 mm²','25 mm²','35 mm²','50 mm²'],"m"],
+   ["tierra","Cable TW-80 tierra",113,['2.5 mm²','4 mm²','6 mm²','10 mm²','16 mm²','25 mm²'],"m"],["desnudo","Cable de cobre desnudo",217,['6 mm²','10 mm²','16 mm²','25 mm²','35 mm²','50 mm²'],"m"],
    ["utp","Cable UTP",114,['Cat 5e','Cat 6','Cat 6A'],"m"],["coax","Cable coaxial",115,['RG6','RG59','RG11'],"m"],["tel","Cable telefónico",0,['2 hilos','4 hilos'],"m"]]},
   {id:"tub",n:"Tubería",c:"#7C878C",items:[
    ["sap","Tubo PVC SAP (3 m)",116,M.SAP,"tubo"],["sel","Tubo PVC SEL (3 m)",117,['⅝"','¾"','1"','1¼"'],"tubo"],["curva","Curva SAP",118,M.SAP,u],
@@ -3986,7 +3987,7 @@ const INV_CAT=(()=>{const M=INV_M,u="und";return [
   {id:"caj",n:"Cajas",c:"#4F6F8F",items:[
    ["rectp","Caja rectangular PVC",123,['4" × 2" × 1½"','4" × 2" × 2⅛"'],u],["rectm","Caja rectangular metálica",124,['4" × 2" × 1½"','4" × 2" × 2⅛"'],u],
    ["octp","Caja octogonal PVC",125,['4" × 1½"','4" × 2⅛"'],u],["octm","Caja octogonal metálica",126,['4" × 1½"','4" × 2⅛"'],u],
-   ["cuad","Caja cuadrada / de pase",127,['4" × 4" × 1½"','4" × 4" × 2⅛"','5" × 5"','6" × 6"','8" × 8"','10" × 10"','12" × 12"'],u],["ciega","Tapa ciega",0,['Rectangular','Octogonal','Cuadrada 4"','Cuadrada 6"'],u]]},
+   ["cuad","Caja cuadrada / de pase",127,['4" × 4" × 1½"','4" × 4" × 2⅛"','5" × 5"','6" × 6"','8" × 8"','10" × 10"','12" × 12"'],u],["ciega","Tapa ciega",216,['Rectangular','Octogonal','Cuadrada 4"','Cuadrada 6"'],u]]},
   {id:"int",n:"Interruptores y tomas",c:"#A9A08C",items:[
    ["simple","Interruptor simple",128,['Estándar','Con luz piloto'],u],["doble","Interruptor doble",129,M.EST,u],["triple","Interruptor triple",130,M.EST,u],["conm","Interruptor conmutador",128,['Simple','Doble'],u],
    ["tdob","Tomacorriente",131,['Doble','Triple'],u],["ttie","Tomacorriente con tierra",132,['Doble universal','Schuko'],u],["ttv","Toma de TV",133,M.EST,u],["timbre","Pulsador de timbre",134,M.EST,u],
@@ -3998,7 +3999,7 @@ const INV_CAT=(()=>{const M=INV_M,u="und";return [
    ["dif","Interruptor diferencial",140,M.DIF,u],["temp","Temporizador digital",141,M.EST,u],["peine","Peine de conexión",142,['1 polo','2 polos','3 polos'],u],
    ["varilla","Varilla de cobre",143,['⅝" × 1.8 m','⅝" × 2.4 m','¾" × 2.4 m','¾" × 3 m'],u],["convar","Conector de varilla",144,['⅝"','¾"'],u],
    ["cuchilla","Interruptor de cuchilla",0,['2 × 30 A','2 × 60 A','2 × 100 A','3 × 30 A','3 × 60 A','3 × 100 A'],u],["contac","Contactor",0,['9 A','12 A','18 A','25 A','32 A','40 A','65 A'],u],
-   ["barra","Barra de tierra",0,['6 puntos','8 puntos','12 puntos'],u],["bento","Bentonita / cemento conductivo",0,['Bolsa 25 kg','Bolsa 30 kg'],u]]},
+   ["barra","Barra de tierra",215,['6 puntos','8 puntos','12 puntos'],u],["bento","Bentonita / cemento conductivo",214,['Bolsa 25 kg','Bolsa 30 kg'],u]]},
   {id:"ilu",n:"Iluminación",c:"#D9A93A",items:[
    ["foco","Foco LED",145,['5 W','7 W','9 W','12 W','15 W','18 W','20 W','24 W','30 W','40 W'],u],["dicro","Dicroico LED GU10",146,['3 W','5 W','7 W'],u],
    ["refl","Reflector LED",147,['10 W','20 W','30 W','50 W','100 W','150 W','200 W','300 W'],u],["emerg","Luminaria de emergencia",148,M.EST,u],
@@ -4013,6 +4014,9 @@ const INV_CAT=(()=>{const M=INV_M,u="und";return [
 // Índice rápido: "gas.ppr.codo90" → {cat, grupo, id, n, f, m, u}
 const INV_IDX={};
 INV_CAT.forEach(c=>c.grupos.forEach(g=>g.items.forEach(([id,n,f,m,u])=>{const k=c.id+"."+g.id+"."+id;INV_IDX[k]={k,cat:c,g,id,n,f,m,u}})));
+// Catálogo depurado (pedido de Josué): fuera las piezas sin foto y las poco usadas. Siguen en INV_IDX para que el historial antiguo muestre su nombre.
+const INV_FUERA=new Set(["gas.pvca.tubo75","gas.pvca.tubor","gas.pvca.codo22","gas.ppr.tubo20","gas.ppr.tubo25"]);
+INV_CAT.forEach(c=>{c.grupos.forEach(g=>{g.items=g.items.filter(([id,n,f])=>f>0&&!INV_FUERA.has(c.id+"."+g.id+"."+id))});c.grupos=c.grupos.filter(g=>g.items.length)});
 
 /* ===== Inventario de obra =====
    Movimientos: "entra" (llega material a la obra), "usa" (se instala en un piso), "sobra" (se devuelve o se lleva).
@@ -4029,7 +4033,7 @@ const invCfg=o=>invData.obras.find(x=>x.obra.toUpperCase()===String(o||"").toUpp
 const invTodoCosto=()=>((invCfg(invObra)||{}).modalidad||"todo")==="todo";
 function invPisos(o){const c=invCfg(o);const p=(c&&c.pisos)?c.pisos.split(",").map(s=>s.trim()).filter(Boolean):["1","2","3"];return p}
 function pisoLbl(p){if(/^\d+$/.test(p)){const n=+p;return n+(n===1||n===3?".er":".º")+" piso"}return p}
-function invFoto(it){return invFotos[it.k]||(it.f?invFotos["f"+it.f]:"")||""}
+function invFoto(it){return invFotos[it.k]||(it.f?invFotos["f"+it.f]:"")||(it.f>=201?`fotos-inv/f${it.f}.jpg`:"")||""}
 function invMovsObra(){const O=String(invObra||"").toUpperCase();return invData.movs.concat(invCola.filter(c=>c.accion==="invMov").map(c=>Object.assign({pend:1},c.mov))).filter(m=>String(m.obra).toUpperCase()===O&&!invCola.some(c=>c.accion==="invBorrar"&&c.id===m.id))}
 function invSaldo(movs,k,med){let s=0;movs.forEach(m=>{if(m.item!==k||(med!=null&&m.medida!==med))return;s+=m.tipo==="entra"?m.cant:-m.cant});return s}
 function invPrecio(movs,k,med){const L=movs.filter(m=>m.item===k&&m.medida===med&&m.precio>0).sort((a,b)=>b.ts-a.ts);return L.length?L[0].precio:0}

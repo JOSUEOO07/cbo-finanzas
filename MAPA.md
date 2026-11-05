@@ -1,5 +1,5 @@
 # Mapa de CBO Finanzas
-Actualizado: 05/11/2026 · caché: cbo-finanzas-v62-obra-escrita
+Actualizado: 05/11/2026 · caché: cbo-finanzas-v63-catalogo
 
 ## Archivos
 - codigo-fuente.html: versión editable (4287 líneas). index.html es la copia que se publica: editar codigo-fuente.html y copiarlo a index.html.
@@ -64,3 +64,5 @@ Actualizado: 05/11/2026 · caché: cbo-finanzas-v62-obra-escrita
 - Categorías nuevas de gasto e ingreso, "Otra (escribir…)" y "Tus categorías".
 - Adornos de temporada en el logo con ajuste y vista previa.
 - Inventario: la obra se elige de las guardadas o se escribe una nueva (invUsarObra la guarda con pisos 1-3 y "a todo costo"; se ajusta en Editar obra).
+- Catálogo de inventario depurado: sin piezas sin foto (INV_FUERA y f=0 no se muestran; siguen en INV_IDX para el historial). Un solo tubo PVC agua (SP C-10), sin codo 22.5°, PPR solo PN10 agua fría y PN16 agua caliente.
+- Fotos nuevas incluidas en la app: carpeta fotos-inv/ (f201-f217: CPVC, pasta selladora, tapa de cisterna, cemento conductivo, barra de tierra, tapa ciega, cable desnudo). invFoto: foto subida > foto de Google > foto incluida.
