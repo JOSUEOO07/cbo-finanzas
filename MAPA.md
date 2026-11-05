@@ -1,5 +1,5 @@
 # Mapa de CBO Finanzas
-Actualizado: 05/11/2026 · caché: cbo-finanzas-v61-limpia
+Actualizado: 05/11/2026 · caché: cbo-finanzas-v62-obra-escrita
 
 ## Archivos
 - codigo-fuente.html: versión editable (4287 líneas). index.html es la copia que se publica: editar codigo-fuente.html y copiarlo a index.html.
@@ -63,3 +63,4 @@ Actualizado: 05/11/2026 · caché: cbo-finanzas-v61-limpia
 - Barra de abajo (celular): el indicador blanco se recoloca también después de cargar (antes podía quedar sobre "Movim." estando en otra sección). En Configuración → Barra de abajo los dos selectores ocupan todo el ancho en celular.
 - Categorías nuevas de gasto e ingreso, "Otra (escribir…)" y "Tus categorías".
 - Adornos de temporada en el logo con ajuste y vista previa.
+- Inventario: la obra se elige de las guardadas o se escribe una nueva (invUsarObra la guarda con pisos 1-3 y "a todo costo"; se ajusta en Editar obra).

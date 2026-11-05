@@ -884,7 +884,7 @@ button.ud-card{cursor:pointer;width:100%}
 .inv-obra{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:10px 16px}
 .inv-obra-sel{display:grid;gap:4px;min-width:0;flex:1 1 240px}
 .inv-obra-sel span{font-size:.8rem;color:var(--muted);font-weight:600}
-.inv-obra-sel select{font:inherit;font-weight:700;font-size:1.05rem;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0;width:100%}
+.inv-obra-sel select,.inv-obra-sel input{font:inherit;font-weight:700;font-size:1.05rem;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0;width:100%}
 .inv-obra-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .inv-mod{font-size:.75rem;font-weight:700;padding:5px 10px;border-radius:99px}
 .inv-mod.tc{background:var(--in-bg);color:var(--in)}.inv-mod.cl{background:var(--warn-bg);color:var(--warn)}
@@ -4083,6 +4083,15 @@ const IC={
   edit:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>',
   lupa:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></svg>'
 };
+async function invUsarObra(nombre,luego){
+  const n=String(nombre||"").replace(/\s+/g," ").trim();
+  if(!n){toast("Escribe o elige el nombre de la obra");luego&&luego();return}
+  const ya=invObrasLista().find(o=>o.toUpperCase()===n.toUpperCase());
+  if(ya){invObra=ya}
+  else{if(n.length<3){toast("El nombre de la obra es muy corto");luego&&luego();return}
+    await invGuardar("invObra",{obra:{obra:n,modalidad:"todo",pisos:"1,2,3"}});invObra=n;toast(`Obra nueva guardada: ${n}. Ajusta sus pisos y quién pone el material en "Editar obra".`)}
+  guardarLS(INV_OBRA,invObra);luego&&luego();
+}
 function invObrasLista(){
   const s=new Map(); invData.obras.forEach(o=>s.set(o.obra.toUpperCase(),o.obra));
   try{obrasConocidas().forEach(o=>{if(!s.has(o.n.toUpperCase()))s.set(o.n.toUpperCase(),o.n)})}catch{}
@@ -4102,7 +4111,7 @@ function invRenderHome(el){
       <span class="inv-cat-tx"><b>${cat.n}</b><small>${cat.sub}</small><em>${n} piezas${sal?` · ${sal} con saldo en obra`:""}</em></span></button>`};
   el.innerHTML=`
   <div class="inv-obra">
-    <label class="inv-obra-sel"><span>Obra</span><select id="invObraSel">${obras.length?obras.map(o=>`<option value="${escA(o)}" ${o.toUpperCase()===String(invObra).toUpperCase()?"selected":""}>${esc(o)}</option>`).join(""):'<option value="">Aún no hay obras</option>'}</select></label>
+    <label class="inv-obra-sel"><span>Obra · elige o escribe una nueva</span><input id="invObraSel" list="invObrasDL" maxlength="60" autocomplete="off" value="${escA(invObra||"")}" placeholder="${obras.length?"Elige la obra o escribe una nueva":"Escribe el nombre de la obra"}"><datalist id="invObrasDL">${obras.map(o=>`<option value="${escA(o)}">`).join("")}</datalist></label>
     <div class="inv-obra-meta">${invObra?`<span class="inv-mod ${tc?"tc":"cl"}">${tc?"A todo costo":"Material del cliente"}</span><span class="inv-pis">${pisos.length} niveles</span>`:""}
       <button type="button" class="btnlink" id="invObraCfg">${c?"Editar obra":invObra?"Configurar obra":"+ Nueva obra"}</button>${invObra?'<button type="button" class="btnlink" id="invObraNueva">+ Nueva</button>':""}</div>
   </div>
@@ -4115,7 +4124,7 @@ function invRenderHome(el){
   <section class="panel"><div class="ph"><h2>Últimos movimientos</h2><span class="hint">${movs.length?movs.length+" en esta obra":""}</span></div>
     <div class="inv-movs">${invFilasMov(movs.slice().sort((a,b)=>b.ts-a.ts).slice(0,8))||'<p class="hint inv-vacio">Todavía no hay material registrado en esta obra. Entra a Gasfitería o Electricidad, toca una pieza y registra lo que llega.</p>'}</div>
   </section>`:'<p class="inv-vacio">Crea tu primera obra para empezar a llevar el material.</p>'}`;
-  const sel=$("invObraSel"); if(sel) sel.onchange=()=>{invObra=sel.value;guardarLS(INV_OBRA,invObra);invRender()};
+  const sel=$("invObraSel"); if(sel){sel.onchange=()=>invUsarObra(sel.value,()=>invRender());sel.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();sel.blur()}};sel.onfocus=()=>sel.select()}
   el.querySelectorAll("[data-invcat]").forEach(b=>b.onclick=()=>{invVista="cat:"+b.dataset.invcat;invGrupo="";invQ="";invRender();window.scrollTo(0,0)});
   const cf=$("invObraCfg"); if(cf) cf.onclick=()=>invAbrirObra(invObra?invObra:"");
   const nv=$("invObraNueva"); if(nv) nv.onclick=()=>invAbrirObra("");
@@ -4189,7 +4198,7 @@ function invPintarItem(){
       <label class="btnlink inv-foto-btn">${IC.cam}${f?"Cambiar foto":"Agregar foto"}<input type="file" accept="image/*" id="invFotoIn" hidden></label></div>
     <button type="button" class="x" data-cerrar-inv aria-label="Cerrar">✕</button>
   </div>
-  <div class="inv-obra-pieza"><label class="inv-f"><span class="inv-lbl">Obra</span><select id="invObraItem">${invObrasLista().map(o=>`<option value="${escA(o)}" ${o.toUpperCase()===String(invObra).toUpperCase()?"selected":""}>${esc(o)}</option>`).join("")}</select></label>
+  <div class="inv-obra-pieza"><label class="inv-f"><span class="inv-lbl">Obra · elige o escribe una nueva</span><input id="invObraItem" list="invObrasDL2" maxlength="60" autocomplete="off" value="${escA(invObra||"")}" placeholder="Elige la obra o escribe una nueva"><datalist id="invObrasDL2">${invObrasLista().map(o=>`<option value="${escA(o)}">`).join("")}</datalist></label>
     <small class="hint">Todo lo que registres aquí queda en esta obra.</small></div>
   <div class="seg inv-seg" role="group" aria-label="Qué pasó con el material">${Object.entries(INV_TIPOS).map(([t,n])=>`<button type="button" data-invtipo="${t}" aria-pressed="${F.tipo===t}">${n}</button>`).join("")}</div>
   <div class="inv-f"><span class="inv-lbl">Medida${I.m.length>12?` · ${I.m.length} opciones`:""}</span>${I.m.length>12?'<input id="invMedQ" type="search" placeholder="Filtrar, ej. 1/2, 40 cm, 2P" autocomplete="off">':""}<div class="inv-meds" id="invMeds">${I.m.map(m=>{const s=invSaldo(movs,k,m);return `<button type="button" class="inv-med" data-invmed="${escA(m)}" aria-pressed="${F.medida===m}">${esc(m)}${s>0.0001?`<em>${invNum(s)}</em>`:""}</button>`}).join("")}</div></div>
@@ -4212,7 +4221,7 @@ function invPintarItem(){
   S.querySelectorAll("[data-invmed]").forEach(b=>b.onclick=()=>{lee();F.medida=b.dataset.invmed;F.precio="";invPintarItem()});
   const ps=$("invPisoSel"); if(ps) ps.onchange=()=>{F.piso=ps.value};
   // Cambiar de obra dentro de la hoja: el saldo, los pisos y el historial pasan a ser de esa obra
-  const oi=$("invObraItem"); if(oi) oi.onchange=()=>{lee();invObra=oi.value;guardarLS(INV_OBRA,invObra);F.piso="";F.destino="";F.precio="";invPintarItem();invRender()};
+  const oi=$("invObraItem"); if(oi){oi.onchange=()=>{lee();invUsarObra(oi.value,()=>{F.piso="";F.destino="";F.precio="";invPintarItem();invRender()})};oi.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();oi.blur()}};oi.onfocus=()=>oi.select()}
   const de=$("invDestino"); if(de) de.onchange=()=>{F.destino=de.value};
   // Cambiar "hasta qué piso" guarda la obra con todos sus pisos (respeta sótano, azotea y cisterna)
   const ph=$("invHasta"); if(ph) ph.onchange=async()=>{lee();const n=Math.min(99,Math.max(1,parseInt(ph.value)||1));ph.value=n;
