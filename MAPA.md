@@ -1,5 +1,5 @@
 # Mapa de CBO Finanzas
-Actualizado: 05/11/2026 · caché: cbo-finanzas-v79-categorias-teclado
+Actualizado: 05/11/2026 · caché: cbo-finanzas-v80-teclado-abajo
 
 ## Archivos
 - codigo-fuente.html: versión editable (4287 líneas). index.html es la copia que se publica: editar codigo-fuente.html y copiarlo a index.html.
@@ -79,5 +79,5 @@ Actualizado: 05/11/2026 · caché: cbo-finanzas-v79-categorias-teclado
 - Festividad: su color manda en toda la app (FI_TEMA, fiestaCol) con combinaciones y degradados; el color elegido vuelve al terminar. Barra sin fiesta: animación sutil (tb-zona).
 - Usuario arriba a la derecha (#usuarioBtn): solo el circulito con la inicial o la imagen, sin nombre; abre su imagen (ovPerfil: foto o muñequito, cbo-avatares, solo en el equipo). No cambia de usuario; eso sigue en Configuración → Quién registra.
 - Sincronización de foto y colores por usuario (sincPerfil, subirPerfil, aplicarPerfil; acciones verAjustes y guardarAjustes; pestaña Ajustes). Gana el último cambio; si la nube está vacía, lo que el equipo ya tenía se sube solo. Ya instalado en el Apps Script publicado (versión 15). Copia del agregado: mejoras/APPS-SCRIPT-AGREGADO-AJUSTES.gs en el Apps Script publicado; sin él la app sigue igual.
-- Registro: Categoría con búsqueda (catBuscar, catSug, CAT_GRUPOS; 32 opciones de compra; compras sin marcar; #cat oculto guarda el valor). Monto con teclado propio en celular (teclMonto, inputmode none). Al cambiar de paso se cierra el teclado (irPaso).
+- Registro: Categoría con búsqueda (catBuscar, catSug, CAT_GRUPOS; 32 opciones de compra; compras sin marcar; #cat oculto guarda el valor). Monto con teclado propio en celular, fijo abajo solo en el paso Monto (teclMonto dentro de #ov, clase con-tecl, inputmode none). Al cambiar de paso se cierra el teclado (irPaso).
 - Antes de mostrar o publicar: correr mejoras/revision-app.js (revisarTodo) en la vista previa.
