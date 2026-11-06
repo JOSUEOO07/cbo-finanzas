@@ -1191,6 +1191,21 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
 .usuario{width:44px;height:44px;max-width:none;padding:0;border:0;background:none;justify-content:center;border-radius:50%}
 .usuario i{width:38px;height:38px;font-size:1rem}
 .usuario span{display:none}
+
+
+/* Búsqueda en Categoría y teclado de números de la app */
+.cat-sug{max-height:240px}
+.sug-g{position:sticky;top:0;padding:6px 12px 4px;background:var(--soft);color:var(--muted);font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.sug .cat-nueva{color:var(--brand-2);font-weight:700}
+.sug button{min-height:44px}
+.tecl-monto{display:none}
+@media (max-width:980px){
+  .tecl-monto{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:4px}
+  .tecl-monto button{min-height:50px;border:1px solid var(--line);border-radius:14px;background:var(--soft);color:var(--ink);font:700 1.3rem var(--display);cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:transform .1s ease,background-color .1s ease}
+  .tecl-monto button:active{transform:scale(.95);background:var(--brand);color:var(--brand-ink);border-color:var(--brand-2)}
+  .tecl-monto .borra{background:var(--brand);color:var(--brand-ink);border-color:transparent}
+  body:is(.fiesta,.especial) .tecl-monto .borra,body:is(.fiesta,.especial) .tecl-monto button:active{background:var(--fi-g);background-size:var(--fi-s);color:#F6F7F9}
+}
 </style>
 </head>
 <body data-barra="d">
@@ -1498,6 +1513,7 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
         <div class="monto-big"><span>S/</span><input id="monto" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00" aria-label="Monto total en soles"></div>
         <button type="button" class="qr-btn" id="btnQR" aria-label="Escanear comprobante: QR, foto o captura"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><rect x="8" y="8" width="3" height="3"/><rect x="13" y="8" width="3" height="3"/><rect x="8" y="13" width="3" height="3"/><path d="M13 13h3v3"/></svg><span>Escanear</span></button>
       </div>
+      <div class="tecl-monto" id="teclMonto" role="group" aria-label="Teclado de números"><button type="button">1</button><button type="button">2</button><button type="button">3</button><button type="button">4</button><button type="button">5</button><button type="button">6</button><button type="button">7</button><button type="button">8</button><button type="button">9</button><button type="button">.</button><button type="button">0</button><button type="button" class="borra" data-borra="1" aria-label="Borrar">⌫</button></div>
       <button type="button" class="btnlink pagosun-link pla-link" id="irPagoPla">👷 ¿Pagaste a un trabajador? Regístralo aquí ›</button>
       <button type="button" class="btnlink pagosun-link" id="irPagoSun">🏛 ¿Pagaste a SUNAT? Regístralo aquí ›</button>
     </div>
@@ -1535,7 +1551,7 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
 
     <div class="paso" data-paso="4" hidden>
       <div class="row2">
-        <label>Categoría<select id="cat"></select></label>
+        <div class="ac-wrap"><label>Categoría<input id="catBuscar" type="text" autocomplete="off" autocapitalize="sentences" role="combobox" aria-autocomplete="list" aria-controls="catSug" aria-expanded="false" placeholder="Escribe o elige"></label><select id="cat" hidden tabindex="-1" aria-hidden="true"></select><div class="sug cat-sug" id="catSug" role="listbox" hidden></div></div>
         <label id="catOtraBox" hidden>Escribe la categoría<input id="catOtra" maxlength="40" autocomplete="off" placeholder="Ej. Bebidas para la obra"></label>
         <label>Fecha<input id="fecha" type="date"></label>
       </div>
@@ -1794,10 +1810,25 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
 const IGV=0.18, UIT=5500, LIM_UIT=300;
 const CATS={
   ingreso:["Venta de servicio","Servicio a todo costo","Solo mano de obra","Venta de materiales","Adelanto de obra","Valorización de obra","Mantenimiento","Otros ingresos"],
-  gasto:["Compra de materiales","Materiales de gasfitería","Materiales eléctricos","Cemento y agregados","Pintura y acabados","Herramientas y equipos","Alquiler de equipos y maquinaria","Combustible","Pasajes y movilidad","Transporte y fletes","Comida y bebidas (refrigerios)","Viáticos y hospedaje","Seguros (SCTR, etc.)","Servicios de terceros / subcontratos","EPP y seguridad","Útiles de oficina","Teléfono e internet","Luz y agua","Alquiler de local o almacén","Mantenimiento de vehículo","Trámites, licencias y notaría","Comisiones bancarias","Publicidad","Otros gastos"]
+  gasto:["Compra de materiales","Materiales de gasfitería","Materiales eléctricos","Cemento y agregados","Pintura y acabados","Ferretería en general","Herramientas y equipos","Alquiler de equipos y maquinaria","EPP y seguridad","Uniformes y ropa de trabajo","Combustible","Pasajes y movilidad","Transporte y fletes","Mantenimiento de vehículo","Peajes y estacionamiento","Comida y bebidas (refrigerios)","Agua para la obra","Viáticos y hospedaje","Artículos de limpieza","Medicinas y primeros auxilios","Útiles de oficina","Teléfono e internet","Luz y agua","Alquiler de local o almacén","Imprevistos","Seguros (SCTR, etc.)","Servicios de terceros / subcontratos","Trámites, licencias y notaría","Multas y penalidades","Comisiones bancarias","Publicidad","Otros gastos"]
 };
 // Categorías: las de la lista + las que ya se usaron en registros (antiguas o escritas con "Otra"), y al final "Otra (escribir…)"
 const CAT_OTRA="__otra__";
+const catTexto=()=>{const v=$("cat").value;return v===CAT_OTRA?"Otra (escribir…)":v};
+function pintarCatBuscar(){const i=$("catBuscar");if(i&&document.activeElement!==i)i.value=catTexto()}
+function catListas(){const us=catsUsadas(fTipo),L=fTipo==="gasto"?CAT_GRUPOS.map(x=>[x[0],x[1]]):[["",CATS[fTipo]||[]]];return us.length?[...L,["Tus categorías",us]]:L}
+function cerrarCatSug(){const b=$("catSug");b.hidden=true;$("catBuscar").setAttribute("aria-expanded","false")}
+function abrirCatSug(filtrar){
+  const inp=$("catBuscar"),b=$("catSug"),q=filtrar?sinTildes(inp.value.trim()):"",html=[];let exacto=false;
+  catListas().forEach(([g,l])=>{const m=l.filter(c=>{const t=sinTildes(c);if(t===q)exacto=true;return !q||t.includes(q)});if(!m.length)return;if(g)html.push(`<div class="sug-g">${esc(g)}</div>`);m.forEach(c=>html.push(`<button type="button" role="option" data-cat="${esc(c).replace(/"/g,"&quot;")}">${esc(c)}</button>`))});
+  if(q&&!exacto&&!html.length)html.push(`<button type="button" role="option" class="cat-nueva" data-catnueva="1">Usar «${esc(inp.value.trim())}» como categoría nueva</button>`);
+  if(!q)html.push(`<button type="button" role="option" data-cat="${CAT_OTRA}">Otra (escribir…)</button>`);
+  b.innerHTML=html.join("");b.hidden=false;b.scrollTop=0;inp.setAttribute("aria-expanded","true");
+}
+function elegirCat(v,nueva){const sel=$("cat");if(nueva){sel.value=CAT_OTRA;$("catOtra").value=nueva}else{sel.value=v;if(v!==CAT_OTRA)$("catOtra").value=""}
+  const otra=verCatOtra();$("catBuscar").value=catTexto();cerrarCatSug();$("msg").textContent="";if(otra&&!nueva)setTimeout(()=>$("catOtra").focus(),30)}
+// Compras: primero el grupo y luego el detalle
+const CAT_GRUPOS=[["Materiales",["Compra de materiales","Materiales de gasfitería","Materiales eléctricos","Cemento y agregados","Pintura y acabados","Ferretería en general"]],["Herramientas y seguridad",["Herramientas y equipos","Alquiler de equipos y maquinaria","EPP y seguridad","Uniformes y ropa de trabajo"]],["Movilidad",["Combustible","Pasajes y movilidad","Transporte y fletes","Mantenimiento de vehículo","Peajes y estacionamiento"]],["Comida y viajes",["Comida y bebidas (refrigerios)","Agua para la obra","Viáticos y hospedaje"]],["Limpieza y salud",["Artículos de limpieza","Medicinas y primeros auxilios"]],["Oficina y local",["Útiles de oficina","Teléfono e internet","Luz y agua","Alquiler de local o almacén"]],["Imprevistos y otros",["Imprevistos","Seguros (SCTR, etc.)","Servicios de terceros / subcontratos","Trámites, licencias y notaría","Multas y penalidades","Comisiones bancarias","Publicidad","Otros gastos"]]];
 function catsUsadas(t){const base=CATS[t]||[],v=new Set();rows.forEach(r=>{const c=String(r.categoria||"").trim();if(r.tipo===t&&c&&c!=="Planilla / jornales"&&c!=="Pago a SUNAT"&&!base.includes(c))v.add(c)});return [...v].sort((a,b)=>a.localeCompare(b,"es"))}
 function catsDe(t){return [...(CATS[t]||[]),...catsUsadas(t)]}
 function catElegida(){if($("cat").value!==CAT_OTRA)return $("cat").value;let c=$("catOtra").value.trim().replace(/\s+/g," ");if(!c)return "";c=c.charAt(0).toUpperCase()+c.slice(1);return catsDe(fTipo).find(x=>x.toLowerCase()===c.toLowerCase())||c}
@@ -1820,7 +1851,10 @@ const leerLS=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.p
 const guardarLS=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 let mes=hoyISO.slice(0,7), filtro="todos", rows=[], store=null, pendingDel=null, seccion="inicio", periodoTer="mes";
 let fTipo="ingreso", fComp="factura";
-let ajustes=Object.assign({tema:"calido",meta:300000,paleta:"grafito"},leerLS("cbo-ajustes",{})); // Grafito es la paleta por defecto
+const PAL_DEF="esp-38"; // Noche (Especiales) es el color por defecto
+let ajustes=Object.assign({tema:"calido",meta:300000,paleta:PAL_DEF},leerLS("cbo-ajustes",{}));
+// Quien seguía con el Grafito de antes (era el color por defecto) pasa una sola vez a Noche
+if(!ajustes.v5){if(ajustes.paleta==="grafito")ajustes.paleta=PAL_DEF;ajustes.v5=1;guardarLS("cbo-ajustes",ajustes)}
 // v4: el tema predeterminado pasa a "Cálido" aunque antes se hubiera guardado "auto"
 if(!ajustes.v4){if(ajustes.tema==="auto")ajustes.tema="calido";ajustes.v4=1;guardarLS("cbo-ajustes",ajustes)}
 function esc(s){const d=document.createElement("div");d.textContent=s??"";return d.innerHTML}
@@ -2198,7 +2232,7 @@ function temaDe(h){
 }
 function aplicarTema(){
   document.documentElement.setAttribute("data-theme","oscuro");
-  const P=PALETAS.find(x=>x[0]===ajustes.paleta)||PALETAS.find(x=>x[0]==="grafito");
+  const P=PALETAS.find(x=>x[0]===ajustes.paleta)||PALETAS.find(x=>x[0]===PAL_DEF);
   let st=document.getElementById("cboVars"); if(!st){st=document.createElement("style");st.id="cboVars";document.head.appendChild(st)}
   const CT=fiestaCol||[P[2],P[3],P[4]],T=temaDe(CT[0]);document.body.classList.toggle("especial",!fiestaCol&&!!P[4]);st.textContent=`:root:root{--brand:${CT[0]};--brand-2:${CT[1]};--brand-ink:${T.ink};--brand-deep:${T.deep};--logo-f:${T.claro?"invert(1)":"none"}${CT[2]?`;--fi-g:${CT[2]};--fi-b:${(fiestaCol&&fiestaCol[3])||CT[2]};--fi-s:${(fiestaCol&&fiestaCol[4])||"240% 100%"}`:""}}`;
   document.querySelector('meta[name="theme-color"]').setAttribute("content","#0B0D10");
@@ -2207,6 +2241,13 @@ function aplicarTema(){
     <button type="button" class="pal-esp" data-fam="especial" aria-pressed="${F.k==="especial"}"><span>Especiales</span><small>Combinaciones y degradados</small></button>
     <p class="pal-t">${F.k==="especial"?`Especiales: ${F.t.length} combinaciones`:`${F.n}: del más clarito al más intenso`}</p><div class="pal-esc" role="group" aria-label="Tonos de ${F.n}">${(F.k==="especial"?F.t:F.t.slice(1)).map(([k,n,a,b,g])=>`<button type="button" class="pal-tono" data-pal="${k}" aria-pressed="${k===P[0]}" aria-label="${n}"><i style="background:${g||a}"></i><span>${n}</span></button>`).join("")}</div>${F.k==="especial"?`<button type="button" class="btn pal-gen" id="espGen">Crear otra combinación</button>`:""}`}
 }
+// Teclado de la app para el monto: en celular reemplaza al del sistema; en computadora se sigue escribiendo normal
+(function(){const m=$("monto"),t=$("teclMonto");if(!m||!t)return;const mq=matchMedia("(max-width:980px)"),ajusta=()=>m.setAttribute("inputmode",mq.matches?"none":"decimal");ajusta();mq.addEventListener("change",ajusta);
+  t.addEventListener("mousedown",e=>e.preventDefault());
+  t.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;let v=m.value;
+    if(b.dataset.borra)v=v.slice(0,-1);else{const k=b.textContent;if(k==="."&&v.includes("."))return;if(k==="."&&!v)v="0";if(v==="0"&&k!==".")v="";const pt=v.indexOf(".");if(pt>=0&&v.length-pt>2&&k!==".")return;if(v.replace(".","").length>=10)return;v+=k}
+    m.value=v;m.dispatchEvent(new Event("input",{bubbles:true}));try{sonar&&0}catch{}});
+})();
 function nuevaEspecial(){
   const azar=(a,b)=>a+Math.random()*(b-a),col=(h,s,l)=>{const a=s*Math.min(l,1-l),f=n=>{const k=(n+h/30)%12;return l-a*Math.max(-1,Math.min(k-3,9-k,1))};return "#"+[f(0),f(8),f(4)].map(v=>Math.round(v*255).toString(16).padStart(2,"0")).join("")};
   const h=azar(0,360),d=azar(35,170)*(Math.random()<.5?-1:1),h2=(h+d+360)%360,h3=(h2+azar(20,60))%360,st=[col(h,.72,.2),col(h2,.75,.3),col(h3,.75,.32)];
@@ -2298,7 +2339,7 @@ function syncForm(){
   document.querySelector('#segComp [data-v="boleta"]').hidden=sinBoleta;
   $("segComp").classList.toggle("three",!sinBoleta);
   seg("segTipo",fTipo); seg("segComp",fComp);
-  const prev=$("cat").value, usadas=catsUsadas(fTipo); $("cat").innerHTML=CATS[fTipo].map(c=>`<option>${esc(c)}</option>`).join("")+(usadas.length?`<optgroup label="Tus categorías">${usadas.map(c=>`<option>${esc(c)}</option>`).join("")}</optgroup>`:"")+`<option value="${CAT_OTRA}">Otra (escribir…)</option>`; if(prev===CAT_OTRA||catsDe(fTipo).includes(prev))$("cat").value=prev; verCatOtra();
+  const prev=$("cat").value, usadas=catsUsadas(fTipo); const opc=l=>l.map(c=>`<option>${esc(c)}</option>`).join(""); $("cat").innerHTML=(fTipo==="gasto"?`<option value="">Elige de qué es</option>`+CAT_GRUPOS.map(([g,l])=>`<optgroup label="${esc(g)}">${opc(l)}</optgroup>`).join(""):opc(CATS[fTipo]))+(usadas.length?`<optgroup label="Tus categorías">${opc(usadas)}</optgroup>`:"")+`<option value="${CAT_OTRA}">Otra (escribir…)</option>`; if(prev===CAT_OTRA||catsDe(fTipo).includes(prev))$("cat").value=prev; else if(fTipo==="gasto")$("cat").value=""; verCatOtra(); pintarCatBuscar();
   $("lblCli").firstChild.textContent=fTipo==="ingreso"?"Cliente / obra":"Proveedor / detalle";
   $("pasoCliLbl").textContent=fTipo==="ingreso"?"Cliente":"Proveedor";
   $("hintCli").textContent=fTipo==="ingreso"?"Escribe y elige de tus clientes ya registrados: el RUC se llena solo.":"Escribe y elige de tus proveedores ya registrados: el RUC se llena solo.";
@@ -2324,6 +2365,9 @@ function pintarResumen(){
 }
 $("resumen").addEventListener("click",e=>{const b=e.target.closest("[data-ir-paso]");if(b)irPaso(+b.dataset.irPaso)});
 function irPaso(n){
+  // Al cambiar de paso se cierra el teclado y cualquier lista abierta
+  const act=document.activeElement;if(act&&act.closest&&act.closest("#f .paso"))act.blur();
+  try{cerrarCatSug()}catch{}
   const atras=n<paso; paso=n;
   document.querySelectorAll("#f .paso").forEach(d=>{const on=+d.dataset.paso===n;d.hidden=!on;if(on){d.classList.toggle("atras",atras);d.style.animation="none";void d.offsetWidth;d.style.animation=""}});
   document.querySelectorAll("#pasos button").forEach(b=>{const k=+b.dataset.p;b.classList.toggle("hecho",k<n);if(k===n)b.setAttribute("aria-current","step");else b.removeAttribute("aria-current")});
@@ -2341,10 +2385,20 @@ function validarPaso(n){
   if(n===2&&fComp!=="ninguno"&&!nroValido($("nro").value)){$("msg").textContent="Escribe la serie y el número del comprobante (ej. F001-1234). Es obligatorio.";$("nro").focus();return false}
   if(n===3&&fComp!=="ninguno"&&!rucValido($("ruc").value)){$("msg").textContent=`Escribe el RUC del ${fTipo==="ingreso"?"cliente":"proveedor"} (11 números). Es obligatorio.`;$("ruc").focus();return false}
   if(n===4&&!$("fecha").value){$("msg").textContent="Elige una fecha.";return false}
+  if(n===4&&!$("cat").value){$("msg").textContent=fTipo==="gasto"?"Elige de qué es esta compra en Categoría: escribe o toca una opción.":"Elige la categoría: escribe o toca una opción.";$("catBuscar").focus();return false}
   if(n===4&&$("cat").value===CAT_OTRA&&!catElegida()){$("msg").textContent="Escribe la categoría (ej. Bebidas para la obra).";$("catOtra").focus();return false}
   return true;
 }
-$("cat").addEventListener("change",()=>{if(verCatOtra())setTimeout(()=>$("catOtra").focus(),30)});
+$("cat").addEventListener("change",()=>{pintarCatBuscar();if(verCatOtra())setTimeout(()=>$("catOtra").focus(),30)});
+(function(){const i=$("catBuscar"),b=$("catSug"),mover=d=>{const L=[...b.querySelectorAll("button")];if(!L.length)return;let k=L.findIndex(x=>x.classList.contains("sel"));if(k>=0)L[k].classList.remove("sel");k=(k+d+L.length)%L.length;L[k].classList.add("sel");L[k].scrollIntoView({block:"nearest"})};
+  i.addEventListener("focus",()=>{i.select();abrirCatSug(false)});
+  i.addEventListener("click",()=>{if(b.hidden)abrirCatSug(false)});
+  i.addEventListener("input",()=>{$("cat").value="";verCatOtra();abrirCatSug(true)});
+  i.addEventListener("blur",()=>setTimeout(()=>{cerrarCatSug();const t=sinTildes(i.value.trim());if(!$("cat").value&&t){const h=catListas().flatMap(x=>x[1]).find(c=>sinTildes(c)===t);if(h){$("cat").value=h;verCatOtra();i.value=h}}else if($("cat").value)i.value=catTexto()},150));
+  i.addEventListener("keydown",e=>{if(e.key==="ArrowDown"||e.key==="ArrowUp"){e.preventDefault();if(b.hidden)abrirCatSug(true);mover(e.key==="ArrowDown"?1:-1)}else if(e.key==="Escape"){cerrarCatSug()}else if(e.key==="Enter"){e.preventDefault();if(b.hidden)return;const x=b.querySelector("button.sel")||b.querySelector("button");if(x)x.click()}});
+  b.addEventListener("mousedown",e=>e.preventDefault());
+  b.addEventListener("click",e=>{const x=e.target.closest("button");if(!x)return;if(x.dataset.catnueva)elegirCat("",i.value.trim());else elegirCat(x.dataset.cat);i.blur()});
+})();
 $("pasos").onclick=e=>{const b=e.target.closest("button");if(!b)return;const n=+b.dataset.p;if(n>paso){for(let k=paso;k<n;k++)if(!validarPaso(k))return}irPaso(n)};
 $("btnAtras").onclick=()=>{if(paso===1)closeF();else irPaso(paso-1)};
 $("segTipo").onclick=e=>{const b=e.target.closest("button");if(b){fTipo=b.dataset.v;syncForm()}};
@@ -2372,7 +2426,7 @@ function mostrarSug(){
   $("sug").hidden=false; $("desc").setAttribute("aria-expanded","true");
 }
 function ocultarSug(){$("sug").hidden=true;$("desc").setAttribute("aria-expanded","false")}
-function elegirSug(i){const x=sugLista[i];if(!x)return;$("desc").value=x.desc;if(x.ruc){$("ruc").value=x.ruc;$("ruc").dataset.auto=x.ruc}if(x.obra&&!$("obra").value.trim())$("obra").value=x.obra;if(catsDe(fTipo).includes(x.cat))$("cat").value=x.cat;ocultarSug();syncForm()}
+function elegirSug(i){const x=sugLista[i];if(!x)return;$("desc").value=x.desc;if(x.ruc){$("ruc").value=x.ruc;$("ruc").dataset.auto=x.ruc}if(x.obra&&!$("obra").value.trim())$("obra").value=x.obra;if(catsDe(fTipo).includes(x.cat))($("cat").value=x.cat,pintarCatBuscar());ocultarSug();syncForm()}
 // Si el nombre escrito ya está registrado, su RUC se completa solo (si es nuevo, se escribe a mano)
 const normNom=s=>sinTildes(s).replace(/[^a-z0-9]/g,"");
 function autoRuc(){
@@ -2381,7 +2435,7 @@ function autoRuc(){
   if(!x){if(R.dataset.auto&&R.value===R.dataset.auto){R.value="";info.hidden=true}delete R.dataset.auto;return}
   if(!R.value.trim()||R.dataset.auto===R.value){R.value=x.ruc;R.dataset.auto=x.ruc;info.className="ruc-info ok";info.textContent=`✓ RUC de ${x.desc}, ya registrado`;info.hidden=false}
   if(x.obra&&!$("obra").value.trim())$("obra").value=x.obra;
-  if(catsDe(fTipo).includes(x.cat))$("cat").value=x.cat;
+  if(catsDe(fTipo).includes(x.cat))($("cat").value=x.cat,pintarCatBuscar());
   syncForm();
 }
 $("desc").addEventListener("input",mostrarSug);
@@ -2427,7 +2481,7 @@ $("obra").addEventListener("keydown",e=>{
 $("sugObra").addEventListener("mousedown",e=>e.preventDefault());
 $("sugObra").addEventListener("click",e=>{const b=e.target.closest("[data-i]");if(b)elegirSugObra(+b.dataset.i)});
 // Si escribe un RUC conocido y aún no hay nombre, se completa el nombre
-$("ruc").addEventListener("input",()=>{const v=$("ruc").value.trim();$("rucInfo").hidden=true;if(v.length<8||$("desc").value.trim())return;const x=terceros(fTipo).find(t=>t.ruc===v);if(x){$("desc").value=x.desc;if(catsDe(fTipo).includes(x.cat))$("cat").value=x.cat;return}buscarNombreRuc(v)});
+$("ruc").addEventListener("input",()=>{const v=$("ruc").value.trim();$("rucInfo").hidden=true;if(v.length<8||$("desc").value.trim())return;const x=terceros(fTipo).find(t=>t.ruc===v);if(x){$("desc").value=x.desc;if(catsDe(fTipo).includes(x.cat))($("cat").value=x.cat,pintarCatBuscar());return}buscarNombreRuc(v)});
 /* Nombre automático: si el RUC es nuevo, se pide la razón social a SUNAT (a través de tu Apps Script) */
 let rucBuscando="";
 async function buscarNombreRuc(v,alTerminar){
@@ -2452,7 +2506,7 @@ async function buscarNombreRuc(v,alTerminar){
   }finally{rucBuscando=""}
 }
 
-function limpiarForm(){
+function limpiarForm(){$("cat").value="";$("catOtra").value="";
   $("monto").value="";$("desc").value="";$("ruc").value="";delete $("ruc").dataset.auto;$("nro").value="";delete $("det").dataset.touched;$("det").checked=false;$("detPct").value="4";
   qrIgv=null;$("avisoQR").hidden=true;$("rucInfo").hidden=true;$("obra").value="";quitarFoto();$("catOtra").value="";
 }
@@ -2462,7 +2516,7 @@ function cargarEnForm(r,conFecha){
   $("nro").value=r.serie?`${r.serie}-${r.numero||""}`:(r.numero||"");
   $("obra").value=r.obra||"";
   $("det").checked=!!r.detraccion; $("det").dataset.touched="1"; $("detPct").value=String(r.detPct===12?12:4);
-  syncForm(); if(catsDe(fTipo).includes(r.categoria))$("cat").value=r.categoria;
+  syncForm(); if(catsDe(fTipo).includes(r.categoria))($("cat").value=r.categoria,pintarCatBuscar());
   $("fecha").value=conFecha?r.fecha:(mes===hoyISO.slice(0,7)?hoyISO:mes+"-01");
   if(fComp!=="ninguno"&&typeof r.igv==="number") qrIgv={total:r.monto,igv:r.igv};
 }
@@ -2606,7 +2660,7 @@ function aplicarQR(texto){
   if(q.fecha) $("fecha").value=q.fecha;
   qrIgv={total:q.total,igv:q.igv};
   if(!$("det").dataset.touched)$("det").checked=fTipo==="ingreso"&&q.total>700;
-  syncForm(); if(previo&&catsDe(fTipo).includes(previo.cat))$("cat").value=previo.cat;
+  syncForm(); if(previo&&catsDe(fTipo).includes(previo.cat))($("cat").value=previo.cat,pintarCatBuscar());
   $("avisoQR").textContent=`QR leído: ${q.tipoNombre} ${q.serie}-${q.numero} por ${fmt(q.total)}${previo?" de "+previo.desc:""}. Revisa los datos y toca Guardar.`+(q.tipo==="07"?" Ojo: es una nota de crédito.":"");
   $("avisoQR").hidden=false;
   irPaso(previo?4:3);
@@ -2717,7 +2771,7 @@ function aplicarTexto(q){
   if(q.fecha)$("fecha").value=q.fecha;
   qrIgv=q.igv>0&&q.total>0?{total:q.total,igv:q.igv}:null;
   if(!$("det").dataset.touched)$("det").checked=fTipo==="ingreso"&&q.total>700;
-  syncForm(); if(previo&&catsDe(fTipo).includes(previo.cat))$("cat").value=previo.cat;
+  syncForm(); if(previo&&catsDe(fTipo).includes(previo.cat))($("cat").value=previo.cat,pintarCatBuscar());
   const falta=[!(q.total>0)&&"monto",fComp!=="ninguno"&&!q.serie&&"serie-número",fComp!=="ninguno"&&!q.rucTercero&&"RUC",!q.fecha&&"fecha"].filter(Boolean);
   $("avisoQR").textContent=`Leído del comprobante: ${COMP_TXT[fComp]}${q.serie?" "+q.serie+"-"+q.numero:""}${q.total?" por "+fmt(q.total):""}${previo?" de "+previo.desc:""}. `
     +(falta.length?`No pude leer: ${falta.join(", ")}. Complétalo a mano.`:"Revisa que los datos coincidan con el comprobante y toca Guardar.");
@@ -3094,7 +3148,7 @@ async function sincPerfil(forzar){
   perfilOcupado=true;perfilUlt=ah;
   try{const j=await api("verAjustes",{usuario:quien}),rem=j.ajustes||null,tl=+leerLS(PERFIL_K,0)||0,tr=rem?+rem.ts||0:0;
     // Primera vez: lo que este equipo ya tenía (foto o color elegidos antes) se sube solo si la nube está vacía
-    if(!rem&&!tl&&(avDe(quien)||(ajustes.paleta&&ajustes.paleta!=="grafito")||(ajustes.espGen||[]).length)){guardarLS(PERFIL_K,Date.now());await subirPerfil();return}
+    if(!rem&&!tl&&(avDe(quien)||(ajustes.paleta&&ajustes.paleta!==PAL_DEF)||(ajustes.espGen||[]).length)){guardarLS(PERFIL_K,Date.now());await subirPerfil();return}
     if(tr>tl)aplicarPerfil(rem);else if(tl>tr)await subirPerfil()}
   catch(e){}finally{perfilOcupado=false}
 }
@@ -3909,7 +3963,7 @@ async function sincronizarFirmas(){
 /* ===== Configuración: resumen de cada opción y una sola abierta a la vez ===== */
 function pintarResumenCfg(){
   const v=(k,h)=>{const e=document.getElementById("cfgv-"+k);if(e)e.innerHTML=h};
-  const P=PALETAS.find(x=>x[0]===ajustes.paleta)||PALETAS.find(x=>x[0]==="grafito");
+  const P=PALETAS.find(x=>x[0]===ajustes.paleta)||PALETAS.find(x=>x[0]===PAL_DEF);
   v("tema",`<i style="background:${P[4]||P[2]}"></i> ${P[1]}`);
   const nb=k=>(BAR_DEF[k]||[""])[0].replace("Movim.","Movimientos");
   v("barra",`${nb(ajustes.barA||"movimientos")} y ${nb(ajustes.barB||"planilla")}`);
