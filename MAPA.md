@@ -1,5 +1,5 @@
 # Mapa de CBO Finanzas
-Actualizado: 05/11/2026 · caché: cbo-finanzas-v71-animaciones
+Actualizado: 05/11/2026 · caché: cbo-finanzas-v72-adornos
 
 ## Archivos
 - codigo-fuente.html: versión editable (4287 líneas). index.html es la copia que se publica: editar codigo-fuente.html y copiarlo a index.html.
@@ -72,4 +72,5 @@ Actualizado: 05/11/2026 · caché: cbo-finanzas-v71-animaciones
 - Paletas: 36 (se agregaron 18). El botón + de la barra de abajo usa solo los colores de la paleta (antes tenía verde y dorado fijos).
 - Escáner: botón "Subir documento" (PDF o imagen). leerPDFComprobante lee el QR o el texto del PDF; si es escaneado, lo lee como imagen (pdf.js 3.11.174 desde jsDelivr, render con intent print).
 - Adornos: 16 fiestas, con el Mundial (14 jun-14 jul, solo años 2030, 2034...; tiene prioridad sobre las demás) (Josué quitó Eid, Mujer, Tierra, Inti Raymi, EE. UU., Janucá, Acción de Gracias, Todos los Santos, Oktoberfest, Diwali y Holi) (ADOR_F; las lunares usan adTabla, con años limitados). Toda la zona del logo y el nombre está ambientada e interactiva (ZON, ZSP, zPintar, zEstallar).
-- Adornos, movimiento: capas separadas (avance adz-f, balanceo adz-o, aleteo adz-aleta), tres profundidades, solo transform y opacity. Al volar van por los bordes para no tapar el nombre. Destello del nombre cada 9 s. Toque: onda y 8 figuras con gravedad (zEstallar). Con mouse: seguimiento suave.
+- Adornos, movimiento: capas separadas (avance adz-f, balanceo adz-o, aleteo adz-aleta), tres profundidades, solo transform y opacity. Al volar van por los bordes para no tapar el nombre. Los colores de la fiesta pasan de corrido por las letras del nombre (adzColores). Toque: onda y 8 figuras con gravedad (zEstallar). Con mouse: seguimiento suave.
+- Adornos, dibujos: figuras con volumen (degradados en #zDefs). Mundial con la Copa del Mundo dibujada (COPA). Día de Muertos con papel picado, calavera de azúcar, cempasúchil, pétalos y velas.

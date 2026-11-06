@@ -1095,10 +1095,11 @@ h1,h2,h3,.bar h1{font-family:var(--display);letter-spacing:-.02em}
 @keyframes adzSube{0%{transform:translate(var(--x),100cqh);opacity:0}18%{opacity:var(--op)}65%{opacity:var(--op)}100%{transform:translate(var(--x),-12px);opacity:0}}
 .adz-chispa,.adz-onda{position:absolute;left:0;top:0;line-height:0;pointer-events:none;will-change:transform,opacity}
 .adz-onda{width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;border:1.5px solid var(--z1)}
-/* El nombre: un destello que pasa cada 9 segundos y descansa */
-.adz b{background:linear-gradient(100deg,currentColor 0%,currentColor 34%,var(--z1) 46%,var(--z2) 54%,currentColor 66%,currentColor 100%);background-size:300% 100%;background-position:100% 0;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:adzBrillo 9s var(--zio) infinite}
-@keyframes adzBrillo{0%{background-position:100% 0}18%,100%{background-position:-50% 0}}
-@media (prefers-reduced-motion:reduce){.adz b{animation:none;background:none;-webkit-text-fill-color:currentColor}.adz-capa{display:none}.adz>:not(.adz-capa){transition:none}}
+/* Las letras del nombre: los colores de la fiesta pasan de corrido, sin cortes */
+.adz b,.adz small{background:linear-gradient(90deg,currentColor 0%,currentColor 12%,var(--z1) 30%,var(--z2) 50%,var(--z1) 70%,currentColor 88%,currentColor 100%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:adzColores 6s linear infinite}
+.adz small{opacity:1;animation-delay:-.5s}
+@keyframes adzColores{from{background-position:200% 0}to{background-position:0 0}}
+@media (prefers-reduced-motion:reduce){.adz b,.adz small{animation:none;background:none;-webkit-text-fill-color:currentColor}.adz-capa{display:none}.adz>:not(.adz-capa){transition:none}}
 </style>
 </head>
 <body data-barra="d">
@@ -3938,7 +3939,7 @@ const ADOR_ART={
   trabajo:()=>`<g class="a-flota"><g transform="translate(8 -10)"><path d="M2 14C2 4 9-1 16-1S30 4 30 14Z" fill="#F2B705"/><rect x="-1" y="13" width="34" height="3.6" rx="1.8" fill="#D99A00"/><rect x="14" y="-1.6" width="4" height="12" rx="2" fill="#FFD84D"/></g></g><g transform="translate(54 33)"><g class="a-martillo"><rect x="-1.2" y="0" width="2.4" height="13" rx="1" fill="#A86B32"/><rect x="-5" y="-3" width="10" height="4" rx="1" fill="#9AA5B1"/></g></g>`,
   madre:()=>`<g class="a-mece">${AD.flor(53,41,4,"#FF6B9A","#FFE08A")}${AD.flor(46,45,3.2,"#FFB3C7","#FFF")}${AD.flor(59,45,3,"#E2445C","#FFE08A")}</g>${AD.sube(49,31,"#FF6B9A",0)}${AD.sube(56,29,"#FF9EBB",1.2)}${AD.sube(52,33,"#E2445C",2.1)}`,
   padre:()=>`<g transform="translate(54 29)"><g class="a-pendulo"><path d="M-2.5 0h5l-1 3h-3z" fill="#1E4E8C"/><path d="M-1.5 3h3l2.5 11-4 4-4-4z" fill="#2F6FBF"/><path d="M-1 6l3 2M-1.6 9.5l3.6 2.4M-2 13l3.5 2.3" stroke="#BFD7FF" stroke-width=".7"/></g></g>${AD.estrella(6,-4,"#FFD54A")}${AD.estrella(16,-8,"#FFF","d2")}`,
-  mundial:()=>`<g transform="translate(52 40)"><g class="a-flota"><circle r="7.5" fill="#F7F7F2" stroke="#222" stroke-width=".6"/><path d="M-3.2-1.1L-2 2.8H2L3.2-1.1L0-3.4Z" fill="#222"/><path d="M0-3.4V-7.3M3.2-1.1L6.9-2.3M-3.2-1.1L-6.9-2.3M2 2.8L4.3 6M-2 2.8L-4.3 6" stroke="#222" stroke-width=".7"/></g></g><g transform="translate(8 -9)"><g class="a-mece"><path d="M-5 0H5V3C5 7 2 9 0 9.5C-2 9-5 7-5 3Z" fill="#FFC93C"/><path d="M-5 1H-8C-8 5-6 6-4.4 6M5 1H8C8 5 6 6 4.4 6" stroke="#FFC93C" stroke-width="1.2" fill="none"/><rect x="-1" y="9.5" width="2" height="3" fill="#E5A800"/><rect x="-3.5" y="12" width="7" height="2" rx=".6" fill="#2F9E5B"/></g></g>${AD.estrella(30,-8,"#FFD54A")}`,
+  mundial:()=>`<g transform="translate(53 26) scale(1.5)"><g class="a-flota">${COPA}</g></g><g transform="translate(5 43) scale(.72)"><g class="a-flota d2">${ZSP.pel}</g></g>${AD.estrella(38,-7,"#FFD54A")}${AD.estrella(22,-5,"#FFF1B8","d2")}`,
   patrias:()=>`<line x1="3" y1="10" x2="3" y2="-16" stroke="#E6E6E6" stroke-width="1.2" stroke-linecap="round"/><circle cx="3" cy="-16.6" r="1.3" fill="#FFD54A"/><g transform="translate(3.6 -15.5)"><g class="a-ondea"><rect width="7" height="12" fill="#D91023"/><rect x="7" width="7" height="12" fill="#FFF"/><rect x="14" width="7" height="12" fill="#D91023"/></g></g><g transform="translate(55 40)"><path d="M-2 4l-2.4 7 2.8-1.6L0 11zM2 4l2.4 7-2.8-1.6L0 11z" fill="#D91023"/><g class="a-gira"><circle r="5.6" fill="#D91023"/><circle r="4.6" fill="none" stroke="#FFF" stroke-width="1.4" stroke-dasharray="1.2 1.2"/><circle r="2.2" fill="#FFF"/><circle r="1.1" fill="#D91023"/></g></g>`,
   rosa:()=>`<g class="a-mece">${AD.rosa(52,41,3.6)}${AD.rosa(58,45,2.8)}</g>${AD.cae([8,20,32,44],["#FF8FB1","#E23D6B"],1.1)}`,
   primavera:()=>`<g class="a-mece">${AD.flor(4,44,3.4,"#FFD23F","#F28C28")}</g><g class="a-mece d2">${AD.flor(56,43,3.6,"#FF8FB1","#FFE08A")}</g><g transform="translate(12 -6)"><g class="a-mariposa"><g class="a-aleteo"><path d="M0 0C-4-5-8-3-6 1C-5 3-2 2 0 0ZM0 0C4-5 8-3 6 1C5 3 2 2 0 0Z" fill="#7FD3FF"/><path d="M0 0C-3 2-5 5-2 5C-1 5 0 3 0 0ZM0 0C3 2 5 5 2 5C1 5 0 3 0 0Z" fill="#B39DFF"/></g><rect x="-.5" y="-2" width="1" height="6" rx=".5" fill="#2B2B2B"/></g></g>`,
@@ -3946,33 +3947,56 @@ const ADOR_ART={
   chino:()=>{const f=(x,y,cls)=>`<g transform="translate(${x} ${y})"><g class="a-pendulo ${cls}"><line y1="-5" y2="0" stroke="#FFC93C" stroke-width=".8"/><ellipse cy="6" rx="6" ry="5.4" fill="#D7263D"/><path d="M-3 1.4Q-5 6-3 10.6M3 1.4Q5 6 3 10.6M0 .6V11.4" stroke="#8E1023" stroke-width=".6" fill="none"/><rect x="-3" y=".2" width="6" height="1.5" rx=".5" fill="#FFC93C"/><rect x="-3" y="10.4" width="6" height="1.5" rx=".5" fill="#FFC93C"/><path d="M0 12v4M-1 12v3M1 12v3" stroke="#FFC93C" stroke-width=".5"/></g></g>`;return f(5,-5,"")+f(55,-5,"d2")+AD.estrella(30,-8,"#FFD54A")},
   valentin:()=>`<g transform="translate(52 40)"><g class="a-flota">${AD.corazon(0,0,1.9,"#E2264D")}</g></g>${AD.sube(44,34,"#FF6B8A",0)}${AD.sube(56,30,"#FF9EB5",1.1)}`,
   patricio:()=>{const t=(x,y,e,cls)=>`<g class="a-mece ${cls}"><g transform="translate(${x} ${y}) scale(${e})"><path d="M0 8Q1 12 3 14" stroke="#1F8A3B" stroke-width="1.2" fill="none"/>${[0,120,240].map(a=>`<g transform="rotate(${a})">${AD.corazon(0,-3.6,1,"#2FB04F")}</g>`).join("")}</g></g>`;return t(52,38,1,"")+t(7,41,.7,"d2")},
-  muertos:()=>`<g transform="translate(52 37)"><g class="a-flota"><path d="M-7-1C-7-7-3-9 0-9S7-7 7-1C7 2 5 3 4 4V7H-4V4C-5 3-7 2-7-1Z" fill="#F4F0E6"/><circle cx="-3" cy="-1.5" r="2.2" fill="#E2264D"/><circle cx="3" cy="-1.5" r="2.2" fill="#2F8FE0"/><path d="M0 1L-1 3H1Z" fill="#222"/><path d="M-2.5 7V4.8M0 7V4.8M2.5 7V4.8" stroke="#222" stroke-width=".6"/><circle cy="-6.5" r="1" fill="#F7931E"/></g></g><g class="a-mece d2">${AD.flor(6,44,3.6,"#F7931E","#FFD23F")}</g>`,
+  muertos:()=>`<g class="a-mece d2"><path d="M-4-11Q30-5 64-11" stroke="#E8DCC4" stroke-width=".5" fill="none"/>${[[-2,"#E2367A"],[10,"#F7931E"],[22,"#2FC4D6"],[34,"#FFD23F"],[46,"#9B5DE5"]].map(([x,c],i)=>`<path transform="translate(${x} ${(-10.4+[0,1.7,2.4,1.9,.6][i]).toFixed(1)})" fill-rule="evenodd" fill="${c}" d="M0 0H10V8L8.3 9.6L6.7 8L5 9.6L3.3 8L1.7 9.6L0 8ZM5 1.6L6.8 4L5 6.4L3.2 4ZM1.2 1.4H2.6V2.8H1.2ZM7.4 1.4H8.8V2.8H7.4Z"/>`).join("")}</g><g transform="translate(53 35) scale(1.2)"><g class="a-flota">${ZSP.cal2}</g></g><g transform="translate(6 41) scale(.8)"><g class="a-mece">${ZSP.cem}</g></g><g transform="translate(14 38) scale(.7)">${ZSP.vel}</g>`,
   navidad:()=>`${AD.cae([6,18,30,42,54],"#FFF")}<g class="a-flota"><g transform="translate(17 -4) rotate(-12 13 6)"><path d="M3 6C5-5 15-11 27-8C22-4 21 1 22 6Z" fill="#D7263D"/><path d="M9 1C13-6 19-9 26-8" stroke="#8E1023" stroke-width="1.1" fill="none" opacity=".55"/><rect x="1" y="4" width="23" height="5" rx="2.5" fill="#F7F7F7"/><circle class="a-brilla" cx="28" cy="-8" r="3.1" fill="#FFF"/></g></g><g class="a-mece"><path d="M53 22L60 32H57L62 40H58L64 47H42L48 40H44L49 32H46Z" fill="#1E8E4E" stroke="#0E5C31" stroke-width=".6"/><rect x="51.5" y="47" width="3" height="3.5" fill="#7A4A1E"/><circle class="a-brilla" cx="50" cy="42" r="1.1" fill="#FF5A5A"/><circle class="a-brilla d2" cx="56" cy="36" r="1.1" fill="#FFD54A"/><circle class="a-brilla d3" cx="57" cy="44" r="1.1" fill="#6EC6FF"/>${AD.estrella(53,19.5,"#FFD54A")}</g>`
 };
 // Figuras que recorren TODA la zona del logo y el nombre (dibujadas en un cuadro de -10 a 10)
+// Degradados compartidos: dan volumen a las figuras
+if(!document.getElementById("zDefs"))document.body.insertAdjacentHTML("afterbegin",`<svg id="zDefs" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<linearGradient id="zOro" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF3B0"/><stop offset=".45" stop-color="#F5C542"/><stop offset="1" stop-color="#A9740F"/></linearGradient>
+<linearGradient id="zOroV" x1="0" x2="1"><stop offset="0" stop-color="#8F6209"/><stop offset=".3" stop-color="#FFE27A"/><stop offset=".55" stop-color="#F2BE3A"/><stop offset="1" stop-color="#8A5C08"/></linearGradient>
+<linearGradient id="zMal" x1="0" x2="1"><stop offset="0" stop-color="#0B5A36"/><stop offset=".45" stop-color="#2FBF78"/><stop offset="1" stop-color="#084A2C"/></linearGradient>
+<radialGradient id="zNar" cx=".38" cy=".3" r=".85"><stop offset="0" stop-color="#FFB14A"/><stop offset=".6" stop-color="#F07B1A"/><stop offset="1" stop-color="#A84507"/></radialGradient>
+<radialGradient id="zHue" cx=".4" cy=".28" r=".9"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".7" stop-color="#F2EBDD"/><stop offset="1" stop-color="#BFB3A0"/></radialGradient>
+<radialGradient id="zBal" cx=".36" cy=".3" r=".8"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".6" stop-color="#EDEDE6"/><stop offset="1" stop-color="#A7A79E"/></radialGradient>
+<linearGradient id="zVer" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#46C97A"/><stop offset="1" stop-color="#14713F"/></linearGradient>
+<linearGradient id="zRoj" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF5A66"/><stop offset="1" stop-color="#A80F2C"/></linearGradient>
+<linearGradient id="zLla" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#FF7A1A"/><stop offset=".6" stop-color="#FFC93C"/><stop offset="1" stop-color="#FFF6C9"/></linearGradient>
+</defs></svg>`);
+// La Copa del Mundo: dos figuras en espiral que sostienen el globo terráqueo, sobre dos anillos verdes (cuadro de -10 a 10)
+const COPA=`<circle cy="-6.4" r="3.6" fill="url(#zOro)"/><path d="M-3.4-7.2C-1.4-6.2 1.4-6.2 3.4-7.2M-3.6-5.6C-1.4-4.6 1.4-4.6 3.6-5.6M-1.4-9.6C-2.4-7.4-2.4-5.2-1.2-3M1.4-9.6C2.4-7.4 2.4-5.2 1.2-3" stroke="#9C6C0C" stroke-width=".4" fill="none"/>
+<path d="M-3-3.4C-3.5-2.1-2.9-1.2-2.3 0C-1.5 1.8-3.2 3.8-2.9 7H2.9C3.2 3.8 1.5 1.8 2.3 0C2.9-1.2 3.5-2.1 3-3.4C1.2-2.5-1.2-2.5-3-3.4Z" fill="url(#zOroV)"/>
+<path d="M-2.6 6.6C-.6 5 1.8 2.6 1.1.2C.7-1.2-.7-2.2-2.7-3M2.6 6.6C.6 5-1.8 2.6-1.1.2C-.7-1.2.7-2.2 2.7-3" stroke="#8A5C08" stroke-width=".5" fill="none"/>
+<rect x="-3.3" y="7" width="6.6" height="1.1" fill="url(#zMal)"/><rect x="-3.6" y="8.1" width="7.2" height=".4" fill="url(#zOroV)"/><rect x="-3.8" y="8.5" width="7.6" height="1.1" fill="url(#zMal)"/><rect x="-4.2" y="9.6" width="8.4" height=".5" rx=".2" fill="url(#zOroV)"/>`;
+const CALAVERA=`<path d="M-8-1.2C-8-7.4-3.8-9.6 0-9.6S8-7.4 8-1.2C8 2 6 3.4 4.8 4.4V8.2C4.8 8.9 4.3 9.3 3.7 9.3H-3.7C-4.3 9.3-4.8 8.9-4.8 8.2V4.4C-6 3.4-8 2-8-1.2Z" fill="url(#zHue)"/>
+<circle cx="-3.5" cy="-1.3" r="2.7" fill="#1E1420"/><circle cx="3.5" cy="-1.3" r="2.7" fill="#1E1420"/>
+${[0,60,120,180,240,300].map(a=>`<circle cx="${(-3.5+Math.cos(a*Math.PI/180)*1.55).toFixed(2)}" cy="${(-1.3+Math.sin(a*Math.PI/180)*1.55).toFixed(2)}" r=".62" fill="#FF8A1F"/><circle cx="${(3.5+Math.cos(a*Math.PI/180)*1.55).toFixed(2)}" cy="${(-1.3+Math.sin(a*Math.PI/180)*1.55).toFixed(2)}" r=".62" fill="#E2367A"/>`).join("")}
+<circle cx="-3.5" cy="-1.3" r=".8" fill="#FFD23F"/><circle cx="3.5" cy="-1.3" r=".8" fill="#2FC4D6"/>
+<path d="M0 1.1C-.9.3-1.7 1-1.2 1.9L0 3.2L1.2 1.9C1.7 1 .9.3 0 1.1Z" fill="#E2264D"/>
+${[-3,-1,1,3].map(x=>`<path d="M${x} 5V8.6" stroke="#2A1D2A" stroke-width=".55"/>`).join("")}<path d="M-4.4 5H4.4" stroke="#2A1D2A" stroke-width=".55"/>
+${[0,72,144,216,288].map(a=>`<ellipse cy="-1.25" rx=".62" ry="1.05" fill="#E2367A" transform="translate(0 -6.3) rotate(${a})"/>`).join("")}<circle cy="-6.3" r=".7" fill="#FFD23F"/>
+<path d="M-6.6-5.6Q-5.4-7.2-4.2-7.6M6.6-5.6Q5.4-7.2 4.2-7.6" stroke="#2FC4D6" stroke-width=".6" fill="none" stroke-linecap="round"/>`;
+const CEMPA=(()=>{const c=(n,r,rx,ry,col)=>Array.from({length:n},(_,i)=>`<ellipse cy="${-r}" rx="${rx}" ry="${ry}" fill="${col}" transform="rotate(${(i*360/n).toFixed(0)})"/>`).join("");return c(14,6.2,1.9,3,"#E8690C")+c(11,4.2,1.7,2.5,"#F7931E")+c(8,2.4,1.3,1.9,"#FFB627")+'<circle r="1.5" fill="#D9570A"/>'})();
 const ZSP={
-  mur:`<path d="M-10 0Q-7-5-4-2.5Q-2.5-5 0-2Q2.5-5 4-2.5Q7-5 10 0Q6-1 5 2Q2.5 0 0 2.5Q-2.5 0-5 2Q-6-1-10 0Z" fill="#2A2238" stroke="#B9A6FF" stroke-width=".8"/>`,
-  cal:`<ellipse rx="8.5" ry="7" cy="1" fill="#F07B1A"/><ellipse rx="4" ry="7" cy="1" fill="#F59331"/><path d="M0-6c0-2 1-3 3-3.6" stroke="#3E7D2E" stroke-width="1.6" fill="none"/><path d="M-4-1l2 2h-3zM4-1l1 2h-3zM-4 4q4 2.5 8 0q-4 1-8 0z" fill="#5A2A00"/>`,
-  copo:`<g stroke="#EAF6FF" stroke-width="1.5" stroke-linecap="round"><path d="M0-9V9M-8-4.5L8 4.5M-8 4.5L8-4.5M-2.5-7L0-4.5L2.5-7M-2.5 7L0 4.5L2.5 7"/></g>`,
-  arb:`<path d="M0-10L6-3H3L8 3H4L9 8H-9L-4 3H-8L-3-3H-6Z" fill="#2E9B57"/><rect x="-1.5" y="8" width="3" height="2" fill="#7A4A21"/><circle cy="-10" r="1.4" fill="#FFD54A"/><circle cx="-3" cy="2" r="1" fill="#E2264D"/><circle cx="3" cy="5" r="1" fill="#FFD54A"/>`,
-  est:`<path d="M0-9l2.6 6.2 6.6.5-5 4.3 1.6 6.5L0 5l-5.8 3.5 1.6-6.5-5-4.3 6.6-.5z" fill="var(--z1)"/>`,
-  cor:`<path d="M0 8C-11 1-10-7-5-7.5C-2.5-8-.8-6 0-4C.8-6 2.5-8 5-7.5C10-7 11 1 0 8Z" fill="var(--z1)"/>`,
-  tre:`<g fill="#2FB04F"><circle cx="0" cy="-4.5" r="4"/><circle cx="-4.2" cy="2" r="4"/><circle cx="4.2" cy="2" r="4"/></g><path d="M0 1Q1 6 3 9" stroke="#1F8A3B" stroke-width="1.5" fill="none"/>`,
-  far:`<line y1="-10" y2="-7" stroke="#FFC93C" stroke-width="1"/><ellipse rx="7" ry="6.5" fill="#D7263D"/><path d="M-3.5-5.5Q-5.5 0-3.5 5.5M3.5-5.5Q5.5 0 3.5 5.5" stroke="#8E1023" fill="none"/><rect x="-3.5" y="-7.5" width="7" height="2" fill="#FFC93C"/><rect x="-3.5" y="5.5" width="7" height="2" fill="#FFC93C"/>`,
-  flo:`${[0,72,144,216,288].map(a=>`<ellipse rx="3.4" ry="5.6" cy="-4.6" fill="var(--z1)" transform="rotate(${a})"/>`).join("")}<circle r="3" fill="var(--z2)"/>`,
-  con:`<rect x="-5" y="-3" width="10" height="6" rx="1" fill="var(--z1)"/>`,
-  con2:`<circle r="4.5" fill="var(--z2)"/>`,
-  hoj:`<path d="M0-9C6-6 7 1 0 8C-7 1-6-6 0-9Z" fill="var(--z1)"/><path d="M0-7V9" stroke="#7A3B10" stroke-width=".8"/>`,
-  luz:`<path d="M0-9C4-4 4 0 0 3C-4 0-4-4 0-9Z" fill="#FFC93C"/><path d="M-7 3H7Q6 9 0 9T-7 3Z" fill="#D9622B"/>`,
-  sol:`<g stroke="#FFB300" stroke-width="1.6" stroke-linecap="round"><path d="M0-9.5V-7M0 7V9.5M-9.5 0H-7M7 0H9.5M-6.8-6.8L-5-5M5 5L6.8 6.8M-6.8 6.8L-5 5M5-5L6.8-6.8"/></g><circle r="5" fill="#FFC928"/>`,
-  ban:`<rect x="-9" y="-6" width="6" height="12" fill="#D91023"/><rect x="-3" y="-6" width="6" height="12" fill="#FFF"/><rect x="3" y="-6" width="6" height="12" fill="#D91023"/>`,
-  cas:`<path d="M-8 4C-8-3-4-7 0-7S8-3 8 4Z" fill="#F2B705"/><rect x="-10" y="4" width="20" height="2.6" rx="1.3" fill="#D99A00"/>`,
-  mar:`<path d="M0 0C-5-7-10-4-8 1C-7 4-3 3 0 0ZM0 0C5-7 10-4 8 1C7 4 3 3 0 0ZM0 1C-4 3-6 7-3 8C-1 8 0 4 0 1ZM0 1C4 3 6 7 3 8C1 8 0 4 0 1Z" fill="var(--z1)"/><path d="M0-3V6" stroke="#333" stroke-width="1.2"/>`,
-  luna:`<path d="M4-8A8.5 8.5 0 1 0 4 8A6.8 6.8 0 1 1 4-8Z" fill="#FFD54A"/>`,
-  cal2:`<path d="M-7-1C-7-7-3-9 0-9S7-7 7-1C7 2 5 3 4 4V7H-4V4C-5 3-7 2-7-1Z" fill="#F4F0E6"/><circle cx="-3" cy="-1.5" r="2.2" fill="#E2264D"/><circle cx="3" cy="-1.5" r="2.2" fill="#2F8FE0"/><path d="M0 1L-1 3H1Z" fill="#222"/>`,
-  pel:`<circle r="9" fill="#F7F7F2" stroke="#222" stroke-width=".7"/><path d="M-3.8-1.3L-2.4 3.3H2.4L3.8-1.3L0-4Z" fill="#222"/><path d="M0-4V-8.6M3.8-1.3L8.2-2.8M-3.8-1.3L-8.2-2.8M2.4 3.3L5 7.2M-2.4 3.3L-5 7.2" stroke="#222" stroke-width=".8"/>`,
-  cop:`<path d="M-5-8H5V-3C5 2 2 4 0 4.5C-2 4-5 2-5-3Z" fill="#FFC93C"/><path d="M-5-7H-8.5C-8.5-2-6-1-4.5-1M5-7H8.5C8.5-2 6-1 4.5-1" stroke="#FFC93C" stroke-width="1.4" fill="none"/><rect x="-1.2" y="4.5" width="2.4" height="3" fill="#E5A800"/><rect x="-4" y="7" width="8" height="2.4" rx=".7" fill="#2F9E5B"/>`,
-  bur:`<circle r="5" fill="none" stroke="#FFE9A8" stroke-width="1.4"/><circle cx="-1.6" cy="-1.6" r="1" fill="#FFF"/>`
+  mur:`<path d="M-10 .5Q-8-5-4.6-3Q-3.2-6-1.3-3.4L-.9-5.4L0-4L.9-5.4L1.3-3.4Q3.2-6 4.6-3Q8-5 10 .5Q6.4-1 5.2 2.2Q2.6.2 0 3.4Q-2.6.2-5.2 2.2Q-6.4-1-10 .5Z" fill="#231A33" stroke="#A98BFF" stroke-width=".55"/><circle cx="-.9" cy="-2.3" r=".42" fill="#FFD23F"/><circle cx=".9" cy="-2.3" r=".42" fill="#FFD23F"/>`,
+  cal:`<ellipse cx="-4.6" cy="1.4" rx="4.4" ry="6.8" fill="url(#zNar)"/><ellipse cx="4.6" cy="1.4" rx="4.4" ry="6.8" fill="url(#zNar)"/><ellipse cy="1.2" rx="4.3" ry="7.4" fill="url(#zNar)"/><path d="M0-6C-.2-8 .8-9.4 2.8-9.8L3.4-8.2C2-7.9 1.5-7 1.6-6Z" fill="#3E7D2E"/><path d="M-5-1L-2.2-.6L-3.6 1.4ZM5-1L2.2-.6L3.6 1.4ZM-5 3.4L-3 4.4L-1.6 3.4L0 4.6L1.6 3.4L3 4.4L5 3.4C4 7 -4 7 -5 3.4Z" fill="#FFE27A"/>`,
+  copo:`<g stroke="#EAF6FF" stroke-width="1.2" stroke-linecap="round" fill="none">${[0,60,120].map(a=>`<g transform="rotate(${a})"><path d="M0-9.2V9.2M-2.4-7L0-4.8L2.4-7M-2.4 7L0 4.8L2.4 7"/></g>`).join("")}</g><circle r="1.1" fill="#FFF"/>`,
+  arb:`<path d="M0-8L5.4-2.4H2.8L6.8 2.2H3.8L8.2 7.2H-8.2L-3.8 2.2H-6.8L-2.8-2.4H-5.4Z" fill="url(#zVer)"/><rect x="-1.5" y="7.2" width="3" height="2.4" rx=".4" fill="#7A4A21"/><path d="M0-10.4l.8 1.8 2 .2-1.5 1.3.5 2-1.8-1-1.8 1 .5-2-1.5-1.3 2-.2z" fill="url(#zOro)"/><circle cx="-2.6" cy="1" r=".95" fill="#FF5A66"/><circle cx="2.4" cy="-1.6" r=".85" fill="#FFD23F"/><circle cx="3.4" cy="4.8" r=".95" fill="#4FB4FF"/><circle cx="-3.8" cy="5" r=".85" fill="#FFD23F"/>`,
+  est:`<path d="M0-9.4l2.7 6.3 6.7.6-5.1 4.4 1.6 6.6L0 5l-5.9 3.5 1.6-6.6-5.1-4.4 6.7-.6z" fill="var(--z1)"/><path d="M0-9.4l2.7 6.3 6.7.6L0 0Z" fill="#FFF" opacity=".28"/>`,
+  cor:`<path d="M0 8.6C-11.5 1.2-10.4-7.4-5.2-7.9C-2.6-8.2-.8-6.2 0-4.2C.8-6.2 2.6-8.2 5.2-7.9C10.4-7.4 11.5 1.2 0 8.6Z" fill="var(--z1)"/><ellipse cx="-4.6" cy="-3.8" rx="2.1" ry="1.3" fill="#FFF" opacity=".5" transform="rotate(-28 -4.6 -3.8)"/>`,
+  tre:`<g fill="url(#zVer)">${[0,120,240].map(a=>`<path transform="rotate(${a})" d="M0-.4C-5-3-5.4-8-2.4-8.4C-1.2-8.6-.3-7.8 0-6.8C.3-7.8 1.2-8.6 2.4-8.4C5.4-8 5-3 0-.4Z"/>`).join("")}</g><path d="M0 0Q1.2 5 3.4 9.4" stroke="#14713F" stroke-width="1.5" fill="none" stroke-linecap="round"/>`,
+  far:`<path d="M0-10.4V-7.6" stroke="#FFC93C" stroke-width=".9"/><ellipse rx="7.6" ry="6.6" fill="url(#zRoj)"/><path d="M-3.6-6Q-6.2 0-3.6 6M0-6.6V6.6M3.6-6Q6.2 0 3.6 6" stroke="#7E0B20" stroke-width=".6" fill="none"/><rect x="-3.8" y="-7.8" width="7.6" height="1.8" rx=".5" fill="url(#zOro)"/><rect x="-3.8" y="6" width="7.6" height="1.8" rx=".5" fill="url(#zOro)"/><path d="M0 7.8V10.6M-1.2 7.8V10M1.2 7.8V10" stroke="#FFC93C" stroke-width=".6"/>`,
+  flo:`${[0,72,144,216,288].map(a=>`<ellipse rx="3.5" ry="5.6" cy="-4.7" fill="var(--z1)" transform="rotate(${a})"/><ellipse rx="1.3" ry="3" cy="-5.2" fill="#FFF" opacity=".28" transform="rotate(${a})"/>`).join("")}<circle r="3" fill="var(--z2)"/>`,
+  con:`<rect x="-5.2" y="-2.8" width="10.4" height="5.6" rx="1" fill="var(--z1)"/><rect x="-5.2" y="-2.8" width="10.4" height="1.7" rx=".8" fill="#FFF" opacity=".3"/>`,
+  con2:`<circle r="4.6" fill="var(--z2)"/><ellipse cx="-1.5" cy="-1.7" rx="1.5" ry="1" fill="#FFF" opacity=".45"/>`,
+  ban:`<path d="M-9.5-5.6Q-5-8 0-5.6T9.5-5.6V5.6Q5 3.2 0 5.6T-9.5 5.6Z" fill="#D91023"/><path d="M-3.2-6.9Q-1.6-6.4 0-5.6T3.2-4.4V6.9Q1.6 6.4 0 5.6T-3.2 4.4Z" fill="#F7F7F2"/>`,
+  cas:`<path d="M-8 3.6C-8-3.4-4-7.2 0-7.2S8-3.4 8 3.6Z" fill="url(#zOro)"/><rect x="-1.5" y="-7.8" width="3" height="9" rx="1.2" fill="#FFE27A"/><rect x="-10" y="3.4" width="20" height="2.8" rx="1.4" fill="#C98A0A"/>`,
+  mar:`<path d="M0 0C-5-7.4-10.4-4-8.2 1C-7 4-3 3 0 0ZM0 0C5-7.4 10.4-4 8.2 1C7 4 3 3 0 0Z" fill="var(--z1)"/><path d="M0 1C-4 3-6.2 7-3.2 8C-1 8.4 0 4 0 1ZM0 1C4 3 6.2 7 3.2 8C1 8.4 0 4 0 1Z" fill="var(--z2)"/><circle cx="-5.4" cy="-1.2" r="1.1" fill="#FFF" opacity=".6"/><circle cx="5.4" cy="-1.2" r="1.1" fill="#FFF" opacity=".6"/><path d="M0-3.6V6" stroke="#2B2230" stroke-width="1.1" stroke-linecap="round"/>`,
+  cal2:CALAVERA, cem:CEMPA,
+  pet:`<path d="M0-8C4.4-5.6 5-.6 0 7.4C-5-.6-4.4-5.6 0-8Z" fill="#F7931E"/><path d="M0-6C1.8-4 2-1 0 4C-1-1-.9-4 0-6Z" fill="#FFC24A"/>`,
+  vel:`<circle cy="-5.4" r="4.2" fill="#FFB547" opacity=".28"/><path d="M0-9.6C2.4-6.6 2.4-4.4 0-2.8C-2.4-4.4-2.4-6.6 0-9.6Z" fill="url(#zLla)"/><rect x="-2.6" y="-2.8" width="5.2" height="12" rx="1" fill="url(#zHue)"/><path d="M-2.6-1.4H2.6" stroke="#E2367A" stroke-width=".8"/><path d="M-2.6 6.6H2.6" stroke="#2FC4D6" stroke-width=".8"/>`,
+  pel:`<circle r="9.2" fill="url(#zBal)"/><path d="M0-4.4L4.2-1.4L2.6 3.6H-2.6L-4.2-1.4Z" fill="#20242A"/><path d="M0-4.4V-8.9M4.2-1.4L8.7-2.8M-4.2-1.4L-8.7-2.8M2.6 3.6L5.4 7.3M-2.6 3.6L-5.4 7.3" stroke="#20242A" stroke-width=".8"/><path d="M-3-8.6L0-8.9L3-8.6L0-6.6ZM8.6-3.2L8.9.4L7.6 3L6.8-.8ZM-8.6-3.2L-8.9.4L-7.6 3L-6.8-.8ZM5-7.4L6.8 7ZM-5.6 7L-2 8.9H2L5.6 7L3 5.6H-3Z" fill="#20242A"/>`,
+  cop:COPA
 };
 // m: "vuela" cruza de lado a lado; "cae" baja; "sube" asciende. z1/z2: colores de la fiesta (también brillan en el nombre)
 const ZON={
@@ -3983,10 +4007,10 @@ const ZON={
   santa:{m:"sube",s:["est"],z1:"#FFE9A8",z2:"#7CCB62"},
   trabajo:{m:"vuela",s:["cas","est"],z1:"#FFD84D",z2:"#FFB300"},madre:{m:"sube",s:["cor","flo"],z1:"#FF8FB1",z2:"#FFE08A"},
   padre:{m:"vuela",s:["est"],z1:"#8FC1FF",z2:"#FFE08A"},
-  mundial:{m:"vuela",s:["pel","cop","pel"],z1:"#FFD54A",z2:"#5FE08A"},patrias:{m:"vuela",s:["ban","est"],z1:"#FF6B7A",z2:"#FFF"},
+  mundial:{m:"vuela",s:["pel","cop","pel"],z1:"#FFD54A",z2:"#3FD98A"},patrias:{m:"vuela",s:["ban","est"],z1:"#FF6B7A",z2:"#FFF"},
   rosa:{m:"cae",s:["flo"],z1:"#FF8FB1",z2:"#FFE08A"},primavera:{m:"vuela",s:["mar","flo"],z1:"#FFB3D1",z2:"#FFE08A"},
   halloween:{m:"vuela",s:["mur","cal"],z1:"#FF9A3C",z2:"#C9B3FF"},
-  muertos:{m:"vuela",s:["cal2","flo","mar"],z1:"#FFA63D",z2:"#FF6BA8"},
+  muertos:{m:"cae",s:["pet","cal2","pet","vel","cem","pet"],z1:"#FFA63D",z2:"#FF5C9E"},
   
   navidad:{m:"cae",s:["copo","est","arb"],z1:"#FF6B6B",z2:"#7FE0A0"}
 };
