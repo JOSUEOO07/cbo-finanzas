@@ -1100,6 +1100,26 @@ h1,h2,h3,.bar h1{font-family:var(--display);letter-spacing:-.02em}
 .adz small{opacity:1;animation-delay:-.5s}
 @keyframes adzColores{from{background-position:200% 0}to{background-position:0 0}}
 @media (prefers-reduced-motion:reduce){.adz b,.adz small{animation:none;background:none;-webkit-text-fill-color:currentColor}.adz-capa{display:none}.adz>:not(.adz-capa){transition:none}}
+
+/* ===== Festividad en la barra de abajo y en el título (v74) ===== */
+.tb-zona{position:absolute!important;inset:0;border-radius:inherit;overflow:hidden;pointer-events:none;z-index:0}
+.tb-zona::before{content:"";display:none;position:absolute;left:0;top:0;width:200%;height:2px;background:linear-gradient(90deg,transparent,var(--z1),var(--z2),var(--z1),transparent,var(--z1),var(--z2),var(--z1),transparent);animation:tbLinea 5s linear infinite}
+.tb-zona::after{content:"";display:none;position:absolute;inset:0;background:linear-gradient(100deg,color-mix(in srgb,var(--z1) 22%,transparent),transparent 45%,color-mix(in srgb,var(--z2) 22%,transparent));animation:tbAura 3.6s ease-in-out infinite alternate}
+body.fiesta .tb-zona::before,body.fiesta .tb-zona::after{display:block}
+body.fiesta #tabbar{border-color:color-mix(in srgb,var(--z1) 55%,transparent)!important}
+@keyframes tbLinea{to{transform:translateX(-50%)}}
+@keyframes tbAura{from{opacity:.45}to{opacity:1}}
+.fi-ic{display:none;line-height:0}
+.fi-ic svg{display:block;overflow:visible}
+body.fiesta .mas-reg .c>svg{display:none}
+body.fiesta .fi-ic{display:block;animation:fiIc 2.2s ease-in-out infinite alternate}
+body.fiesta .mas-reg span.c{background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--z1) 36%,#20242B),#0D0F13 76%)!important;box-shadow:0 10px 24px rgba(0,0,0,.45),0 0 0 2px var(--z1),0 0 18px color-mix(in srgb,var(--z1) 60%,transparent)!important;animation:none!important}
+body.fiesta .mas-reg:active span.c{transform:scale(.92)!important}
+body.fiesta.abanico .mas-reg .c>svg{display:block}
+body.fiesta.abanico .fi-ic{display:none}
+@keyframes fiIc{from{transform:translateY(1.5px) rotate(-5deg)}to{transform:translateY(-1.5px) rotate(5deg)}}
+body.fiesta #titulo{background:linear-gradient(90deg,currentColor 0%,currentColor 12%,var(--z1) 30%,var(--z2) 50%,var(--z1) 70%,currentColor 88%,currentColor 100%);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:adzColores 6s linear infinite}
+@media (prefers-reduced-motion:reduce){.tb-zona::before,.tb-zona::after,body.fiesta .fi-ic{animation:none}body.fiesta #titulo{animation:none;background:none;-webkit-text-fill-color:currentColor}}
 </style>
 </head>
 <body data-barra="d">
@@ -1578,10 +1598,10 @@ h1,h2,h3,.bar h1{font-family:var(--display);letter-spacing:-.02em}
 </div>
 
 <!-- Barra inferior (celular) -->
-<nav class="tabbar" id="tabbar" aria-label="Secciones">
+<nav class="tabbar" id="tabbar" aria-label="Secciones"><span class="tb-zona" id="tbZona" aria-hidden="true"></span>
   <button type="button" data-tab="inicio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span class="lb">Inicio</span></button>
   <button type="button" data-tab="movimientos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span class="lb">Movimientos</span></button>
-  <button type="button" class="mas-reg" id="tabReg" aria-label="Registrar movimiento"><span class="c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><span class="lb">Registrar</span></button>
+  <button type="button" class="mas-reg" id="tabReg" aria-label="Registrar movimiento"><span class="c"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span class="fi-ic" id="fiIcono" aria-hidden="true"></span></span><span class="lb">Registrar</span></button>
   <button type="button" data-tab="sunat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span class="lb">SUNAT</span></button>
   <button type="button" data-tab="mas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg><span class="lb">Más</span></button>
 </nav>
@@ -4003,6 +4023,11 @@ const ZSP={
   vel:`<circle cy="-5.4" r="4.2" fill="#FFB547" opacity=".28"/><path d="M0-9.6C2.4-6.6 2.4-4.4 0-2.8C-2.4-4.4-2.4-6.6 0-9.6Z" fill="url(#zLla)"/><rect x="-2.6" y="-2.8" width="5.2" height="12" rx="1" fill="url(#zHue)"/><path d="M-2.6-1.4H2.6" stroke="#E2367A" stroke-width=".8"/><path d="M-2.6 6.6H2.6" stroke="#2FC4D6" stroke-width=".8"/>`,
   pel:`<circle r="9.2" fill="url(#zBal)"/><path d="M0-4.4L4.2-1.4L2.6 3.6H-2.6L-4.2-1.4Z" fill="#20242A"/><path d="M0-4.4V-8.9M4.2-1.4L8.7-2.8M-4.2-1.4L-8.7-2.8M2.6 3.6L5.4 7.3M-2.6 3.6L-5.4 7.3" stroke="#20242A" stroke-width=".8"/><path d="M-3-8.6L0-8.9L3-8.6L0-6.6ZM8.6-3.2L8.9.4L7.6 3L6.8-.8ZM-8.6-3.2L-8.9.4L-7.6 3L-6.8-.8ZM5-7.4L6.8 7ZM-5.6 7L-2 8.9H2L5.6 7L3 5.6H-3Z" fill="#20242A"/>`,
   cop:COPA,
+  tor:TORTA,
+  masc:`<path d="M-9-4C-6-6-3-5 0-3.4C3-5 6-6 9-4C9.5 1 7 5 4 5.4C2.5 5.6 1 4 0 2.6C-1 4-2.5 5.6-4 5.4C-7 5-9.5 1-9-4Z" fill="var(--z1)"/><ellipse cx="-4.2" cy="-.6" rx="2" ry="1.4" fill="#141414"/><ellipse cx="4.2" cy="-.6" rx="2" ry="1.4" fill="#141414"/><path d="M-6-5.4Q-8-9-5-9.6M6-5.4Q8-9 5-9.6M0-3.4V-8" stroke="var(--z2)" stroke-width="1.2" fill="none" stroke-linecap="round"/>`,
+  cruzS:`<path d="M-1.6-9.6H1.6V-4.4H6.4V-1.2H1.6V9.6H-1.6V-1.2H-6.4V-4.4H-1.6Z" fill="url(#zOro)"/>`,
+  cbt:`<path d="M-3-9.4H3L1.8-5.6H-1.8Z" fill="#1E4E8C"/><path d="M-1.8-5.6H1.8L4.4 5L0 9.6L-4.4 5Z" fill="#2F6FBF"/><path d="M-2.2-2L2.4.8M-3 1.6L3 5" stroke="#BFD7FF" stroke-width=".9"/>`,
+  esc:`<path d="M-3 5L-5.4 10.4L-2.4 9L-.6 10.6L1 5ZM3 5L5.4 10.4L2.4 9L.6 10.6L-1 5Z" fill="#D91023"/><circle cy="-1" r="7.6" fill="#D91023"/><circle cy="-1" r="6" fill="none" stroke="#fff" stroke-width="1.6" stroke-dasharray="1.6 1.2"/><circle cy="-1" r="3.2" fill="#fff"/><circle cy="-1" r="1.5" fill="#D91023"/>`,
   glo:GLOBO("var(--z1)"),glo2:GLOBO("var(--z2)"),
   ser:`<path d="M-9-6Q-5-10-3-5T3-3T9 2T4 8" stroke="var(--z2)" stroke-width="1.7" fill="none" stroke-linecap="round"/>`
 };
@@ -4060,13 +4085,23 @@ function zEstallar(z,x,y){
     an.onfinish=()=>e.remove()}
 }
 let adorVista="";
+// Ícono que reemplaza a la + de la barra durante cada fiesta
+const FI_IC={anio:"est",chino:"far",valentin:"cor",carnaval:"masc",patricio:"tre",santa:"cruzS",trabajo:"cas",madre:"flo",cumple:"tor",padre:"cbt",mundial:"cop",patrias:"esc",rosa:"flo",primavera:"mar",halloween:"cal",muertos:"cal2",navidad:"arb"};
+function pintarFiestaBarra(k){
+  const b=document.body,c=k&&ZON[k];
+  b.classList.toggle("fiesta",!!c);
+  if(c){b.style.setProperty("--z1",c.z1);b.style.setProperty("--z2",c.z2)}else{b.style.removeProperty("--z1");b.style.removeProperty("--z2")}
+  const i=$("fiIcono");if(i)i.innerHTML=c?zSvg(FI_IC[k]||c.s[0],38):"";
+}
 const adorNombreMes=f=>{const m=MESES[f[2]-1];return m.charAt(0).toUpperCase()+m.slice(1)};
+(function(){const tb=$("tabbar"),zo=$("tbZona");if(tb&&zo)tb.addEventListener("pointerdown",e=>{if(zo.dataset.zk)zEstallar(zo,e.clientX,e.clientY)})})();
 function adorResumen(){if(ajustes.adornos===0)return "Desactivados";const f=adorHoy();return "Activados"+(f?" · "+f[1]:"")}
 function pintarAdornos(){
   const on=ajustes.adornos!==0, f=on?(adorVista?ADOR_F.find(x=>x[0]===adorVista):adorHoy()):null, k=f?f[0]:"";
   document.querySelectorAll(".adw").forEach(w=>{const a=w.querySelector(".adorno");if(!a||a.dataset.k===k)return;a.dataset.k=k;
     a.innerHTML=k?`<svg viewBox="0 0 60 48" aria-hidden="true" focusable="false">${ADOR_ART[k]()}</svg>`:"";w.title=f?f[1]:""});
-  document.querySelectorAll("#side .marca,#logoH,#adorPrev").forEach(z=>zPintar(z,matchMedia("(prefers-reduced-motion: reduce)").matches?"":k));
+  document.querySelectorAll("#side .marca,#logoH,#adorPrev,#tbZona").forEach(z=>zPintar(z,matchMedia("(prefers-reduced-motion: reduce)").matches?"":k));
+  pintarFiestaBarra(k);
   document.querySelectorAll("#adorSeg [data-ador]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.ador===(on?1:0))));
   const s=$("adorVer"); if(s){s.disabled=!on;s.value=adorVista}
   const v=$("cfgv-ador"); if(v) v.textContent=adorResumen();

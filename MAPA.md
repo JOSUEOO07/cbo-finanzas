@@ -1,5 +1,5 @@
 # Mapa de CBO Finanzas
-Actualizado: 05/11/2026 · caché: cbo-finanzas-v73-cumple
+Actualizado: 05/11/2026 · caché: cbo-finanzas-v74-barra-fiesta
 
 ## Archivos
 - codigo-fuente.html: versión editable (4287 líneas). index.html es la copia que se publica: editar codigo-fuente.html y copiarlo a index.html.
@@ -75,3 +75,4 @@ Actualizado: 05/11/2026 · caché: cbo-finanzas-v73-cumple
 - Adornos, movimiento: capas separadas (avance adz-f, balanceo adz-o, aleteo adz-aleta), tres profundidades, solo transform y opacity. Al volar van por los bordes para no tapar el nombre. Los colores de la fiesta pasan de corrido por las letras del nombre (adzColores). Toque: onda y 8 figuras con gravedad (zEstallar). Con mouse: seguimiento suave.
 - Adornos, dibujos: figuras con volumen (degradados en #zDefs). Mundial con la Copa del Mundo dibujada (COPA). Día de Muertos con papel picado, calavera de azúcar, cempasúchil, pétalos y velas.
 - Adorno de cumpleaños de Josué: solo el 14 de junio y solo con el usuario JOSUÉ VILLAR. El Mundial va del 15 de junio al 14 de julio.
+- Festividad en la barra de abajo (celular): capa #tbZona con figuras y línea de luz, la + cambia por el ícono de la fiesta (FI_IC, pintarFiestaBarra) y #titulo toma los colores de la fiesta en todas las secciones.
