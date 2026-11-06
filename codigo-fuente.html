@@ -3901,6 +3901,7 @@ const ADOR_F=[
   ["trabajo","Día del Trabajo",5,y=>new Date(y,4,1),0],
   ["madre","Día de la Madre",5,y=>adDomingo(y,4,2),0],
   ["padre","Día del Padre",6,y=>adDomingo(y,5,3),0],
+  ["mundial","Mundial de Fútbol (cada 4 años)",6,y=>y%4===2?new Date(y,6,14):new Date(1970,0,1),0,30],
   ["patrias","Fiestas Patrias",7,y=>new Date(y,6,28),1],
   ["rosa","Santa Rosa de Lima",8,y=>new Date(y,7,30),0],
   ["primavera","Día de la Primavera",9,y=>new Date(y,8,23),0],
@@ -3910,7 +3911,7 @@ const ADOR_F=[
   ["navidad","Navidad",12,y=>new Date(y,11,25),0]
 ];
 function adorHoy(h){h=h||new Date();const t=new Date(h.getFullYear(),h.getMonth(),h.getDate());let mejor=null,dm=99;
-  for(const y of [t.getFullYear(),t.getFullYear()+1])for(const f of ADOR_F){const dias=Math.round((f[3](y)-t)/864e5);if(dias<=7&&dias>=-f[4]&&Math.abs(dias)<dm){dm=Math.abs(dias);mejor=f}}
+  for(const y of [t.getFullYear(),t.getFullYear()+1])for(const f of ADOR_F){const dias=Math.round((f[3](y)-t)/864e5);if(f[5]){if(dias>=0&&dias<=f[5])return f;continue}if(dias<=7&&dias>=-f[4]&&Math.abs(dias)<dm){dm=Math.abs(dias);mejor=f}}
   return mejor}
 const AD={
   cae:(xs,c,r)=>xs.map((x,i)=>`<circle class="a-cae" style="animation-delay:${(i*.85).toFixed(2)}s;animation-duration:${(3.2+i%3*.7).toFixed(1)}s" cx="${x}" cy="0" r="${r||1.3}" fill="${Array.isArray(c)?c[i%c.length]:c}"/>`).join(""),
@@ -3932,6 +3933,7 @@ const ADOR_ART={
   trabajo:()=>`<g class="a-flota"><g transform="translate(8 -10)"><path d="M2 14C2 4 9-1 16-1S30 4 30 14Z" fill="#F2B705"/><rect x="-1" y="13" width="34" height="3.6" rx="1.8" fill="#D99A00"/><rect x="14" y="-1.6" width="4" height="12" rx="2" fill="#FFD84D"/></g></g><g transform="translate(54 33)"><g class="a-martillo"><rect x="-1.2" y="0" width="2.4" height="13" rx="1" fill="#A86B32"/><rect x="-5" y="-3" width="10" height="4" rx="1" fill="#9AA5B1"/></g></g>`,
   madre:()=>`<g class="a-mece">${AD.flor(53,41,4,"#FF6B9A","#FFE08A")}${AD.flor(46,45,3.2,"#FFB3C7","#FFF")}${AD.flor(59,45,3,"#E2445C","#FFE08A")}</g>${AD.sube(49,31,"#FF6B9A",0)}${AD.sube(56,29,"#FF9EBB",1.2)}${AD.sube(52,33,"#E2445C",2.1)}`,
   padre:()=>`<g transform="translate(54 29)"><g class="a-pendulo"><path d="M-2.5 0h5l-1 3h-3z" fill="#1E4E8C"/><path d="M-1.5 3h3l2.5 11-4 4-4-4z" fill="#2F6FBF"/><path d="M-1 6l3 2M-1.6 9.5l3.6 2.4M-2 13l3.5 2.3" stroke="#BFD7FF" stroke-width=".7"/></g></g>${AD.estrella(6,-4,"#FFD54A")}${AD.estrella(16,-8,"#FFF","d2")}`,
+  mundial:()=>`<g transform="translate(52 40)"><g class="a-flota"><circle r="7.5" fill="#F7F7F2" stroke="#222" stroke-width=".6"/><path d="M-3.2-1.1L-2 2.8H2L3.2-1.1L0-3.4Z" fill="#222"/><path d="M0-3.4V-7.3M3.2-1.1L6.9-2.3M-3.2-1.1L-6.9-2.3M2 2.8L4.3 6M-2 2.8L-4.3 6" stroke="#222" stroke-width=".7"/></g></g><g transform="translate(8 -9)"><g class="a-mece"><path d="M-5 0H5V3C5 7 2 9 0 9.5C-2 9-5 7-5 3Z" fill="#FFC93C"/><path d="M-5 1H-8C-8 5-6 6-4.4 6M5 1H8C8 5 6 6 4.4 6" stroke="#FFC93C" stroke-width="1.2" fill="none"/><rect x="-1" y="9.5" width="2" height="3" fill="#E5A800"/><rect x="-3.5" y="12" width="7" height="2" rx=".6" fill="#2F9E5B"/></g></g>${AD.estrella(30,-8,"#FFD54A")}`,
   patrias:()=>`<line x1="3" y1="10" x2="3" y2="-16" stroke="#E6E6E6" stroke-width="1.2" stroke-linecap="round"/><circle cx="3" cy="-16.6" r="1.3" fill="#FFD54A"/><g transform="translate(3.6 -15.5)"><g class="a-ondea"><rect width="7" height="12" fill="#D91023"/><rect x="7" width="7" height="12" fill="#FFF"/><rect x="14" width="7" height="12" fill="#D91023"/></g></g><g transform="translate(55 40)"><path d="M-2 4l-2.4 7 2.8-1.6L0 11zM2 4l2.4 7-2.8-1.6L0 11z" fill="#D91023"/><g class="a-gira"><circle r="5.6" fill="#D91023"/><circle r="4.6" fill="none" stroke="#FFF" stroke-width="1.4" stroke-dasharray="1.2 1.2"/><circle r="2.2" fill="#FFF"/><circle r="1.1" fill="#D91023"/></g></g>`,
   rosa:()=>`<g class="a-mece">${AD.rosa(52,41,3.6)}${AD.rosa(58,45,2.8)}</g>${AD.cae([8,20,32,44],["#FF8FB1","#E23D6B"],1.1)}`,
   primavera:()=>`<g class="a-mece">${AD.flor(4,44,3.4,"#FFD23F","#F28C28")}</g><g class="a-mece d2">${AD.flor(56,43,3.6,"#FF8FB1","#FFE08A")}</g><g transform="translate(12 -6)"><g class="a-mariposa"><g class="a-aleteo"><path d="M0 0C-4-5-8-3-6 1C-5 3-2 2 0 0ZM0 0C4-5 8-3 6 1C5 3 2 2 0 0Z" fill="#7FD3FF"/><path d="M0 0C-3 2-5 5-2 5C-1 5 0 3 0 0ZM0 0C3 2 5 5 2 5C1 5 0 3 0 0Z" fill="#B39DFF"/></g><rect x="-.5" y="-2" width="1" height="6" rx=".5" fill="#2B2B2B"/></g></g>`,
@@ -3965,6 +3967,8 @@ const ZSP={
   mar:`<path d="M0 0C-5-7-10-4-8 1C-7 4-3 3 0 0ZM0 0C5-7 10-4 8 1C7 4 3 3 0 0ZM0 1C-4 3-6 7-3 8C-1 8 0 4 0 1ZM0 1C4 3 6 7 3 8C1 8 0 4 0 1Z" fill="var(--z1)"/><path d="M0-3V6" stroke="#333" stroke-width="1.2"/>`,
   luna:`<path d="M4-8A8.5 8.5 0 1 0 4 8A6.8 6.8 0 1 1 4-8Z" fill="#FFD54A"/>`,
   cal2:`<path d="M-7-1C-7-7-3-9 0-9S7-7 7-1C7 2 5 3 4 4V7H-4V4C-5 3-7 2-7-1Z" fill="#F4F0E6"/><circle cx="-3" cy="-1.5" r="2.2" fill="#E2264D"/><circle cx="3" cy="-1.5" r="2.2" fill="#2F8FE0"/><path d="M0 1L-1 3H1Z" fill="#222"/>`,
+  pel:`<circle r="9" fill="#F7F7F2" stroke="#222" stroke-width=".7"/><path d="M-3.8-1.3L-2.4 3.3H2.4L3.8-1.3L0-4Z" fill="#222"/><path d="M0-4V-8.6M3.8-1.3L8.2-2.8M-3.8-1.3L-8.2-2.8M2.4 3.3L5 7.2M-2.4 3.3L-5 7.2" stroke="#222" stroke-width=".8"/>`,
+  cop:`<path d="M-5-8H5V-3C5 2 2 4 0 4.5C-2 4-5 2-5-3Z" fill="#FFC93C"/><path d="M-5-7H-8.5C-8.5-2-6-1-4.5-1M5-7H8.5C8.5-2 6-1 4.5-1" stroke="#FFC93C" stroke-width="1.4" fill="none"/><rect x="-1.2" y="4.5" width="2.4" height="3" fill="#E5A800"/><rect x="-4" y="7" width="8" height="2.4" rx=".7" fill="#2F9E5B"/>`,
   bur:`<circle r="5" fill="none" stroke="#FFE9A8" stroke-width="1.4"/><circle cx="-1.6" cy="-1.6" r="1" fill="#FFF"/>`
 };
 // m: "vuela" cruza de lado a lado; "cae" baja; "sube" asciende. z1/z2: colores de la fiesta (también brillan en el nombre)
@@ -3976,7 +3980,7 @@ const ZON={
   santa:{m:"sube",s:["est"],z1:"#FFE9A8",z2:"#7CCB62"},
   trabajo:{m:"vuela",s:["cas","est"],z1:"#FFD84D",z2:"#FFB300"},madre:{m:"sube",s:["cor","flo"],z1:"#FF8FB1",z2:"#FFE08A"},
   padre:{m:"vuela",s:["est"],z1:"#8FC1FF",z2:"#FFE08A"},
-  patrias:{m:"vuela",s:["ban","est"],z1:"#FF6B7A",z2:"#FFF"},
+  mundial:{m:"vuela",s:["pel","cop","pel"],z1:"#FFD54A",z2:"#5FE08A"},patrias:{m:"vuela",s:["ban","est"],z1:"#FF6B7A",z2:"#FFF"},
   rosa:{m:"cae",s:["flo"],z1:"#FF8FB1",z2:"#FFE08A"},primavera:{m:"vuela",s:["mar","flo"],z1:"#FFB3D1",z2:"#FFE08A"},
   halloween:{m:"vuela",s:["mur","cal"],z1:"#FF9A3C",z2:"#C9B3FF"},
   muertos:{m:"vuela",s:["cal2","flo","mar"],z1:"#FFA63D",z2:"#FF6BA8"},
