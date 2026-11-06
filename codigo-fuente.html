@@ -1045,15 +1045,15 @@ h1,h2,h3,.bar h1{font-family:var(--display);letter-spacing:-.02em}
 .adorno .a-mece{transform-box:fill-box;transform-origin:50% 100%;animation:adMece 3.4s ease-in-out infinite}
 .adorno .a-pendulo{transform-box:fill-box;transform-origin:50% 0;animation:adMece 2.6s ease-in-out infinite}
 @keyframes adMece{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
-.adorno .a-brilla{transform-box:fill-box;transform-origin:center;animation:adBrilla 1.8s ease-in-out infinite}
-@keyframes adBrilla{0%,100%{opacity:.45;transform:scale(.85)}50%{opacity:1;transform:scale(1.15)}}
+.adorno .a-brilla{transform-box:fill-box;transform-origin:center;animation:adBrilla 2.6s ease-in-out infinite}
+@keyframes adBrilla{0%,100%{opacity:.5;transform:scale(.92)}50%{opacity:1;transform:scale(1.06)}}
 .adorno .a-gira{transform-box:fill-box;transform-origin:center;animation:adGira 16s linear infinite}
 @keyframes adGira{to{transform:rotate(360deg)}}
-.adorno .a-estalla{transform-box:fill-box;transform-origin:center;animation:adEstalla 2.4s ease-out infinite}
-@keyframes adEstalla{0%{transform:scale(.15);opacity:0}15%{opacity:1}70%{opacity:.9}100%{transform:scale(1.15);opacity:0}}
+.adorno .a-estalla{transform-box:fill-box;transform-origin:center;animation:adEstalla 2.8s cubic-bezier(.23,1,.32,1) infinite}
+@keyframes adEstalla{0%{transform:scale(.5);opacity:0}15%{opacity:1}70%{opacity:.9}100%{transform:scale(1.15);opacity:0}}
 .adorno .a-serp{stroke-dasharray:7 4;animation:adSerp 2.2s linear infinite}
 @keyframes adSerp{to{stroke-dashoffset:-22}}
-.adorno .a-sube{animation:adSube 3s ease-in infinite}
+.adorno .a-sube{animation:adSube 3.4s cubic-bezier(.23,1,.32,1) infinite}
 @keyframes adSube{0%{transform:translateY(4px);opacity:0}25%{opacity:1}100%{transform:translateY(-20px);opacity:0}}
 .adorno .a-martillo{transform-box:fill-box;transform-origin:50% 100%;animation:adMartillo 1.6s ease-in-out infinite}
 @keyframes adMartillo{0%,60%,100%{transform:rotate(18deg)}75%{transform:rotate(-28deg)}85%{transform:rotate(22deg)}}
@@ -1061,7 +1061,7 @@ h1,h2,h3,.bar h1{font-family:var(--display);letter-spacing:-.02em}
 @keyframes adOndea{0%,100%{transform:skewY(0) scaleX(1)}50%{transform:skewY(-8deg) scaleX(.93)}}
 .adorno .a-vuela{animation:adVuela 7s ease-in-out infinite}
 @keyframes adVuela{0%,100%{transform:translate(0,0)}25%{transform:translate(16px,-5px)}50%{transform:translate(30px,2px)}75%{transform:translate(12px,6px)}}
-.adorno .a-ala{transform-box:fill-box;transform-origin:center;animation:adAla .35s ease-in-out infinite alternate}
+.adorno .a-ala{transform-box:fill-box;transform-origin:center;animation:adAla .46s ease-in-out infinite alternate}
 @keyframes adAla{to{transform:scaleY(.35)}}
 .adorno .a-aleteo{transform-box:fill-box;transform-origin:center;animation:adAleteo .3s ease-in-out infinite alternate}
 @keyframes adAleteo{to{transform:scaleX(.3)}}
@@ -1070,28 +1070,35 @@ h1,h2,h3,.bar h1{font-family:var(--display);letter-spacing:-.02em}
 .adorno .a-llama{transform-box:fill-box;transform-origin:50% 100%;animation:adLlama .9s ease-in-out infinite alternate}
 @keyframes adLlama{0%{transform:scale(.9,.85);opacity:.85}100%{transform:scale(1.05,1.12);opacity:1}}
 .adorno .d2{animation-delay:-.8s}.adorno .d3{animation-delay:-1.6s}
-.adw.salta .adorno{animation:adSalta .6s cubic-bezier(.34,1.56,.64,1)}
-@keyframes adSalta{0%,100%{transform:none;filter:none}35%{transform:translateY(-5px) scale(1.06);filter:brightness(1.35) drop-shadow(0 0 5px rgba(255,230,150,.75))}}
+.adw.salta .adorno{animation:adSalta .34s cubic-bezier(.23,1,.32,1)}
+@keyframes adSalta{0%,100%{transform:none}40%{transform:translateY(-2px) scale(1.03)}}
 .ador-prev{display:flex;align-items:center;gap:10px;padding:16px 14px 12px;border-radius:14px;background:var(--brand);color:var(--brand-ink)}
 .ador-prev img{width:52px;display:block}.ador-prev b{display:block;font-family:var(--display);font-size:1rem;line-height:1.15}.ador-prev small{opacity:.75;font-size:.75rem}
 @media (prefers-reduced-motion:reduce){.adorno *,.adw.salta .adorno{animation:none!important}}
-/* Toda la zona del logo y el nombre: figuras que la recorren, nombre con brillo de la fiesta y reacción al tocar */
-.adz{position:relative;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}
-.adz-capa{position:absolute;inset:-4px -2px;pointer-events:none;z-index:3;overflow:visible}
-.adz-f{position:absolute;left:var(--x);top:var(--y);line-height:0;opacity:.95;filter:drop-shadow(0 1px 2px rgba(0,0,0,.45))}
-.adz-chispa{position:absolute;line-height:0;pointer-events:none}
-.adz-vuela{left:0;animation:adzVuela 12s linear infinite}
-@keyframes adzVuela{0%{left:-6%;transform:translateY(0);opacity:0}6%{opacity:.95}25%{transform:translateY(-7px)}50%{transform:translateY(5px)}75%{transform:translateY(-5px)}94%{opacity:.95}100%{left:100%;transform:translateY(0);opacity:0}}
-.adz-cae{top:0;animation:adzCae 4s linear infinite}
-@keyframes adzCae{0%{top:-8%;transform:rotate(0);opacity:0}12%{opacity:.95}85%{opacity:.8}100%{top:100%;transform:rotate(200deg);opacity:0}}
-.adz-sube{top:auto;bottom:0;animation:adzSube 4.4s ease-in infinite}
-@keyframes adzSube{0%{bottom:-4%;transform:translateX(0) scale(.7);opacity:0}15%{opacity:.95}50%{transform:translateX(5px) scale(1)}100%{bottom:100%;transform:translateX(-4px) scale(.9);opacity:0}}
-.adz b{background:linear-gradient(100deg,currentColor 0%,currentColor 34%,var(--z1) 46%,var(--z2) 54%,currentColor 66%,currentColor 100%);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:adzBrillo 5s linear infinite}
-@keyframes adzBrillo{from{background-position:100% 0}to{background-position:-50% 0}}
-.adz.adz-salta b{animation:adzSalta .6s cubic-bezier(.34,1.56,.64,1),adzBrillo 5s linear infinite;display:block}
-.adz.adz-salta small{animation:adzSalta .6s .05s cubic-bezier(.34,1.56,.64,1);display:block}
-@keyframes adzSalta{0%,100%{transform:none}40%{transform:translateY(-4px) scale(1.03)}}
-@media (prefers-reduced-motion:reduce){.adz b{animation:none;background:none;-webkit-text-fill-color:currentColor}.adz-capa{display:none}}
+/* Toda la zona del logo y el nombre. Movimiento por capas (avance, balanceo, aleteo) con duraciones distintas para que nunca se repita igual.
+   Solo transform y opacity. Las figuras viajan por los bordes de la zona para no tapar el nombre. */
+.adz{--zo:cubic-bezier(.23,1,.32,1);--zio:cubic-bezier(.77,0,.175,1);position:relative;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+.adz>:not(.adz-capa){transition:transform .14s var(--zo)}
+.adz:active>:not(.adz-capa){transform:scale(.98)}
+.adz-capa{position:absolute;inset:-6px -4px;pointer-events:none;z-index:3;container-type:size;transition:transform .6s var(--zo)}
+.adz-f{position:absolute;left:0;top:0;line-height:0;will-change:transform,opacity;animation-iteration-count:infinite;animation-duration:var(--d);animation-delay:var(--r)}
+.adz-o{display:block;line-height:0;animation:adzBalanceo var(--od) ease-in-out infinite alternate}
+.adz-o svg{display:block;overflow:visible}
+.adz-aleta{transform-box:fill-box;transform-origin:center;animation:adzAleta .46s ease-in-out infinite alternate}
+@keyframes adzBalanceo{from{transform:translate(calc(var(--ox)*-1),calc(var(--oy)*-1)) rotate(calc(var(--or)*-1))}to{transform:translate(var(--ox),var(--oy)) rotate(var(--or))}}
+@keyframes adzAleta{from{transform:scaleY(1)}to{transform:scaleY(.52)}}
+.adz-vuela{animation-name:adzVuela;animation-timing-function:linear}
+@keyframes adzVuela{0%{transform:translate(-18px,var(--y));opacity:0}7%{opacity:var(--op)}93%{opacity:var(--op)}100%{transform:translate(calc(100cqw + 2px),var(--y));opacity:0}}
+.adz-cae{animation-name:adzCae;animation-timing-function:linear}
+@keyframes adzCae{0%{transform:translate(var(--x),-14px);opacity:0}14%{opacity:var(--op)}82%{opacity:var(--op)}100%{transform:translate(var(--x),100cqh);opacity:0}}
+.adz-sube{animation-name:adzSube;animation-timing-function:var(--zo)}
+@keyframes adzSube{0%{transform:translate(var(--x),100cqh);opacity:0}18%{opacity:var(--op)}65%{opacity:var(--op)}100%{transform:translate(var(--x),-12px);opacity:0}}
+.adz-chispa,.adz-onda{position:absolute;left:0;top:0;line-height:0;pointer-events:none;will-change:transform,opacity}
+.adz-onda{width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;border:1.5px solid var(--z1)}
+/* El nombre: un destello que pasa cada 9 segundos y descansa */
+.adz b{background:linear-gradient(100deg,currentColor 0%,currentColor 34%,var(--z1) 46%,var(--z2) 54%,currentColor 66%,currentColor 100%);background-size:300% 100%;background-position:100% 0;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:adzBrillo 9s var(--zio) infinite}
+@keyframes adzBrillo{0%{background-position:100% 0}18%,100%{background-position:-50% 0}}
+@media (prefers-reduced-motion:reduce){.adz b{animation:none;background:none;-webkit-text-fill-color:currentColor}.adz-capa{display:none}.adz>:not(.adz-capa){transition:none}}
 </style>
 </head>
 <body data-barra="d">
@@ -3990,18 +3997,34 @@ function zPintar(z,k){
   if(z.dataset.zk===k&&cap)return;
   const c=ZON[k];z.dataset.zk=k;z.classList.add("adz");z.style.setProperty("--z1",c.z1);z.style.setProperty("--z2",c.z2);
   if(!cap){cap=document.createElement("span");cap.className="adz-capa";cap.setAttribute("aria-hidden","true");z.append(cap)}
-  const n=c.m==="vuela"?4:7;
-  cap.innerHTML=Array.from({length:n},(_,i)=>{const sp=c.s[i%c.s.length],dur=c.m==="vuela"?9+i*2.3:3.6+(i%4)*.8,tam=c.m==="vuela"?14+(i%3)*3:9+(i%3)*3;
-    return `<span class="adz-f adz-${c.m}" style="--x:${(6+i*(88/Math.max(1,n-1))).toFixed(0)}%;--y:${(12+(i*29)%70)}%;animation-duration:${dur.toFixed(1)}s;animation-delay:${(-i*dur/n).toFixed(1)}s">${zSvg(sp,tam)}</span>`}).join("");
+  // Tres profundidades: lejos (chica, tenue, lenta) y cerca (grande, nítida, más rápida)
+  const P=[[.62,.5,1.3],[.82,.72,1.08],[1,.95,.9]], vuela=c.m==="vuela", n=vuela?3:6;
+  cap.innerHTML=Array.from({length:n},(_,i)=>{
+    const sp=c.s[i%c.s.length],[e,op,v]=P[i%3],tam=Math.round((vuela?17:13)*e);
+    const base=vuela?15+i*5:c.m==="cae"?5.4:6.2, d=(base*v).toFixed(1), r=(-(i*base*v)/n-(i%2)*1.3).toFixed(1);
+    // Volando: por el borde de arriba o de abajo, no por encima del nombre
+    const y=vuela?(i%2?"calc(100cqh - 15px)":"-2px"):"0px", x=`${(5+((i*37)%90))}cqw`;
+    const ox=vuela?0:3+i%3, oy=vuela?2.5+i%2:0, or=vuela?5:12+i*3, od=(vuela?2.3+i*.47:1.5+i*.31).toFixed(2);
+    const ale=sp==="mur"||sp==="mar";
+    return `<span class="adz-f adz-${c.m}" style="--d:${d}s;--r:${r}s;--op:${op};--y:${y};--x:${x}"><span class="adz-o" style="--ox:${ox}px;--oy:${oy}px;--or:${or}deg;--od:${od}s">${zSvg(sp,tam).replace("<svg ",ale?'<svg class="adz-aleta" ':"<svg ")}</span></span>`}).join("");
+  if(cap.animate)cap.animate([{opacity:0},{opacity:1}],{duration:320,easing:"cubic-bezier(.23,1,.32,1)"});
 }
-// Tocar o pasar por cualquier parte de la zona: salen figuras desde ese punto
-function zEstallar(z,x,y,cant){
-  const k=z.dataset.zk,c=ZON[k],cap=z.querySelector(":scope > .adz-capa");if(!c||!cap||!cap.animate)return;
-  const r=z.getBoundingClientRect(),px=x==null?r.width/2:x-r.left,py=y==null?r.height/2:y-r.top;
-  for(let i=0;i<cant;i++){const e=document.createElement("span");e.className="adz-chispa";e.innerHTML=zSvg(c.s[i%c.s.length],10+Math.round(Math.random()*8));e.style.left=px+"px";e.style.top=py+"px";cap.append(e);
-    const a=Math.random()*Math.PI*2,d=26+Math.random()*44;
-    e.animate([{transform:"translate(-50%,-50%) scale(.3)",opacity:1},{transform:`translate(calc(-50% + ${(Math.cos(a)*d).toFixed(0)}px),calc(-50% + ${(Math.sin(a)*d+14).toFixed(0)}px)) scale(1) rotate(${Math.round(Math.random()*360-180)}deg)`,opacity:0}],{duration:800+Math.random()*500,easing:"cubic-bezier(.16,1,.3,1)"}).onfinish=()=>e.remove()}
-  z.classList.remove("adz-salta");void z.offsetWidth;z.classList.add("adz-salta");clearTimeout(z._zt);z._zt=setTimeout(()=>z.classList.remove("adz-salta"),700);
+// Tocar cualquier parte de la zona: una onda y figuras que salen, frenan y caen con gravedad
+function zEstallar(z,x,y){
+  const c=ZON[z.dataset.zk],cap=z.querySelector(":scope > .adz-capa");if(!c||!cap||!cap.animate)return;
+  if(cap.querySelectorAll(".adz-chispa").length>16)return;
+  const r=cap.getBoundingClientRect(),px=x-r.left,py=y-r.top,zo="cubic-bezier(.23,1,.32,1)",lleva=e=>{cap.append(e);return e};
+  const on=lleva(Object.assign(document.createElement("span"),{className:"adz-onda"}));
+  on.animate([{transform:`translate(${px}px,${py}px) scale(.5)`,opacity:.75},{transform:`translate(${px}px,${py}px) scale(2.3)`,opacity:0}],{duration:460,easing:zo}).onfinish=()=>on.remove();
+  const n=8,giro=Math.random()*6.28;
+  for(let i=0;i<n;i++){const e=document.createElement("span");e.className="adz-chispa";e.innerHTML=zSvg(c.s[i%c.s.length],9+(i%3)*3);lleva(e);
+    const a=giro+i/n*6.28+Math.random()*.35,d=20+Math.random()*20,dx=Math.cos(a)*d,dy=Math.sin(a)*d*.7,rot=Math.round(Math.random()*150-75),t=`translate(${px}px,${py}px) translate(-50%,-50%)`;
+    const an=e.animate([
+      {transform:`${t} scale(.6)`,opacity:0,easing:zo},
+      {transform:`${t} translate(${dx.toFixed(1)}px,${dy.toFixed(1)}px) scale(1) rotate(${rot/2}deg)`,opacity:1,offset:.42,easing:"ease-in"},
+      {transform:`${t} translate(${(dx*1.15).toFixed(1)}px,${(dy+24).toFixed(1)}px) scale(.85) rotate(${rot}deg)`,opacity:0}
+    ],{duration:760+i*22,delay:i*14,fill:"backwards"});
+    an.onfinish=()=>e.remove()}
 }
 let adorVista="";
 const adorNombreMes=f=>{const m=MESES[f[2]-1];return m.charAt(0).toUpperCase()+m.slice(1)};
@@ -4022,9 +4045,10 @@ function pintarAdornos(){
     const a=document.createElement("span");a.className="adorno";a.setAttribute("aria-hidden","true");w.append(a)});
   const quieto=matchMedia("(prefers-reduced-motion: reduce)");
   document.querySelectorAll("#side .marca,#logoH,#adorPrev").forEach(z=>{const go=()=>{const w=z.querySelector(".adw");if(quieto.matches||!w||!w.querySelector(".adorno").dataset.k)return;
-    w.classList.remove("salta");void w.offsetWidth;w.classList.add("salta");clearTimeout(w._t);w._t=setTimeout(()=>w.classList.remove("salta"),700)};z.addEventListener("pointerenter",go);z.addEventListener("pointerdown",e=>{go();if(!quieto.matches&&z.dataset.zk)zEstallar(z,e.clientX,e.clientY,12)});
-    // Con el mouse: al pasar por la zona va dejando figuras
-    let ult=0;z.addEventListener("pointermove",e=>{if(e.pointerType!=="mouse"||!z.dataset.zk||quieto.matches)return;const t=performance.now();if(t-ult<140)return;ult=t;zEstallar(z,e.clientX,e.clientY,1)})});
+    w.classList.remove("salta");void w.offsetWidth;w.classList.add("salta");clearTimeout(w._t);w._t=setTimeout(()=>w.classList.remove("salta"),700)};z.addEventListener("pointerdown",e=>{go();if(!quieto.matches&&z.dataset.zk)zEstallar(z,e.clientX,e.clientY)});
+    // Con mouse: las figuras se inclinan apenas hacia el puntero (profundidad)
+    z.addEventListener("pointermove",e=>{if(e.pointerType!=="mouse"||!z.dataset.zk||quieto.matches)return;const c=z.querySelector(":scope > .adz-capa");if(!c)return;const b=z.getBoundingClientRect();c.style.transform=`translate(${(((e.clientX-b.left)/b.width-.5)*7).toFixed(1)}px,${(((e.clientY-b.top)/b.height-.5)*5).toFixed(1)}px)`});
+    z.addEventListener("pointerleave",()=>{const c=z.querySelector(":scope > .adz-capa");if(c)c.style.transform=""})});
   document.addEventListener("animationend",e=>{if(e.animationName==="adSalta"){const w=e.target.closest(".adw");if(w)w.classList.remove("salta")}});
   document.addEventListener("click",e=>{const b=e.target.closest("[data-ador]");if(!b)return;ajustes.adornos=+b.dataset.ador;if(!ajustes.adornos)adorVista="";guardarLS("cbo-ajustes",ajustes);pintarAdornos()});
   const s=$("adorVer");
