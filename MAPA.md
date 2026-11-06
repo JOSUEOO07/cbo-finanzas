@@ -1,5 +1,5 @@
 # Mapa de CBO Finanzas
-Actualizado: 05/11/2026 · caché: cbo-finanzas-v72-adornos
+Actualizado: 05/11/2026 · caché: cbo-finanzas-v73-cumple
 
 ## Archivos
 - codigo-fuente.html: versión editable (4287 líneas). index.html es la copia que se publica: editar codigo-fuente.html y copiarlo a index.html.
@@ -74,3 +74,4 @@ Actualizado: 05/11/2026 · caché: cbo-finanzas-v72-adornos
 - Adornos: 16 fiestas, con el Mundial (14 jun-14 jul, solo años 2030, 2034...; tiene prioridad sobre las demás) (Josué quitó Eid, Mujer, Tierra, Inti Raymi, EE. UU., Janucá, Acción de Gracias, Todos los Santos, Oktoberfest, Diwali y Holi) (ADOR_F; las lunares usan adTabla, con años limitados). Toda la zona del logo y el nombre está ambientada e interactiva (ZON, ZSP, zPintar, zEstallar).
 - Adornos, movimiento: capas separadas (avance adz-f, balanceo adz-o, aleteo adz-aleta), tres profundidades, solo transform y opacity. Al volar van por los bordes para no tapar el nombre. Los colores de la fiesta pasan de corrido por las letras del nombre (adzColores). Toque: onda y 8 figuras con gravedad (zEstallar). Con mouse: seguimiento suave.
 - Adornos, dibujos: figuras con volumen (degradados en #zDefs). Mundial con la Copa del Mundo dibujada (COPA). Día de Muertos con papel picado, calavera de azúcar, cempasúchil, pétalos y velas.
+- Adorno de cumpleaños de Josué: solo el 14 de junio y solo con el usuario JOSUÉ VILLAR. El Mundial va del 15 de junio al 14 de julio.

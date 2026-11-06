@@ -2935,7 +2935,7 @@ function pintarQuien(){
   if($("quienEstado")) $("quienEstado").textContent=quien?"Este celular: "+titulo(quien):"Sin elegir";
   $("quienBtns").innerHTML=PERSONAS.map(n=>`<button type="button" class="btn${n===PERSONAS[0]?" pri":""}" data-quien="${n}" style="padding:16px;font-size:1.05rem">Soy ${titulo(n)}</button>`).join("");
 }
-function elegirQuien(n){quien=n;try{localStorage.setItem("cbo-quien",n)}catch{};pintarQuien();cerrarOv("ovQuien");toast("Registrarás como "+titulo(n))}
+function elegirQuien(n){quien=n;try{localStorage.setItem("cbo-quien",n)}catch{};pintarQuien();pintarAdornos();cerrarOv("ovQuien");toast("Registrarás como "+titulo(n))}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-quien]");if(b)elegirQuien(b.dataset.quien)});
 pintarQuien();
 const sinCeros=v=>String(v||"").trim().replace(/^0+/,"");
@@ -3907,8 +3907,9 @@ const ADOR_F=[
   ["santa","Semana Santa",4,y=>adPascua(y),0],
   ["trabajo","Día del Trabajo",5,y=>new Date(y,4,1),0],
   ["madre","Día de la Madre",5,y=>adDomingo(y,4,2),0],
+  ["cumple","Cumpleaños de Josué",6,y=>new Date(y,5,14),0,0],
   ["padre","Día del Padre",6,y=>adDomingo(y,5,3),0],
-  ["mundial","Mundial de Fútbol (cada 4 años)",6,y=>y%4===2?new Date(y,6,14):new Date(1970,0,1),0,30],
+  ["mundial","Mundial de Fútbol (cada 4 años)",6,y=>y%4===2?new Date(y,6,14):new Date(1970,0,1),0,29],
   ["patrias","Fiestas Patrias",7,y=>new Date(y,6,28),1],
   ["rosa","Santa Rosa de Lima",8,y=>new Date(y,7,30),0],
   ["primavera","Día de la Primavera",9,y=>new Date(y,8,23),0],
@@ -3917,7 +3918,7 @@ const ADOR_F=[
   ["navidad","Navidad",12,y=>new Date(y,11,25),0]
 ];
 function adorHoy(h){h=h||new Date();const t=new Date(h.getFullYear(),h.getMonth(),h.getDate());let mejor=null,dm=99;
-  for(const y of [t.getFullYear(),t.getFullYear()+1])for(const f of ADOR_F){const dias=Math.round((f[3](y)-t)/864e5);if(f[5]){if(dias>=0&&dias<=f[5])return f;continue}if(dias<=7&&dias>=-f[4]&&Math.abs(dias)<dm){dm=Math.abs(dias);mejor=f}}
+  for(const y of [t.getFullYear(),t.getFullYear()+1])for(const f of ADOR_F){if(f[0]==="cumple"&&quien!=="JOSUÉ VILLAR")continue;const dias=Math.round((f[3](y)-t)/864e5);if(f[5]!=null){if(dias>=0&&dias<=f[5])return f;continue}if(dias<=7&&dias>=-f[4]&&Math.abs(dias)<dm){dm=Math.abs(dias);mejor=f}}
   return mejor}
 const AD={
   cae:(xs,c,r)=>xs.map((x,i)=>`<circle class="a-cae" style="animation-delay:${(i*.85).toFixed(2)}s;animation-duration:${(3.2+i%3*.7).toFixed(1)}s" cx="${x}" cy="0" r="${r||1.3}" fill="${Array.isArray(c)?c[i%c.length]:c}"/>`).join(""),
@@ -3939,6 +3940,7 @@ const ADOR_ART={
   trabajo:()=>`<g class="a-flota"><g transform="translate(8 -10)"><path d="M2 14C2 4 9-1 16-1S30 4 30 14Z" fill="#F2B705"/><rect x="-1" y="13" width="34" height="3.6" rx="1.8" fill="#D99A00"/><rect x="14" y="-1.6" width="4" height="12" rx="2" fill="#FFD84D"/></g></g><g transform="translate(54 33)"><g class="a-martillo"><rect x="-1.2" y="0" width="2.4" height="13" rx="1" fill="#A86B32"/><rect x="-5" y="-3" width="10" height="4" rx="1" fill="#9AA5B1"/></g></g>`,
   madre:()=>`<g class="a-mece">${AD.flor(53,41,4,"#FF6B9A","#FFE08A")}${AD.flor(46,45,3.2,"#FFB3C7","#FFF")}${AD.flor(59,45,3,"#E2445C","#FFE08A")}</g>${AD.sube(49,31,"#FF6B9A",0)}${AD.sube(56,29,"#FF9EBB",1.2)}${AD.sube(52,33,"#E2445C",2.1)}`,
   padre:()=>`<g transform="translate(54 29)"><g class="a-pendulo"><path d="M-2.5 0h5l-1 3h-3z" fill="#1E4E8C"/><path d="M-1.5 3h3l2.5 11-4 4-4-4z" fill="#2F6FBF"/><path d="M-1 6l3 2M-1.6 9.5l3.6 2.4M-2 13l3.5 2.3" stroke="#BFD7FF" stroke-width=".7"/></g></g>${AD.estrella(6,-4,"#FFD54A")}${AD.estrella(16,-8,"#FFF","d2")}`,
+  cumple:()=>`<g transform="translate(52 36) scale(1.25)">${TORTA}</g><g transform="translate(7 2) scale(.95)"><g class="a-flota">${GLOBO("#FF5C9E")}</g></g><g transform="translate(19 -5) scale(.8)"><g class="a-flota d2">${GLOBO("#FFD23F")}</g></g><g transform="translate(30 -2) scale(.62)"><g class="a-flota d3">${GLOBO("#4FB4FF")}</g></g>${AD.confeti([4,16,28,40],["#FF5C9E","#FFD54A","#4FB4FF","#7BE495"])}`,
   mundial:()=>`<g transform="translate(53 26) scale(1.5)"><g class="a-flota">${COPA}</g></g><g transform="translate(5 43) scale(.72)"><g class="a-flota d2">${ZSP.pel}</g></g>${AD.estrella(38,-7,"#FFD54A")}${AD.estrella(22,-5,"#FFF1B8","d2")}`,
   patrias:()=>`<line x1="3" y1="10" x2="3" y2="-16" stroke="#E6E6E6" stroke-width="1.2" stroke-linecap="round"/><circle cx="3" cy="-16.6" r="1.3" fill="#FFD54A"/><g transform="translate(3.6 -15.5)"><g class="a-ondea"><rect width="7" height="12" fill="#D91023"/><rect x="7" width="7" height="12" fill="#FFF"/><rect x="14" width="7" height="12" fill="#D91023"/></g></g><g transform="translate(55 40)"><path d="M-2 4l-2.4 7 2.8-1.6L0 11zM2 4l2.4 7-2.8-1.6L0 11z" fill="#D91023"/><g class="a-gira"><circle r="5.6" fill="#D91023"/><circle r="4.6" fill="none" stroke="#FFF" stroke-width="1.4" stroke-dasharray="1.2 1.2"/><circle r="2.2" fill="#FFF"/><circle r="1.1" fill="#D91023"/></g></g>`,
   rosa:()=>`<g class="a-mece">${AD.rosa(52,41,3.6)}${AD.rosa(58,45,2.8)}</g>${AD.cae([8,20,32,44],["#FF8FB1","#E23D6B"],1.1)}`,
@@ -3961,6 +3963,7 @@ if(!document.getElementById("zDefs"))document.body.insertAdjacentHTML("afterbegi
 <radialGradient id="zBal" cx=".36" cy=".3" r=".8"><stop offset="0" stop-color="#FFFFFF"/><stop offset=".6" stop-color="#EDEDE6"/><stop offset="1" stop-color="#A7A79E"/></radialGradient>
 <linearGradient id="zVer" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#46C97A"/><stop offset="1" stop-color="#14713F"/></linearGradient>
 <linearGradient id="zRoj" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF5A66"/><stop offset="1" stop-color="#A80F2C"/></linearGradient>
+<linearGradient id="zTor" x1="0" x2="1"><stop offset="0" stop-color="#C93B7E"/><stop offset=".4" stop-color="#FF7DB4"/><stop offset="1" stop-color="#B02C6C"/></linearGradient>
 <linearGradient id="zLla" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#FF7A1A"/><stop offset=".6" stop-color="#FFC93C"/><stop offset="1" stop-color="#FFF6C9"/></linearGradient>
 </defs></svg>`);
 // La Copa del Mundo: dos figuras en espiral que sostienen el globo terráqueo, sobre dos anillos verdes (cuadro de -10 a 10)
@@ -3977,6 +3980,9 @@ ${[-3,-1,1,3].map(x=>`<path d="M${x} 5V8.6" stroke="#2A1D2A" stroke-width=".55"/
 ${[0,72,144,216,288].map(a=>`<ellipse cy="-1.25" rx=".62" ry="1.05" fill="#E2367A" transform="translate(0 -6.3) rotate(${a})"/>`).join("")}<circle cy="-6.3" r=".7" fill="#FFD23F"/>
 <path d="M-6.6-5.6Q-5.4-7.2-4.2-7.6M6.6-5.6Q5.4-7.2 4.2-7.6" stroke="#2FC4D6" stroke-width=".6" fill="none" stroke-linecap="round"/>`;
 const CEMPA=(()=>{const c=(n,r,rx,ry,col)=>Array.from({length:n},(_,i)=>`<ellipse cy="${-r}" rx="${rx}" ry="${ry}" fill="${col}" transform="rotate(${(i*360/n).toFixed(0)})"/>`).join("");return c(14,6.2,1.9,3,"#E8690C")+c(11,4.2,1.7,2.5,"#F7931E")+c(8,2.4,1.3,1.9,"#FFB627")+'<circle r="1.5" fill="#D9570A"/>'})();
+// Torta de dos pisos con velas y globo de cumpleaños (cuadro de -10 a 10)
+const TORTA=`<ellipse cy="9.3" rx="9.8" ry="1.1" fill="url(#zOroV)"/><rect x="-8.2" y="1.6" width="16.4" height="7.6" rx="1.2" fill="url(#zTor)"/><path d="M-8.2 2.6C-8.2 1.6-7.4 1.2-6.6 1.2H6.6C7.4 1.2 8.2 1.6 8.2 2.6V3.8C7.2 5.6 6.2 5.6 5.4 3.9C4.6 5.8 3 5.8 2.4 3.9C1.6 5.4.2 5.4-.6 3.9C-1.4 5.8-3 5.8-3.6 3.9C-4.4 5.4-5.6 5.6-6.2 3.9C-6.9 5.2-7.7 5-8.2 3.8Z" fill="#FFF6EA"/><path d="M-8.2 7.6H8.2" stroke="#FFD54A" stroke-width=".7"/><rect x="-5.6" y="-3.6" width="11.2" height="5.2" rx="1" fill="url(#zTor)"/><path d="M-5.6-2.8C-5.6-3.5-5-3.8-4.4-3.8H4.4C5-3.8 5.6-3.5 5.6-2.8V-1.8C4.8-.6 4-.6 3.4-1.8C2.8-.4 1.4-.4.8-1.8C.2-.6-1.2-.6-1.8-1.8C-2.4-.4-3.6-.6-4.2-1.8C-4.8-.9-5.3-1-5.6-1.8Z" fill="#FFF6EA"/>${[[-3.4,"#4FB4FF"],[0,"#FFD54A"],[3.4,"#7BE495"]].map(([x,c],i)=>`<rect x="${x-.55}" y="-7.2" width="1.1" height="3.5" rx=".3" fill="${c}"/><path class="a-brilla${i?" d"+(i+1):""}" transform="translate(${x} 0)" d="M0-10.2C1-8.9 1-8 0-7.3C-1-8-1-8.9 0-10.2Z" fill="url(#zLla)"/>`).join("")}`;
+const GLOBO=c=>`<path d="M0 5.4Q-1.6 7.6 0 10.4" stroke="#E8E8E8" stroke-width=".5" fill="none"/><path d="M0-9.4C4.4-9.4 6.6-6 6.6-2.6C6.6 1 3 4 0 4.8C-3 4-6.6 1-6.6-2.6C-6.6-6-4.4-9.4 0-9.4Z" fill="${c}"/><path d="M-1 4.6L1 4.6L1.3 5.8H-1.3Z" fill="${c}"/><path d="M0-9.4C4.4-9.4 6.6-6 6.6-2.6C6.6 1 3 4 0 4.8C2.6 2.6 3.6-.2 3.6-2.6C3.6-6 2-8.4 0-9.4Z" fill="#000" opacity=".14"/><ellipse cx="-2.8" cy="-5.2" rx="1.3" ry="2.1" fill="#FFF" opacity=".6" transform="rotate(22 -2.8 -5.2)"/>`;
 const ZSP={
   mur:`<path d="M-10 .5Q-8-5-4.6-3Q-3.2-6-1.3-3.4L-.9-5.4L0-4L.9-5.4L1.3-3.4Q3.2-6 4.6-3Q8-5 10 .5Q6.4-1 5.2 2.2Q2.6.2 0 3.4Q-2.6.2-5.2 2.2Q-6.4-1-10 .5Z" fill="#231A33" stroke="#A98BFF" stroke-width=".55"/><circle cx="-.9" cy="-2.3" r=".42" fill="#FFD23F"/><circle cx=".9" cy="-2.3" r=".42" fill="#FFD23F"/>`,
   cal:`<ellipse cx="-4.6" cy="1.4" rx="4.4" ry="6.8" fill="url(#zNar)"/><ellipse cx="4.6" cy="1.4" rx="4.4" ry="6.8" fill="url(#zNar)"/><ellipse cy="1.2" rx="4.3" ry="7.4" fill="url(#zNar)"/><path d="M0-6C-.2-8 .8-9.4 2.8-9.8L3.4-8.2C2-7.9 1.5-7 1.6-6Z" fill="#3E7D2E"/><path d="M-5-1L-2.2-.6L-3.6 1.4ZM5-1L2.2-.6L3.6 1.4ZM-5 3.4L-3 4.4L-1.6 3.4L0 4.6L1.6 3.4L3 4.4L5 3.4C4 7 -4 7 -5 3.4Z" fill="#FFE27A"/>`,
@@ -3996,7 +4002,9 @@ const ZSP={
   pet:`<path d="M0-8C4.4-5.6 5-.6 0 7.4C-5-.6-4.4-5.6 0-8Z" fill="#F7931E"/><path d="M0-6C1.8-4 2-1 0 4C-1-1-.9-4 0-6Z" fill="#FFC24A"/>`,
   vel:`<circle cy="-5.4" r="4.2" fill="#FFB547" opacity=".28"/><path d="M0-9.6C2.4-6.6 2.4-4.4 0-2.8C-2.4-4.4-2.4-6.6 0-9.6Z" fill="url(#zLla)"/><rect x="-2.6" y="-2.8" width="5.2" height="12" rx="1" fill="url(#zHue)"/><path d="M-2.6-1.4H2.6" stroke="#E2367A" stroke-width=".8"/><path d="M-2.6 6.6H2.6" stroke="#2FC4D6" stroke-width=".8"/>`,
   pel:`<circle r="9.2" fill="url(#zBal)"/><path d="M0-4.4L4.2-1.4L2.6 3.6H-2.6L-4.2-1.4Z" fill="#20242A"/><path d="M0-4.4V-8.9M4.2-1.4L8.7-2.8M-4.2-1.4L-8.7-2.8M2.6 3.6L5.4 7.3M-2.6 3.6L-5.4 7.3" stroke="#20242A" stroke-width=".8"/><path d="M-3-8.6L0-8.9L3-8.6L0-6.6ZM8.6-3.2L8.9.4L7.6 3L6.8-.8ZM-8.6-3.2L-8.9.4L-7.6 3L-6.8-.8ZM5-7.4L6.8 7ZM-5.6 7L-2 8.9H2L5.6 7L3 5.6H-3Z" fill="#20242A"/>`,
-  cop:COPA
+  cop:COPA,
+  glo:GLOBO("var(--z1)"),glo2:GLOBO("var(--z2)"),
+  ser:`<path d="M-9-6Q-5-10-3-5T3-3T9 2T4 8" stroke="var(--z2)" stroke-width="1.7" fill="none" stroke-linecap="round"/>`
 };
 // m: "vuela" cruza de lado a lado; "cae" baja; "sube" asciende. z1/z2: colores de la fiesta (también brillan en el nombre)
 const ZON={
@@ -4006,6 +4014,7 @@ const ZON={
   patricio:{m:"cae",s:["tre"],z1:"#5FE08A",z2:"#FFD54A"},
   santa:{m:"sube",s:["est"],z1:"#FFE9A8",z2:"#7CCB62"},
   trabajo:{m:"vuela",s:["cas","est"],z1:"#FFD84D",z2:"#FFB300"},madre:{m:"sube",s:["cor","flo"],z1:"#FF8FB1",z2:"#FFE08A"},
+  cumple:{m:"sube",s:["glo","con","glo2","ser","con2","glo"],z1:"#FF6FB5",z2:"#FFD54A"},
   padre:{m:"vuela",s:["est"],z1:"#8FC1FF",z2:"#FFE08A"},
   mundial:{m:"vuela",s:["pel","cop","pel"],z1:"#FFD54A",z2:"#3FD98A"},patrias:{m:"vuela",s:["ban","est"],z1:"#FF6B7A",z2:"#FFF"},
   rosa:{m:"cae",s:["flo"],z1:"#FF8FB1",z2:"#FFE08A"},primavera:{m:"vuela",s:["mar","flo"],z1:"#FFB3D1",z2:"#FFE08A"},
