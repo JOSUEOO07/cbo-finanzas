@@ -2214,6 +2214,7 @@ function nuevaEspecial(){
   const it=["gen-"+Date.now().toString(36),"Mezcla "+ajustes.espCont,st[1],col(h3,.85,.74),`linear-gradient(115deg,${st.join(",")},${st[0]})`];
   gen.push(it);f.t.push(it);PALETAS.push(it);ajustes.paleta=it[0];guardarLS("cbo-ajustes",ajustes);palFam="especial";aplicarTema();try{pintarFlujo()}catch{}
 }
+$("paletas").addEventListener("click",()=>{setTimeout(()=>{if(typeof marcaPerfil==="function"&&window.__palUlt!==ajustes.paleta){window.__palUlt=ajustes.paleta;marcaPerfil()}},0)});
 $("paletas").addEventListener("click",e=>{if(e.target.closest("#espGen")){nuevaEspecial();return}const fa=e.target.closest("[data-fam]");if(fa){palFam=fa.dataset.fam;const f=FAMILIAS.find(x=>x.k===palFam);ajustes.paleta=f.t[0][0];guardarLS("cbo-ajustes",ajustes);aplicarTema();try{pintarFlujo()}catch{};return}
   const b=e.target.closest("[data-pal]");if(!b)return;ajustes.paleta=b.dataset.pal;guardarLS("cbo-ajustes",ajustes);aplicarTema();try{pintarFlujo()}catch{}});
 $("meta").value=ajustes.meta;
@@ -3062,14 +3063,38 @@ const AVATARES={"gas":["Gasfitero","<svg viewBox=\"0 0 64 64\" aria-hidden=\"tru
 const leerAv=()=>leerLS("cbo-avatares",{})||{};
 const avDe=n=>leerAv()[n]||"";
 const avHTML=v=>v&&v.startsWith("data:image/")?`<img alt="" src="${v}">`:AVATARES[v]?AVATARES[v][1]:"";
-function ponerAv(v){const m=leerAv();if(v)m[quien]=v;else delete m[quien];guardarLS("cbo-avatares",m);const ok=(leerAv()[quien]||"")===(v||"");pintarQuien();toast(ok?(v?"Imagen actualizada":"Imagen quitada"):"No hay espacio para guardar esa imagen")}
+function ponerAv(v){const m=leerAv();if(v)m[quien]=v;else delete m[quien];guardarLS("cbo-avatares",m);const ok=(leerAv()[quien]||"")===(v||"");pintarQuien();if(ok)marcaPerfil();toast(ok?(v?"Imagen actualizada":"Imagen quitada"):"No hay espacio para guardar esa imagen")}
 async function subirAv(file){
   if(!file)return;
   if(!/^image\//.test(file.type||"")){toast("Elige una imagen");return}
   const url=URL.createObjectURL(file);
   try{const im=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=url});
-    const c=document.createElement("canvas"),T=160,a=Math.min(im.naturalWidth,im.naturalHeight);c.width=c.height=T;c.getContext("2d").drawImage(im,(im.naturalWidth-a)/2,(im.naturalHeight-a)/2,a,a,0,0,T,T);ponerAv(c.toDataURL("image/jpeg",.85))}
+    const c=document.createElement("canvas"),T=160,a=Math.min(im.naturalWidth,im.naturalHeight);c.width=c.height=T;c.getContext("2d").drawImage(im,(im.naturalWidth-a)/2,(im.naturalHeight-a)/2,a,a,0,0,T,T);let u=c.toDataURL("image/jpeg",.85);if(u.length>40000)u=c.toDataURL("image/jpeg",.55);ponerAv(u)}
   catch(e){toast("No se pudo abrir esa imagen. Prueba con una JPG o PNG.")}finally{URL.revokeObjectURL(url)}
+}
+/* Foto y colores iguales en todos los equipos del mismo usuario. Se guardan en la pestaña Ajustes del Excel.
+   Gana el último cambio. Si el Apps Script todavía no tiene esta función, la app sigue igual, sin avisar. */
+const PERFIL_K="cbo-perfil-ts";let perfilTm=null,perfilUlt=0,perfilOcupado=false;
+function marcaPerfil(){guardarLS(PERFIL_K,Date.now());clearTimeout(perfilTm);perfilTm=setTimeout(()=>subirPerfil(),900)}
+async function subirPerfil(){
+  if(esDemo()||!cfg||!navigator.onLine)return false;
+  try{await api("guardarAjustes",{usuario:quien,ts:leerLS(PERFIL_K,0)||0,paleta:ajustes.paleta||"",espGen:ajustes.espGen||[],espCont:ajustes.espCont||0,foto:avDe(quien)||""});return true}catch(e){return false}
+}
+function aplicarPerfil(a){
+  ajustes.espCont=Math.max(ajustes.espCont||0,+a.espCont||0);
+  const f=FAMILIAS.find(x=>x.k==="especial"),L=ajustes.espGen||(ajustes.espGen=[]);
+  (Array.isArray(a.espGen)?a.espGen:[]).forEach(it=>{if(!Array.isArray(it)||!it[0]||L.some(x=>x[0]===it[0]))return;L.push(it);f.t.push(it);PALETAS.push(it)});
+  if(a.paleta&&PALETAS.some(x=>x[0]===a.paleta)){ajustes.paleta=a.paleta;palFam=(famDe(a.paleta)||FAMILIAS[0]).k}
+  guardarLS("cbo-ajustes",ajustes);
+  const m=leerAv(),ft=String(a.foto||"");if(ft.startsWith("data:image/")||AVATARES[ft])m[quien]=ft;else delete m[quien];guardarLS("cbo-avatares",m);
+  window.__palUlt=ajustes.paleta;guardarLS(PERFIL_K,+a.ts||Date.now());aplicarTema();pintarQuien();try{pintarFlujo()}catch{}
+}
+async function sincPerfil(forzar){
+  const ah=Date.now();if(perfilOcupado||esDemo()||!cfg||!navigator.onLine||(!forzar&&ah-perfilUlt<60000))return;
+  perfilOcupado=true;perfilUlt=ah;
+  try{const j=await api("verAjustes",{usuario:quien}),rem=j.ajustes||null,tl=+leerLS(PERFIL_K,0)||0,tr=rem?+rem.ts||0:0;
+    if(tr>tl)aplicarPerfil(rem);else if(tl>tr)await subirPerfil()}
+  catch(e){}finally{perfilOcupado=false}
 }
 function pintarQuien(){
   const ub=$("usuarioBtn"); if(ub){const n=nomCorto(quien);const av=avHTML(avDe(quien));ub.innerHTML=n?`<i aria-hidden="true">${av||esc(n.charAt(0))}</i><span>${esc(n)}</span>`:`<span>Elegir usuario</span>`;ub.setAttribute("aria-label",`Usuario: ${titulo(quien)}. Tocar para cambiar la imagen`);ub.onclick=()=>abrirOv("ovPerfil")}
@@ -4219,6 +4244,9 @@ function pintarFiestaBarra(k){
   const nuevo=c&&FI_TEMA[k]||null; if(nuevo!==fiestaCol){fiestaCol=nuevo;aplicarTema()}
 }
 const adorNombreMes=f=>{const m=MESES[f[2]-1];return m.charAt(0).toUpperCase()+m.slice(1)};
+window.__palUlt=ajustes.paleta;setTimeout(()=>sincPerfil(true),2500);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")sincPerfil()});
+window.addEventListener("online",()=>sincPerfil(true));
 (function(){const tb=$("tabbar"),zo=$("tbZona");if(tb&&zo)tb.addEventListener("pointerdown",e=>{if(zo.dataset.zk)zEstallar(zo,e.clientX,e.clientY)})})();
 function adorResumen(){if(ajustes.adornos===0)return "Desactivados";const f=adorHoy();return "Activados"+(f?" · "+f[1]:"")}
 function pintarAdornos(){
