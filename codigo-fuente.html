@@ -3093,6 +3093,8 @@ async function sincPerfil(forzar){
   const ah=Date.now();if(perfilOcupado||esDemo()||!cfg||!navigator.onLine||(!forzar&&ah-perfilUlt<60000))return;
   perfilOcupado=true;perfilUlt=ah;
   try{const j=await api("verAjustes",{usuario:quien}),rem=j.ajustes||null,tl=+leerLS(PERFIL_K,0)||0,tr=rem?+rem.ts||0:0;
+    // Primera vez: lo que este equipo ya tenía (foto o color elegidos antes) se sube solo si la nube está vacía
+    if(!rem&&!tl&&(avDe(quien)||(ajustes.paleta&&ajustes.paleta!=="grafito")||(ajustes.espGen||[]).length)){guardarLS(PERFIL_K,Date.now());await subirPerfil();return}
     if(tr>tl)aplicarPerfil(rem);else if(tl>tr)await subirPerfil()}
   catch(e){}finally{perfilOcupado=false}
 }
