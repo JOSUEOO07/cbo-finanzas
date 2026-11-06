@@ -1075,6 +1075,23 @@ h1,h2,h3,.bar h1{font-family:var(--display);letter-spacing:-.02em}
 .ador-prev{display:flex;align-items:center;gap:10px;padding:16px 14px 12px;border-radius:14px;background:var(--brand);color:var(--brand-ink)}
 .ador-prev img{width:52px;display:block}.ador-prev b{display:block;font-family:var(--display);font-size:1rem;line-height:1.15}.ador-prev small{opacity:.75;font-size:.75rem}
 @media (prefers-reduced-motion:reduce){.adorno *,.adw.salta .adorno{animation:none!important}}
+/* Toda la zona del logo y el nombre: figuras que la recorren, nombre con brillo de la fiesta y reacción al tocar */
+.adz{position:relative;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+.adz-capa{position:absolute;inset:-4px -2px;pointer-events:none;z-index:3;overflow:visible}
+.adz-f{position:absolute;left:var(--x);top:var(--y);line-height:0;opacity:.95;filter:drop-shadow(0 1px 2px rgba(0,0,0,.45))}
+.adz-chispa{position:absolute;line-height:0;pointer-events:none}
+.adz-vuela{left:0;animation:adzVuela 12s linear infinite}
+@keyframes adzVuela{0%{left:-6%;transform:translateY(0);opacity:0}6%{opacity:.95}25%{transform:translateY(-7px)}50%{transform:translateY(5px)}75%{transform:translateY(-5px)}94%{opacity:.95}100%{left:100%;transform:translateY(0);opacity:0}}
+.adz-cae{top:0;animation:adzCae 4s linear infinite}
+@keyframes adzCae{0%{top:-8%;transform:rotate(0);opacity:0}12%{opacity:.95}85%{opacity:.8}100%{top:100%;transform:rotate(200deg);opacity:0}}
+.adz-sube{top:auto;bottom:0;animation:adzSube 4.4s ease-in infinite}
+@keyframes adzSube{0%{bottom:-4%;transform:translateX(0) scale(.7);opacity:0}15%{opacity:.95}50%{transform:translateX(5px) scale(1)}100%{bottom:100%;transform:translateX(-4px) scale(.9);opacity:0}}
+.adz b{background:linear-gradient(100deg,currentColor 0%,currentColor 34%,var(--z1) 46%,var(--z2) 54%,currentColor 66%,currentColor 100%);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:adzBrillo 5s linear infinite}
+@keyframes adzBrillo{from{background-position:100% 0}to{background-position:-50% 0}}
+.adz.adz-salta b{animation:adzSalta .6s cubic-bezier(.34,1.56,.64,1),adzBrillo 5s linear infinite;display:block}
+.adz.adz-salta small{animation:adzSalta .6s .05s cubic-bezier(.34,1.56,.64,1);display:block}
+@keyframes adzSalta{0%,100%{transform:none}40%{transform:translateY(-4px) scale(1.03)}}
+@media (prefers-reduced-motion:reduce){.adz b{animation:none;background:none;-webkit-text-fill-color:currentColor}.adz-capa{display:none}}
 </style>
 </head>
 <body data-barra="d">
@@ -1627,8 +1644,9 @@ h1,h2,h3,.bar h1{font-family:var(--display);letter-spacing:-.02em}
   <video id="video" playsinline muted></video>
   <div class="marco" aria-hidden="true"></div>
   <div class="pie-esc">
-    <p id="escMsg">Apunta al QR del comprobante. ¿No tiene QR? Toma foto al comprobante completo.</p>
+    <p id="escMsg">Apunta al QR del comprobante. ¿No tiene QR? Toma foto al comprobante o sube el documento.</p>
     <button type="button" class="btn pri" id="escFoto">📸 Tomar foto al comprobante</button>
+    <label class="btn2" style="display:flex;align-items:center;justify-content:center;text-transform:none;letter-spacing:0;font-size:.95rem;color:#F4EDE0;cursor:pointer">📄 Subir documento (PDF o imagen)<input type="file" id="qrDoc" accept="application/pdf,.pdf,image/*" hidden></label>
     <div class="row2">
       <label class="btn2" style="display:flex;align-items:center;justify-content:center;text-transform:none;letter-spacing:0;font-size:.95rem;color:#F4EDE0;cursor:pointer">🖼 Foto o captura<input type="file" id="qrFoto" accept="image/*" hidden></label>
       <button type="button" class="btn2" id="escCerrar">Cancelar</button>
@@ -2565,7 +2583,7 @@ function aplicarTexto(q){
   if(!$("det").dataset.touched)$("det").checked=fTipo==="ingreso"&&q.total>700;
   syncForm(); if(previo&&catsDe(fTipo).includes(previo.cat))$("cat").value=previo.cat;
   const falta=[!(q.total>0)&&"monto",fComp!=="ninguno"&&!q.serie&&"serie-número",fComp!=="ninguno"&&!q.rucTercero&&"RUC",!q.fecha&&"fecha"].filter(Boolean);
-  $("avisoQR").textContent=`Leído de la foto: ${COMP_TXT[fComp]}${q.serie?" "+q.serie+"-"+q.numero:""}${q.total?" por "+fmt(q.total):""}${previo?" de "+previo.desc:""}. `
+  $("avisoQR").textContent=`Leído del comprobante: ${COMP_TXT[fComp]}${q.serie?" "+q.serie+"-"+q.numero:""}${q.total?" por "+fmt(q.total):""}${previo?" de "+previo.desc:""}. `
     +(falta.length?`No pude leer: ${falta.join(", ")}. Complétalo a mano.`:"Revisa que los datos coincidan con el comprobante y toca Guardar.");
   $("avisoQR").hidden=false;
   // Lleva al primer dato que falte; si está todo, al resumen
@@ -2593,6 +2611,51 @@ $("escFoto").onclick=async()=>{
   const cv=document.createElement("canvas");cv.width=v.videoWidth;cv.height=v.videoHeight;cv.getContext("2d").drawImage(v,0,0);
   clearTimeout(qrTimer); leerImagenComprobante(cv);
 };
+// Documento subido: PDF (lee su QR o su texto; si es escaneado, lo lee como imagen) o imagen
+let pdfLib=null;
+function cargarPDFLib(){
+  if(pdfLib) return pdfLib;
+  const base="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/";
+  pdfLib=new Promise((ok,mal)=>{const sc=document.createElement("script");sc.src=base+"pdf.min.js";sc.async=true;
+    sc.onload=()=>{if(!window.pdfjsLib)return mal();window.pdfjsLib.GlobalWorkerOptions.workerSrc=base+"pdf.worker.min.js";ok(window.pdfjsLib)};
+    sc.onerror=()=>{sc.remove();mal()};document.head.appendChild(sc)});
+  pdfLib.catch(()=>{pdfLib=null});
+  return pdfLib;
+}
+async function textoPaginaPDF(pag){
+  const {items}=await pag.getTextContent(), filas=new Map();
+  items.forEach(it=>{if(!it.str||!it.str.trim())return;const y=Math.round(it.transform[5]/3);(filas.get(y)||filas.set(y,[]).get(y)).push(it)});
+  return [...filas.entries()].sort((a,b)=>b[0]-a[0]).map(([,f])=>f.sort((a,b)=>a.transform[4]-b.transform[4]).map(x=>x.str).join(" ")).join("\n");
+}
+async function leerPDFComprobante(file){
+  const msg=$("escMsg"); $("escaner").classList.add("leyendo"); msg.textContent="Abriendo el documento…";
+  try{
+    let lib; try{lib=await cargarPDFLib()}catch(e){msg.textContent="No se pudo cargar el lector de PDF. Revisa tu internet e intenta de nuevo.";return}
+    let doc; try{doc=await lib.getDocument({data:await file.arrayBuffer()}).promise}
+    catch(e){msg.textContent=e&&e.name==="PasswordException"?"Ese PDF tiene contraseña. Quítasela o súbelo como imagen.":"No se pudo abrir ese PDF. Revisa que no esté dañado.";return}
+    const pag=await doc.getPage(1), base=pag.getViewport({scale:1}), vp=pag.getViewport({scale:Math.min(3,2000/Math.max(base.width,base.height))});
+    const cv=document.createElement("canvas");cv.width=Math.round(vp.width);cv.height=Math.round(vp.height);
+    const q=parseTextoComprobante(await textoPaginaPDF(pag),RUC_CBO);
+    // intent "print": dibuja de corrido, sin depender de que la pantalla esté refrescando
+    let dibujado=true; try{await Promise.race([pag.render({canvasContext:cv.getContext("2d"),viewport:vp,intent:"print"}).promise,new Promise((_,m)=>setTimeout(()=>m(new Error("tiempo")),20000))])}catch(e){dibujado=false}
+    // Un PDF con texto se lee directo; también se busca su QR, que es el dato más exacto
+    if(q.total>0||q.serie||q.rucs.length){
+      msg.textContent="Buscando el QR…";
+      if(dibujado)try{const det=await prepararDetector(),txt=await det(cv);if(txt&&parseQRSunat(txt,RUC_CBO)){aplicarQR(txt);guardarComoFoto(cv);return}}catch(e){}
+      aplicarTexto(q);if(dibujado)guardarComoFoto(cv);return;
+    }
+    if(!dibujado){msg.textContent="No se pudo leer ese documento. Súbelo como imagen o toma una foto.";return}
+    $("escaner").classList.remove("leyendo");await leerImagenComprobante(cv);   // PDF escaneado: sin texto, se lee como imagen
+  }catch(e){msg.textContent="No se pudo leer ese documento. Intenta otra vez."}
+  finally{$("escaner").classList.remove("leyendo")}
+}
+$("qrDoc").addEventListener("change",async e=>{
+  const f=e.target.files[0]; e.target.value=""; if(!f)return;
+  clearTimeout(qrTimer);
+  if(f.type==="application/pdf"||/\.pdf$/i.test(f.name)){leerPDFComprobante(f);return}
+  let img; try{img=await createImageBitmap(f)}catch{$("escMsg").textContent="Ese archivo no se puede abrir. Sube un PDF o una imagen.";return}
+  leerImagenComprobante(img);
+});
 $("qrFoto").addEventListener("change",async e=>{
   const f=e.target.files[0]; e.target.value=""; if(!f)return;
   if($("escaner").hidden)$("escaner").hidden=false;
@@ -3820,25 +3883,39 @@ render=function(){const r=_renderBase.apply(this,arguments);try{pintarFlujo()}ca
 document.addEventListener("click",e=>{const b=e.target.closest("[data-son]");if(!b)return;ajustes.sonido=+b.dataset.son;guardarLS("cbo-ajustes",ajustes);pintarSon();if(ajustes.sonido)sonar("registro")});
 function pintarSon(){document.querySelectorAll("#sonSeg [data-son]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.son===(ajustes.sonido===0?0:1))))}
 pintarSon();
-/* ===== Adornos de temporada en el logo (v61): una fiesta peruana por mes, activa desde 7 días antes hasta el día.
+/* ===== Adornos de temporada en el logo (v61): fiestas de Perú y las más conocidas del mundo, activas desde 7 días antes hasta el día.
    Ajustes → Apariencia → Adornos de temporada (ajustes.adornos: 0 = apagados) y "Ver cómo se ve" (solo vista previa). ===== */
 function adPascua(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),n=h+l-7*m+114;return new Date(y,Math.floor(n/31)-1,n%31+1)}
 function adDomingo(y,m,n){const d=new Date(y,m,1);return new Date(y,m,1+(7-d.getDay())%7+7*(n-1))}
+// Fiestas de calendario lunar: cambian cada año (Eid puede moverse un día según la luna). Fuera de la tabla, simplemente no salen.
+const adTabla=t=>y=>{const v=t[y];return v?new Date(y,v[0]-1,v[1]):new Date(1970,0,1)};
 // [clave, nombre, mes, fecha del año, días que sigue después del día]
 const ADOR_F=[
   ["anio","Año Nuevo",1,y=>new Date(y,0,1),0],
+  ["chino","Año Nuevo Chino",2,adTabla({2027:[2,6],2028:[1,26],2029:[2,13],2030:[2,3],2031:[1,23],2032:[2,11],2033:[1,31],2034:[2,19],2035:[2,8]}),0],
+  ["valentin","San Valentín",2,y=>new Date(y,1,14),0],
   ["carnaval","Carnaval",2,y=>{const p=adPascua(y);return new Date(p.getFullYear(),p.getMonth(),p.getDate()-47)},0],
   ["mujer","Día de la Mujer",3,y=>new Date(y,2,8),0],
+  ["holi","Holi, festival de colores (India)",3,adTabla({2027:[3,22],2028:[3,11],2029:[3,1],2030:[3,20]}),0],
+  ["patricio","San Patricio",3,y=>new Date(y,2,17),0],
+  ["eid","Eid al-Fitr, fin del Ramadán",3,adTabla({2027:[3,10],2028:[2,27],2029:[2,15],2030:[2,5]}),0],
   ["santa","Semana Santa",4,y=>adPascua(y),0],
+  ["tierra","Día de la Tierra",4,y=>new Date(y,3,22),0],
   ["trabajo","Día del Trabajo",5,y=>new Date(y,4,1),0],
   ["madre","Día de la Madre",5,y=>adDomingo(y,4,2),0],
   ["padre","Día del Padre",6,y=>adDomingo(y,5,3),0],
   ["inti","Inti Raymi y San Juan",6,y=>new Date(y,5,24),0],
+  ["usa","Independencia de EE. UU.",7,y=>new Date(y,6,4),0],
   ["patrias","Fiestas Patrias",7,y=>new Date(y,6,28),1],
   ["rosa","Santa Rosa de Lima",8,y=>new Date(y,7,30),0],
   ["primavera","Día de la Primavera",9,y=>new Date(y,8,23),0],
+  ["oktober","Oktoberfest (Alemania)",9,y=>{const d=adDomingo(y,9,1);return new Date(y,d.getMonth(),d.getDate()-15)},0],
   ["halloween","Halloween y Canción Criolla",10,y=>new Date(y,9,31),0],
-  ["santos","Todos los Santos",11,y=>new Date(y,10,1),1],
+  ["santos","Todos los Santos",11,y=>new Date(y,10,1),0],
+  ["muertos","Día de Muertos (México)",11,y=>new Date(y,10,2),0],
+  ["diwali","Diwali, festival de luces (India)",11,adTabla({2026:[11,8],2027:[10,29],2028:[10,17],2029:[11,5],2030:[10,26]}),0],
+  ["gracias","Día de Acción de Gracias",11,y=>{const d=new Date(y,10,1);return new Date(y,10,1+(11-d.getDay())%7+21)},0],
+  ["januca","Janucá",12,adTabla({2026:[12,5],2027:[12,25],2028:[12,13],2029:[12,2],2030:[12,21]}),0],
   ["navidad","Navidad",12,y=>new Date(y,11,25),0]
 ];
 function adorHoy(h){h=h||new Date();const t=new Date(h.getFullYear(),h.getMonth(),h.getDate());let mejor=null,dm=99;
@@ -3870,9 +3947,80 @@ const ADOR_ART={
   rosa:()=>`<g class="a-mece">${AD.rosa(52,41,3.6)}${AD.rosa(58,45,2.8)}</g>${AD.cae([8,20,32,44],["#FF8FB1","#E23D6B"],1.1)}`,
   primavera:()=>`<g class="a-mece">${AD.flor(4,44,3.4,"#FFD23F","#F28C28")}</g><g class="a-mece d2">${AD.flor(56,43,3.6,"#FF8FB1","#FFE08A")}</g><g transform="translate(12 -6)"><g class="a-mariposa"><g class="a-aleteo"><path d="M0 0C-4-5-8-3-6 1C-5 3-2 2 0 0ZM0 0C4-5 8-3 6 1C5 3 2 2 0 0Z" fill="#7FD3FF"/><path d="M0 0C-3 2-5 5-2 5C-1 5 0 3 0 0ZM0 0C3 2 5 5 2 5C1 5 0 3 0 0Z" fill="#B39DFF"/></g><rect x="-.5" y="-2" width="1" height="6" rx=".5" fill="#2B2B2B"/></g></g>`,
   halloween:()=>`${AD.murcielago(12,-6,.9,0)}${AD.murcielago(30,-12,.7,-2.5)}<g transform="translate(53 41)"><g class="a-flota"><ellipse rx="7.5" ry="6" fill="#F07B1A"/><ellipse rx="3.6" ry="6" fill="#F59331"/><path d="M0-6c0-2 1-3 2.5-3.4" stroke="#3E7D2E" stroke-width="1.4" fill="none" stroke-linecap="round"/><g class="a-brilla" fill="#FFE27A"><path d="M-4-1.5l1.6-1.8 1.4 1.8zM1-1.5l1.6-1.8 1.4 1.8zM-4 1.5q4 3 8 0l-1.4.6-1-1-1 1-1.2-1-1 1z"/></g></g></g>`,
+  chino:()=>{const f=(x,y,cls)=>`<g transform="translate(${x} ${y})"><g class="a-pendulo ${cls}"><line y1="-5" y2="0" stroke="#FFC93C" stroke-width=".8"/><ellipse cy="6" rx="6" ry="5.4" fill="#D7263D"/><path d="M-3 1.4Q-5 6-3 10.6M3 1.4Q5 6 3 10.6M0 .6V11.4" stroke="#8E1023" stroke-width=".6" fill="none"/><rect x="-3" y=".2" width="6" height="1.5" rx=".5" fill="#FFC93C"/><rect x="-3" y="10.4" width="6" height="1.5" rx=".5" fill="#FFC93C"/><path d="M0 12v4M-1 12v3M1 12v3" stroke="#FFC93C" stroke-width=".5"/></g></g>`;return f(5,-5,"")+f(55,-5,"d2")+AD.estrella(30,-8,"#FFD54A")},
+  valentin:()=>`<g transform="translate(52 40)"><g class="a-flota">${AD.corazon(0,0,1.9,"#E2264D")}</g></g>${AD.sube(44,34,"#FF6B8A",0)}${AD.sube(56,30,"#FF9EB5",1.1)}`,
+  holi:()=>{const n=(x,y,c,cls)=>`<g transform="translate(${x} ${y})"><g class="a-estalla ${cls}" fill="${c}">${[0,60,120,180,240,300].map(a=>`<circle cx="${(Math.cos(a*Math.PI/180)*5).toFixed(1)}" cy="${(Math.sin(a*Math.PI/180)*5).toFixed(1)}" r="1.5"/>`).join("")}<circle r="2.2"/></g></g>`;return n(8,-4,"#FF3E9D","")+n(52,-5,"#FFD400","d2")+n(54,40,"#2FD3FF","d2")},
+  patricio:()=>{const t=(x,y,e,cls)=>`<g class="a-mece ${cls}"><g transform="translate(${x} ${y}) scale(${e})"><path d="M0 8Q1 12 3 14" stroke="#1F8A3B" stroke-width="1.2" fill="none"/>${[0,120,240].map(a=>`<g transform="rotate(${a})">${AD.corazon(0,-3.6,1,"#2FB04F")}</g>`).join("")}</g></g>`;return t(52,38,1,"")+t(7,41,.7,"d2")},
+  eid:()=>`<g transform="translate(52 -3)"><g class="a-flota"><path d="M4-7A8 8 0 1 0 4 7A6.3 6.3 0 1 1 4-7Z" fill="#FFD54A"/><path transform="translate(5 0) scale(.8)" d="M0-3l.9 2.1 2.1.2-1.6 1.4.5 2.2L0 1.8-1.9 2.9l.5-2.2-1.6-1.4 2.1-.2z" fill="#FFF1B8"/></g></g>${AD.estrella(30,-8,"#FFF1B8")}${AD.estrella(16,-5,"#FFD54A","d2")}`,
+  tierra:()=>`<g transform="translate(52 39)"><g class="a-flota"><circle r="8" fill="#2F8FE0"/><path d="M-6-3Q-3-7 0-5T2-1T-2 2T-6 1ZM2 2Q5 1 6 3T3 7T1 5Z" fill="#46B85A"/><path d="M-3-7.2A8 8 0 0 1 6-5" stroke="#BFE3FF" stroke-width=".8" fill="none"/></g></g>`,
+  usa:()=>`<g transform="translate(10 -5)"><g class="a-estalla" stroke="#E2264D" stroke-width="1.3" stroke-linecap="round">${AD.rayos(10,3,8)}</g></g><g transform="translate(50 -3)"><g class="a-estalla d2" stroke="#4F8DFF" stroke-width="1.3" stroke-linecap="round">${AD.rayos(10,3,8)}</g></g>${AD.estrella(30,-8,"#FFF")}`,
+  oktober:()=>`<g transform="translate(46 28)"><g class="a-flota"><rect x="2" y="3" width="11" height="15" rx="1.5" fill="#F2B233" stroke="#FFF" stroke-width=".7"/><path d="M13 6h2.5a2.5 2.5 0 0 1 2.5 2.5v3a2.5 2.5 0 0 1-2.5 2.5H13" stroke="#FFF" stroke-width="1.3" fill="none"/><ellipse cx="4.5" cy="3" rx="3.4" ry="2.4" fill="#FFF"/><ellipse cx="9" cy="2.4" rx="4" ry="2.7" fill="#FFF"/><path d="M5 7v8M8 7v8M11 7v8" stroke="#C98A16" stroke-width=".7"/></g></g>`,
+  diwali:()=>{const d=(x,y,e,cls)=>`<g transform="translate(${x} ${y}) scale(${e})"><circle class="a-brilla ${cls}" cy="-5" r="5" fill="#FFB547" opacity=".35"/><path class="a-llama ${cls}" d="M0-8C1.9-5 1.9-3 0-1.8C-1.9-3-1.9-5 0-8Z" fill="#FFC93C"/><path d="M-7-1.5H7Q6 5 0 5T-7-1.5Z" fill="#D9622B"/><path d="M-6.4.4H6.4" stroke="#FFD54A" stroke-width=".8"/></g>`;return d(52,41,1,"")+d(7,43,.8,"d2")+AD.estrella(30,-8,"#FFD54A")},
+  muertos:()=>`<g transform="translate(52 37)"><g class="a-flota"><path d="M-7-1C-7-7-3-9 0-9S7-7 7-1C7 2 5 3 4 4V7H-4V4C-5 3-7 2-7-1Z" fill="#F4F0E6"/><circle cx="-3" cy="-1.5" r="2.2" fill="#E2264D"/><circle cx="3" cy="-1.5" r="2.2" fill="#2F8FE0"/><path d="M0 1L-1 3H1Z" fill="#222"/><path d="M-2.5 7V4.8M0 7V4.8M2.5 7V4.8" stroke="#222" stroke-width=".6"/><circle cy="-6.5" r="1" fill="#F7931E"/></g></g><g class="a-mece d2">${AD.flor(6,44,3.6,"#F7931E","#FFD23F")}</g>`,
+  gracias:()=>`<g transform="translate(52 42)"><g class="a-mece">${[-60,-30,0,30,60].map((a,i)=>`<ellipse cy="-8" rx="2.6" ry="6" fill="${["#C0392B","#F7931E","#FFD23F","#F7931E","#C0392B"][i]}" transform="rotate(${a})"/>`).join("")}<ellipse rx="5.4" ry="4.8" fill="#7A4A21"/><circle cx="3.6" cy="-4.2" r="2.5" fill="#94602E"/><path d="M5.8-4.6l2 .7-2 .7z" fill="#FFB300"/><path d="M4.8-3v2.2" stroke="#D7263D" stroke-width="1"/><circle cx="4" cy="-4.8" r=".4" fill="#111"/></g></g>`,
+  januca:()=>`<g transform="translate(50 42)"><g fill="none" stroke="#FFD54A" stroke-width=".9"><path d="M0 0V-14"/><path d="M-3 -14Q-3 -6 0 -6T3 -14"/><path d="M-6 -14Q-6 -3 0 -3T6 -14"/><path d="M-9 -14Q-9 0 0 0T9 -14"/><path d="M-4 3H4"/><path d="M0 0V3"/></g>${[-9,-6,-3,0,3,6,9].map((x,i)=>`<path class="a-llama ${["","d2","d3"][i%3]}" transform="translate(${x} ${i===3?-15.5:-14.5})" d="M0-2.6C.9-1.3.9-.4 0 .2C-.9-.4-.9-1.3 0-2.6Z" fill="#FFB547"/>`).join("")}</g>${AD.estrella(14,-6,"#9CC7FF")}`,
   santos:()=>`${AD.vela(50,36,12,"")}${AD.vela(57,39,9,"d2")}<g class="a-mece">${AD.flor(4,44,3.4,"#F7931E","#C0392B")}</g>`,
   navidad:()=>`${AD.cae([6,18,30,42,54],"#FFF")}<g class="a-flota"><g transform="translate(17 -4) rotate(-12 13 6)"><path d="M3 6C5-5 15-11 27-8C22-4 21 1 22 6Z" fill="#D7263D"/><path d="M9 1C13-6 19-9 26-8" stroke="#8E1023" stroke-width="1.1" fill="none" opacity=".55"/><rect x="1" y="4" width="23" height="5" rx="2.5" fill="#F7F7F7"/><circle class="a-brilla" cx="28" cy="-8" r="3.1" fill="#FFF"/></g></g><g class="a-mece"><path d="M53 22L60 32H57L62 40H58L64 47H42L48 40H44L49 32H46Z" fill="#1E8E4E" stroke="#0E5C31" stroke-width=".6"/><rect x="51.5" y="47" width="3" height="3.5" fill="#7A4A1E"/><circle class="a-brilla" cx="50" cy="42" r="1.1" fill="#FF5A5A"/><circle class="a-brilla d2" cx="56" cy="36" r="1.1" fill="#FFD54A"/><circle class="a-brilla d3" cx="57" cy="44" r="1.1" fill="#6EC6FF"/>${AD.estrella(53,19.5,"#FFD54A")}</g>`
 };
+// Figuras que recorren TODA la zona del logo y el nombre (dibujadas en un cuadro de -10 a 10)
+const ZSP={
+  mur:`<path d="M-10 0Q-7-5-4-2.5Q-2.5-5 0-2Q2.5-5 4-2.5Q7-5 10 0Q6-1 5 2Q2.5 0 0 2.5Q-2.5 0-5 2Q-6-1-10 0Z" fill="#2A2238" stroke="#B9A6FF" stroke-width=".8"/>`,
+  cal:`<ellipse rx="8.5" ry="7" cy="1" fill="#F07B1A"/><ellipse rx="4" ry="7" cy="1" fill="#F59331"/><path d="M0-6c0-2 1-3 3-3.6" stroke="#3E7D2E" stroke-width="1.6" fill="none"/><path d="M-4-1l2 2h-3zM4-1l1 2h-3zM-4 4q4 2.5 8 0q-4 1-8 0z" fill="#5A2A00"/>`,
+  copo:`<g stroke="#EAF6FF" stroke-width="1.5" stroke-linecap="round"><path d="M0-9V9M-8-4.5L8 4.5M-8 4.5L8-4.5M-2.5-7L0-4.5L2.5-7M-2.5 7L0 4.5L2.5 7"/></g>`,
+  arb:`<path d="M0-10L6-3H3L8 3H4L9 8H-9L-4 3H-8L-3-3H-6Z" fill="#2E9B57"/><rect x="-1.5" y="8" width="3" height="2" fill="#7A4A21"/><circle cy="-10" r="1.4" fill="#FFD54A"/><circle cx="-3" cy="2" r="1" fill="#E2264D"/><circle cx="3" cy="5" r="1" fill="#FFD54A"/>`,
+  est:`<path d="M0-9l2.6 6.2 6.6.5-5 4.3 1.6 6.5L0 5l-5.8 3.5 1.6-6.5-5-4.3 6.6-.5z" fill="var(--z1)"/>`,
+  cor:`<path d="M0 8C-11 1-10-7-5-7.5C-2.5-8-.8-6 0-4C.8-6 2.5-8 5-7.5C10-7 11 1 0 8Z" fill="var(--z1)"/>`,
+  tre:`<g fill="#2FB04F"><circle cx="0" cy="-4.5" r="4"/><circle cx="-4.2" cy="2" r="4"/><circle cx="4.2" cy="2" r="4"/></g><path d="M0 1Q1 6 3 9" stroke="#1F8A3B" stroke-width="1.5" fill="none"/>`,
+  far:`<line y1="-10" y2="-7" stroke="#FFC93C" stroke-width="1"/><ellipse rx="7" ry="6.5" fill="#D7263D"/><path d="M-3.5-5.5Q-5.5 0-3.5 5.5M3.5-5.5Q5.5 0 3.5 5.5" stroke="#8E1023" fill="none"/><rect x="-3.5" y="-7.5" width="7" height="2" fill="#FFC93C"/><rect x="-3.5" y="5.5" width="7" height="2" fill="#FFC93C"/>`,
+  flo:`${[0,72,144,216,288].map(a=>`<ellipse rx="3.4" ry="5.6" cy="-4.6" fill="var(--z1)" transform="rotate(${a})"/>`).join("")}<circle r="3" fill="var(--z2)"/>`,
+  con:`<rect x="-5" y="-3" width="10" height="6" rx="1" fill="var(--z1)"/>`,
+  con2:`<circle r="4.5" fill="var(--z2)"/>`,
+  hoj:`<path d="M0-9C6-6 7 1 0 8C-7 1-6-6 0-9Z" fill="var(--z1)"/><path d="M0-7V9" stroke="#7A3B10" stroke-width=".8"/>`,
+  luz:`<path d="M0-9C4-4 4 0 0 3C-4 0-4-4 0-9Z" fill="#FFC93C"/><path d="M-7 3H7Q6 9 0 9T-7 3Z" fill="#D9622B"/>`,
+  sol:`<g stroke="#FFB300" stroke-width="1.6" stroke-linecap="round"><path d="M0-9.5V-7M0 7V9.5M-9.5 0H-7M7 0H9.5M-6.8-6.8L-5-5M5 5L6.8 6.8M-6.8 6.8L-5 5M5-5L6.8-6.8"/></g><circle r="5" fill="#FFC928"/>`,
+  ban:`<rect x="-9" y="-6" width="6" height="12" fill="#D91023"/><rect x="-3" y="-6" width="6" height="12" fill="#FFF"/><rect x="3" y="-6" width="6" height="12" fill="#D91023"/>`,
+  cas:`<path d="M-8 4C-8-3-4-7 0-7S8-3 8 4Z" fill="#F2B705"/><rect x="-10" y="4" width="20" height="2.6" rx="1.3" fill="#D99A00"/>`,
+  mar:`<path d="M0 0C-5-7-10-4-8 1C-7 4-3 3 0 0ZM0 0C5-7 10-4 8 1C7 4 3 3 0 0ZM0 1C-4 3-6 7-3 8C-1 8 0 4 0 1ZM0 1C4 3 6 7 3 8C1 8 0 4 0 1Z" fill="var(--z1)"/><path d="M0-3V6" stroke="#333" stroke-width="1.2"/>`,
+  luna:`<path d="M4-8A8.5 8.5 0 1 0 4 8A6.8 6.8 0 1 1 4-8Z" fill="#FFD54A"/>`,
+  cal2:`<path d="M-7-1C-7-7-3-9 0-9S7-7 7-1C7 2 5 3 4 4V7H-4V4C-5 3-7 2-7-1Z" fill="#F4F0E6"/><circle cx="-3" cy="-1.5" r="2.2" fill="#E2264D"/><circle cx="3" cy="-1.5" r="2.2" fill="#2F8FE0"/><path d="M0 1L-1 3H1Z" fill="#222"/>`,
+  bur:`<circle r="5" fill="none" stroke="#FFE9A8" stroke-width="1.4"/><circle cx="-1.6" cy="-1.6" r="1" fill="#FFF"/>`
+};
+// m: "vuela" cruza de lado a lado; "cae" baja; "sube" asciende. z1/z2: colores de la fiesta (también brillan en el nombre)
+const ZON={
+  anio:{m:"cae",s:["est","con","con2"],z1:"#FFD54A",z2:"#FF7AB6"},chino:{m:"vuela",s:["far","est"],z1:"#FFD54A",z2:"#FF5A5A"},
+  valentin:{m:"sube",s:["cor"],z1:"#FF6B8A",z2:"#FFB3C7"},carnaval:{m:"cae",s:["con","con2"],z1:"#FF5A8A",z2:"#3EC6FF"},
+  mujer:{m:"sube",s:["flo","cor"],z1:"#C99BF0",z2:"#FFD54A"},holi:{m:"cae",s:["con2","con"],z1:"#FF3E9D",z2:"#7CFC4A"},
+  patricio:{m:"cae",s:["tre"],z1:"#5FE08A",z2:"#FFD54A"},eid:{m:"vuela",s:["luna","est"],z1:"#FFD54A",z2:"#FFF1B8"},
+  santa:{m:"sube",s:["est"],z1:"#FFE9A8",z2:"#7CCB62"},tierra:{m:"cae",s:["hoj","flo"],z1:"#7CCB62",z2:"#FFE08A"},
+  trabajo:{m:"vuela",s:["cas","est"],z1:"#FFD84D",z2:"#FFB300"},madre:{m:"sube",s:["cor","flo"],z1:"#FF8FB1",z2:"#FFE08A"},
+  padre:{m:"vuela",s:["est"],z1:"#8FC1FF",z2:"#FFE08A"},inti:{m:"vuela",s:["sol"],z1:"#FFC928",z2:"#FF9A3C"},
+  usa:{m:"cae",s:["est","con"],z1:"#FF6B6B",z2:"#7FB2FF"},patrias:{m:"vuela",s:["ban","est"],z1:"#FF6B7A",z2:"#FFF"},
+  rosa:{m:"cae",s:["flo"],z1:"#FF8FB1",z2:"#FFE08A"},primavera:{m:"vuela",s:["mar","flo"],z1:"#FFB3D1",z2:"#FFE08A"},
+  oktober:{m:"sube",s:["bur"],z1:"#FFD76A",z2:"#FFF"},halloween:{m:"vuela",s:["mur","cal"],z1:"#FF9A3C",z2:"#C9B3FF"},
+  santos:{m:"sube",s:["luz","flo"],z1:"#FFB547",z2:"#FFE08A"},muertos:{m:"vuela",s:["cal2","flo","mar"],z1:"#FFA63D",z2:"#FF6BA8"},
+  diwali:{m:"sube",s:["luz","est"],z1:"#FFC93C",z2:"#FF7A59"},gracias:{m:"cae",s:["hoj"],z1:"#F7931E",z2:"#FFD23F"},
+  januca:{m:"sube",s:["luz","est"],z1:"#9CC7FF",z2:"#FFE08A"},navidad:{m:"cae",s:["copo","est","arb"],z1:"#FF6B6B",z2:"#7FE0A0"}
+};
+const zSvg=(n,tam)=>`<svg viewBox="-11 -11 22 22" width="${tam}" height="${tam}" aria-hidden="true" focusable="false">${ZSP[n]||ZSP.est}</svg>`;
+function zPintar(z,k){
+  let cap=z.querySelector(":scope > .adz-capa");
+  if(!k||!ZON[k]){z.classList.remove("adz");if(cap)cap.remove();z.dataset.zk="";return}
+  if(z.dataset.zk===k&&cap)return;
+  const c=ZON[k];z.dataset.zk=k;z.classList.add("adz");z.style.setProperty("--z1",c.z1);z.style.setProperty("--z2",c.z2);
+  if(!cap){cap=document.createElement("span");cap.className="adz-capa";cap.setAttribute("aria-hidden","true");z.append(cap)}
+  const n=c.m==="vuela"?4:7;
+  cap.innerHTML=Array.from({length:n},(_,i)=>{const sp=c.s[i%c.s.length],dur=c.m==="vuela"?9+i*2.3:3.6+(i%4)*.8,tam=c.m==="vuela"?14+(i%3)*3:9+(i%3)*3;
+    return `<span class="adz-f adz-${c.m}" style="--x:${(6+i*(88/Math.max(1,n-1))).toFixed(0)}%;--y:${(12+(i*29)%70)}%;animation-duration:${dur.toFixed(1)}s;animation-delay:${(-i*dur/n).toFixed(1)}s">${zSvg(sp,tam)}</span>`}).join("");
+}
+// Tocar o pasar por cualquier parte de la zona: salen figuras desde ese punto
+function zEstallar(z,x,y,cant){
+  const k=z.dataset.zk,c=ZON[k],cap=z.querySelector(":scope > .adz-capa");if(!c||!cap||!cap.animate)return;
+  const r=z.getBoundingClientRect(),px=x==null?r.width/2:x-r.left,py=y==null?r.height/2:y-r.top;
+  for(let i=0;i<cant;i++){const e=document.createElement("span");e.className="adz-chispa";e.innerHTML=zSvg(c.s[i%c.s.length],10+Math.round(Math.random()*8));e.style.left=px+"px";e.style.top=py+"px";cap.append(e);
+    const a=Math.random()*Math.PI*2,d=26+Math.random()*44;
+    e.animate([{transform:"translate(-50%,-50%) scale(.3)",opacity:1},{transform:`translate(calc(-50% + ${(Math.cos(a)*d).toFixed(0)}px),calc(-50% + ${(Math.sin(a)*d+14).toFixed(0)}px)) scale(1) rotate(${Math.round(Math.random()*360-180)}deg)`,opacity:0}],{duration:800+Math.random()*500,easing:"cubic-bezier(.16,1,.3,1)"}).onfinish=()=>e.remove()}
+  z.classList.remove("adz-salta");void z.offsetWidth;z.classList.add("adz-salta");clearTimeout(z._zt);z._zt=setTimeout(()=>z.classList.remove("adz-salta"),700);
+}
 let adorVista="";
 const adorNombreMes=f=>{const m=MESES[f[2]-1];return m.charAt(0).toUpperCase()+m.slice(1)};
 function adorResumen(){if(ajustes.adornos===0)return "Desactivados";const f=adorHoy();return "Activados"+(f?" · "+f[1]:"")}
@@ -3880,6 +4028,7 @@ function pintarAdornos(){
   const on=ajustes.adornos!==0, f=on?(adorVista?ADOR_F.find(x=>x[0]===adorVista):adorHoy()):null, k=f?f[0]:"";
   document.querySelectorAll(".adw").forEach(w=>{const a=w.querySelector(".adorno");if(!a||a.dataset.k===k)return;a.dataset.k=k;
     a.innerHTML=k?`<svg viewBox="0 0 60 48" aria-hidden="true" focusable="false">${ADOR_ART[k]()}</svg>`:"";w.title=f?f[1]:""});
+  document.querySelectorAll("#side .marca,#logoH,#adorPrev").forEach(z=>zPintar(z,matchMedia("(prefers-reduced-motion: reduce)").matches?"":k));
   document.querySelectorAll("#adorSeg [data-ador]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.ador===(on?1:0))));
   const s=$("adorVer"); if(s){s.disabled=!on;s.value=adorVista}
   const v=$("cfgv-ador"); if(v) v.textContent=adorResumen();
@@ -3891,7 +4040,9 @@ function pintarAdornos(){
     const a=document.createElement("span");a.className="adorno";a.setAttribute("aria-hidden","true");w.append(a)});
   const quieto=matchMedia("(prefers-reduced-motion: reduce)");
   document.querySelectorAll("#side .marca,#logoH,#adorPrev").forEach(z=>{const go=()=>{const w=z.querySelector(".adw");if(quieto.matches||!w||!w.querySelector(".adorno").dataset.k)return;
-    w.classList.remove("salta");void w.offsetWidth;w.classList.add("salta");clearTimeout(w._t);w._t=setTimeout(()=>w.classList.remove("salta"),700)};z.addEventListener("pointerenter",go);z.addEventListener("pointerdown",go)});
+    w.classList.remove("salta");void w.offsetWidth;w.classList.add("salta");clearTimeout(w._t);w._t=setTimeout(()=>w.classList.remove("salta"),700)};z.addEventListener("pointerenter",go);z.addEventListener("pointerdown",e=>{go();if(!quieto.matches&&z.dataset.zk)zEstallar(z,e.clientX,e.clientY,12)});
+    // Con el mouse: al pasar por la zona va dejando figuras
+    let ult=0;z.addEventListener("pointermove",e=>{if(e.pointerType!=="mouse"||!z.dataset.zk||quieto.matches)return;const t=performance.now();if(t-ult<140)return;ult=t;zEstallar(z,e.clientX,e.clientY,1)})});
   document.addEventListener("animationend",e=>{if(e.animationName==="adSalta"){const w=e.target.closest(".adw");if(w)w.classList.remove("salta")}});
   document.addEventListener("click",e=>{const b=e.target.closest("[data-ador]");if(!b)return;ajustes.adornos=+b.dataset.ador;if(!ajustes.adornos)adorVista="";guardarLS("cbo-ajustes",ajustes);pintarAdornos()});
   const s=$("adorVer");
