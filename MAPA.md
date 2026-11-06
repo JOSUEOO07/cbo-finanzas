@@ -1,5 +1,5 @@
 # Mapa de CBO Finanzas
-Actualizado: 05/11/2026 · caché: cbo-finanzas-v67-documentos-adornos
+Actualizado: 05/11/2026 · caché: cbo-finanzas-v68-fiestas
 
 ## Archivos
 - codigo-fuente.html: versión editable (4287 líneas). index.html es la copia que se publica: editar codigo-fuente.html y copiarlo a index.html.
@@ -71,4 +71,4 @@ Actualizado: 05/11/2026 · caché: cbo-finanzas-v67-documentos-adornos
 - Barra de abajo: se esconde mientras se escribe con el teclado (clase body.escribiendo) y vuelve al cerrarlo. "Inventario" se puede elegir como acceso de la barra.
 - Paletas: 36 (se agregaron 18). El botón + de la barra de abajo usa solo los colores de la paleta (antes tenía verde y dorado fijos).
 - Escáner: botón "Subir documento" (PDF o imagen). leerPDFComprobante lee el QR o el texto del PDF; si es escaneado, lo lee como imagen (pdf.js 3.11.174 desde jsDelivr, render con intent print).
-- Adornos: 26 fiestas de Perú y del mundo (ADOR_F; las lunares usan adTabla, con años limitados). Toda la zona del logo y el nombre está ambientada e interactiva (ZON, ZSP, zPintar, zEstallar).
+- Adornos: 17 fiestas (Josué quitó Eid, Mujer, Tierra, Inti Raymi, EE. UU., Janucá, Acción de Gracias, Todos los Santos y Oktoberfest) (ADOR_F; las lunares usan adTabla, con años limitados). Toda la zona del logo y el nombre está ambientada e interactiva (ZON, ZSP, zPintar, zEstallar).

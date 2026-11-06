@@ -3887,7 +3887,7 @@ pintarSon();
    Ajustes → Apariencia → Adornos de temporada (ajustes.adornos: 0 = apagados) y "Ver cómo se ve" (solo vista previa). ===== */
 function adPascua(y){const a=y%19,b=Math.floor(y/100),c=y%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),n=h+l-7*m+114;return new Date(y,Math.floor(n/31)-1,n%31+1)}
 function adDomingo(y,m,n){const d=new Date(y,m,1);return new Date(y,m,1+(7-d.getDay())%7+7*(n-1))}
-// Fiestas de calendario lunar: cambian cada año (Eid puede moverse un día según la luna). Fuera de la tabla, simplemente no salen.
+// Fiestas de calendario lunar: cambian cada año (fechas por año). Fuera de la tabla, simplemente no salen.
 const adTabla=t=>y=>{const v=t[y];return v?new Date(y,v[0]-1,v[1]):new Date(1970,0,1)};
 // [clave, nombre, mes, fecha del año, días que sigue después del día]
 const ADOR_F=[
@@ -3895,27 +3895,18 @@ const ADOR_F=[
   ["chino","Año Nuevo Chino",2,adTabla({2027:[2,6],2028:[1,26],2029:[2,13],2030:[2,3],2031:[1,23],2032:[2,11],2033:[1,31],2034:[2,19],2035:[2,8]}),0],
   ["valentin","San Valentín",2,y=>new Date(y,1,14),0],
   ["carnaval","Carnaval",2,y=>{const p=adPascua(y);return new Date(p.getFullYear(),p.getMonth(),p.getDate()-47)},0],
-  ["mujer","Día de la Mujer",3,y=>new Date(y,2,8),0],
   ["holi","Holi, festival de colores (India)",3,adTabla({2027:[3,22],2028:[3,11],2029:[3,1],2030:[3,20]}),0],
   ["patricio","San Patricio",3,y=>new Date(y,2,17),0],
-  ["eid","Eid al-Fitr, fin del Ramadán",3,adTabla({2027:[3,10],2028:[2,27],2029:[2,15],2030:[2,5]}),0],
   ["santa","Semana Santa",4,y=>adPascua(y),0],
-  ["tierra","Día de la Tierra",4,y=>new Date(y,3,22),0],
   ["trabajo","Día del Trabajo",5,y=>new Date(y,4,1),0],
   ["madre","Día de la Madre",5,y=>adDomingo(y,4,2),0],
   ["padre","Día del Padre",6,y=>adDomingo(y,5,3),0],
-  ["inti","Inti Raymi y San Juan",6,y=>new Date(y,5,24),0],
-  ["usa","Independencia de EE. UU.",7,y=>new Date(y,6,4),0],
   ["patrias","Fiestas Patrias",7,y=>new Date(y,6,28),1],
   ["rosa","Santa Rosa de Lima",8,y=>new Date(y,7,30),0],
   ["primavera","Día de la Primavera",9,y=>new Date(y,8,23),0],
-  ["oktober","Oktoberfest (Alemania)",9,y=>{const d=adDomingo(y,9,1);return new Date(y,d.getMonth(),d.getDate()-15)},0],
   ["halloween","Halloween y Canción Criolla",10,y=>new Date(y,9,31),0],
-  ["santos","Todos los Santos",11,y=>new Date(y,10,1),0],
   ["muertos","Día de Muertos (México)",11,y=>new Date(y,10,2),0],
   ["diwali","Diwali, festival de luces (India)",11,adTabla({2026:[11,8],2027:[10,29],2028:[10,17],2029:[11,5],2030:[10,26]}),0],
-  ["gracias","Día de Acción de Gracias",11,y=>{const d=new Date(y,10,1);return new Date(y,10,1+(11-d.getDay())%7+21)},0],
-  ["januca","Janucá",12,adTabla({2026:[12,5],2027:[12,25],2028:[12,13],2029:[12,2],2030:[12,21]}),0],
   ["navidad","Navidad",12,y=>new Date(y,11,25),0]
 ];
 function adorHoy(h){h=h||new Date();const t=new Date(h.getFullYear(),h.getMonth(),h.getDate());let mejor=null,dm=99;
@@ -3937,12 +3928,10 @@ const AD={
 const ADOR_ART={
   anio:()=>`<g transform="translate(10 -5)"><g class="a-estalla" stroke="#FFD54A" stroke-width="1.3" stroke-linecap="round">${AD.rayos(10,3,8)}</g></g><g transform="translate(50 -3)"><g class="a-estalla d2" stroke="#FF7AB6" stroke-width="1.3" stroke-linecap="round">${AD.rayos(10,3,8)}</g></g><g transform="translate(31 -12)"><g class="a-estalla d3" stroke="#7FE3FF" stroke-width="1.1" stroke-linecap="round">${AD.rayos(8,2,6)}</g></g>${AD.estrella(57,41,"#FFD54A")}${AD.estrella(3,40,"#FFF","d2")}`,
   carnaval:()=>`<path class="a-serp" d="M-4 4q5-7 10 0t10 0 10 0 10 0 10 0 10 0" stroke="#FF5A8A" stroke-width="1.8" fill="none" stroke-linecap="round"/><path class="a-serp d2" d="M-2-3q5 6 10 0t10 0 10 0 10 0 10 0 10 0" stroke="#3EC6FF" stroke-width="1.6" fill="none" stroke-linecap="round"/><path class="a-serp d3" d="M2-9q5-6 10 0t10 0 10 0 10 0 10 0" stroke="#FFD54A" stroke-width="1.5" fill="none" stroke-linecap="round"/>${AD.confeti([4,14,26,38,50,58],["#FF5A8A","#3EC6FF","#FFD54A","#7BE495"])}`,
-  mujer:()=>`<g class="a-mece">${AD.flor(53,41,4,"#B57EDC","#FFD54A")}${AD.flor(46,45,3,"#E89AC7","#FFF")}</g>${AD.sube(50,30,"#E06FAE",0)}${AD.sube(57,28,"#B57EDC",1.4)}`,
   santa:()=>`${AD.palma("translate(3 47) rotate(-18)")}${AD.palma("translate(57 47) rotate(18) scale(-1 1)","d2")}${AD.estrella(30,-8,"#FFE9A8")}${AD.estrella(20,-4,"#FFF","d2")}${AD.estrella(41,-5,"#FFF","d3")}`,
   trabajo:()=>`<g class="a-flota"><g transform="translate(8 -10)"><path d="M2 14C2 4 9-1 16-1S30 4 30 14Z" fill="#F2B705"/><rect x="-1" y="13" width="34" height="3.6" rx="1.8" fill="#D99A00"/><rect x="14" y="-1.6" width="4" height="12" rx="2" fill="#FFD84D"/></g></g><g transform="translate(54 33)"><g class="a-martillo"><rect x="-1.2" y="0" width="2.4" height="13" rx="1" fill="#A86B32"/><rect x="-5" y="-3" width="10" height="4" rx="1" fill="#9AA5B1"/></g></g>`,
   madre:()=>`<g class="a-mece">${AD.flor(53,41,4,"#FF6B9A","#FFE08A")}${AD.flor(46,45,3.2,"#FFB3C7","#FFF")}${AD.flor(59,45,3,"#E2445C","#FFE08A")}</g>${AD.sube(49,31,"#FF6B9A",0)}${AD.sube(56,29,"#FF9EBB",1.2)}${AD.sube(52,33,"#E2445C",2.1)}`,
   padre:()=>`<g transform="translate(54 29)"><g class="a-pendulo"><path d="M-2.5 0h5l-1 3h-3z" fill="#1E4E8C"/><path d="M-1.5 3h3l2.5 11-4 4-4-4z" fill="#2F6FBF"/><path d="M-1 6l3 2M-1.6 9.5l3.6 2.4M-2 13l3.5 2.3" stroke="#BFD7FF" stroke-width=".7"/></g></g>${AD.estrella(6,-4,"#FFD54A")}${AD.estrella(16,-8,"#FFF","d2")}`,
-  inti:()=>`<g transform="translate(8 -3)"><g class="a-gira" stroke="#FFB300" stroke-width="1.6" stroke-linecap="round">${AD.rayos(12,8.5,12.5)}</g><circle r="7" fill="#FFC928" stroke="#F29F05" stroke-width="1"/><circle cx="-2.3" cy="-1" r=".9" fill="#8A4B00"/><circle cx="2.3" cy="-1" r=".9" fill="#8A4B00"/><path d="M-2.6 2.2q2.6 2.2 5.2 0" stroke="#8A4B00" stroke-width=".9" fill="none" stroke-linecap="round"/></g>`,
   patrias:()=>`<line x1="3" y1="10" x2="3" y2="-16" stroke="#E6E6E6" stroke-width="1.2" stroke-linecap="round"/><circle cx="3" cy="-16.6" r="1.3" fill="#FFD54A"/><g transform="translate(3.6 -15.5)"><g class="a-ondea"><rect width="7" height="12" fill="#D91023"/><rect x="7" width="7" height="12" fill="#FFF"/><rect x="14" width="7" height="12" fill="#D91023"/></g></g><g transform="translate(55 40)"><path d="M-2 4l-2.4 7 2.8-1.6L0 11zM2 4l2.4 7-2.8-1.6L0 11z" fill="#D91023"/><g class="a-gira"><circle r="5.6" fill="#D91023"/><circle r="4.6" fill="none" stroke="#FFF" stroke-width="1.4" stroke-dasharray="1.2 1.2"/><circle r="2.2" fill="#FFF"/><circle r="1.1" fill="#D91023"/></g></g>`,
   rosa:()=>`<g class="a-mece">${AD.rosa(52,41,3.6)}${AD.rosa(58,45,2.8)}</g>${AD.cae([8,20,32,44],["#FF8FB1","#E23D6B"],1.1)}`,
   primavera:()=>`<g class="a-mece">${AD.flor(4,44,3.4,"#FFD23F","#F28C28")}</g><g class="a-mece d2">${AD.flor(56,43,3.6,"#FF8FB1","#FFE08A")}</g><g transform="translate(12 -6)"><g class="a-mariposa"><g class="a-aleteo"><path d="M0 0C-4-5-8-3-6 1C-5 3-2 2 0 0ZM0 0C4-5 8-3 6 1C5 3 2 2 0 0Z" fill="#7FD3FF"/><path d="M0 0C-3 2-5 5-2 5C-1 5 0 3 0 0ZM0 0C3 2 5 5 2 5C1 5 0 3 0 0Z" fill="#B39DFF"/></g><rect x="-.5" y="-2" width="1" height="6" rx=".5" fill="#2B2B2B"/></g></g>`,
@@ -3951,15 +3940,8 @@ const ADOR_ART={
   valentin:()=>`<g transform="translate(52 40)"><g class="a-flota">${AD.corazon(0,0,1.9,"#E2264D")}</g></g>${AD.sube(44,34,"#FF6B8A",0)}${AD.sube(56,30,"#FF9EB5",1.1)}`,
   holi:()=>{const n=(x,y,c,cls)=>`<g transform="translate(${x} ${y})"><g class="a-estalla ${cls}" fill="${c}">${[0,60,120,180,240,300].map(a=>`<circle cx="${(Math.cos(a*Math.PI/180)*5).toFixed(1)}" cy="${(Math.sin(a*Math.PI/180)*5).toFixed(1)}" r="1.5"/>`).join("")}<circle r="2.2"/></g></g>`;return n(8,-4,"#FF3E9D","")+n(52,-5,"#FFD400","d2")+n(54,40,"#2FD3FF","d2")},
   patricio:()=>{const t=(x,y,e,cls)=>`<g class="a-mece ${cls}"><g transform="translate(${x} ${y}) scale(${e})"><path d="M0 8Q1 12 3 14" stroke="#1F8A3B" stroke-width="1.2" fill="none"/>${[0,120,240].map(a=>`<g transform="rotate(${a})">${AD.corazon(0,-3.6,1,"#2FB04F")}</g>`).join("")}</g></g>`;return t(52,38,1,"")+t(7,41,.7,"d2")},
-  eid:()=>`<g transform="translate(52 -3)"><g class="a-flota"><path d="M4-7A8 8 0 1 0 4 7A6.3 6.3 0 1 1 4-7Z" fill="#FFD54A"/><path transform="translate(5 0) scale(.8)" d="M0-3l.9 2.1 2.1.2-1.6 1.4.5 2.2L0 1.8-1.9 2.9l.5-2.2-1.6-1.4 2.1-.2z" fill="#FFF1B8"/></g></g>${AD.estrella(30,-8,"#FFF1B8")}${AD.estrella(16,-5,"#FFD54A","d2")}`,
-  tierra:()=>`<g transform="translate(52 39)"><g class="a-flota"><circle r="8" fill="#2F8FE0"/><path d="M-6-3Q-3-7 0-5T2-1T-2 2T-6 1ZM2 2Q5 1 6 3T3 7T1 5Z" fill="#46B85A"/><path d="M-3-7.2A8 8 0 0 1 6-5" stroke="#BFE3FF" stroke-width=".8" fill="none"/></g></g>`,
-  usa:()=>`<g transform="translate(10 -5)"><g class="a-estalla" stroke="#E2264D" stroke-width="1.3" stroke-linecap="round">${AD.rayos(10,3,8)}</g></g><g transform="translate(50 -3)"><g class="a-estalla d2" stroke="#4F8DFF" stroke-width="1.3" stroke-linecap="round">${AD.rayos(10,3,8)}</g></g>${AD.estrella(30,-8,"#FFF")}`,
-  oktober:()=>`<g transform="translate(46 28)"><g class="a-flota"><rect x="2" y="3" width="11" height="15" rx="1.5" fill="#F2B233" stroke="#FFF" stroke-width=".7"/><path d="M13 6h2.5a2.5 2.5 0 0 1 2.5 2.5v3a2.5 2.5 0 0 1-2.5 2.5H13" stroke="#FFF" stroke-width="1.3" fill="none"/><ellipse cx="4.5" cy="3" rx="3.4" ry="2.4" fill="#FFF"/><ellipse cx="9" cy="2.4" rx="4" ry="2.7" fill="#FFF"/><path d="M5 7v8M8 7v8M11 7v8" stroke="#C98A16" stroke-width=".7"/></g></g>`,
   diwali:()=>{const d=(x,y,e,cls)=>`<g transform="translate(${x} ${y}) scale(${e})"><circle class="a-brilla ${cls}" cy="-5" r="5" fill="#FFB547" opacity=".35"/><path class="a-llama ${cls}" d="M0-8C1.9-5 1.9-3 0-1.8C-1.9-3-1.9-5 0-8Z" fill="#FFC93C"/><path d="M-7-1.5H7Q6 5 0 5T-7-1.5Z" fill="#D9622B"/><path d="M-6.4.4H6.4" stroke="#FFD54A" stroke-width=".8"/></g>`;return d(52,41,1,"")+d(7,43,.8,"d2")+AD.estrella(30,-8,"#FFD54A")},
   muertos:()=>`<g transform="translate(52 37)"><g class="a-flota"><path d="M-7-1C-7-7-3-9 0-9S7-7 7-1C7 2 5 3 4 4V7H-4V4C-5 3-7 2-7-1Z" fill="#F4F0E6"/><circle cx="-3" cy="-1.5" r="2.2" fill="#E2264D"/><circle cx="3" cy="-1.5" r="2.2" fill="#2F8FE0"/><path d="M0 1L-1 3H1Z" fill="#222"/><path d="M-2.5 7V4.8M0 7V4.8M2.5 7V4.8" stroke="#222" stroke-width=".6"/><circle cy="-6.5" r="1" fill="#F7931E"/></g></g><g class="a-mece d2">${AD.flor(6,44,3.6,"#F7931E","#FFD23F")}</g>`,
-  gracias:()=>`<g transform="translate(52 42)"><g class="a-mece">${[-60,-30,0,30,60].map((a,i)=>`<ellipse cy="-8" rx="2.6" ry="6" fill="${["#C0392B","#F7931E","#FFD23F","#F7931E","#C0392B"][i]}" transform="rotate(${a})"/>`).join("")}<ellipse rx="5.4" ry="4.8" fill="#7A4A21"/><circle cx="3.6" cy="-4.2" r="2.5" fill="#94602E"/><path d="M5.8-4.6l2 .7-2 .7z" fill="#FFB300"/><path d="M4.8-3v2.2" stroke="#D7263D" stroke-width="1"/><circle cx="4" cy="-4.8" r=".4" fill="#111"/></g></g>`,
-  januca:()=>`<g transform="translate(50 42)"><g fill="none" stroke="#FFD54A" stroke-width=".9"><path d="M0 0V-14"/><path d="M-3 -14Q-3 -6 0 -6T3 -14"/><path d="M-6 -14Q-6 -3 0 -3T6 -14"/><path d="M-9 -14Q-9 0 0 0T9 -14"/><path d="M-4 3H4"/><path d="M0 0V3"/></g>${[-9,-6,-3,0,3,6,9].map((x,i)=>`<path class="a-llama ${["","d2","d3"][i%3]}" transform="translate(${x} ${i===3?-15.5:-14.5})" d="M0-2.6C.9-1.3.9-.4 0 .2C-.9-.4-.9-1.3 0-2.6Z" fill="#FFB547"/>`).join("")}</g>${AD.estrella(14,-6,"#9CC7FF")}`,
-  santos:()=>`${AD.vela(50,36,12,"")}${AD.vela(57,39,9,"d2")}<g class="a-mece">${AD.flor(4,44,3.4,"#F7931E","#C0392B")}</g>`,
   navidad:()=>`${AD.cae([6,18,30,42,54],"#FFF")}<g class="a-flota"><g transform="translate(17 -4) rotate(-12 13 6)"><path d="M3 6C5-5 15-11 27-8C22-4 21 1 22 6Z" fill="#D7263D"/><path d="M9 1C13-6 19-9 26-8" stroke="#8E1023" stroke-width="1.1" fill="none" opacity=".55"/><rect x="1" y="4" width="23" height="5" rx="2.5" fill="#F7F7F7"/><circle class="a-brilla" cx="28" cy="-8" r="3.1" fill="#FFF"/></g></g><g class="a-mece"><path d="M53 22L60 32H57L62 40H58L64 47H42L48 40H44L49 32H46Z" fill="#1E8E4E" stroke="#0E5C31" stroke-width=".6"/><rect x="51.5" y="47" width="3" height="3.5" fill="#7A4A1E"/><circle class="a-brilla" cx="50" cy="42" r="1.1" fill="#FF5A5A"/><circle class="a-brilla d2" cx="56" cy="36" r="1.1" fill="#FFD54A"/><circle class="a-brilla d3" cx="57" cy="44" r="1.1" fill="#6EC6FF"/>${AD.estrella(53,19.5,"#FFD54A")}</g>`
 };
 // Figuras que recorren TODA la zona del logo y el nombre (dibujadas en un cuadro de -10 a 10)
@@ -3989,17 +3971,17 @@ const ZSP={
 const ZON={
   anio:{m:"cae",s:["est","con","con2"],z1:"#FFD54A",z2:"#FF7AB6"},chino:{m:"vuela",s:["far","est"],z1:"#FFD54A",z2:"#FF5A5A"},
   valentin:{m:"sube",s:["cor"],z1:"#FF6B8A",z2:"#FFB3C7"},carnaval:{m:"cae",s:["con","con2"],z1:"#FF5A8A",z2:"#3EC6FF"},
-  mujer:{m:"sube",s:["flo","cor"],z1:"#C99BF0",z2:"#FFD54A"},holi:{m:"cae",s:["con2","con"],z1:"#FF3E9D",z2:"#7CFC4A"},
-  patricio:{m:"cae",s:["tre"],z1:"#5FE08A",z2:"#FFD54A"},eid:{m:"vuela",s:["luna","est"],z1:"#FFD54A",z2:"#FFF1B8"},
-  santa:{m:"sube",s:["est"],z1:"#FFE9A8",z2:"#7CCB62"},tierra:{m:"cae",s:["hoj","flo"],z1:"#7CCB62",z2:"#FFE08A"},
+  holi:{m:"cae",s:["con2","con"],z1:"#FF3E9D",z2:"#7CFC4A"},
+  patricio:{m:"cae",s:["tre"],z1:"#5FE08A",z2:"#FFD54A"},
+  santa:{m:"sube",s:["est"],z1:"#FFE9A8",z2:"#7CCB62"},
   trabajo:{m:"vuela",s:["cas","est"],z1:"#FFD84D",z2:"#FFB300"},madre:{m:"sube",s:["cor","flo"],z1:"#FF8FB1",z2:"#FFE08A"},
-  padre:{m:"vuela",s:["est"],z1:"#8FC1FF",z2:"#FFE08A"},inti:{m:"vuela",s:["sol"],z1:"#FFC928",z2:"#FF9A3C"},
-  usa:{m:"cae",s:["est","con"],z1:"#FF6B6B",z2:"#7FB2FF"},patrias:{m:"vuela",s:["ban","est"],z1:"#FF6B7A",z2:"#FFF"},
+  padre:{m:"vuela",s:["est"],z1:"#8FC1FF",z2:"#FFE08A"},
+  patrias:{m:"vuela",s:["ban","est"],z1:"#FF6B7A",z2:"#FFF"},
   rosa:{m:"cae",s:["flo"],z1:"#FF8FB1",z2:"#FFE08A"},primavera:{m:"vuela",s:["mar","flo"],z1:"#FFB3D1",z2:"#FFE08A"},
-  oktober:{m:"sube",s:["bur"],z1:"#FFD76A",z2:"#FFF"},halloween:{m:"vuela",s:["mur","cal"],z1:"#FF9A3C",z2:"#C9B3FF"},
-  santos:{m:"sube",s:["luz","flo"],z1:"#FFB547",z2:"#FFE08A"},muertos:{m:"vuela",s:["cal2","flo","mar"],z1:"#FFA63D",z2:"#FF6BA8"},
-  diwali:{m:"sube",s:["luz","est"],z1:"#FFC93C",z2:"#FF7A59"},gracias:{m:"cae",s:["hoj"],z1:"#F7931E",z2:"#FFD23F"},
-  januca:{m:"sube",s:["luz","est"],z1:"#9CC7FF",z2:"#FFE08A"},navidad:{m:"cae",s:["copo","est","arb"],z1:"#FF6B6B",z2:"#7FE0A0"}
+  halloween:{m:"vuela",s:["mur","cal"],z1:"#FF9A3C",z2:"#C9B3FF"},
+  muertos:{m:"vuela",s:["cal2","flo","mar"],z1:"#FFA63D",z2:"#FF6BA8"},
+  diwali:{m:"sube",s:["luz","est"],z1:"#FFC93C",z2:"#FF7A59"},
+  navidad:{m:"cae",s:["copo","est","arb"],z1:"#FF6B6B",z2:"#7FE0A0"}
 };
 const zSvg=(n,tam)=>`<svg viewBox="-11 -11 22 22" width="${tam}" height="${tam}" aria-hidden="true" focusable="false">${ZSP[n]||ZSP.est}</svg>`;
 function zPintar(z,k){
