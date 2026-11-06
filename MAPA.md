@@ -1,5 +1,5 @@
 # Mapa de CBO Finanzas
-Actualizado: 05/11/2026 · caché: cbo-finanzas-v75-colores-usuario
+Actualizado: 05/11/2026 · caché: cbo-finanzas-v76-circulo-usuario
 
 ## Archivos
 - codigo-fuente.html: versión editable (4287 líneas). index.html es la copia que se publica: editar codigo-fuente.html y copiarlo a index.html.
@@ -77,4 +77,4 @@ Actualizado: 05/11/2026 · caché: cbo-finanzas-v75-colores-usuario
 - Adorno de cumpleaños de Josué: solo el 14 de junio y solo con el usuario JOSUÉ VILLAR. El Mundial va del 15 de junio al 14 de julio.
 - Festividad en la barra de abajo (celular): capa #tbZona con figuras y línea de luz, la + cambia por el ícono de la fiesta (FI_IC, pintarFiestaBarra) y #titulo toma los colores de la fiesta en todas las secciones.
 - Festividad: su color manda en toda la app (FI_TEMA, fiestaCol) con combinaciones y degradados; el color elegido vuelve al terminar. Barra sin fiesta: animación sutil (tb-zona).
-- Usuario arriba a la derecha (#usuarioBtn): muestra quién es y abre su imagen (ovPerfil: foto o muñequito, cbo-avatares, solo en el equipo). No cambia de usuario; eso sigue en Configuración → Quién registra.
+- Usuario arriba a la derecha (#usuarioBtn): solo el circulito con la inicial o la imagen, sin nombre; abre su imagen (ovPerfil: foto o muñequito, cbo-avatares, solo en el equipo). No cambia de usuario; eso sigue en Configuración → Quién registra.
