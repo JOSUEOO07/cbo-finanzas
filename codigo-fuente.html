@@ -2123,7 +2123,7 @@ function ir(s){
   const enMas=!["inicio",...[...document.querySelectorAll("#tabbar [data-tab]")].map(b=>b.dataset.tab)].includes(s);
   document.querySelectorAll("#tabbar [data-tab]").forEach(b=>b.setAttribute("aria-current",(b.dataset.tab===s||(b.dataset.tab==="mas"&&enMas))?"page":"false"));
   $("titulo").textContent=TITULOS[s]; $("monthsel").hidden=s==="config"||s==="inventario";
-  $("app").classList.remove("abierto");document.body.classList.remove("menu"); try{history.replaceState(null,"","#"+s)}catch{}
+  $("app").classList.remove("abierto");document.body.classList.remove("menu"); try{history.replaceState(history.state,"","#"+s)}catch{}
   if(s==="obras") try{renderObras()}catch(e){console.error(e)}
   if(s==="inventario") try{invRender();invCargar()}catch(e){console.error(e)}
   if(cambio) entrarSeccion(s,antes);
@@ -4312,6 +4312,28 @@ window.__palUlt=ajustes.paleta;setTimeout(()=>sincPerfil(true),2500);
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")sincPerfil()});
 window.addEventListener("online",()=>sincPerfil(true));
 (function(){const tb=$("tabbar"),zo=$("tbZona");if(tb&&zo)tb.addEventListener("pointerdown",e=>{if(zo.dataset.zk)zEstallar(zo,e.clientX,e.clientY)})})();
+/* Gesto o botón "atrás" del celular: primero cierra lo abierto, luego vuelve a la pantalla anterior y a Inicio.
+   Solo sale de la app estando en Inicio. Devuelve true si atendió el gesto. */
+function alAtras(){
+  const vis=id=>{const e=$(id);return !!e&&!e.hidden};
+  if(vis("bloqueo")||vis("setup"))return true;
+  if(vis("escaner")){cerrarEscaner();return true}
+  for(const id of ["ovFirmaT","ovInvObra","ovInv","ovTrab","ovPla","ovSun","ovMov","ovMas","ovPerfil","ovQuien"]){if(vis(id)){cerrarOv(id);if(id==="ovInv")invItemAbierto=null;return true}}
+  if(vis("ov")){if(paso>1)irPaso(paso-1);else closeF();return true}
+  if(document.body.classList.contains("abanico")){document.body.classList.remove("abanico");return true}
+  if($("app").classList.contains("abierto")){$("app").classList.remove("abierto");document.body.classList.remove("menu");return true}
+  if(seccion==="inventario"&&invVista!=="home"){invVista="home";invRender();window.scrollTo(0,0);return true}
+  if(seccion==="obras"&&obraSel&&!matchMedia("(min-width:1100px)").matches){obraSel=null;renderObras();window.scrollTo(0,0);return true}
+  if(seccion!=="inicio"){ir("inicio");window.scrollTo(0,0);return true}
+  return false;
+}
+(function(){
+  const arma=()=>{try{if(!(history.state&&history.state.cbo))history.pushState({cbo:1},"",location.href)}catch{}};
+  arma();
+  // Un toque cuenta como uso de la app y deja lista la protección para el siguiente gesto
+  document.addEventListener("pointerdown",arma,{capture:true,passive:true});
+  addEventListener("popstate",()=>{if(alAtras())arma();else{try{history.back()}catch{}}});
+})();
 function adorResumen(){if(ajustes.adornos===0)return "Desactivados";const f=adorHoy();return "Activados"+(f?" · "+f[1]:"")}
 function pintarAdornos(){
   const on=ajustes.adornos!==0, f=on?(adorVista?ADOR_F.find(x=>x[0]===adorVista):adorHoy()):null, k=f?f[0]:"";
