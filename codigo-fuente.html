@@ -431,6 +431,9 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
 .cola-aviso{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.cola-aviso[hidden]{display:none}
 /* Tarjetas que se tocan: Ingresos, Gastos y SUNAT llevan a su detalle */
 button.kpi,button.big{font:inherit;text-align:left;width:100%;-webkit-tap-highlight-color:transparent}
+/* Toques instantáneos: sin la espera del doble toque y con respuesta visual en el mismo momento */
+button,a,summary,label,select,input[type=checkbox],input[type=radio],[role=button],[data-ir],[data-tab],.chip,.swipe>.item{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button:not(:disabled):active,summary:active,[role=button]:active,.chip:active{filter:brightness(.86);transition:filter 0s}
 button.big{border:0}
 .tap{position:relative;cursor:pointer;transition:transform .15s var(--ease),box-shadow .15s var(--ease)}
 .tap:active{transform:scale(.97)}
@@ -3311,7 +3314,6 @@ function pintarSesion(){
     <p class="pal-t">Equipos con sesión abierta</p>${(p.eq||[]).length?`<ul class="usr-eq">${p.eq.map(e=>`<li><span>${esc(e.eq)}<small>Entró ${fhUsr(e.c)} · último uso ${fhUsr(e.u)}</small></span><button class="btnlink" type="button" data-cerrarses="${esc(p.n)}" data-sid="${esc(e.id)}">Cerrar sesión</button></li>`).join("")}</ul>`:`<p class="hint" style="margin:0">Ninguno</p>`}</div></li>`;
   const adm=sesion.admin?`<p class="pal-t" style="margin:16px 0 6px">Usuarios</p><ul class="usr-lista">${PERSONAS.map(fila).join("")}</ul>
     <div class="line usr-nuevo"><input id="usrNombre" type="text" placeholder="Nombre y apellido" maxlength="40" autocomplete="off" aria-label="Nombre del usuario nuevo"><button class="btn" type="button" id="usrAgregar">Agregar usuario</button></div>
-    <p class="pal-t" style="margin:16px 0 6px">Equipos con sesión abierta</p>${(()=>{const t=PERSONAS.flatMap(p=>(p.eq||[]).map(e=>({p,e}))).sort((a,b)=>(b.e.u||0)-(a.e.u||0));return t.length?`<ul class="usr-eq usr-todos">${t.map(({p,e})=>`<li><span><b>${esc(e.eq)}</b><small>Usuario: ${esc(titulo(p.n))} · último uso ${fhUsr(e.u)}</small></span><button class="btnlink" type="button" data-cerrarses="${esc(p.n)}" data-sid="${esc(e.id)}">Cerrar sesión</button></li>`).join("")}</ul>`:`<p class="hint" style="margin:0">Ninguno</p>`})()}
     <p class="pal-t" style="margin:16px 0 6px">Historial de cambios (solo lo ves tú)</p><button class="btn" type="button" id="verHist">Ver historial</button><ul class="usr-hist" id="usrHist" hidden></ul>`:"";
   el.innerHTML=`<p class="usr-yo">Entraste como <b>${esc(titulo(quien))}</b> en este equipo.</p>${!sesion.admin&&leerLS(SESA_K,null)?`<div class="line" style="margin-bottom:10px"><button class="btn pri" type="button" id="sesVolver">Volver a ${esc(nomCorto(leerLS(SESA_K,{}).u))}</button></div>`:""}<div class="line"><button class="btnlink" type="button" id="sesSalir">Salir de este equipo</button></div>${adm}`;
   const vb=$("sesVolver");if(vb)vb.onclick=volverAdmin;
