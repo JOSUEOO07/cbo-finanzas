@@ -552,6 +552,9 @@ body.escribiendo .tabbar,body.escribiendo .fab{display:none!important}
 .usr-perm label{display:flex;gap:10px;align-items:center;justify-content:flex-start;font-size:.86rem;line-height:1.2;min-height:42px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;text-align:left;margin:0;width:auto}
 .usr-perm input[type=checkbox]{flex:0 0 18px;width:18px;height:18px;margin:0;padding:0;min-width:0;min-height:0;accent-color:var(--brand)}
 .usr-eq{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.usr-eq li>span{flex:1}
+.eq-ic{flex:0 0 22px;display:grid;place-items:center;color:var(--muted)}
+.eq-ic svg{width:20px;height:20px}
 .usr-todos li{padding:10px 12px;border:1px solid var(--line);border-radius:12px}
 .usr-hist{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:2px;max-height:360px;overflow:auto}
 .usr-hist li{font-size:.84rem;border-bottom:1px solid var(--line);padding:6px 0;overflow-wrap:anywhere}
@@ -3211,27 +3214,7 @@ const sinNube=()=>esDemo()&&!window.__nube; // modo de prueba sin servidor: no h
 // El PIN de cada uno (solo llega al administrador) se queda en memoria, no se guarda en el equipo
 const usarLista=j=>{PERSONAS=(j.usuarios||[]).map(x=>({n:x.usuario,pin:!!x.tienePin,admin:!!x.admin,p:x.pin||"",b:!!x.bloqueado,oc:x.ocultas||[],d:!!x.descargar,eq:x.equipos||[]}));guardarLS("cbo-personas",PERSONAS.map(({p,...r})=>r));pintarQuien()};
 // Nombre del equipo para la lista "Equipos con sesión abierta" del administrador
-// Marca y modelo a partir del código que da el celular (Android). iPhone y computadoras no dan modelo ni marca.
-function marcaModelo(m){
-  m=String(m||"").trim();if(!m||m==="K")return "";
-  let x;
-  if((x=m.match(/^SM-([AMFE])(\d\d)\d/i)))return "Samsung Galaxy "+x[1].toUpperCase()+x[2];
-  if((x=m.match(/^SM-S9(\d)\d/i)))return "Samsung Galaxy S"+(22+ +x[1]);
-  if(/^SM-/i.test(m))return "Samsung Galaxy ("+m+")";
-  if(/^Pixel/i.test(m))return "Google "+m;
-  if(/^moto/i.test(m))return "Motorola "+m.replace(/^moto/i,"Moto");
-  if(/^(Redmi|POCO|Mi )/i.test(m))return "Xiaomi "+m;
-  if(/^(\d{4,5}[A-Z0-9]{4,}|M\d{4}[A-Z]\d*[A-Z]*)$/.test(m))return "Xiaomi ("+m+")";
-  if(/^CPH\d/i.test(m))return "OPPO ("+m+")";
-  if(/^RMX\d/i.test(m))return "realme ("+m+")";
-  if(/^V\d{4}/.test(m))return "vivo ("+m+")";
-  if(/^(HUAWEI|[A-Z]{3}-[A-Z]{1,2}\d)/.test(m))return "Huawei ("+m+")";
-  if(/^(Infinix|TECNO|itel|Nokia|ZTE|LG|Lenovo|OnePlus|HONOR|Honor)/i.test(m))return m;
-  return m;
-}
-let EQUIPO=(()=>{const a=navigator.userAgent||"";const um=(a.match(/Android [\d.]+; ([^;)]+)\)/)||[])[1];const so=/Android/i.test(a)?(marcaModelo(um)||"Celular Android"):/iPhone/i.test(a)?"Apple iPhone":/iPad/i.test(a)?"Apple iPad":/Windows/i.test(a)?"PC Windows":/Mac/i.test(a)?"Apple Mac":"Equipo";const nav=/Edg\//.test(a)?"Edge":/Chrome\//.test(a)?"Chrome":/Safari\//.test(a)?"Safari":/Firefox\//.test(a)?"Firefox":"";let inst=false;try{inst=matchMedia("(display-mode: standalone)").matches}catch{}return so+(inst?" · app instalada":nav?" · "+nav:"")})();
-// Chrome en Android esconde el modelo en el texto del navegador: se pide aparte
-try{if(navigator.userAgentData&&/Android/i.test(navigator.userAgent))navigator.userAgentData.getHighEntropyValues(["model"]).then(h=>{const mm=marcaModelo(h&&h.model);if(mm){const p=EQUIPO.split(" · ");p[0]=mm;EQUIPO=p.join(" · ")}}).catch(()=>{})}catch{}
+let EQUIPO=(()=>{const a=navigator.userAgent||"";const um=(a.match(/Android [\d.]+; ([^;)]+)\)/)||[])[1];const so=/Android/i.test(a)?"Celular Android":/iPhone/i.test(a)?"Apple iPhone":/iPad/i.test(a)?"Apple iPad":/Windows/i.test(a)?"PC Windows":/Mac/i.test(a)?"Apple Mac":"Equipo";const nav=/Edg\//.test(a)?"Edge":/Chrome\//.test(a)?"Chrome":/Safari\//.test(a)?"Safari":/Firefox\//.test(a)?"Firefox":"";let inst=false;try{inst=matchMedia("(display-mode: standalone)").matches}catch{}return so+(inst?" · app instalada":nav?" · "+nav:"")})();
 const sesDe=j=>({u:j.usuario,t:j.token,admin:!!j.admin,ocultas:j.ocultas||[],descargar:!!(j.admin||j.descargar)});
 async function pedirEntrada(n,pin){
   if(sinNube())return {u:n,t:"demo",admin:!!(PERSONAS.find(p=>p.n===n)||{}).admin,ocultas:[],descargar:true};
@@ -3304,6 +3287,11 @@ async function agregarUsuario(){
   try{usarLista(await api("crearUsuario",{nombre:nom,pin}));i.value="";toast(`${titulo(nom)} agregado con su PIN.`)}catch(e){toast(e.message)}
 }
 let usrAbierto="";
+// Equipos: ícono de celular, tablet o computadora a la izquierda, sin marca ni modelo
+function tipoEq(t){t=String(t||"");return /iPad|Tablet/i.test(t)?"tablet":(/PC|Windows|Mac|Linux/i.test(t)&&!/Android|iPhone/i.test(t))?"pc":"cel"}
+function nomEq(t){const p=String(t||"").split(" · ");const adm=p[0]==="Administrador"?p.shift():"";if(tipoEq(p.join(" "))==="cel"&&!/^(Celular Android|Apple iPhone)$/.test(p[0]||""))p[0]=/iPhone/i.test(p[0]||"")?"Apple iPhone":"Celular Android";return (adm?adm+" · ":"")+p.filter(Boolean).join(" · ")}
+const ICO_EQ={cel:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>',tablet:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M11 18h2"/></svg>',pc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M1 20h22"/></svg>'};
+const icoEq=t=>ICO_EQ[tipoEq(t)];
 const fhUsr=ms=>{try{return ms?new Date(ms).toLocaleString("es-PE",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}):""}catch{return ""}};
 function pintarSesion(){
   const el=$("quienSeg");if(!el)return;
@@ -3311,7 +3299,7 @@ function pintarSesion(){
   const fila=p=>`<li class="usr-li${p.b?" off":""}"><div class="usr-cab"><span><b>${esc(titulo(p.n))}${p.n===quien?" (tú)":""}</b><small>${p.admin?"Administrador":p.b?"Sin acceso":"Usuario"} · PIN <span class="usr-pin" data-pin="${esc(p.p||"")}">••••</span></small></span><button class="btnlink" type="button" data-abrir="${esc(p.n)}">${usrAbierto===p.n?"Cerrar":"Opciones"}</button></div>
     <div class="usr-det"${usrAbierto===p.n?"":" hidden"}><div class="usr-acc">${p.p?`<button class="btnlink" type="button" data-verpin>Ver PIN</button>`:""}${p.n!==quien&&!p.b?`<button class="btnlink" type="button" data-como="${esc(p.n)}">Entrar como</button>`:""}<button class="btnlink" type="button" data-ponpin="${esc(p.n)}">Cambiar PIN</button>${!p.admin?`<button class="btnlink" type="button" data-acceso="${esc(p.n)}" data-permitir="${p.b?"1":""}">${p.b?"Dar acceso":"Quitar acceso"}</button>`:""}</div>
     ${!p.admin?`<p class="pal-t">Puede ver y usar</p><div class="usr-perm">${SECC_PERM.map(k=>`<label><input type="checkbox" data-secc="${k}"${(p.oc||[]).includes(k)?"":" checked"}> ${SECC_NOM[k]}</label>`).join("")}<label><input type="checkbox" data-desc${p.d?" checked":""}> Descargar reportes</label></div><div class="line"><button class="btn" type="button" data-guardperm="${esc(p.n)}">Guardar permisos</button></div>`:""}
-    <p class="pal-t">Equipos con sesión abierta</p>${(p.eq||[]).length?`<ul class="usr-eq">${p.eq.map(e=>`<li><span>${esc(e.eq)}<small>Entró ${fhUsr(e.c)} · último uso ${fhUsr(e.u)}</small></span><button class="btnlink" type="button" data-cerrarses="${esc(p.n)}" data-sid="${esc(e.id)}">Cerrar sesión</button></li>`).join("")}</ul>`:`<p class="hint" style="margin:0">Ninguno</p>`}</div></li>`;
+    <p class="pal-t">Equipos con sesión abierta</p>${(p.eq||[]).length?`<ul class="usr-eq">${p.eq.map(e=>`<li><i class="eq-ic" aria-hidden="true">${icoEq(e.eq)}</i><span>${esc(nomEq(e.eq))}<small>Entró ${fhUsr(e.c)} · último uso ${fhUsr(e.u)}</small></span><button class="btnlink" type="button" data-cerrarses="${esc(p.n)}" data-sid="${esc(e.id)}">Cerrar sesión</button></li>`).join("")}</ul>`:`<p class="hint" style="margin:0">Ninguno</p>`}</div></li>`;
   const adm=sesion.admin?`<p class="pal-t" style="margin:16px 0 6px">Usuarios</p><ul class="usr-lista">${PERSONAS.map(fila).join("")}</ul>
     <div class="line usr-nuevo"><input id="usrNombre" type="text" placeholder="Nombre y apellido" maxlength="40" autocomplete="off" aria-label="Nombre del usuario nuevo"><button class="btn" type="button" id="usrAgregar">Agregar usuario</button></div>
     <p class="pal-t" style="margin:16px 0 6px">Historial de cambios (solo lo ves tú)</p><button class="btn" type="button" id="verHist">Ver historial</button><ul class="usr-hist" id="usrHist" hidden></ul>`:"";
