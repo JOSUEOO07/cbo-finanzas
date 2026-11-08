@@ -538,6 +538,16 @@ body.escribiendo .tabbar,body.escribiendo .fab{display:none!important}
 .escaner.leyendo .marco::after{animation-duration:.6s}
 .req{font-weight:600;opacity:.75;text-transform:none;letter-spacing:0}
 /* PIN */
+.usr-lista{list-style:none;margin:0 0 12px;padding:0;display:grid;gap:8px}
+.usr-lista li{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px}
+.usr-lista li>span{display:grid;min-width:0;overflow-wrap:anywhere}
+.usr-lista small{color:var(--muted);font-size:.78rem}
+.usr-yo{margin:0 0 10px}
+.usr-acc{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.usr-pin{font-variant-numeric:tabular-nums;letter-spacing:.08em}
+.usr-lista li.off>span{opacity:.55}
+#ovQuien{background:var(--bg)} /* sin sesión no se ve lo guardado detrás */
+.usr-nuevo input{flex:1 1 160px;min-width:0}
 .bloqueo{position:fixed;inset:0;z-index:60;background:var(--brand);color:var(--brand-ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px}
 .bloqueo h2{font-family:var(--display);margin:0;font-size:1.3rem}
 .bloqueo .puntos{display:flex;gap:14px;height:16px}
@@ -1440,9 +1450,9 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
               <div class="ador-prev" id="adorPrev"><img id="adorPrevImg" alt=""><span><b>Casa Bonita Oregón</b><small>Así se ve arriba a la izquierda</small></span></div>
           </div></details>
           <p class="cfg-grupo">Tu empresa</p>
-          <details class="cfg-item" data-cfg="quien"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></i><span class="cfg-t"><b>Quién registra</b><small class="cfg-v" id="cfgv-quien"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
-            <p class="hint" style="margin:0 0 10px">Lo que se registre desde este celular quedará con este nombre.</p>
-            <div class="seg" id="quienSeg" role="group" aria-label="Quién registra"></div>
+          <details class="cfg-item" data-cfg="quien"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></i><span class="cfg-t"><b>Tu usuario y PIN</b><small class="cfg-v" id="cfgv-quien"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
+            <p class="hint" style="margin:0 0 10px">Cada persona entra con su nombre y su PIN. Lo que registre queda con su nombre, y nadie más puede registrar a su nombre.</p>
+            <div id="quienSeg"></div>
           </div></details>
           <details class="cfg-item" data-cfg="meta"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg></i><span class="cfg-t"><b>Meta y datos de la empresa</b><small class="cfg-v" id="cfgv-meta"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
             <div class="cfgrow"><label for="meta">Meta de ventas del año (S/)</label><div class="line"><input id="meta" type="number" inputmode="decimal" min="0" step="1000" style="max-width:220px"><button class="btn" id="guardarMeta" type="button">Guardar</button><span class="hint" id="metaOk"></span></div></div>
@@ -1626,8 +1636,8 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
 </div>
 <div class="overlay" id="ovQuien" hidden>
   <div class="sheet" style="max-width:420px">
-    <h3>¿Quién usa este celular?</h3>
-    <p class="hint" style="margin:0 0 12px">Cada comprobante y pago que registres quedará con tu nombre, en la app y en el Excel. Se elige una sola vez (puedes cambiarlo en Más → Quién registra).</p>
+    <h3>¿Quién eres?</h3>
+    <p class="hint" style="margin:0 0 12px">Toca tu nombre y escribe tu PIN. Lo que registres quedará con tu nombre, en la app y en el Excel. Se hace una sola vez en cada equipo.</p>
     <div style="display:grid;gap:10px" id="quienBtns"></div>
   </div>
 </div>
@@ -2904,13 +2914,13 @@ async function hashPin(pin){
   const h=await crypto.subtle.digest("SHA-256",d);
   return [...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,"0")).join("");
 }
-let pinBuf="", pinModo=null, pinNuevo="", pinOk=null, ocultoDesde=0;
+let pinBuf="", pinModo=null, pinNuevo="", pinOk=null, ocultoDesde=0, pinCheck=null, pinVolver="nuevo", pinRevisando=false;
 const PIN_LARGO=4;
 function pintarPuntos(){$("pinPuntos").innerHTML=Array.from({length:PIN_LARGO},(_,i)=>`<i class="${i<pinBuf.length?"on":""}"></i>`).join("")}
 $("teclado").innerHTML=["1","2","3","4","5","6","7","8","9","","0","⌫"].map(k=>k?`<button type="button" data-k="${k}" ${k==="⌫"?'aria-label="Borrar" class="sin"':""}>${k}</button>`:"<span></span>").join("");
-function abrirPin(modo,titulo){
-  pinModo=modo; pinBuf=""; $("pinTit").textContent=titulo; $("pinErr").textContent="";
-  $("pinOlvido").hidden=modo!=="desbloquear"; $("pinCancelar").hidden=modo==="desbloquear";
+function abrirPin(modo,titulo,check){
+  pinModo=modo; pinCheck=check||null; pinRevisando=false; pinBuf=""; $("pinTit").textContent=titulo; $("pinErr").textContent="";
+  $("pinOlvido").hidden=modo!=="desbloquear"&&modo!=="externo"; $("pinCancelar").hidden=modo==="desbloquear";
   pintarPuntos(); $("bloqueo").hidden=false;
   return new Promise(ok=>pinOk=ok);
 }
@@ -2921,10 +2931,17 @@ async function teclaPin(k){
   pinBuf+=k; pintarPuntos();
   if(pinBuf.length<PIN_LARGO)return;
   const pin=pinBuf;
-  if(pinModo==="nuevo"){pinNuevo=pin;pinModo="confirmar";pinBuf="";$("pinTit").textContent="Repite tu nuevo PIN";setTimeout(pintarPuntos,120);return}
+  if(pinModo==="nuevo"||pinModo==="elegir"){pinNuevo=pin;pinVolver=pinModo;pinModo="confirmar";pinBuf="";$("pinTit").textContent="Repite el PIN";setTimeout(pintarPuntos,120);return}
   if(pinModo==="confirmar"){
-    if(pin!==pinNuevo){pinModo="nuevo";$("pinTit").textContent="Elige un PIN de 4 números";errorPin("No coinciden. Vuelve a intentarlo.");return}
+    if(pin!==pinNuevo){pinModo=pinVolver;$("pinTit").textContent="Elige un PIN de 4 números";errorPin("No coinciden. Vuelve a intentarlo.");return}
+    if(pinVolver==="elegir"){cerrarPin(pin);return}
     guardarLS(PIN_K,await hashPin(pin)); cerrarPin(true); return}
+  // PIN de usuario: lo revisa el servidor; el error se muestra aquí mismo
+  if(pinModo==="externo"){
+    if(pinRevisando)return; pinRevisando=true; $("pinErr").textContent="Revisando…";
+    try{const r=await pinCheck(pin);pinRevisando=false;$("pinErr").textContent="";cerrarPin(r)}
+    catch(e){pinRevisando=false;if(e.code==="sinpin"){cerrarPin({sinpin:true});return}errorPin(e.message||"No se pudo revisar el PIN")}
+    return}
   const ok=(await hashPin(pin))===leerLS(PIN_K,"");
   if(!ok){errorPin("PIN incorrecto");return}
   cerrarPin(true);
@@ -2934,6 +2951,7 @@ $("teclado").addEventListener("click",e=>{const b=e.target.closest("[data-k]");i
 document.addEventListener("keydown",e=>{if($("bloqueo").hidden)return;if(/^\d$/.test(e.key))teclaPin(e.key);else if(e.key==="Backspace")teclaPin("⌫")});
 $("pinCancelar").onclick=()=>cerrarPin(false);
 $("pinOlvido").onclick=()=>{
+  if(pinModo==="externo"){$("pinErr").textContent="Pídele a un administrador que te ponga un PIN nuevo (Más → Tu usuario y PIN).";return}
   const c=prompt("Para quitar el PIN, escribe tu clave de acceso de Google (la del servidor):");
   if(c==null)return;
   if(cfg&&c.trim()===cfg.clave){try{localStorage.removeItem(PIN_K)}catch{}cerrarPin(true);pintarPinCfg();toast("PIN quitado")}
@@ -2961,15 +2979,18 @@ let cfg=leerLS(CFG_K,null);
 // Enlace de acceso: quien abre la app con #conectar=CBO1:... queda conectado sin escribir enlace ni clave
 try{const m=location.hash.match(/conectar=(CBO1%3A[^&]+|CBO1:[^&]+)/);if(m){const t=decodeURIComponent(m[1]),o=JSON.parse(decodeURIComponent(escape(atob(t.slice(5)))));
   if(o.url&&o.clave){cfg={url:o.url,clave:o.clave};guardarLS(CFG_K,cfg)}history.replaceState(null,"",location.pathname+"#inicio")}}catch(e){console.warn("enlace de acceso",e)}
+const SES_K="cbo-sesion";
+let sesion=leerLS(SES_K,null); if(!(sesion&&sesion.u&&sesion.t))sesion=null;
 async function api(accion,extra,conf){
   const c=conf||cfg;
   // Con señal débil la petición puede quedarse colgada: se corta a los 30 s y cuenta como "sin internet"
   const ctl=new AbortController(), to=setTimeout(()=>ctl.abort(),45000);
   let res;
-  try{res=await fetch(c.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({clave:c.clave,accion},extra||{})),redirect:"follow",signal:ctl.signal})}
+  try{res=await fetch(c.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({clave:c.clave,accion,token:sesion?sesion.t:""},extra||{})),redirect:"follow",signal:ctl.signal})}
   finally{clearTimeout(to)}
   const j=await res.json();
-  if(!j.ok){const e=new Error(j.error==="duplicado"?"ya está registrado"+(j.por?" por "+nomCorto(j.por):""):(j.error||"Error"));e.code=j.error;e.por=j.por;throw e}
+  if(!j.ok&&j.error==="sesion"&&!conf)perderSesion();
+  if(!j.ok){const e=new Error(j.error==="duplicado"?"ya está registrado"+(j.por?" por "+nomCorto(j.por):""):j.error==="sesion"?"Entra con tu PIN para continuar":(j.error||"Error"));e.code=j.error;e.por=j.por;throw e}
   return j;
 }
 // Modo de prueba: solo cuando el enlace apunta a 127.0.0.1 (el simulador). Guarda en este equipo y no llama a Google.
@@ -2978,6 +2999,7 @@ let versionServidor=1; // el Apps Script nuevo responde "version": 2 y entonces 
 let cargando=false;
 async function cargar(){
   if(!cfg||cargando)return;
+  if(!sesion){pedirUsuario();return}
   if(esDemo()){$("status").textContent="Modo de prueba (simulador): los cambios se guardan solo en este equipo.";$("cfgEstado").textContent="Modo de prueba";return}
   cargando=true; $("cargando").hidden=false;
   try{
@@ -3112,13 +3134,12 @@ const storeGoogle={
     await cargar();
   }
 };
-/* ===== Quién registra (Josué / Jesús) y control de duplicados ===== */
-const PERSONAS=["JOSUÉ VILLAR","JESÚS VILLAR"];
-let quien=""; try{quien=localStorage.getItem("cbo-quien")||""}catch{}
-// Celular de Josué: se marca una vez abriendo el enlace ?soy=josue. Cualquier otro equipo registra como Jesús.
-try{const soy=(new URLSearchParams(location.search).get("soy")||"").toLowerCase();
-  if(soy==="josue"||soy==="jesus"){quien=soy==="josue"?"JOSUÉ VILLAR":"JESÚS VILLAR";localStorage.setItem("cbo-quien",quien);history.replaceState(null,"",location.pathname)}}catch{}
-if(!quien) quien="JESÚS VILLAR";
+/* ===== Usuarios con PIN propio y control de duplicados =====
+   Cada persona entra con su nombre y su PIN, que revisa el servidor. Con esa sesión, lo que registre queda con su nombre. */
+let PERSONAS=leerLS("cbo-personas",null)||[{n:"JOSUÉ VILLAR",pin:true,admin:true},{n:"JESÚS VILLAR",pin:true}];
+let quien=sesion?sesion.u:"";
+const quienAntes=(()=>{try{return localStorage.getItem("cbo-quien")||""}catch{return ""}})();
+try{if(new URLSearchParams(location.search).has("soy"))history.replaceState(null,"",location.pathname+location.hash)}catch{}
 const nomCorto=n=>{const t=String(n||"").trim();return t?titulo(t.split(/\s+/)[0]):""};
 // Imagen de cada usuario: foto subida o muñequito. Se guarda solo en este equipo.
 const AVATARES={"gas":["Gasfitero","<svg viewBox=\"0 0 64 64\" aria-hidden=\"true\"><rect width=\"64\" height=\"64\" fill=\"#16304F\"/><path d=\"M9 64c0-13 10-20 23-20s23 7 23 20z\" fill=\"#1D5FBF\"/><rect x=\"27\" y=\"38\" width=\"10\" height=\"9\" fill=\"#D9A77C\"/><circle cx=\"32\" cy=\"28\" r=\"13\" fill=\"#D9A77C\"/><circle cx=\"27\" cy=\"28\" r=\"1.6\" fill=\"#1B1B1B\"/><circle cx=\"37\" cy=\"28\" r=\"1.6\" fill=\"#1B1B1B\"/><path d=\"M27 34.5q5 3.5 10 0\" stroke=\"#5A2A1A\" stroke-width=\"1.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M18 24C18 13 25 8 32 8s14 5 14 16z\" fill=\"#3F8FE8\"/><rect x=\"29.5\" y=\"6\" width=\"5\" height=\"11\" rx=\"2.5\" fill=\"#3F8FE8\"/><rect x=\"14\" y=\"23\" width=\"36\" height=\"4\" rx=\"2\" fill=\"#3F8FE8\"/><path d=\"M21 21c1-5 4-8 8-9\" stroke=\"#fff\" stroke-opacity=\".5\" stroke-width=\"1.6\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M25 53l10-7 3 3-10 7z\" fill=\"#D6DCE2\"/></svg>"],"ele":["Electricista","<svg viewBox=\"0 0 64 64\" aria-hidden=\"true\"><rect width=\"64\" height=\"64\" fill=\"#3A2F0A\"/><path d=\"M9 64c0-13 10-20 23-20s23 7 23 20z\" fill=\"#A87600\"/><rect x=\"27\" y=\"38\" width=\"10\" height=\"9\" fill=\"#C98F63\"/><circle cx=\"32\" cy=\"28\" r=\"13\" fill=\"#C98F63\"/><circle cx=\"27\" cy=\"28\" r=\"1.6\" fill=\"#1B1B1B\"/><circle cx=\"37\" cy=\"28\" r=\"1.6\" fill=\"#1B1B1B\"/><path d=\"M27 34.5q5 3.5 10 0\" stroke=\"#5A2A1A\" stroke-width=\"1.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M18 24C18 13 25 8 32 8s14 5 14 16z\" fill=\"#FFD23F\"/><rect x=\"29.5\" y=\"6\" width=\"5\" height=\"11\" rx=\"2.5\" fill=\"#FFD23F\"/><rect x=\"14\" y=\"23\" width=\"36\" height=\"4\" rx=\"2\" fill=\"#FFD23F\"/><path d=\"M21 21c1-5 4-8 8-9\" stroke=\"#fff\" stroke-opacity=\".5\" stroke-width=\"1.6\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M33 46l-5 8h4l-2 7 7-9h-4l3-6z\" fill=\"#FFE27A\"/></svg>"],"mae":["Maestro","<svg viewBox=\"0 0 64 64\" aria-hidden=\"true\"><rect width=\"64\" height=\"64\" fill=\"#2B2F36\"/><path d=\"M9 64c0-13 10-20 23-20s23 7 23 20z\" fill=\"#5A6470\"/><rect x=\"27\" y=\"38\" width=\"10\" height=\"9\" fill=\"#B97F55\"/><circle cx=\"32\" cy=\"28\" r=\"13\" fill=\"#B97F55\"/><circle cx=\"27\" cy=\"28\" r=\"1.6\" fill=\"#1B1B1B\"/><circle cx=\"37\" cy=\"28\" r=\"1.6\" fill=\"#1B1B1B\"/><path d=\"M27 34.5q5 3.5 10 0\" stroke=\"#5A2A1A\" stroke-width=\"1.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M18 24C18 13 25 8 32 8s14 5 14 16z\" fill=\"#F2F4F7\"/><rect x=\"29.5\" y=\"6\" width=\"5\" height=\"11\" rx=\"2.5\" fill=\"#F2F4F7\"/><rect x=\"14\" y=\"23\" width=\"36\" height=\"4\" rx=\"2\" fill=\"#F2F4F7\"/><path d=\"M21 21c1-5 4-8 8-9\" stroke=\"#fff\" stroke-opacity=\".5\" stroke-width=\"1.6\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M25 33c3-2 5-2 7 0c2-2 4-2 7 0c-2 3-5 3-7 1c-2 2-5 2-7-1z\" fill=\"#2A1A10\"/></svg>"],"ing":["Ingeniera","<svg viewBox=\"0 0 64 64\" aria-hidden=\"true\"><rect width=\"64\" height=\"64\" fill=\"#40230F\"/><path d=\"M9 64c0-13 10-20 23-20s23 7 23 20z\" fill=\"#C2500F\"/><rect x=\"27\" y=\"38\" width=\"10\" height=\"9\" fill=\"#E2B48E\"/><circle cx=\"32\" cy=\"28\" r=\"13\" fill=\"#E2B48E\"/><circle cx=\"27\" cy=\"28\" r=\"1.6\" fill=\"#1B1B1B\"/><circle cx=\"37\" cy=\"28\" r=\"1.6\" fill=\"#1B1B1B\"/><path d=\"M27 34.5q5 3.5 10 0\" stroke=\"#5A2A1A\" stroke-width=\"1.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M18 24C18 13 25 8 32 8s14 5 14 16z\" fill=\"#FF8A2B\"/><rect x=\"29.5\" y=\"6\" width=\"5\" height=\"11\" rx=\"2.5\" fill=\"#FF8A2B\"/><rect x=\"14\" y=\"23\" width=\"36\" height=\"4\" rx=\"2\" fill=\"#FF8A2B\"/><path d=\"M21 21c1-5 4-8 8-9\" stroke=\"#fff\" stroke-opacity=\".5\" stroke-width=\"1.6\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M19 24c-2 8-2 15 1 20l5-4V25zM45 24c2 8 2 15-1 20l-5-4V25z\" fill=\"#3A2214\"/></svg>"],"pin":["Pintor","<svg viewBox=\"0 0 64 64\" aria-hidden=\"true\"><rect width=\"64\" height=\"64\" fill=\"#401528\"/><path d=\"M9 64c0-13 10-20 23-20s23 7 23 20z\" fill=\"#F2F4F7\"/><rect x=\"27\" y=\"38\" width=\"10\" height=\"9\" fill=\"#D9A77C\"/><circle cx=\"32\" cy=\"28\" r=\"13\" fill=\"#D9A77C\"/><circle cx=\"27\" cy=\"28\" r=\"1.6\" fill=\"#1B1B1B\"/><circle cx=\"37\" cy=\"28\" r=\"1.6\" fill=\"#1B1B1B\"/><path d=\"M27 34.5q5 3.5 10 0\" stroke=\"#5A2A1A\" stroke-width=\"1.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M19 24c0-9 6-14 13-14s13 5 13 14z\" fill=\"#C4161C\"/><path d=\"M41 21h12c0 3-3 5-12 5z\" fill=\"#C4161C\"/><rect x=\"38\" y=\"48\" width=\"4\" height=\"11\" rx=\"1\" fill=\"#8A4B1F\"/><rect x=\"36\" y=\"44\" width=\"8\" height=\"6\" rx=\"1\" fill=\"#E01E26\"/></svg>"],"sol":["Soldador","<svg viewBox=\"0 0 64 64\" aria-hidden=\"true\"><rect width=\"64\" height=\"64\" fill=\"#171A1E\"/><path d=\"M9 64c0-13 10-20 23-20s23 7 23 20z\" fill=\"#44403C\"/><rect x=\"27\" y=\"38\" width=\"10\" height=\"9\" fill=\"#B97F55\"/><circle cx=\"32\" cy=\"28\" r=\"13\" fill=\"#B97F55\"/><path d=\"M18 16c5-6 23-6 28 0l1 22c-6 7-24 7-30 0z\" fill=\"#3A3F46\"/><rect x=\"23\" y=\"24\" width=\"18\" height=\"7\" rx=\"1.5\" fill=\"#FFB547\"/><path d=\"M26 39h12\" stroke=\"#6A7480\" stroke-width=\"2\"/></svg>"],"ger":["Gerente","<svg viewBox=\"0 0 64 64\" aria-hidden=\"true\"><rect width=\"64\" height=\"64\" fill=\"#0F2442\"/><path d=\"M9 64c0-13 10-20 23-20s23 7 23 20z\" fill=\"#1B2433\"/><rect x=\"27\" y=\"38\" width=\"10\" height=\"9\" fill=\"#D9A77C\"/><circle cx=\"32\" cy=\"28\" r=\"13\" fill=\"#D9A77C\"/><circle cx=\"27\" cy=\"28\" r=\"1.6\" fill=\"#1B1B1B\"/><circle cx=\"37\" cy=\"28\" r=\"1.6\" fill=\"#1B1B1B\"/><path d=\"M27 34.5q5 3.5 10 0\" stroke=\"#5A2A1A\" stroke-width=\"1.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M19 26c-1-11 6-15 13-15s14 4 13 15c-3-6-7-8-13-8s-10 2-13 8z\" fill=\"#20140C\"/><path d=\"M29 44h6l-1 4 2 13h-8l2-13z\" fill=\"#C0262D\"/></svg>"],"con":["Contadora","<svg viewBox=\"0 0 64 64\" aria-hidden=\"true\"><rect width=\"64\" height=\"64\" fill=\"#2A1250\"/><path d=\"M9 64c0-13 10-20 23-20s23 7 23 20z\" fill=\"#6D35B8\"/><rect x=\"27\" y=\"38\" width=\"10\" height=\"9\" fill=\"#E2B48E\"/><path d=\"M16 42c-3-20 4-32 16-32s19 12 16 32c-4 2-8 2-12 0H28c-4 2-8 2-12 0z\" fill=\"#2B1608\"/><circle cx=\"32\" cy=\"28\" r=\"12\" fill=\"#E2B48E\"/><circle cx=\"27\" cy=\"28\" r=\"1.6\" fill=\"#1B1B1B\"/><circle cx=\"37\" cy=\"28\" r=\"1.6\" fill=\"#1B1B1B\"/><path d=\"M27 34.5q5 3.5 10 0\" stroke=\"#5A2A1A\" stroke-width=\"1.5\" fill=\"none\" stroke-linecap=\"round\"/><path d=\"M20 25c2-7 7-10 12-10s10 3 12 10c-7-1-14-3-17-7c-1 4-3 6-7 7z\" fill=\"#2B1608\"/><circle cx=\"27\" cy=\"28\" r=\"4\" fill=\"none\" stroke=\"#1B1B1B\" stroke-width=\"1.3\"/><circle cx=\"37\" cy=\"28\" r=\"4\" fill=\"none\" stroke=\"#1B1B1B\" stroke-width=\"1.3\"/><path d=\"M31 28h2\" stroke=\"#1B1B1B\" stroke-width=\"1.3\"/></svg>"]};
@@ -3131,16 +3152,17 @@ async function subirAv(file){
   if(!/^image\//.test(file.type||"")){toast("Elige una imagen");return}
   const url=URL.createObjectURL(file);
   try{const im=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=url});
-    const c=document.createElement("canvas"),T=160,a=Math.min(im.naturalWidth,im.naturalHeight);c.width=c.height=T;c.getContext("2d").drawImage(im,(im.naturalWidth-a)/2,(im.naturalHeight-a)/2,a,a,0,0,T,T);let u=c.toDataURL("image/jpeg",.85);if(u.length>40000)u=c.toDataURL("image/jpeg",.55);ponerAv(u)}
+    const c=document.createElement("canvas"),T=160,a=Math.min(im.naturalWidth,im.naturalHeight);c.width=c.height=T;c.getContext("2d").drawImage(im,(im.naturalWidth-a)/2,(im.naturalHeight-a)/2,a,a,0,0,T,T);let u=c.toDataURL("image/jpeg",.85);if(u.length>40000)u=c.toDataURL("image/jpeg",.55);if(u.length>40000)u=c.toDataURL("image/jpeg",.3);ponerAv(u)}
   catch(e){toast("No se pudo abrir esa imagen. Prueba con una JPG o PNG.")}finally{URL.revokeObjectURL(url)}
 }
 /* Foto y colores iguales en todos los equipos del mismo usuario. Se guardan en la pestaña Ajustes del Excel.
    Gana el último cambio. Si el Apps Script todavía no tiene esta función, la app sigue igual, sin avisar. */
 const PERFIL_K="cbo-perfil-ts";let perfilTm=null,perfilUlt=0,perfilOcupado=false;
-function marcaPerfil(){guardarLS(PERFIL_K,Date.now());clearTimeout(perfilTm);perfilTm=setTimeout(()=>subirPerfil(),900)}
-async function subirPerfil(){
-  if(esDemo()||!cfg||!navigator.onLine)return false;
-  try{await api("guardarAjustes",{usuario:quien,ts:leerLS(PERFIL_K,0)||0,paleta:ajustes.paleta||"",espGen:ajustes.espGen||[],espCont:ajustes.espCont||0,foto:avDe(quien)||""});return true}catch(e){return false}
+function marcaPerfil(){guardarLS(PERFIL_K,Date.now());clearTimeout(perfilTm);perfilTm=setTimeout(()=>subirPerfil(true),900)}
+async function subirPerfil(avisar){
+  if(esDemo()||!cfg||!navigator.onLine||!sesion)return false;
+  try{await api("guardarAjustes",{usuario:quien,ts:leerLS(PERFIL_K,0)||0,paleta:ajustes.paleta||"",espGen:ajustes.espGen||[],espCont:ajustes.espCont||0,foto:avDe(quien)||""});return true}
+  catch(e){if(avisar&&e.code!=="sesion")toast("No se pudo guardar tu imagen en la nube ("+e.message+"). Se volverá a intentar sola.");return false}
 }
 function aplicarPerfil(a){
   ajustes.espCont=Math.max(ajustes.espCont||0,+a.espCont||0);
@@ -3152,7 +3174,7 @@ function aplicarPerfil(a){
   window.__palUlt=ajustes.paleta;guardarLS(PERFIL_K,+a.ts||Date.now());aplicarTema();pintarQuien();try{pintarFlujo()}catch{}
 }
 async function sincPerfil(forzar){
-  const ah=Date.now();if(perfilOcupado||esDemo()||!cfg||!navigator.onLine||(!forzar&&ah-perfilUlt<60000))return;
+  const ah=Date.now();if(perfilOcupado||esDemo()||!cfg||!sesion||!navigator.onLine||(!forzar&&ah-perfilUlt<60000))return;
   perfilOcupado=true;perfilUlt=ah;
   try{const j=await api("verAjustes",{usuario:quien}),rem=j.ajustes||null,tl=+leerLS(PERFIL_K,0)||0,tr=rem?+rem.ts||0:0;
     // Primera vez: lo que este equipo ya tenía (foto o color elegidos antes) se sube solo si la nube está vacía
@@ -3161,15 +3183,70 @@ async function sincPerfil(forzar){
   catch(e){}finally{perfilOcupado=false}
 }
 function pintarQuien(){
-  const ub=$("usuarioBtn"); if(ub){const n=nomCorto(quien);const av=avHTML(avDe(quien));ub.innerHTML=n?`<i aria-hidden="true">${av||esc(n.charAt(0))}</i><span>${esc(n)}</span>`:`<span>Elegir usuario</span>`;ub.setAttribute("aria-label",`Usuario: ${titulo(quien)}. Tocar para cambiar la imagen`);ub.onclick=()=>abrirOv("ovPerfil")}
-  const seg=$("quienSeg"); if(seg) seg.innerHTML=PERSONAS.map(n=>`<button type="button" data-quien="${n}" aria-pressed="${quien===n}">${titulo(n)}</button>`).join("");
+  const ub=$("usuarioBtn"); if(ub){const n=nomCorto(quien);const av=avHTML(avDe(quien));ub.innerHTML=n?`<i aria-hidden="true">${av||esc(n.charAt(0))}</i><span>${esc(n)}</span>`:`<span>Entrar</span>`;ub.setAttribute("aria-label",`Usuario: ${titulo(quien)}. Tocar para cambiar la imagen`);ub.onclick=()=>quien?abrirOv("ovPerfil"):pedirUsuario()}
+  pintarSesion();
   if($("quienEstado")) $("quienEstado").textContent=quien?"Este celular: "+titulo(quien):"Sin elegir";
-  $("quienBtns").innerHTML=PERSONAS.map(n=>`<button type="button" class="btn${n===PERSONAS[0]?" pri":""}" data-quien="${n}" style="padding:16px;font-size:1.05rem">Soy ${titulo(n)}</button>`).join("");
+  $("quienBtns").innerHTML=[...PERSONAS].sort((a,b)=>(b.n===quienAntes)-(a.n===quienAntes)).map(p=>`<button type="button" class="btn" data-entrar="${esc(p.n)}" style="padding:14px 16px;font-size:1.05rem">${esc(titulo(p.n))}</button>`).join("");
   const pf=$("perfilAv");if(pf){const act=quien?avDe(quien):"";pf.hidden=!quien;pf.innerHTML=quien?`<p class="pal-t">Imagen de ${esc(nomCorto(quien))}</p><div class="av-acc"><label class="btn av-sub">Subir foto<input type="file" accept="image/*" id="avFile" hidden></label>${act?`<button type="button" class="btnlink" data-av="">Quitar imagen</button>`:""}</div><div class="av-lista" role="group" aria-label="Muñequitos">${Object.entries(AVATARES).map(([k,[n,sv]])=>`<button type="button" class="av-op" data-av="${k}" aria-pressed="${act===k}" aria-label="${n}"><i>${sv}</i><span>${n}</span></button>`).join("")}</div>`:"";
     const fi=$("avFile");if(fi)fi.onchange=()=>subirAv(fi.files[0])}
 }
-function elegirQuien(n){quien=n;try{localStorage.setItem("cbo-quien",n)}catch{};pintarQuien();pintarAdornos();cerrarOv("ovQuien");toast("Registrarás como "+titulo(n))}
-document.addEventListener("click",e=>{const av=e.target.closest("[data-av]");if(av){ponerAv(av.dataset.av);return}const b=e.target.closest("[data-quien]");if(b)elegirQuien(b.dataset.quien);else if(e.target.id==="ovPerfil"||e.target.id==="perfilCerrar")cerrarOv("ovPerfil")});
+const sinNube=()=>esDemo()&&!window.__nube; // modo de prueba sin servidor: no hay PIN que revisar
+// El PIN de cada uno (solo llega al administrador) se queda en memoria, no se guarda en el equipo
+const usarLista=j=>{PERSONAS=(j.usuarios||[]).map(x=>({n:x.usuario,pin:!!x.tienePin,admin:!!x.admin,p:x.pin||"",b:!!x.bloqueado}));guardarLS("cbo-personas",PERSONAS.map(({p,...r})=>r));pintarQuien()};
+async function pedirEntrada(n,pin,nuevo){
+  if(sinNube())return {u:n,t:"demo",admin:!!(PERSONAS.find(p=>p.n===n)||{}).admin};
+  const j=await api("entrar",{usuario:n,pin,nuevo:!!nuevo});
+  return {u:j.usuario,t:j.token,admin:!!j.admin};
+}
+function ponerSesion(s){sesion=s;guardarLS(SES_K,s);quien=s.u;try{localStorage.setItem("cbo-quien",s.u)}catch{};pintarQuien();pintarAdornos()}
+async function entrarComo(n){
+  // El PIN se pide una sola vez en cada equipo; después la sesión queda guardada
+  const s=await abrirPin("externo",`${nomCorto(n)}, escribe tu PIN`,pin=>pedirEntrada(n,pin,false));
+  if(!s||!s.t)return;
+  ponerSesion(s);cerrarOv("ovQuien");toast("Entraste como "+titulo(s.u));
+  perfilUlt=0;sincPerfil(true);if(s.admin)cargarUsuarios();cargar();
+}
+async function cargarUsuarios(){if(!cfg||sinNube())return;try{usarLista(await api("usuarios"))}catch(e){}}
+let pidiendo=false;
+async function pedirUsuario(){
+  if(!cfg||sesion||pidiendo||!$("ovQuien").hidden)return;
+  pidiendo=true;pintarQuien();abrirOv("ovQuien");await cargarUsuarios();pidiendo=false;
+}
+function perderSesion(){if(!sesion)return;sesion=null;try{localStorage.removeItem(SES_K)}catch{};quien="";pintarQuien();setTimeout(pedirUsuario,0)}
+function salirSesion(){perderSesion();$("app").classList.remove("abierto");document.body.classList.remove("menu")}
+async function pinParaOtro(n){
+  if(sinNube()){toast("En el modo de prueba no hay PIN");return}
+  const pin=await abrirPin("elegir",`Nuevo PIN para ${nomCorto(n)}`);if(!pin)return;
+  try{const j=await api("ponerPin",{usuario:n,pin});if(j.token)ponerSesion({u:quien,t:j.token,admin:true});usarLista(j);
+    toast(n===quien?"Tu PIN cambió.":`PIN de ${nomCorto(n)} cambiado. Tendrá que entrar de nuevo con ese PIN.`)}catch(e){toast(e.message)}
+}
+// Quitar o devolver el acceso a la app (solo administrador). Sin acceso, su sesión se cierra en todos sus equipos.
+async function cambiarAcceso(n,permitir){
+  if(sinNube()){toast("En el modo de prueba no se cambia el acceso");return}
+  if(!permitir&&!confirm(`¿Quitarle el acceso a ${titulo(n)}? No podrá entrar a la app hasta que se lo devuelvas.`))return;
+  try{usarLista(await api("acceso",{usuario:n,permitir}));toast(permitir?`${nomCorto(n)} puede entrar otra vez.`:`${nomCorto(n)} ya no puede entrar a la app.`)}catch(e){toast(e.message)}
+}
+async function agregarUsuario(){
+  const i=$("usrNombre"),nom=i.value.trim().replace(/\s+/g," ");
+  if(nom.length<3){toast("Escribe el nombre y apellido");i.focus();return}
+  if(PERSONAS.some(p=>p.n===nom.toUpperCase())){toast("Ese usuario ya existe");return}
+  if(sinNube()){toast("En el modo de prueba no se agregan usuarios");return}
+  const pin=await abrirPin("elegir",`PIN para ${nomCorto(nom)}`);if(!pin)return;
+  try{usarLista(await api("crearUsuario",{nombre:nom,pin}));i.value="";toast(`${titulo(nom)} agregado con su PIN.`)}catch(e){toast(e.message)}
+}
+function pintarSesion(){
+  const el=$("quienSeg");if(!el)return;
+  if(!sesion){el.innerHTML=`<button class="btn pri" type="button" id="sesEntrar">Entrar con mi PIN</button>`;$("sesEntrar").onclick=pedirUsuario;return}
+  const adm=sesion.admin?`<p class="pal-t" style="margin:16px 0 6px">Usuarios</p><ul class="usr-lista">${PERSONAS.map(p=>`<li${p.b?' class="off"':""}><span><b>${esc(titulo(p.n))}${p.n===quien?" (tú)":""}</b><small>${p.admin?"Administrador":p.b?"Sin acceso":"Usuario"} · PIN <span class="usr-pin" data-pin="${esc(p.p||"")}">••••</span></small></span><span class="usr-acc">${p.p?`<button class="btnlink" type="button" data-verpin>Ver PIN</button>`:""}<button class="btnlink" type="button" data-ponpin="${esc(p.n)}">Cambiar PIN</button>${!p.admin?`<button class="btnlink" type="button" data-acceso="${esc(p.n)}" data-permitir="${p.b?"1":""}">${p.b?"Dar acceso":"Quitar acceso"}</button>`:""}</span></li>`).join("")}</ul>
+    <div class="line usr-nuevo"><input id="usrNombre" type="text" placeholder="Nombre y apellido" maxlength="40" autocomplete="off" aria-label="Nombre del usuario nuevo"><button class="btn" type="button" id="usrAgregar">Agregar usuario</button></div>`:"";
+  el.innerHTML=`<p class="usr-yo">Entraste como <b>${esc(titulo(quien))}</b> en este equipo.</p><div class="line"><button class="btnlink" type="button" id="sesSalir">Salir de este equipo</button></div>${adm}`;
+  $("sesSalir").onclick=salirSesion;
+  const ag=$("usrAgregar");if(ag)ag.onclick=agregarUsuario;
+  el.querySelectorAll("[data-ponpin]").forEach(b=>b.onclick=()=>pinParaOtro(b.dataset.ponpin));
+  el.querySelectorAll("[data-acceso]").forEach(b=>b.onclick=()=>cambiarAcceso(b.dataset.acceso,!!b.dataset.permitir));
+  el.querySelectorAll("[data-verpin]").forEach(b=>b.onclick=()=>{const s=b.closest("li").querySelector(".usr-pin"),ver=b.textContent==="Ver PIN";s.textContent=ver?s.dataset.pin:"••••";b.textContent=ver?"Ocultar":"Ver PIN"});
+}
+document.addEventListener("click",e=>{const av=e.target.closest("[data-av]");if(av){ponerAv(av.dataset.av);return}const b=e.target.closest("[data-entrar]");if(b)entrarComo(b.dataset.entrar);else if(e.target.id==="ovPerfil"||e.target.id==="perfilCerrar")cerrarOv("ovPerfil")});
 pintarQuien();
 const sinCeros=v=>String(v||"").trim().replace(/^0+/,"");
 // Busca si lo que se va a guardar ya está registrado (por cualquiera de los dos)
@@ -3199,8 +3276,9 @@ $("setupF").addEventListener("submit",async e=>{
   if(!/^https:\/\/script\.google\.com\/.+\/exec$/.test(url)){$("setupMsg").textContent="Pega el enlace completo que termina en /exec.";return}
   if(!clave){$("setupMsg").textContent="Escribe la clave de acceso.";return}
   $("setupMsg").textContent="Conectando…";
-  try{await api("datos",null,{url,clave});cfg={url,clave};guardarLS(CFG_K,cfg);$("setup").hidden=true;$("cfgClave").value="";cargar()}
-  catch(err){$("setupMsg").textContent=err.code==="clave"?"La clave no es correcta.":"No se pudo conectar. Revisa el enlace y tu internet."}
+  try{await api("datos",null,{url,clave})}
+  catch(err){if(err.code!=="sesion"){$("setupMsg").textContent=err.code==="clave"?"La clave no es correcta.":"No se pudo conectar. Revisa el enlace y tu internet.";return}}
+  cfg={url,clave};guardarLS(CFG_K,cfg);$("setup").hidden=true;$("cfgClave").value="";cargar()
 });
 /* Código de conexión: guarda enlace y clave en un texto para recuperarlos sin buscarlos (queda solo en manos del dueño) */
 const aCodigo=c=>"CBO1:"+btoa(unescape(encodeURIComponent(JSON.stringify({url:c.url,clave:c.clave}))));
@@ -4309,6 +4387,7 @@ function pintarFiestaBarra(k){
 }
 const adorNombreMes=f=>{const m=MESES[f[2]-1];return m.charAt(0).toUpperCase()+m.slice(1)};
 window.__palUlt=ajustes.paleta;setTimeout(()=>sincPerfil(true),2500);
+if(cfg&&!sesion)setTimeout(pedirUsuario,300);else if(sesion&&sesion.admin)setTimeout(cargarUsuarios,3000);
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")sincPerfil()});
 window.addEventListener("online",()=>sincPerfil(true));
 (function(){const tb=$("tabbar"),zo=$("tbZona");if(tb&&zo)tb.addEventListener("pointerdown",e=>{if(zo.dataset.zk)zEstallar(zo,e.clientX,e.clientY)})})();
@@ -4316,7 +4395,7 @@ window.addEventListener("online",()=>sincPerfil(true));
    Solo sale de la app estando en Inicio. Devuelve true si atendió el gesto. */
 function alAtras(){
   const vis=id=>{const e=$(id);return !!e&&!e.hidden};
-  if(vis("bloqueo")||vis("setup"))return true;
+  if(vis("bloqueo")||vis("setup")||(vis("ovQuien")&&!sesion))return true;
   if(vis("escaner")){cerrarEscaner();return true}
   for(const id of ["ovFirmaT","ovInvObra","ovInv","ovTrab","ovPla","ovSun","ovMov","ovMas","ovPerfil","ovQuien"]){if(vis(id)){cerrarOv(id);if(id==="ovInv")invItemAbierto=null;return true}}
   if(vis("ov")){if(paso>1)irPaso(paso-1);else closeF();return true}

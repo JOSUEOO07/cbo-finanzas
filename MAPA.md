@@ -1,5 +1,5 @@
 # Mapa de CBO Finanzas
-Actualizado: 06/11/2026 · caché: cbo-finanzas-v82-gesto-atras
+Actualizado: 07/11/2026 · caché: cbo-finanzas-v83-usuarios-pin
 
 ## Archivos
 - codigo-fuente.html: versión editable (4287 líneas). index.html es la copia que se publica: editar codigo-fuente.html y copiarlo a index.html.
@@ -77,9 +77,11 @@ Actualizado: 06/11/2026 · caché: cbo-finanzas-v82-gesto-atras
 - Adorno de cumpleaños de Josué: solo el 14 de junio y solo con el usuario JOSUÉ VILLAR. El Mundial va del 15 de junio al 14 de julio.
 - Festividad en la barra de abajo (celular): capa #tbZona con figuras y línea de luz, la + cambia por el ícono de la fiesta (FI_IC, pintarFiestaBarra) y #titulo toma los colores de la fiesta en todas las secciones.
 - Festividad: su color manda en toda la app (FI_TEMA, fiestaCol) con combinaciones y degradados; el color elegido vuelve al terminar. Barra sin fiesta: animación sutil (tb-zona).
-- Usuario arriba a la derecha (#usuarioBtn): solo el circulito con la inicial o la imagen, sin nombre; abre su imagen (ovPerfil: foto o muñequito, cbo-avatares, solo en el equipo). No cambia de usuario; eso sigue en Configuración → Quién registra.
+- Usuario arriba a la derecha (#usuarioBtn): circulito con la inicial o la imagen; sin sesión dice "Entrar".
 - Sincronización de foto y colores por usuario (sincPerfil, subirPerfil, aplicarPerfil; acciones verAjustes y guardarAjustes; pestaña Ajustes). Gana el último cambio; si la nube está vacía, lo que el equipo ya tenía se sube solo. Ya instalado en el Apps Script publicado (versión 15). Copia del agregado: mejoras/APPS-SCRIPT-AGREGADO-AJUSTES.gs en el Apps Script publicado; sin él la app sigue igual.
 - Registro: Categoría con búsqueda (catBuscar, catSug, CAT_GRUPOS; 32 opciones de compra; compras sin marcar; #cat oculto guarda el valor). Monto con teclado propio en celular, fijo abajo solo en el paso Monto (teclMonto dentro de #ov, clase con-tecl, inputmode none). Al cambiar de paso se cierra el teclado (irPaso).
 - Antes de mostrar o publicar: correr mejoras/revision-app.js (revisarTodo) en la vista previa.
 - Monto del registro con separador de miles (fmtMonto, pintarMonto); leerMonto quita las comas. Otros campos de monto aún sin separador.
 - Gesto atrás (alAtras, popstate; se rearma con arma al tocar): cierra lo abierto, el registro vuelve de paso, inventario a su portada, secciones a Inicio; solo sale desde Inicio. ir() usa replaceState.
+- Usuarios con PIN (v83): entrar con nombre + PIN una vez por equipo (ovQuien + teclado #bloqueo modo "externo"; sesión en cbo-sesion, token del servidor en cada api()). Sin sesión, ovQuien opaco y el gesto atrás no lo cierra. Josué es administrador: en Configuración → Tu usuario y PIN ve el PIN de cada uno, lo cambia (también el suyo), agrega usuarios y quita/devuelve el acceso (pintarSesion, pinParaOtro, agregarUsuario, cambiarAcceso). Los usuarios no cambian su PIN.
+- Servidor (Apps Script versión 16): acciones usuarios, entrar, crearUsuario, ponerPin, acceso; todo lo demás exige sesión ("sesion" si no). "por" de registros e inventario y el usuario de Ajustes los pone el servidor. Usuarios y PIN cifrados en Propiedades del script (USUARIOS_CBO), no en el Excel. Copia del módulo: mejoras/APPS-SCRIPT-USUARIOS.gs. PIN inicial de Josué y Jesús: el que eligió Josué.
