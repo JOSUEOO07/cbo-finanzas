@@ -1,5 +1,5 @@
 # Mapa de CBO Finanzas
-Actualizado: 07/11/2026 · caché: cbo-finanzas-v84-permisos-admin
+Actualizado: 07/11/2026 · caché: cbo-finanzas-v85-permisos-orden
 
 ## Archivos
 - codigo-fuente.html: versión editable (4287 líneas). index.html es la copia que se publica: editar codigo-fuente.html y copiarlo a index.html.
