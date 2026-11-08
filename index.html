@@ -3207,7 +3207,27 @@ const sinNube=()=>esDemo()&&!window.__nube; // modo de prueba sin servidor: no h
 // El PIN de cada uno (solo llega al administrador) se queda en memoria, no se guarda en el equipo
 const usarLista=j=>{PERSONAS=(j.usuarios||[]).map(x=>({n:x.usuario,pin:!!x.tienePin,admin:!!x.admin,p:x.pin||"",b:!!x.bloqueado,oc:x.ocultas||[],d:!!x.descargar,eq:x.equipos||[]}));guardarLS("cbo-personas",PERSONAS.map(({p,...r})=>r));pintarQuien()};
 // Nombre del equipo para la lista "Equipos con sesión abierta" del administrador
-const EQUIPO=(()=>{const a=navigator.userAgent||"";const so=/Android/i.test(a)?"Android":/iPhone|iPad/i.test(a)?"iPhone":/Windows/i.test(a)?"PC Windows":/Mac/i.test(a)?"Mac":"Equipo";const nav=/Edg\//.test(a)?"Edge":/Chrome\//.test(a)?"Chrome":/Safari\//.test(a)?"Safari":/Firefox\//.test(a)?"Firefox":"";let inst=false;try{inst=matchMedia("(display-mode: standalone)").matches}catch{}return so+(inst?" · app instalada":nav?" · "+nav:"")})();
+// Marca y modelo a partir del código que da el celular (Android). iPhone y computadoras no dan modelo ni marca.
+function marcaModelo(m){
+  m=String(m||"").trim();if(!m||m==="K")return "";
+  let x;
+  if((x=m.match(/^SM-([AMFE])(\d\d)\d/i)))return "Samsung Galaxy "+x[1].toUpperCase()+x[2];
+  if((x=m.match(/^SM-S9(\d)\d/i)))return "Samsung Galaxy S"+(22+ +x[1]);
+  if(/^SM-/i.test(m))return "Samsung Galaxy ("+m+")";
+  if(/^Pixel/i.test(m))return "Google "+m;
+  if(/^moto/i.test(m))return "Motorola "+m.replace(/^moto/i,"Moto");
+  if(/^(Redmi|POCO|Mi )/i.test(m))return "Xiaomi "+m;
+  if(/^(\d{4,5}[A-Z0-9]{4,}|M\d{4}[A-Z]\d*[A-Z]*)$/.test(m))return "Xiaomi ("+m+")";
+  if(/^CPH\d/i.test(m))return "OPPO ("+m+")";
+  if(/^RMX\d/i.test(m))return "realme ("+m+")";
+  if(/^V\d{4}/.test(m))return "vivo ("+m+")";
+  if(/^(HUAWEI|[A-Z]{3}-[A-Z]{1,2}\d)/.test(m))return "Huawei ("+m+")";
+  if(/^(Infinix|TECNO|itel|Nokia|ZTE|LG|Lenovo|OnePlus|HONOR|Honor)/i.test(m))return m;
+  return m;
+}
+let EQUIPO=(()=>{const a=navigator.userAgent||"";const um=(a.match(/Android [\d.]+; ([^;)]+)\)/)||[])[1];const so=/Android/i.test(a)?(marcaModelo(um)||"Celular Android"):/iPhone/i.test(a)?"Apple iPhone":/iPad/i.test(a)?"Apple iPad":/Windows/i.test(a)?"PC Windows":/Mac/i.test(a)?"Apple Mac":"Equipo";const nav=/Edg\//.test(a)?"Edge":/Chrome\//.test(a)?"Chrome":/Safari\//.test(a)?"Safari":/Firefox\//.test(a)?"Firefox":"";let inst=false;try{inst=matchMedia("(display-mode: standalone)").matches}catch{}return so+(inst?" · app instalada":nav?" · "+nav:"")})();
+// Chrome en Android esconde el modelo en el texto del navegador: se pide aparte
+try{if(navigator.userAgentData&&/Android/i.test(navigator.userAgent))navigator.userAgentData.getHighEntropyValues(["model"]).then(h=>{const mm=marcaModelo(h&&h.model);if(mm){const p=EQUIPO.split(" · ");p[0]=mm;EQUIPO=p.join(" · ")}}).catch(()=>{})}catch{}
 const sesDe=j=>({u:j.usuario,t:j.token,admin:!!j.admin,ocultas:j.ocultas||[],descargar:!!(j.admin||j.descargar)});
 async function pedirEntrada(n,pin){
   if(sinNube())return {u:n,t:"demo",admin:!!(PERSONAS.find(p=>p.n===n)||{}).admin,ocultas:[],descargar:true};
