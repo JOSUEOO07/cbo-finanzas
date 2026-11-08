@@ -1,5 +1,5 @@
 # Mapa de CBO Finanzas
-Actualizado: 07/11/2026 · caché: cbo-finanzas-v86-marca-equipo
+Actualizado: 07/11/2026 · caché: cbo-finanzas-v87-equipos-usuario
 
 ## Archivos
 - codigo-fuente.html: versión editable (4287 líneas). index.html es la copia que se publica: editar codigo-fuente.html y copiarlo a index.html.
@@ -87,3 +87,4 @@ Actualizado: 07/11/2026 · caché: cbo-finanzas-v86-marca-equipo
 - Servidor (Apps Script versión 16): acciones usuarios, entrar, crearUsuario, ponerPin, acceso; todo lo demás exige sesión ("sesion" si no). "por" de registros e inventario y el usuario de Ajustes los pone el servidor. Usuarios y PIN cifrados en Propiedades del script (USUARIOS_CBO), no en el Excel. Copia del módulo: mejoras/APPS-SCRIPT-USUARIOS.gs. PIN inicial de Josué y Jesús: el que eligió Josué.
 - Administrador (v84, servidor versión 17): "Entrar como" otro usuario y "Volver" (SESA_K cbo-sesion-admin). Por usuario: secciones visibles (SECC_PERM; ocultas → aplicarPermisos, secOculta, ir() manda a Inicio; el servidor filtra planilla/SUNAT en "datos" y bloquea Inventario), permiso de descargar reportes (puedeDescargar), Configuración solo admin salvo CFG_LIBRE. Solo el admin corrige/borra lo que registró otro (bloqueaAjeno; servidor permiso_). Historial solo admin (hoja oculta "Historial (app)", registrar_; botón Ver historial). Equipos con sesión abierta por usuario y cerrar sesión a distancia (sesiones en Propiedades SES_<usuario>; token usuario~sid~firma).
 - Equipos (v86): marcaModelo() traduce el código del celular Android a marca y modelo (Samsung, Xiaomi, Motorola, OPPO, realme, vivo, Huawei, Google...). iPhone, Mac y PC no dan modelo ni marca al navegador.
+- Equipos (v87): lista general "Equipos con sesión abierta" con el usuario de cada equipo (.usr-todos). Al "Volver" del modo "Entrar como" se cierra esa sesión sola.

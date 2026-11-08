@@ -549,6 +549,7 @@ body.escribiendo .tabbar,body.escribiendo .fab{display:none!important}
 .usr-perm label{display:flex;gap:10px;align-items:center;justify-content:flex-start;font-size:.86rem;line-height:1.2;min-height:42px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;text-align:left;margin:0;width:auto}
 .usr-perm input[type=checkbox]{flex:0 0 18px;width:18px;height:18px;margin:0;padding:0;min-width:0;min-height:0;accent-color:var(--brand)}
 .usr-eq{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.usr-todos li{padding:10px 12px;border:1px solid var(--line);border-radius:12px}
 .usr-hist{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:2px;max-height:360px;overflow:auto}
 .usr-hist li{font-size:.84rem;border-bottom:1px solid var(--line);padding:6px 0;overflow-wrap:anywhere}
 .usr-hist small{color:var(--muted);display:block}
@@ -3280,7 +3281,10 @@ async function entrarComoAdmin(n){
 }
 function volverAdmin(){
   const a=leerLS(SESA_K,null);if(!a)return;try{localStorage.removeItem(SESA_K)}catch{}
-  ponerSesion(a);cargarUsuarios();toast("Volviste a "+titulo(a.u));cargar();
+  const prev=sesion;ponerSesion(a);
+  // La sesión que se usó "como otro usuario" se cierra sola para no dejar equipos de más abiertos
+  try{const t=String(prev&&prev.t||"").split("~"),sid=t.length===3?t[1]:t[3];if(prev&&sid&&prev.u!==a.u)api("cerrarSesion",{usuario:prev.u,id:sid}).then(usarLista).catch(()=>{})}catch{}
+  cargarUsuarios();toast("Volviste a "+titulo(a.u));cargar();
 }
 // Quitar o devolver el acceso a la app (solo administrador). Sin acceso, su sesión se cierra en todos sus equipos.
 async function cambiarAcceso(n,permitir){
@@ -3307,6 +3311,7 @@ function pintarSesion(){
     <p class="pal-t">Equipos con sesión abierta</p>${(p.eq||[]).length?`<ul class="usr-eq">${p.eq.map(e=>`<li><span>${esc(e.eq)}<small>Entró ${fhUsr(e.c)} · último uso ${fhUsr(e.u)}</small></span><button class="btnlink" type="button" data-cerrarses="${esc(p.n)}" data-sid="${esc(e.id)}">Cerrar sesión</button></li>`).join("")}</ul>`:`<p class="hint" style="margin:0">Ninguno</p>`}</div></li>`;
   const adm=sesion.admin?`<p class="pal-t" style="margin:16px 0 6px">Usuarios</p><ul class="usr-lista">${PERSONAS.map(fila).join("")}</ul>
     <div class="line usr-nuevo"><input id="usrNombre" type="text" placeholder="Nombre y apellido" maxlength="40" autocomplete="off" aria-label="Nombre del usuario nuevo"><button class="btn" type="button" id="usrAgregar">Agregar usuario</button></div>
+    <p class="pal-t" style="margin:16px 0 6px">Equipos con sesión abierta</p>${(()=>{const t=PERSONAS.flatMap(p=>(p.eq||[]).map(e=>({p,e}))).sort((a,b)=>(b.e.u||0)-(a.e.u||0));return t.length?`<ul class="usr-eq usr-todos">${t.map(({p,e})=>`<li><span><b>${esc(e.eq)}</b><small>Usuario: ${esc(titulo(p.n))} · último uso ${fhUsr(e.u)}</small></span><button class="btnlink" type="button" data-cerrarses="${esc(p.n)}" data-sid="${esc(e.id)}">Cerrar sesión</button></li>`).join("")}</ul>`:`<p class="hint" style="margin:0">Ninguno</p>`})()}
     <p class="pal-t" style="margin:16px 0 6px">Historial de cambios (solo lo ves tú)</p><button class="btn" type="button" id="verHist">Ver historial</button><ul class="usr-hist" id="usrHist" hidden></ul>`:"";
   el.innerHTML=`<p class="usr-yo">Entraste como <b>${esc(titulo(quien))}</b> en este equipo.</p>${!sesion.admin&&leerLS(SESA_K,null)?`<div class="line" style="margin-bottom:10px"><button class="btn pri" type="button" id="sesVolver">Volver a ${esc(nomCorto(leerLS(SESA_K,{}).u))}</button></div>`:""}<div class="line"><button class="btnlink" type="button" id="sesSalir">Salir de este equipo</button></div>${adm}`;
   const vb=$("sesVolver");if(vb)vb.onclick=volverAdmin;
