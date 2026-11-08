@@ -1,5 +1,5 @@
 # Mapa de CBO Finanzas
-Actualizado: 07/11/2026 · caché: cbo-finanzas-v83-usuarios-pin
+Actualizado: 07/11/2026 · caché: cbo-finanzas-v84-permisos-admin
 
 ## Archivos
 - codigo-fuente.html: versión editable (4287 líneas). index.html es la copia que se publica: editar codigo-fuente.html y copiarlo a index.html.
@@ -85,3 +85,4 @@ Actualizado: 07/11/2026 · caché: cbo-finanzas-v83-usuarios-pin
 - Gesto atrás (alAtras, popstate; se rearma con arma al tocar): cierra lo abierto, el registro vuelve de paso, inventario a su portada, secciones a Inicio; solo sale desde Inicio. ir() usa replaceState.
 - Usuarios con PIN (v83): entrar con nombre + PIN una vez por equipo (ovQuien + teclado #bloqueo modo "externo"; sesión en cbo-sesion, token del servidor en cada api()). Sin sesión, ovQuien opaco y el gesto atrás no lo cierra. Josué es administrador: en Configuración → Tu usuario y PIN ve el PIN de cada uno, lo cambia (también el suyo), agrega usuarios y quita/devuelve el acceso (pintarSesion, pinParaOtro, agregarUsuario, cambiarAcceso). Los usuarios no cambian su PIN.
 - Servidor (Apps Script versión 16): acciones usuarios, entrar, crearUsuario, ponerPin, acceso; todo lo demás exige sesión ("sesion" si no). "por" de registros e inventario y el usuario de Ajustes los pone el servidor. Usuarios y PIN cifrados en Propiedades del script (USUARIOS_CBO), no en el Excel. Copia del módulo: mejoras/APPS-SCRIPT-USUARIOS.gs. PIN inicial de Josué y Jesús: el que eligió Josué.
+- Administrador (v84, servidor versión 17): "Entrar como" otro usuario y "Volver" (SESA_K cbo-sesion-admin). Por usuario: secciones visibles (SECC_PERM; ocultas → aplicarPermisos, secOculta, ir() manda a Inicio; el servidor filtra planilla/SUNAT en "datos" y bloquea Inventario), permiso de descargar reportes (puedeDescargar), Configuración solo admin salvo CFG_LIBRE. Solo el admin corrige/borra lo que registró otro (bloqueaAjeno; servidor permiso_). Historial solo admin (hoja oculta "Historial (app)", registrar_; botón Ver historial). Equipos con sesión abierta por usuario y cerrar sesión a distancia (sesiones en Propiedades SES_<usuario>; token usuario~sid~firma).

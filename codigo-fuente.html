@@ -539,13 +539,22 @@ body.escribiendo .tabbar,body.escribiendo .fab{display:none!important}
 .req{font-weight:600;opacity:.75;text-transform:none;letter-spacing:0}
 /* PIN */
 .usr-lista{list-style:none;margin:0 0 12px;padding:0;display:grid;gap:8px}
-.usr-lista li{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px}
-.usr-lista li>span{display:grid;min-width:0;overflow-wrap:anywhere}
+.usr-lista>li{padding:10px 12px;border:1px solid var(--line);border-radius:12px}
+.usr-cab,.usr-eq li{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.usr-cab>span,.usr-eq li>span{display:grid;min-width:0;overflow-wrap:anywhere}
+.usr-det{margin-top:10px;display:grid;gap:8px}
+.usr-det .pal-t{margin:4px 0 0}
+.usr-perm{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
+.usr-perm label{display:flex;gap:8px;align-items:center;font-size:.86rem}
+.usr-eq{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.usr-hist{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:2px;max-height:360px;overflow:auto}
+.usr-hist li{font-size:.84rem;border-bottom:1px solid var(--line);padding:6px 0;overflow-wrap:anywhere}
+.usr-hist small{color:var(--muted);display:block}
 .usr-lista small{color:var(--muted);font-size:.78rem}
 .usr-yo{margin:0 0 10px}
-.usr-acc{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.usr-acc{display:flex;gap:6px;flex-wrap:wrap}
 .usr-pin{font-variant-numeric:tabular-nums;letter-spacing:.08em}
-.usr-lista li.off>span{opacity:.55}
+.usr-li.off .usr-cab>span{opacity:.55}
 #ovQuien{background:var(--bg)} /* sin sesión no se ve lo guardado detrás */
 .usr-nuevo input{flex:1 1 160px;min-width:0}
 .bloqueo{position:fixed;inset:0;z-index:60;background:var(--brand);color:var(--brand-ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px}
@@ -2127,6 +2136,7 @@ $("chart").addEventListener("click",e=>{const h=e.target.closest(".hit");if(!h)r
 /* ===== Navegación ===== */
 const animar=(el,cls)=>{if(!el)return;el.classList.remove("entra","mes-sig","mes-ant");void el.offsetWidth;el.classList.add(cls)};
 function ir(s){
+  if(secOculta(s))s="inicio";
   document.body.classList.toggle("en-inicio",s==="inicio");
   const cambio=s!==seccion, antes=seccion; seccion=s; document.querySelectorAll("[data-sec]").forEach(x=>x.hidden=x.dataset.sec!==s);
   document.querySelectorAll("#nav button").forEach(b=>b.setAttribute("aria-current",b.dataset.s===s?"page":"false"));
@@ -2202,10 +2212,10 @@ matchMedia("(min-width:1100px)").addEventListener("change",()=>{chart();renderOb
   $(id).addEventListener("click",e=>{const it=e.target.closest(".item.tap");if(it)abrirMov(it.dataset.id)});
   $(id).addEventListener("keydown",e=>{const it=e.target.closest(".item.tap");if(it&&(e.key==="Enter"||e.key===" ")){e.preventDefault();abrirMov(it.dataset.id)}});
 });
-$("movEditar").onclick=()=>{const r=movSel;cerrarOv("ovMov");if(esPagoSun(r))abrirPagoSun(r);else if(esPlanilla(r))abrirPagoPla(r);else openF({modo:"editar",r})};
+$("movEditar").onclick=()=>{const r=movSel;if(bloqueaAjeno(r))return;cerrarOv("ovMov");if(esPagoSun(r))abrirPagoSun(r);else if(esPlanilla(r))abrirPagoPla(r);else openF({modo:"editar",r})};
 $("movDup").onclick=()=>{const r=movSel;cerrarOv("ovMov");if(esPagoSun(r))abrirPagoSun();else if(esPlanilla(r))abrirPagoPla();else openF({modo:"duplicar",r})};
 $("movBorrar").onclick=async()=>{
-  const b=$("movBorrar"), r=movSel; if(!r)return;
+  const b=$("movBorrar"), r=movSel; if(!r||bloqueaAjeno(r))return;
   if(!b.classList.contains("confirm")){b.classList.add("confirm");b.querySelector("span").textContent="¿Seguro?";setTimeout(()=>{b.classList.remove("confirm");b.querySelector("span").textContent="Borrar"},3500);return}
   $("movMsg").textContent="Borrando…";
   try{await store.remove(r.id);cerrarOv("ovMov");toast("Movimiento borrado")}catch{$("movMsg").textContent="No se pudo borrar. Intenta de nuevo."}
@@ -2877,7 +2887,7 @@ function descargar(nombre,contenido,tipo){
   const b=new Blob([contenido],{type:tipo}), u=URL.createObjectURL(b), a=document.createElement("a");
   a.href=u; a.download=nombre; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),4000);
 }
-function reporteCSV(){
+function reporteCSV(){if(!puedeDescargar()){toast("No tienes permiso para descargar reportes");return}
   const lista=delMes(mes).slice().sort((a,b)=>a.fecha.localeCompare(b.fecha)||a.tipo.localeCompare(b.tipo));
   const S=sumas(lista), t=impuestos(mes);
   const c=v=>{const s=v==null?"":String(v);return /[",;\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s};
@@ -2889,7 +2899,7 @@ function reporteCSV(){
   descargar(`CBO-reporte-${mes}.csv`,"﻿"+L.map(f=>f.map(c).join(",")).join("\r\n"),"text/csv;charset=utf-8");
   toast("Reporte en Excel descargado");
 }
-function reportePDF(){
+function reportePDF(){if(!puedeDescargar()){toast("No tienes permiso para descargar reportes");return}
   const lista=delMes(mes).slice().sort((a,b)=>a.fecha.localeCompare(b.fecha));
   const S=sumas(lista), t=impuestos(mes);
   const tabla=arr=>arr.length?`<table><tr><th>Fecha</th><th>Comprobante</th><th>Cliente / proveedor</th><th>RUC / DNI</th><th>Categoría</th><th class="n">IGV</th><th class="n">Total</th></tr>`+
@@ -3007,6 +3017,7 @@ async function cargar(){
     // Carga rápida: si nada cambió en Google desde la última vez, no se vuelve a descargar todo
     const verAnt=leerLS("cbo-ver",""), j=await api("datos",servidorRows.length&&verAnt?{ver:verAnt}:{});
     versionServidor=+j.version||1;
+    if(j.yo&&sesion&&j.yo.usuario===sesion.u){const c=JSON.stringify([sesion.admin,sesion.ocultas,sesion.descargar]);sesion.admin=!!j.yo.admin;sesion.ocultas=j.yo.ocultas||[];sesion.descargar=!!j.yo.descargar;guardarLS(SES_K,sesion);if(c!==JSON.stringify([sesion.admin,sesion.ocultas,sesion.descargar]))pintarQuien()}
     if(j.sinCambios){rows=conCola(servidorRows);render()}
     else{
       if(Array.isArray(j.trabajadores)){trabajadores=j.trabajadores;guardarLS("cbo-trab",trabajadores)}
@@ -3184,7 +3195,7 @@ async function sincPerfil(forzar){
 }
 function pintarQuien(){
   const ub=$("usuarioBtn"); if(ub){const n=nomCorto(quien);const av=avHTML(avDe(quien));ub.innerHTML=n?`<i aria-hidden="true">${av||esc(n.charAt(0))}</i><span>${esc(n)}</span>`:`<span>Entrar</span>`;ub.setAttribute("aria-label",`Usuario: ${titulo(quien)}. Tocar para cambiar la imagen`);ub.onclick=()=>quien?abrirOv("ovPerfil"):pedirUsuario()}
-  pintarSesion();
+  pintarSesion();aplicarPermisos();
   if($("quienEstado")) $("quienEstado").textContent=quien?"Este celular: "+titulo(quien):"Sin elegir";
   $("quienBtns").innerHTML=[...PERSONAS].sort((a,b)=>(b.n===quienAntes)-(a.n===quienAntes)).map(p=>`<button type="button" class="btn" data-entrar="${esc(p.n)}" style="padding:14px 16px;font-size:1.05rem">${esc(titulo(p.n))}</button>`).join("");
   const pf=$("perfilAv");if(pf){const act=quien?avDe(quien):"";pf.hidden=!quien;pf.innerHTML=quien?`<p class="pal-t">Imagen de ${esc(nomCorto(quien))}</p><div class="av-acc"><label class="btn av-sub">Subir foto<input type="file" accept="image/*" id="avFile" hidden></label>${act?`<button type="button" class="btnlink" data-av="">Quitar imagen</button>`:""}</div><div class="av-lista" role="group" aria-label="Muñequitos">${Object.entries(AVATARES).map(([k,[n,sv]])=>`<button type="button" class="av-op" data-av="${k}" aria-pressed="${act===k}" aria-label="${n}"><i>${sv}</i><span>${n}</span></button>`).join("")}</div>`:"";
@@ -3192,11 +3203,29 @@ function pintarQuien(){
 }
 const sinNube=()=>esDemo()&&!window.__nube; // modo de prueba sin servidor: no hay PIN que revisar
 // El PIN de cada uno (solo llega al administrador) se queda en memoria, no se guarda en el equipo
-const usarLista=j=>{PERSONAS=(j.usuarios||[]).map(x=>({n:x.usuario,pin:!!x.tienePin,admin:!!x.admin,p:x.pin||"",b:!!x.bloqueado}));guardarLS("cbo-personas",PERSONAS.map(({p,...r})=>r));pintarQuien()};
-async function pedirEntrada(n,pin,nuevo){
-  if(sinNube())return {u:n,t:"demo",admin:!!(PERSONAS.find(p=>p.n===n)||{}).admin};
-  const j=await api("entrar",{usuario:n,pin,nuevo:!!nuevo});
-  return {u:j.usuario,t:j.token,admin:!!j.admin};
+const usarLista=j=>{PERSONAS=(j.usuarios||[]).map(x=>({n:x.usuario,pin:!!x.tienePin,admin:!!x.admin,p:x.pin||"",b:!!x.bloqueado,oc:x.ocultas||[],d:!!x.descargar,eq:x.equipos||[]}));guardarLS("cbo-personas",PERSONAS.map(({p,...r})=>r));pintarQuien()};
+// Nombre del equipo para la lista "Equipos con sesión abierta" del administrador
+const EQUIPO=(()=>{const a=navigator.userAgent||"";const so=/Android/i.test(a)?"Android":/iPhone|iPad/i.test(a)?"iPhone":/Windows/i.test(a)?"PC Windows":/Mac/i.test(a)?"Mac":"Equipo";const nav=/Edg\//.test(a)?"Edge":/Chrome\//.test(a)?"Chrome":/Safari\//.test(a)?"Safari":/Firefox\//.test(a)?"Firefox":"";let inst=false;try{inst=matchMedia("(display-mode: standalone)").matches}catch{}return so+(inst?" · app instalada":nav?" · "+nav:"")})();
+const sesDe=j=>({u:j.usuario,t:j.token,admin:!!j.admin,ocultas:j.ocultas||[],descargar:!!(j.admin||j.descargar)});
+async function pedirEntrada(n,pin){
+  if(sinNube())return {u:n,t:"demo",admin:!!(PERSONAS.find(p=>p.n===n)||{}).admin,ocultas:[],descargar:true};
+  return sesDe(await api("entrar",{usuario:n,pin,equipo:EQUIPO}));
+}
+/* ===== Permisos que da el administrador: secciones, configuración, reportes y lo registrado por otros ===== */
+const SECC_PERM=["movimientos","sunat","terceros","planilla","obras","inventario","anual"];
+const SECC_NOM={movimientos:"Movimientos",sunat:"Impuestos SUNAT",terceros:"Clientes y proveedores",planilla:"Planilla",obras:"Obras",inventario:"Inventario",anual:"Resumen anual"};
+const CFG_LIBRE=["quien","tema","barra","son","seg","acerca"]; // lo demás de Configuración es solo del administrador
+const esAdmin=()=>!!(sesion&&sesion.admin);
+function secOculta(s){return !!(sesion&&!sesion.admin&&(sesion.ocultas||[]).includes(s))}
+function puedeDescargar(){return !!(sesion&&(sesion.admin||sesion.descargar))}
+function puedeCambiar(r){return !sesion||sesion.admin||(!!r&&!!r.por&&r.por===sesion.u)}
+function bloqueaAjeno(r){if(puedeCambiar(r))return false;toast("Solo el administrador puede cambiar lo que registró otro");return true}
+function aplicarPermisos(){
+  document.querySelectorAll("[data-ir],[data-s],[data-tab]").forEach(b=>{const k=b.dataset.ir||b.dataset.s||b.dataset.tab;if(SECC_PERM.includes(k))b.hidden=secOculta(k)});
+  const adm=esAdmin(),des=puedeDescargar();
+  document.querySelectorAll(".cfg-item[data-cfg]").forEach(d=>{const k=d.dataset.cfg;d.hidden=!!sesion&&!adm&&!CFG_LIBRE.includes(k)&&!(k==="rep"&&des)});
+  document.querySelectorAll(".repCsv,.repPdf").forEach(b=>b.hidden=!!sesion&&!des);
+  if(secOculta(seccion))ir("inicio");
 }
 function ponerSesion(s){sesion=s;guardarLS(SES_K,s);quien=s.u;try{localStorage.setItem("cbo-quien",s.u)}catch{};pintarQuien();pintarAdornos()}
 async function entrarComo(n){
@@ -3212,13 +3241,24 @@ async function pedirUsuario(){
   if(!cfg||sesion||pidiendo||!$("ovQuien").hidden)return;
   pidiendo=true;pintarQuien();abrirOv("ovQuien");await cargarUsuarios();pidiendo=false;
 }
-function perderSesion(){if(!sesion)return;sesion=null;try{localStorage.removeItem(SES_K)}catch{};quien="";pintarQuien();setTimeout(pedirUsuario,0)}
+function perderSesion(){if(!sesion)return;sesion=null;try{localStorage.removeItem(SES_K);localStorage.removeItem("cbo-sesion-admin")}catch{};quien="";pintarQuien();setTimeout(pedirUsuario,0)}
 function salirSesion(){perderSesion();$("app").classList.remove("abierto");document.body.classList.remove("menu")}
 async function pinParaOtro(n){
   if(sinNube()){toast("En el modo de prueba no hay PIN");return}
   const pin=await abrirPin("elegir",`Nuevo PIN para ${nomCorto(n)}`);if(!pin)return;
-  try{const j=await api("ponerPin",{usuario:n,pin});if(j.token)ponerSesion({u:quien,t:j.token,admin:true});usarLista(j);
+  try{const j=await api("ponerPin",{usuario:n,pin,equipo:EQUIPO});if(j.token)ponerSesion(Object.assign({},sesion,{t:j.token}));usarLista(j);
     toast(n===quien?"Tu PIN cambió.":`PIN de ${nomCorto(n)} cambiado. Tendrá que entrar de nuevo con ese PIN.`)}catch(e){toast(e.message)}
+}
+// El administrador entra como otro usuario sin su PIN y puede volver al suyo cuando quiera
+const SESA_K="cbo-sesion-admin";
+async function entrarComoAdmin(n){
+  if(sinNube()){toast("En el modo de prueba no se cambia de usuario");return}
+  try{const j=await api("comoUsuario",{usuario:n,equipo:EQUIPO});guardarLS(SESA_K,sesion);ponerSesion(sesDe(j));
+    toast(`Ahora estás como ${titulo(j.usuario)}. Lo que registres quedará a su nombre.`);cargar()}catch(e){toast(e.message)}
+}
+function volverAdmin(){
+  const a=leerLS(SESA_K,null);if(!a)return;try{localStorage.removeItem(SESA_K)}catch{}
+  ponerSesion(a);cargarUsuarios();toast("Volviste a "+titulo(a.u));cargar();
 }
 // Quitar o devolver el acceso a la app (solo administrador). Sin acceso, su sesión se cierra en todos sus equipos.
 async function cambiarAcceso(n,permitir){
@@ -3234,17 +3274,49 @@ async function agregarUsuario(){
   const pin=await abrirPin("elegir",`PIN para ${nomCorto(nom)}`);if(!pin)return;
   try{usarLista(await api("crearUsuario",{nombre:nom,pin}));i.value="";toast(`${titulo(nom)} agregado con su PIN.`)}catch(e){toast(e.message)}
 }
+let usrAbierto="";
+const fhUsr=ms=>{try{return ms?new Date(ms).toLocaleString("es-PE",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"}):""}catch{return ""}};
 function pintarSesion(){
   const el=$("quienSeg");if(!el)return;
   if(!sesion){el.innerHTML=`<button class="btn pri" type="button" id="sesEntrar">Entrar con mi PIN</button>`;$("sesEntrar").onclick=pedirUsuario;return}
-  const adm=sesion.admin?`<p class="pal-t" style="margin:16px 0 6px">Usuarios</p><ul class="usr-lista">${PERSONAS.map(p=>`<li${p.b?' class="off"':""}><span><b>${esc(titulo(p.n))}${p.n===quien?" (tú)":""}</b><small>${p.admin?"Administrador":p.b?"Sin acceso":"Usuario"} · PIN <span class="usr-pin" data-pin="${esc(p.p||"")}">••••</span></small></span><span class="usr-acc">${p.p?`<button class="btnlink" type="button" data-verpin>Ver PIN</button>`:""}<button class="btnlink" type="button" data-ponpin="${esc(p.n)}">Cambiar PIN</button>${!p.admin?`<button class="btnlink" type="button" data-acceso="${esc(p.n)}" data-permitir="${p.b?"1":""}">${p.b?"Dar acceso":"Quitar acceso"}</button>`:""}</span></li>`).join("")}</ul>
-    <div class="line usr-nuevo"><input id="usrNombre" type="text" placeholder="Nombre y apellido" maxlength="40" autocomplete="off" aria-label="Nombre del usuario nuevo"><button class="btn" type="button" id="usrAgregar">Agregar usuario</button></div>`:"";
-  el.innerHTML=`<p class="usr-yo">Entraste como <b>${esc(titulo(quien))}</b> en este equipo.</p><div class="line"><button class="btnlink" type="button" id="sesSalir">Salir de este equipo</button></div>${adm}`;
+  const fila=p=>`<li class="usr-li${p.b?" off":""}"><div class="usr-cab"><span><b>${esc(titulo(p.n))}${p.n===quien?" (tú)":""}</b><small>${p.admin?"Administrador":p.b?"Sin acceso":"Usuario"} · PIN <span class="usr-pin" data-pin="${esc(p.p||"")}">••••</span></small></span><button class="btnlink" type="button" data-abrir="${esc(p.n)}">${usrAbierto===p.n?"Cerrar":"Opciones"}</button></div>
+    <div class="usr-det"${usrAbierto===p.n?"":" hidden"}><div class="usr-acc">${p.p?`<button class="btnlink" type="button" data-verpin>Ver PIN</button>`:""}${p.n!==quien&&!p.b?`<button class="btnlink" type="button" data-como="${esc(p.n)}">Entrar como</button>`:""}<button class="btnlink" type="button" data-ponpin="${esc(p.n)}">Cambiar PIN</button>${!p.admin?`<button class="btnlink" type="button" data-acceso="${esc(p.n)}" data-permitir="${p.b?"1":""}">${p.b?"Dar acceso":"Quitar acceso"}</button>`:""}</div>
+    ${!p.admin?`<p class="pal-t">Puede ver y usar</p><div class="usr-perm">${SECC_PERM.map(k=>`<label><input type="checkbox" data-secc="${k}"${(p.oc||[]).includes(k)?"":" checked"}> ${SECC_NOM[k]}</label>`).join("")}<label><input type="checkbox" data-desc${p.d?" checked":""}> Descargar reportes</label></div><div class="line"><button class="btn" type="button" data-guardperm="${esc(p.n)}">Guardar permisos</button></div>`:""}
+    <p class="pal-t">Equipos con sesión abierta</p>${(p.eq||[]).length?`<ul class="usr-eq">${p.eq.map(e=>`<li><span>${esc(e.eq)}<small>Entró ${fhUsr(e.c)} · último uso ${fhUsr(e.u)}</small></span><button class="btnlink" type="button" data-cerrarses="${esc(p.n)}" data-sid="${esc(e.id)}">Cerrar sesión</button></li>`).join("")}</ul>`:`<p class="hint" style="margin:0">Ninguno</p>`}</div></li>`;
+  const adm=sesion.admin?`<p class="pal-t" style="margin:16px 0 6px">Usuarios</p><ul class="usr-lista">${PERSONAS.map(fila).join("")}</ul>
+    <div class="line usr-nuevo"><input id="usrNombre" type="text" placeholder="Nombre y apellido" maxlength="40" autocomplete="off" aria-label="Nombre del usuario nuevo"><button class="btn" type="button" id="usrAgregar">Agregar usuario</button></div>
+    <p class="pal-t" style="margin:16px 0 6px">Historial de cambios (solo lo ves tú)</p><button class="btn" type="button" id="verHist">Ver historial</button><ul class="usr-hist" id="usrHist" hidden></ul>`:"";
+  el.innerHTML=`<p class="usr-yo">Entraste como <b>${esc(titulo(quien))}</b> en este equipo.</p>${!sesion.admin&&leerLS(SESA_K,null)?`<div class="line" style="margin-bottom:10px"><button class="btn pri" type="button" id="sesVolver">Volver a ${esc(nomCorto(leerLS(SESA_K,{}).u))}</button></div>`:""}<div class="line"><button class="btnlink" type="button" id="sesSalir">Salir de este equipo</button></div>${adm}`;
+  const vb=$("sesVolver");if(vb)vb.onclick=volverAdmin;
   $("sesSalir").onclick=salirSesion;
   const ag=$("usrAgregar");if(ag)ag.onclick=agregarUsuario;
+  const vh=$("verHist");if(vh)vh.onclick=verHistorial;
+  el.querySelectorAll("[data-abrir]").forEach(b=>b.onclick=()=>{usrAbierto=usrAbierto===b.dataset.abrir?"":b.dataset.abrir;pintarSesion()});
+  el.querySelectorAll("[data-como]").forEach(b=>b.onclick=()=>entrarComoAdmin(b.dataset.como));
   el.querySelectorAll("[data-ponpin]").forEach(b=>b.onclick=()=>pinParaOtro(b.dataset.ponpin));
   el.querySelectorAll("[data-acceso]").forEach(b=>b.onclick=()=>cambiarAcceso(b.dataset.acceso,!!b.dataset.permitir));
-  el.querySelectorAll("[data-verpin]").forEach(b=>b.onclick=()=>{const s=b.closest("li").querySelector(".usr-pin"),ver=b.textContent==="Ver PIN";s.textContent=ver?s.dataset.pin:"••••";b.textContent=ver?"Ocultar":"Ver PIN"});
+  el.querySelectorAll("[data-guardperm]").forEach(b=>b.onclick=()=>guardarPermisos(b.dataset.guardperm,b.closest("li")));
+  el.querySelectorAll("[data-cerrarses]").forEach(b=>b.onclick=()=>cerrarSesionDe(b.dataset.cerrarses,b.dataset.sid));
+  el.querySelectorAll("[data-verpin]").forEach(b=>b.onclick=()=>{const sp=b.closest(".usr-li").querySelector(".usr-pin"),ver=b.textContent==="Ver PIN";sp.textContent=ver?sp.dataset.pin:"••••";b.textContent=ver?"Ocultar":"Ver PIN"});
+}
+async function guardarPermisos(n,li){
+  if(sinNube()){toast("En el modo de prueba no se guardan permisos");return}
+  const oc=[...li.querySelectorAll("[data-secc]")].filter(c=>!c.checked).map(c=>c.dataset.secc),d=!!(li.querySelector("[data-desc]")||{}).checked;
+  try{usarLista(await api("permisos",{usuario:n,ocultas:oc,descargar:d}));toast(`Permisos de ${nomCorto(n)} guardados. Se aplican cuando abra la app.`)}catch(e){toast(e.message)}
+}
+async function cerrarSesionDe(n,id){
+  if(sinNube())return;
+  if(!confirm(`¿Cerrar esa sesión de ${titulo(n)}? Tendrá que entrar otra vez con su PIN en ese equipo.`))return;
+  try{usarLista(await api("cerrarSesion",{usuario:n,id}));toast("Sesión cerrada")}catch(e){toast(e.message)}
+}
+async function verHistorial(){
+  const ul=$("usrHist"),b=$("verHist");if(!ul)return;
+  if(!ul.hidden){ul.hidden=true;b.textContent="Ver historial";return}
+  if(sinNube()){ul.innerHTML='<li>En el modo de prueba no hay historial.</li>';ul.hidden=false;return}
+  b.textContent="Cargando…";
+  try{const j=await api("historial");const h=j.historial||[];
+    ul.innerHTML=h.length?h.map(x=>`<li><b>${esc(titulo(x.u)||"—")}</b> · ${esc(x.d)}<small>${fhUsr(x.f)}</small></li>`).join(""):"<li>Aún no hay cambios anotados.</li>";
+    ul.hidden=false;b.textContent="Ocultar historial"}catch(e){b.textContent="Ver historial";toast(e.message)}
 }
 document.addEventListener("click",e=>{const av=e.target.closest("[data-av]");if(av){ponerAv(av.dataset.av);return}const b=e.target.closest("[data-entrar]");if(b)entrarComo(b.dataset.entrar);else if(e.target.id==="ovPerfil"||e.target.id==="perfilCerrar")cerrarOv("ovPerfil")});
 pintarQuien();
@@ -3389,6 +3461,7 @@ $("movRep").onclick=()=>{const r=movSel;cerrarOv("ovMov");repetirMov(r)};
     const s=e.target.closest(".swipe"); if(!s)return;
     const b=e.target.closest(".acc button");
     if(b){e.stopImmediatePropagation();const r=rows.find(x=>String(x.id)===String(s.dataset.id));if(!r)return;
+      if((b.dataset.a==="editar"||b.dataset.a==="borrar")&&bloqueaAjeno(r)){s.classList.remove("open");return}
       if(b.dataset.a==="editar"){s.classList.remove("open");if(esPagoSun(r))abrirPagoSun(r);else if(esPlanilla(r))abrirPagoPla(r);else openF({modo:"editar",r})}
       else if(b.dataset.a==="repetir"){s.classList.remove("open");repetirMov(r)}
       else if(b.dataset.a==="borrar"){
