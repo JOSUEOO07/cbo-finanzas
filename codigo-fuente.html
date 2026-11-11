@@ -2146,6 +2146,7 @@ $("chart").addEventListener("click",e=>{const h=e.target.closest(".hit");if(!h)r
 const animar=(el,cls)=>{if(!el)return;el.classList.remove("entra","mes-sig","mes-ant");void el.offsetWidth;el.classList.add(cls)};
 function ir(s){
   if(secOculta(s))s="inicio";
+  if(s==="inventario")s="inicio"; // el inventario se pasó a CBO Obras
   document.body.classList.toggle("en-inicio",s==="inicio");
   const cambio=s!==seccion, antes=seccion; seccion=s; document.querySelectorAll("[data-sec]").forEach(x=>x.hidden=x.dataset.sec!==s);
   document.querySelectorAll("#nav button").forEach(b=>b.setAttribute("aria-current",b.dataset.s===s?"page":"false"));
@@ -4961,6 +4962,13 @@ $("ovInvObra").addEventListener("click",e=>{if(e.target===$("ovInvObra"))cerrarO
 window.addEventListener("online",()=>{invEnviarCola()});
 if(typeof seccion!=="undefined"&&seccion==="inventario") try{invRender()}catch(e){console.error(e)}
 
+
+/* ===== El inventario de obra se pasó a CBO Obras: aquí ya no se muestra ===== */
+(function(){
+  document.querySelectorAll('[data-ir="inventario"],[data-s="inventario"],[data-tab="inventario"]').forEach(b=>b.remove());
+  const sec=document.querySelector('[data-sec="inventario"]');if(sec)sec.remove();
+  if(typeof BAR_DEF!=="undefined"&&BAR_DEF.inventario)delete BAR_DEF.inventario;
+})();
 </script>
 </body>
 </html>
