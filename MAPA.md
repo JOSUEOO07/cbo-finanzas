@@ -1,5 +1,5 @@
 # Mapa de CBO Finanzas
-Actualizado: 07/11/2026 · caché: cbo-finanzas-v89-iconos-equipos
+Actualizado: 11/11/2026 · caché: cbo-finanzas-v90-equipos-usuario
 
 ## Archivos
 - codigo-fuente.html: versión editable (4287 líneas). index.html es la copia que se publica: editar codigo-fuente.html y copiarlo a index.html.
@@ -90,3 +90,4 @@ Actualizado: 07/11/2026 · caché: cbo-finanzas-v89-iconos-equipos
 - Equipos (v87): lista general "Equipos con sesión abierta" con el usuario de cada equipo (.usr-todos). Al "Volver" del modo "Entrar como" se cierra esa sesión sola.
 - v88: quitada la lista general de equipos (quedan dentro de Opciones de cada usuario). Toques instantáneos: touch-action:manipulation en botones y respuesta visual al pulsar.
 - v89: equipos con ícono (celular, tablet, computadora: tipoEq, icoEq) y sin marca ni modelo (nomEq; EQUIPO dice Celular Android / Apple iPhone / PC Windows / Apple Mac).
+- v90: cada equipo de la lista dice "Usuario: <nombre>".
