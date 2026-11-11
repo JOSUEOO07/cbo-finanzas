@@ -1,5 +1,5 @@
 # Mapa de CBO Finanzas
-Actualizado: 11/11/2026 · caché: cbo-finanzas-v91-sin-inventario
+Actualizado: 11/11/2026 · caché: cbo-finanzas-v92-pin-azar
 
 ## Archivos
 - codigo-fuente.html: versión editable (4287 líneas). index.html es la copia que se publica: editar codigo-fuente.html y copiarlo a index.html.
@@ -92,3 +92,4 @@ Actualizado: 11/11/2026 · caché: cbo-finanzas-v91-sin-inventario
 - v89: equipos con ícono (celular, tablet, computadora: tipoEq, icoEq) y sin marca ni modelo (nomEq; EQUIPO dice Celular Android / Apple iPhone / PC Windows / Apple Mac).
 - v90: cada equipo de la lista dice "Usuario: <nombre>".
 - v91: Inventario de obra se pasó a CBO Obras (app aparte). Aquí se quita al cargar (bloque al final) e ir("inventario") manda a Inicio. El código del inventario sigue en el archivo pero no se muestra.
+- v92: PIN al azar (pinAlAzar, pinAzarPara, casilla "PIN al azar" al agregar): 4 dígitos, nunca el de otro usuario ni fáciles; el PIN elegido a mano también se revisa (pinUsadoPor).

@@ -566,6 +566,7 @@ body.escribiendo .tabbar,body.escribiendo .fab{display:none!important}
 .usr-li.off .usr-cab>span{opacity:.55}
 #ovQuien{background:var(--bg)} /* sin sesión no se ve lo guardado detrás */
 .usr-nuevo input{flex:1 1 160px;min-width:0}
+.usr-azar{display:flex;align-items:center;gap:6px;font-size:.84rem;color:var(--muted);white-space:nowrap}.usr-nuevo .usr-azar input{flex:0 0 18px;width:18px;height:18px;min-width:0;margin:0}
 .bloqueo{position:fixed;inset:0;z-index:60;background:var(--brand);color:var(--brand-ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px}
 .bloqueo h2{font-family:var(--display);margin:0;font-size:1.3rem}
 .bloqueo .puntos{display:flex;gap:14px;height:16px}
@@ -3253,9 +3254,24 @@ async function pedirUsuario(){
 }
 function perderSesion(){if(!sesion)return;sesion=null;try{localStorage.removeItem(SES_K);localStorage.removeItem("cbo-sesion-admin")}catch{};quien="";pintarQuien();setTimeout(pedirUsuario,0)}
 function salirSesion(){perderSesion();$("app").classList.remove("abierto");document.body.classList.remove("menu")}
+function pinAlAzar(n){
+  const usados=new Set(PERSONAS.filter(p=>p.n!==n).map(p=>p.p).filter(Boolean));
+  const facil=x=>/^(\d)\1{3}$/.test(x)||"01234567890".includes(x)||"09876543210".includes(x);
+  const r=new Uint32Array(1);
+  for(let i=0;i<500;i++){crypto.getRandomValues(r);const x=String(r[0]%10000).padStart(4,"0");if(!usados.has(x)&&!facil(x))return x}
+  return "";
+}
+const pinUsadoPor=(pin,n)=>(PERSONAS.find(p=>p.n!==n&&p.p&&p.p===pin)||{}).n||"";
+async function pinAzarPara(n){
+  if(sinNube()){toast("En el modo de prueba no hay PIN");return}
+  const pin=pinAlAzar(n);if(!pin){toast("No se encontró un PIN libre");return}
+  if(!confirm(`PIN al azar para ${titulo(n)}: ${pin}\n\nNo lo usa ningún otro usuario. Anótalo y dáselo. ¿Lo pongo?`))return;
+  try{const j=await api("ponerPin",{usuario:n,pin,equipo:EQUIPO});if(j.token)ponerSesion(Object.assign({},sesion,{t:j.token}));usarLista(j);toast(`PIN de ${nomCorto(n)}: ${pin}`)}catch(e){toast(e.message)}
+}
 async function pinParaOtro(n){
   if(sinNube()){toast("En el modo de prueba no hay PIN");return}
   const pin=await abrirPin("elegir",`Nuevo PIN para ${nomCorto(n)}`);if(!pin)return;
+  if(pinUsadoPor(pin,n)){toast(`Ese PIN ya lo usa ${nomCorto(pinUsadoPor(pin,n))}. Elige otro o usa "PIN al azar".`);return}
   try{const j=await api("ponerPin",{usuario:n,pin,equipo:EQUIPO});if(j.token)ponerSesion(Object.assign({},sesion,{t:j.token}));usarLista(j);
     toast(n===quien?"Tu PIN cambió.":`PIN de ${nomCorto(n)} cambiado. Tendrá que entrar de nuevo con ese PIN.`)}catch(e){toast(e.message)}
 }
@@ -3284,8 +3300,10 @@ async function agregarUsuario(){
   if(nom.length<3){toast("Escribe el nombre y apellido");i.focus();return}
   if(PERSONAS.some(p=>p.n===nom.toUpperCase())){toast("Ese usuario ya existe");return}
   if(sinNube()){toast("En el modo de prueba no se agregan usuarios");return}
-  const pin=await abrirPin("elegir",`PIN para ${nomCorto(nom)}`);if(!pin)return;
-  try{usarLista(await api("crearUsuario",{nombre:nom,pin}));i.value="";toast(`${titulo(nom)} agregado con su PIN.`)}catch(e){toast(e.message)}
+  const azar=!!($("usrAzar")&&$("usrAzar").checked);
+  const pin=azar?pinAlAzar(nom.toUpperCase()):await abrirPin("elegir",`PIN para ${nomCorto(nom)}`);if(!pin){if(azar)toast("No se encontró un PIN libre");return}
+  if(pinUsadoPor(pin,nom.toUpperCase())){toast(`Ese PIN ya lo usa ${nomCorto(pinUsadoPor(pin,nom.toUpperCase()))}. Elige otro o marca "PIN al azar".`);return}
+  try{usarLista(await api("crearUsuario",{nombre:nom,pin}));i.value="";toast(`${titulo(nom)} agregado. Su PIN: ${pin}`)}catch(e){toast(e.message)}
 }
 let usrAbierto="";
 // Equipos: ícono de celular, tablet o computadora a la izquierda, sin marca ni modelo
@@ -3298,11 +3316,11 @@ function pintarSesion(){
   const el=$("quienSeg");if(!el)return;
   if(!sesion){el.innerHTML=`<button class="btn pri" type="button" id="sesEntrar">Entrar con mi PIN</button>`;$("sesEntrar").onclick=pedirUsuario;return}
   const fila=p=>`<li class="usr-li${p.b?" off":""}"><div class="usr-cab"><span><b>${esc(titulo(p.n))}${p.n===quien?" (tú)":""}</b><small>${p.admin?"Administrador":p.b?"Sin acceso":"Usuario"} · PIN <span class="usr-pin" data-pin="${esc(p.p||"")}">••••</span></small></span><button class="btnlink" type="button" data-abrir="${esc(p.n)}">${usrAbierto===p.n?"Cerrar":"Opciones"}</button></div>
-    <div class="usr-det"${usrAbierto===p.n?"":" hidden"}><div class="usr-acc">${p.p?`<button class="btnlink" type="button" data-verpin>Ver PIN</button>`:""}${p.n!==quien&&!p.b?`<button class="btnlink" type="button" data-como="${esc(p.n)}">Entrar como</button>`:""}<button class="btnlink" type="button" data-ponpin="${esc(p.n)}">Cambiar PIN</button>${!p.admin?`<button class="btnlink" type="button" data-acceso="${esc(p.n)}" data-permitir="${p.b?"1":""}">${p.b?"Dar acceso":"Quitar acceso"}</button>`:""}</div>
+    <div class="usr-det"${usrAbierto===p.n?"":" hidden"}><div class="usr-acc">${p.p?`<button class="btnlink" type="button" data-verpin>Ver PIN</button>`:""}${p.n!==quien&&!p.b?`<button class="btnlink" type="button" data-como="${esc(p.n)}">Entrar como</button>`:""}<button class="btnlink" type="button" data-ponpin="${esc(p.n)}">Cambiar PIN</button><button class="btnlink" type="button" data-pinazar="${esc(p.n)}">PIN al azar</button>${!p.admin?`<button class="btnlink" type="button" data-acceso="${esc(p.n)}" data-permitir="${p.b?"1":""}">${p.b?"Dar acceso":"Quitar acceso"}</button>`:""}</div>
     ${!p.admin?`<p class="pal-t">Puede ver y usar</p><div class="usr-perm">${SECC_PERM.map(k=>`<label><input type="checkbox" data-secc="${k}"${(p.oc||[]).includes(k)?"":" checked"}> ${SECC_NOM[k]}</label>`).join("")}<label><input type="checkbox" data-desc${p.d?" checked":""}> Descargar reportes</label></div><div class="line"><button class="btn" type="button" data-guardperm="${esc(p.n)}">Guardar permisos</button></div>`:""}
     <p class="pal-t">Equipos con sesión abierta</p>${(p.eq||[]).length?`<ul class="usr-eq">${p.eq.map(e=>`<li><i class="eq-ic" aria-hidden="true">${icoEq(e.eq)}</i><span>${esc(nomEq(e.eq))}<small>Usuario: ${esc(titulo(p.n))} · Entró ${fhUsr(e.c)} · último uso ${fhUsr(e.u)}</small></span><button class="btnlink" type="button" data-cerrarses="${esc(p.n)}" data-sid="${esc(e.id)}">Cerrar sesión</button></li>`).join("")}</ul>`:`<p class="hint" style="margin:0">Ninguno</p>`}</div></li>`;
   const adm=sesion.admin?`<p class="pal-t" style="margin:16px 0 6px">Usuarios</p><ul class="usr-lista">${PERSONAS.map(fila).join("")}</ul>
-    <div class="line usr-nuevo"><input id="usrNombre" type="text" placeholder="Nombre y apellido" maxlength="40" autocomplete="off" aria-label="Nombre del usuario nuevo"><button class="btn" type="button" id="usrAgregar">Agregar usuario</button></div>
+    <div class="line usr-nuevo"><input id="usrNombre" type="text" placeholder="Nombre y apellido" maxlength="40" autocomplete="off" aria-label="Nombre del usuario nuevo"><button class="btn" type="button" id="usrAgregar">Agregar usuario</button><label class="usr-azar"><input type="checkbox" id="usrAzar"> PIN al azar</label></div>
     <p class="pal-t" style="margin:16px 0 6px">Historial de cambios (solo lo ves tú)</p><button class="btn" type="button" id="verHist">Ver historial</button><ul class="usr-hist" id="usrHist" hidden></ul>`:"";
   el.innerHTML=`<p class="usr-yo">Entraste como <b>${esc(titulo(quien))}</b> en este equipo.</p>${!sesion.admin&&leerLS(SESA_K,null)?`<div class="line" style="margin-bottom:10px"><button class="btn pri" type="button" id="sesVolver">Volver a ${esc(nomCorto(leerLS(SESA_K,{}).u))}</button></div>`:""}<div class="line"><button class="btnlink" type="button" id="sesSalir">Salir de este equipo</button></div>${adm}`;
   const vb=$("sesVolver");if(vb)vb.onclick=volverAdmin;
@@ -3312,6 +3330,7 @@ function pintarSesion(){
   el.querySelectorAll("[data-abrir]").forEach(b=>b.onclick=()=>{usrAbierto=usrAbierto===b.dataset.abrir?"":b.dataset.abrir;pintarSesion()});
   el.querySelectorAll("[data-como]").forEach(b=>b.onclick=()=>entrarComoAdmin(b.dataset.como));
   el.querySelectorAll("[data-ponpin]").forEach(b=>b.onclick=()=>pinParaOtro(b.dataset.ponpin));
+  el.querySelectorAll("[data-pinazar]").forEach(b=>b.onclick=()=>pinAzarPara(b.dataset.pinazar));
   el.querySelectorAll("[data-acceso]").forEach(b=>b.onclick=()=>cambiarAcceso(b.dataset.acceso,!!b.dataset.permitir));
   el.querySelectorAll("[data-guardperm]").forEach(b=>b.onclick=()=>guardarPermisos(b.dataset.guardperm,b.closest("li")));
   el.querySelectorAll("[data-cerrarses]").forEach(b=>b.onclick=()=>cerrarSesionDe(b.dataset.cerrarses,b.dataset.sid));
