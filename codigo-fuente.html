@@ -2360,7 +2360,7 @@ function pintarFirmaMov(){
 }
 function pintarFirmados(){
   const L=Object.values(FIRMAS).sort((a,b)=>b.ts-a.ts);
-  $("firmadosN").textContent=L.length?L.length+" firmado"+(L.length>1?"s":""):"";
+  const fN=$("firmadosN");if(fN)fN.textContent=L.length?L.length+" firmado"+(L.length>1?"s":""):"";if(!$("firmados"))return;
   $("firmados").innerHTML=L.length?L.map(f=>`<button type="button" data-fid="${esc(String(f.id))}"><span>${esc(f.num||"")} · ${esc(titulo(f.nombre||""))}</span><small>${fechaHora(f.ts)} ⬇</small></button>`).join(""):`<p class="hint" style="margin:0">Aún no hay comprobantes firmados.</p>`;
 }
 async function descargarFirmado(r){
@@ -3151,6 +3151,7 @@ async function enviarCola(){
           }
           // Las operaciones siguientes sobre este registro usan ya el id real
           cola.slice(1).forEach(o=>{if(String(o.id)===String(op.tmp))o.id=nuevo});
+          if(nuevo)moverFirma(op.tmp,nuevo);   // si ya se firmó mientras el pago se enviaba, la firma pasa a su número real
         }
         else if(op.op==="editar") await api("editar",Object.assign({id:op.id,registro:op.registro},op.parcial?{parcial:true}:{}));
         else if(op.op==="borrar") await api("borrar",{id:op.id});
@@ -4392,8 +4393,27 @@ async function quitarFirmaNube(id){
   guardarLS(FIRMA_PEND,(leerLS(FIRMA_PEND,[])||[]).filter(x=>x!==id));
   try{await api("borrarFirma",{id})}catch(e){const L=leerLS(FIRMA_BORR,[])||[];if(!L.includes(id)){L.push(id);guardarLS(FIRMA_BORR,L)}}
 }
+// Firma hecha antes de que el pago llegue a Google (número temporal): pasa al número real y se sube al Excel
+async function moverFirma(viejo,nuevo){
+  const f=FIRMAS[viejo];if(!f||!nuevo||String(viejo)===String(nuevo))return;
+  const n=Object.assign({},f,{id:nuevo});
+  try{await firmasDB.guardar(n);await firmasDB.quitar(viejo)}catch{}
+  delete FIRMAS[viejo];FIRMAS[nuevo]=n;if(movSel&&String(movSel.id)===String(viejo))movSel=Object.assign({},movSel,{id:nuevo});
+  try{pintarFirmados();pintarFirmaMov()}catch{}
+  subirFirma(n);
+}
+// Las firmas que ya quedaron con número temporal se reconocen por trabajador, fecha y monto
+function rescatarFirmas(){
+  for(const f of Object.values(FIRMAS)){
+    if(idReal(f.id))continue;
+    if(rows.some(x=>String(x.id)===String(f.id)))continue;   // el pago aún se está enviando
+    const r=rows.find(x=>idReal(x.id)&&!FIRMAS[x.id]&&String(x.ruc||"")===String(f.dni||"")&&x.fecha===f.fecha&&Math.abs((+x.monto||0)-(+f.monto||0))<0.01);
+    if(r)moverFirma(f.id,r.id);
+  }
+}
 let firmasSync=false;
 async function sincronizarFirmas(){
+  if(!esDemo())try{rescatarFirmas()}catch{}
   if(firmasSync||esDemo()||!cfg||!navigator.onLine) return; firmasSync=true;
   try{
     for(const id of (leerLS(FIRMA_BORR,[])||[])){try{await api("borrarFirma",{id});guardarLS(FIRMA_BORR,(leerLS(FIRMA_BORR,[])||[]).filter(x=>x!==id))}catch{}}
