@@ -3361,7 +3361,7 @@ async function entrarComoAdmin(n){
         if(sesion&&sesion.u===n&&!sesion.t){Object.assign(sesion,{t:s.t,ocultas:s.ocultas,descargar:s.descargar});guardarLS(SES_K,sesion);aplicarPermisos()}
         return s.t}
       catch(e){if(sesion&&sesion.u===n&&!sesion.t){const a=leerLS(SESA_K,null);if(a){try{localStorage.removeItem(SESA_K)}catch{}ponerSesion(a)}toast(e.message||"No se pudo entrar como "+titulo(n))}throw e}
-      finally{tokPend=null}})();
+      finally{tokPend=null}})();if(tokPend)tokPend.catch(()=>{});
   }
   ponerSesion(Object.assign({},base,{t:ac.tc||""}));cerrarOv("ovQuien");
   toast(`Ahora estás como ${titulo(n)}. Lo que registres quedará a su nombre.`);cargar();
@@ -3571,14 +3571,16 @@ async function revisarPinDe(n,pin){
   if(a.h&&a.s&&a.t&&await hashLocal(a.s,pin)===a.h)return Object.assign({},a.ses||{},{u:n,t:a.t});
   // Al instante también la primera vez en el equipo del administrador: él ya conoce los PIN; la sesión del servidor llega por detrás
   const pp=PERSONAS.find(x=>x.n===n);
-  if(pp&&pp.p&&String(pp.p)===String(pin)&&!sinNube()){
+  if(pp&&pp.p&&String(pp.p)!==String(pin)&&!sinNube())throw new Error("PIN incorrecto");   // el administrador ya sabe el PIN: error al instante
+  // Siempre al instante: la app se abre ya y Google revisa el PIN por detrás; si no vale, vuelve a pedirlo con el aviso
+  if(!sinNube()){
     tokPend=(async()=>{try{const s=await pedirEntrada(n,pin);const sal=b64u(reto());
         accPoner(n,{s:sal,h:await hashLocal(sal,pin),t:s.t,ses:{admin:!!s.admin,ocultas:s.ocultas||[],descargar:!!s.descargar},m:metodoDe(n)});
         if(sesion&&sesion.u===n&&!sesion.t){Object.assign(sesion,{t:s.t,admin:!!s.admin,ocultas:s.ocultas||[],descargar:!!s.descargar});guardarLS(SES_K,sesion);aplicarPermisos()}
         return s.t}
       catch(e){if(sesion&&sesion.u===n&&!sesion.t){perderSesion();toast(e.message||"No se pudo entrar")}throw e}
-      finally{tokPend=null}})();
-    return {u:n,t:"",admin:!!pp.admin,ocultas:pp.oc||[],descargar:!!(pp.admin||pp.d)};
+      finally{tokPend=null}})();if(tokPend)tokPend.catch(()=>{});
+    return {u:n,t:"",admin:!!(pp&&pp.admin),ocultas:(pp&&pp.oc)||[],descargar:!!(pp&&(pp.admin||pp.d))};
   }
   const s=await pedirEntrada(n,pin);
   const sal=b64u(reto());
@@ -3591,7 +3593,7 @@ entrarComo=async function(n){
     const s=a.t?Object.assign({},a.ses||{},{u:n,t:a.t}):{u:n,t:"",admin:!!pp.admin,ocultas:pp.oc||[],descargar:!!(pp.admin||pp.d)};
     if(!a.t&&!sinNube())tokPend=(async()=>{try{const r=await pedirEntrada(n,"");accPoner(n,{t:r.t,ses:{admin:!!r.admin,ocultas:r.ocultas||[],descargar:!!r.descargar},m:"libre"});
         if(sesion&&sesion.u===n&&!sesion.t){Object.assign(sesion,{t:r.t,admin:!!r.admin,ocultas:r.ocultas||[],descargar:!!r.descargar});guardarLS(SES_K,sesion);aplicarPermisos()}return r.t}
-      catch(e){if(sesion&&sesion.u===n&&!sesion.t){perderSesion();toast(e.message||"No se pudo entrar")}throw e}finally{tokPend=null}})();
+      catch(e){if(sesion&&sesion.u===n&&!sesion.t){perderSesion();toast(e.message||"No se pudo entrar")}throw e}finally{tokPend=null}})();if(tokPend)tokPend.catch(()=>{});
     ponerSesion(s);cerrarOv("ovQuien");toast("Entraste como "+titulo(n));perfilUlt=0;sincPerfil(true);if(s.admin)cargarUsuarios();cargar();return}
   const m=metodoDe(n),a=accDe(n)||{},hay=await huellaDisponible();
   const conHuella=m!=="pin"&&!!a.cred&&!!a.t&&hay;
@@ -3605,7 +3607,7 @@ entrarComo=async function(n){
     setTimeout(()=>{if(pinHuellaFn&&!$("bloqueo").hidden)$("pinHuella").click()},60);
   }
   const s=await p;
-  if(!s||!s.t)return;
+  if(!s||(!s.t&&!tokPend))return;   // sin permiso todavía: entra igual si Google lo está dando por detrás
   ponerSesion(Object.assign({u:n},s));cerrarOv("ovQuien");toast("Entraste como "+titulo(s.u||n));
   perfilUlt=0;sincPerfil(true);if(s.admin)cargarUsuarios();cargar();
   // Si el administrador pidió huella y este celular todavía no la tiene, se registra ahora
