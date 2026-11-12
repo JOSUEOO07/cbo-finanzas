@@ -574,6 +574,14 @@ body.escribiendo .tabbar,body.escribiendo .fab{display:none!important}
 .usr-perm input[type=checkbox]{flex:0 0 18px;width:18px;height:18px;margin:0;padding:0;min-width:0;min-height:0;accent-color:var(--brand)}
 .usr-eq{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .usr-eq li>span{flex:1}
+.perfil-ses[hidden]{display:none!important}
+.perfil-ses{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}.perfil-ses .btn2{min-height:46px}
+.perfil-salir{color:#E5534B!important;border-color:color-mix(in srgb,#E5534B 45%,transparent)!important}
+@media (max-width:340px){.perfil-ses{grid-template-columns:1fr}}
+.usr-nuevo{display:grid;gap:12px;padding:14px;border:1px solid var(--line);border-radius:14px;margin:0 0 6px}
+.usr-nuevo input#usrNombre{width:100%}
+.usr-nuevo .usr-fila{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.usr-nuevo .usr-fila{flex-wrap:wrap}.usr-nuevo .usr-fila .btn{flex:1 0 auto;max-width:100%}
 .eq-ic{flex:0 0 22px;display:grid;place-items:center;color:var(--muted)}
 .eq-ic svg{width:20px;height:20px}
 .usr-todos li{padding:10px 12px;border:1px solid var(--line);border-radius:12px}
@@ -1690,6 +1698,7 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
 <div class="overlay" id="ovPerfil" hidden>
   <div class="sheet" style="max-width:420px">
     <div id="perfilAv" hidden></div>
+    <div class="perfil-ses"><button type="button" class="btn2" id="perfilCambiar">Cambiar de usuario</button><button type="button" class="btn2 perfil-salir" id="perfilSalir">Cerrar sesión</button></div>
     <button type="button" class="btnlink" id="perfilCerrar" style="display:block;margin:12px auto 0;min-height:44px">Cerrar</button>
   </div>
 </div>
@@ -3065,7 +3074,7 @@ const SES_K="cbo-sesion";
 let sesion=leerLS(SES_K,null); if(!(sesion&&sesion.u&&sesion.t))sesion=null;
 async function api(accion,extra,conf){
   const c=conf||cfg;
-  if(typeof tokPend!=="undefined"&&tokPend&&accion!=="entrar"&&!conf&&sesion&&!sesion.t){try{await tokPend}catch(e){}}   // espera la sesión que se está pidiendo por detrás
+  if(typeof tokPend!=="undefined"&&tokPend&&accion!=="entrar"&&accion!=="comoUsuario"&&!conf&&sesion&&!sesion.t){try{await tokPend}catch(e){}}   // espera la sesión que se está pidiendo por detrás
   // Con señal débil la petición puede quedarse colgada: se corta a los 30 s y cuenta como "sin internet"
   const ctl=new AbortController(), to=setTimeout(()=>ctl.abort(),45000);
   let res;
@@ -3342,13 +3351,20 @@ async function pinParaOtro(n){
 const SESA_K="cbo-sesion-admin";
 async function entrarComoAdmin(n){
   if(sinNube()){toast("En el modo de prueba no se cambia de usuario");return}
-  const ya=typeof accDe==="function"&&(accDe(n)||{}).tc;
-  // Al instante si este equipo ya tiene su sesión; si el servidor la rechaza después, se pide de nuevo sola
-  if(ya){if(!leerLS(SESA_K,null)||sesion.admin)guardarLS(SESA_K,sesion);const pp=PERSONAS.find(x=>x.n===n)||{};ponerSesion(Object.assign({},accDe(n).sc||{},pp.oc?{ocultas:pp.oc,descargar:!!pp.d}:{},{u:n,t:ya,admin:false}));cerrarOv("ovQuien");
-    toast(`Ahora estás como ${titulo(n)}. Lo que registres quedará a su nombre.`);cargar();return}
-  try{const j=await api("comoUsuario",{usuario:n,equipo:EQUIPO});guardarLS(SESA_K,sesion);const s=sesDe(j);ponerSesion(s);
-    if(typeof accPoner==="function")accPoner(n,{tc:s.t,sc:{ocultas:s.ocultas,descargar:s.descargar}});
-    toast(`Ahora estás como ${titulo(j.usuario)}. Lo que registres quedará a su nombre.`);cargar()}catch(e){toast(e.message)}
+  // Al instante: la pantalla cambia ya con lo guardado en el celular; el permiso de Google llega por detrás
+  const ac=typeof accDe==="function"?(accDe(n)||{}):{},pp=PERSONAS.find(x=>x.n===n)||{},sc=ac.sc||{},adminTok=sesion&&sesion.t;
+  if(!leerLS(SESA_K,null)||sesion.admin)guardarLS(SESA_K,sesion);
+  const base={u:n,admin:false,ocultas:pp.oc||sc.ocultas||[],descargar:!!(pp.d||sc.descargar)};
+  if(!ac.tc){
+    tokPend=(async()=>{try{const j=await api("comoUsuario",{usuario:n,equipo:EQUIPO,token:adminTok});const s=sesDe(j);
+        if(typeof accPoner==="function")accPoner(n,{tc:s.t,sc:{ocultas:s.ocultas,descargar:s.descargar}});
+        if(sesion&&sesion.u===n&&!sesion.t){Object.assign(sesion,{t:s.t,ocultas:s.ocultas,descargar:s.descargar});guardarLS(SES_K,sesion);aplicarPermisos()}
+        return s.t}
+      catch(e){if(sesion&&sesion.u===n&&!sesion.t){const a=leerLS(SESA_K,null);if(a){try{localStorage.removeItem(SESA_K)}catch{}ponerSesion(a)}toast(e.message||"No se pudo entrar como "+titulo(n))}throw e}
+      finally{tokPend=null}})();
+  }
+  ponerSesion(Object.assign({},base,{t:ac.tc||""}));cerrarOv("ovQuien");
+  toast(`Ahora estás como ${titulo(n)}. Lo que registres quedará a su nombre.`);cargar();
 }
 function volverAdmin(){
   const a=leerLS(SESA_K,null);if(!a)return;try{localStorage.removeItem(SESA_K)}catch{}
@@ -3375,6 +3391,9 @@ async function agregarUsuario(){
 }
 let usrAbierto="";
 // Equipos: ícono de celular, tablet o computadora a la izquierda, sin marca ni modelo
+// Un solo renglón por tipo de equipo (celular, computadora, tablet): el más reciente, con todas sus sesiones juntas
+function eqAgrupados(L){const g={};(L||[]).forEach(e=>{const k=tipoEq(String(e.eq||"").replace(/^Administrador · /,""));const u=+e.u||+e.c||0;const x=g[k]||(g[k]={e,u:0,ids:[]});x.ids.push(e.id);if(u>=x.u){x.u=u;x.e=e}});
+  return Object.values(g).sort((a,b)=>b.u-a.u)}
 function tipoEq(t){t=String(t||"");return /iPad|Tablet/i.test(t)?"tablet":(/PC|Windows|Mac|Linux/i.test(t)&&!/Android|iPhone/i.test(t))?"pc":"cel"}
 function nomEq(t){const p=String(t||"").split(" · ");const adm=p[0]==="Administrador"?p.shift():"";if(tipoEq(p.join(" "))==="cel"&&!/^(Celular Android|Apple iPhone)$/.test(p[0]||""))p[0]=/iPhone/i.test(p[0]||"")?"Apple iPhone":"Celular Android";return (adm?adm+" · ":"")+p.filter(Boolean).join(" · ")}
 const ICO_EQ={cel:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>',tablet:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M11 18h2"/></svg>',pc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M1 20h22"/></svg>'};
@@ -3386,9 +3405,9 @@ function pintarSesion(){
   const fila=p=>`<li class="usr-li${p.b?" off":""}"><div class="usr-cab"><span><b>${esc(titulo(p.n))}${p.n===quien?" (tú)":""}</b><small>${p.admin?"Administrador":p.b?"Sin acceso":"Usuario"} · PIN <span class="usr-pin" data-pin="${esc(p.p||"")}">••••</span></small></span><button class="btnlink" type="button" data-abrir="${esc(p.n)}">${usrAbierto===p.n?"Cerrar":"Opciones"}</button></div>
     <div class="usr-det"${usrAbierto===p.n?"":" hidden"}><div class="usr-acc">${p.p?`<button class="btnlink" type="button" data-verpin>Ver PIN</button>`:""}${p.n!==quien&&!p.b?`<button class="btnlink" type="button" data-como="${esc(p.n)}">Entrar como</button>`:""}<button class="btnlink" type="button" data-ponpin="${esc(p.n)}">Cambiar PIN</button><button class="btnlink" type="button" data-pinazar="${esc(p.n)}">PIN al azar</button>${!p.admin?`<button class="btnlink" type="button" data-acceso="${esc(p.n)}" data-permitir="${p.b?"1":""}">${p.b?"Dar acceso":"Quitar acceso"}</button>`:""}</div>
     ${!p.admin?`<p class="pal-t">Puede ver y usar</p><div class="usr-perm">${SECC_PERM.map(k=>`<label><input type="checkbox" data-secc="${k}"${(p.oc||[]).includes(k)?"":" checked"}> ${SECC_NOM[k]}</label>`).join("")}<label><input type="checkbox" data-desc${p.d?" checked":""}> Descargar reportes</label></div><div class="line"><button class="btn" type="button" data-guardperm="${esc(p.n)}">Guardar permisos</button></div>`:""}
-    ${filaAcceso(p)}<p class="pal-t">Equipos con sesión abierta</p>${(p.eq||[]).length?`<ul class="usr-eq">${p.eq.map(e=>`<li><i class="eq-ic" aria-hidden="true">${icoEq(e.eq)}</i><span>${esc(nomEq(e.eq))}<small>Usuario: ${esc(titulo(p.n))} · Entró ${fhUsr(e.c)} · último uso ${fhUsr(e.u)}</small></span><button class="btnlink" type="button" data-cerrarses="${esc(p.n)}" data-sid="${esc(e.id)}">Cerrar sesión</button></li>`).join("")}</ul>`:`<p class="hint" style="margin:0">Ninguno</p>`}</div></li>`;
+    ${filaAcceso(p)}<p class="pal-t">Sus equipos</p>${eqAgrupados(p.eq).length?`<ul class="usr-eq">${eqAgrupados(p.eq).map(g=>`<li><i class="eq-ic" aria-hidden="true">${icoEq(g.e.eq)}</i><span>${esc(nomEq(g.e.eq).replace(/^Administrador · /,""))}<small>Último uso ${fhUsr(g.u)}</small></span><button class="btnlink" type="button" data-cerrarses="${esc(p.n)}" data-sids="${esc(g.ids.join(","))}">Cerrar sesión</button></li>`).join("")}</ul>`:`<p class="hint" style="margin:0">Ninguno</p>`}</div></li>`;
   const adm=sesion.admin?`<p class="pal-t" style="margin:16px 0 6px">Usuarios</p><ul class="usr-lista">${PERSONAS.map(fila).join("")}</ul>
-    <div class="line usr-nuevo"><input id="usrNombre" type="text" placeholder="Nombre y apellido" maxlength="40" autocomplete="off" aria-label="Nombre del usuario nuevo"><button class="btn" type="button" id="usrAgregar">Agregar usuario</button><label class="usr-azar"><input type="checkbox" id="usrAzar"> PIN al azar</label></div>
+    <p class="pal-t" style="margin:22px 0 8px">Agregar usuario</p><div class="usr-nuevo"><input id="usrNombre" type="text" placeholder="Nombre y apellido" maxlength="40" autocomplete="off" aria-label="Nombre del usuario nuevo"><div class="usr-fila"><label class="usr-azar"><input type="checkbox" id="usrAzar"> PIN al azar</label><button class="btn" type="button" id="usrAgregar">Agregar usuario</button></div></div>
     <p class="pal-t" style="margin:16px 0 6px">Historial de cambios (solo lo ves tú)</p><button class="btn" type="button" id="verHist">Ver historial</button><ul class="usr-hist" id="usrHist" hidden></ul>`:"";
   el.innerHTML=`<p class="usr-yo">Entraste como <b>${esc(titulo(quien))}</b> en este equipo.</p>${!sesion.admin&&leerLS(SESA_K,null)?`<div class="line" style="margin-bottom:10px"><button class="btn pri" type="button" id="sesVolver">Volver a ${esc(nomCorto(leerLS(SESA_K,{}).u))}</button></div>`:""}<div class="line"><button class="btn" type="button" id="sesCambiar">Cambiar de usuario</button><button class="btnlink" type="button" id="sesSalir">Salir de este equipo</button></div>${adm}`;
   const vb=$("sesVolver");if(vb)vb.onclick=volverAdmin;
@@ -3401,7 +3420,7 @@ function pintarSesion(){
   el.querySelectorAll("[data-pinazar]").forEach(b=>b.onclick=()=>pinAzarPara(b.dataset.pinazar));
   el.querySelectorAll("[data-acceso]").forEach(b=>b.onclick=()=>cambiarAcceso(b.dataset.acceso,!!b.dataset.permitir));
   el.querySelectorAll("[data-guardperm]").forEach(b=>b.onclick=()=>guardarPermisos(b.dataset.guardperm,b.closest("li")));
-  el.querySelectorAll("[data-cerrarses]").forEach(b=>b.onclick=()=>cerrarSesionDe(b.dataset.cerrarses,b.dataset.sid));
+  el.querySelectorAll("[data-cerrarses]").forEach(b=>b.onclick=async()=>{const ids=String(b.dataset.sids||b.dataset.sid||"").split(",").filter(Boolean);if(sinNube()||!ids.length||!confirm(`¿Cerrar la sesión de ${titulo(b.dataset.cerrarses)} en ese equipo? Tendrá que entrar otra vez con su PIN.`))return;for(const id of ids)await cerrarSesionDe(b.dataset.cerrarses,id,true)});
   el.querySelectorAll("[data-verpin]").forEach(b=>b.onclick=()=>{const sp=b.closest(".usr-li").querySelector(".usr-pin"),ver=b.textContent==="Ver PIN";sp.textContent=ver?sp.dataset.pin:"••••";b.textContent=ver?"Ocultar":"Ver PIN"});
 }
 async function guardarPermisos(n,li){
@@ -3409,9 +3428,9 @@ async function guardarPermisos(n,li){
   const oc=[...li.querySelectorAll("[data-secc]")].filter(c=>!c.checked).map(c=>c.dataset.secc),d=!!(li.querySelector("[data-desc]")||{}).checked;
   try{usarLista(await api("permisos",{usuario:n,ocultas:oc,descargar:d}));toast(`Permisos de ${nomCorto(n)} guardados. Se aplican cuando abra la app.`)}catch(e){toast(e.message)}
 }
-async function cerrarSesionDe(n,id){
+async function cerrarSesionDe(n,id,ya){
   if(sinNube())return;
-  if(!confirm(`¿Cerrar esa sesión de ${titulo(n)}? Tendrá que entrar otra vez con su PIN en ese equipo.`))return;
+  if(!ya&&!confirm(`¿Cerrar esa sesión de ${titulo(n)}? Tendrá que entrar otra vez con su PIN en ese equipo.`))return;
   try{usarLista(await api("cerrarSesion",{usuario:n,id}));toast("Sesión cerrada")}catch(e){toast(e.message)}
 }
 async function verHistorial(){
@@ -3587,6 +3606,16 @@ entrarComo=async function(n){
 };
 // Si el servidor rechaza la sesión guardada (PIN cambiado, acceso quitado), se olvida en este equipo
 let cambiandoUsr=false;
+// Desde la foto de arriba: cambiar de usuario (al instante) o cerrar la sesión de este equipo (la próxima vez pide el PIN)
+// Solo el administrador ve "Cambiar de usuario" y "Cerrar sesión" en su foto
+function pintarPerfilSes(){const ps=document.querySelector(".perfil-ses");if(ps)ps.hidden=!esAdmin()}
+$("usuarioBtn").addEventListener("click",pintarPerfilSes,true);pintarPerfilSes();
+$("perfilCambiar").onclick=()=>{if(!esAdmin())return;cerrarOv("ovPerfil");cambiarUsuario()};
+$("perfilSalir").onclick=()=>{if(!sesion||!esAdmin())return;if(!confirm(`¿Cerrar la sesión de ${titulo(sesion.u)} en este equipo? La próxima vez entrará con su PIN.`))return;
+  const yo=sesion.u,t=String(sesion.t||"").split("~"),sid=t.length===3?t[1]:t[3];
+  if(sid&&!sinNube())api("cerrarSesion",{usuario:yo,id:sid}).catch(()=>{});   // por detrás, sin esperar
+  accPoner(yo,{t:"",h:"",s:"",tc:""});try{localStorage.removeItem(SESA_K)}catch{}
+  cerrarOv("ovPerfil");cambiandoUsr=true;try{salirSesion()}finally{cambiandoUsr=false}toast("Sesión cerrada en este equipo")};
 const perderSesionBase=perderSesion;
 perderSesion=function(){if(sesion&&!cambiandoUsr){const a=accDe(sesion.u);if(a&&(a.t||a.tc))accPoner(sesion.u,{t:a.t===sesion.t?"":a.t,tc:a.tc===sesion.t?"":a.tc})}return perderSesionBase()};
 function cambiarUsuario(){cambiandoUsr=true;try{salirSesion()}finally{cambiandoUsr=false}}
@@ -3693,9 +3722,9 @@ bloquearSiHayPin();
   const intro=$("intro");
   const salir=()=>{
     // Cortina sin logo: el panel de la marca sube con el borde curvo y deja ver el inicio
-    if(intro){const c=intro.animate([{transform:"translateY(0)",borderRadius:"0"},{transform:"translateY(-100%)",borderRadius:"0 0 50% 50% / 0 0 14vh 14vh"}],{duration:720,delay:850,easing:"cubic-bezier(.76,0,.24,1)",fill:"forwards"});c.onfinish=()=>intro.remove()}
-    piezas.forEach((p,i)=>p.animate([{opacity:0,transform:"translateY(18px)"},{opacity:1,transform:"none"}],{duration:560,delay:(intro?1150:0)+i*60,easing:"cubic-bezier(.22,1,.36,1)",fill:"forwards"}).onfinish=()=>{p.classList.remove("entra-ini");p.getAnimations().forEach(a=>a.cancel())});
-    setTimeout(()=>{contar($("bigUtV"));contar($("bigSunV"))},intro?1190:120);
+    if(intro){const c=intro.animate([{transform:"translateY(0)",borderRadius:"0"},{transform:"translateY(-100%)",borderRadius:"0 0 50% 50% / 0 0 14vh 14vh"}],{duration:380,delay:80,easing:"cubic-bezier(.76,0,.24,1)",fill:"forwards"});c.onfinish=()=>intro.remove()}
+    piezas.forEach((p,i)=>p.animate([{opacity:0,transform:"translateY(18px)"},{opacity:1,transform:"none"}],{duration:560,delay:(intro?260:0)+i*40,easing:"cubic-bezier(.22,1,.36,1)",fill:"forwards"}).onfinish=()=>{p.classList.remove("entra-ini");p.getAnimations().forEach(a=>a.cancel())});
+    setTimeout(()=>{contar($("bigUtV"));contar($("bigSunV"))},intro?300:120);
   };
   // Espera a que la fuente y el primer pintado estén listos (máx. 600 ms) para que no salte
   const listo=document.fonts&&document.fonts.ready?Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,600))]):Promise.resolve();
