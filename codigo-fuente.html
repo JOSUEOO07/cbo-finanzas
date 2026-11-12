@@ -2332,7 +2332,7 @@ $("paletas").addEventListener("click",()=>{setTimeout(()=>{if(typeof marcaPerfil
 $("paletas").addEventListener("click",e=>{if(e.target.closest("#espGen")){nuevaEspecial();return}const fa=e.target.closest("[data-fam]");if(fa){palFam=fa.dataset.fam;const f=FAMILIAS.find(x=>x.k===palFam);ajustes.paleta=f.t[0][0];guardarLS("cbo-ajustes",ajustes);aplicarTema();try{pintarFlujo()}catch{};return}
   const b=e.target.closest("[data-pal]");if(!b)return;ajustes.paleta=b.dataset.pal;guardarLS("cbo-ajustes",ajustes);aplicarTema();try{pintarFlujo()}catch{}});
 $("meta").value=ajustes.meta;
-$("guardarMeta").onclick=()=>{const v=parseFloat($("meta").value);if(!(v>=0)){$("metaOk").textContent="Escribe un monto válido.";return}ajustes.meta=v;guardarLS("cbo-ajustes",ajustes);$("metaOk").textContent="Guardado";render()};
+$("guardarMeta").onclick=()=>{const v=parseFloat(String($("meta").value).replace(/,/g,""));if(!(v>=0)){$("metaOk").textContent="Escribe un monto válido.";return}ajustes.meta=v;guardarLS("cbo-ajustes",ajustes);$("metaOk").textContent="Guardado";render()};
 aplicarTema();
 
 
@@ -2402,6 +2402,14 @@ let paso=1, fModo="nuevo", fEditId=null, fEditOrig=null, qrIgv=null;
 function seg(id,val){document.querySelectorAll(`#${id} button`).forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===val))}
 // Monto con separador de miles: 1250.5 se ve 1,250.5 (leerMonto ya entiende las comas)
 function fmtMonto(v){let t=String(v||"").replace(/[^\d.,]/g,"");if(/,$/.test(t)&&!t.includes("."))t=t.slice(0,-1)+".";t=t.replace(/,/g,"");const i=t.indexOf(".");let e=i<0?t:t.slice(0,i),d=i<0?null:t.slice(i+1).replace(/\./g,"").slice(0,2);e=e.replace(/^0+(?=\d)/,"");if(i===0)e="0";return e.replace(/\B(?=(\d{3})+(?!\d))/g,",")+(d===null?"":"."+d)}
+/* Montos de los formularios con separador de miles: 1100 se ve 1,100 al escribir y 1,100.00 cuando la app lo calcula */
+function milesEn(ids){
+  const P=Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,"value");
+  ids.forEach(id=>{const el=document.getElementById(id);if(!el||el.dataset.miles)return;el.dataset.miles="1";
+    Object.defineProperty(el,"value",{configurable:true,get(){return P.get.call(this)},set(v){P.set.call(this,v===""||v==null?"":fmtMonto(v))}});
+    el.addEventListener("input",()=>{const v=P.get.call(el),c=el.selectionStart==null?v.length:el.selectionStart,cuenta=v.slice(0,c).replace(/[^\d.]/g,"").length,n=fmtMonto(v);
+      if(n===v)return;P.set.call(el,n);let k=0,p=0;while(p<n.length&&k<cuenta){if(/[\d.]/.test(n[p]))k++;p++}try{el.setSelectionRange(p,p)}catch{}})});
+}
 function pintarMonto(){const m=$("monto");if(!m)return;const n=fmtMonto(m.value);if(n!==m.value)m.value=n;m.classList.toggle("largo",n.length>10)}
 const leerMonto=()=>{const v=parseFloat(String($("monto").value).replace(/[^\d.,]/g,"").replace(/,(?=\d{3}(\D|$))/g,"").replace(",","."));return isFinite(v)?v:0};
 function partesForm(m){
@@ -2611,6 +2619,9 @@ if(window.visualViewport){
   visualViewport.addEventListener("resize",ajustarHojas);visualViewport.addEventListener("scroll",ajustarHojas);ajustarHojas();
 }
 document.addEventListener("focusin",e=>{const t=e.target;if(t.closest&&t.closest(".sheet")&&/INPUT|SELECT|TEXTAREA/.test(t.tagName))setTimeout(()=>t.scrollIntoView({block:"center",behavior:"smooth"}),320)});
+// El teclado sube en etapas: cada vez que cambia el alto visible, el campo activo se vuelve a centrar (sin esperar a que el usuario baje)
+if(window.visualViewport){let vvT;visualViewport.addEventListener("resize",()=>{clearTimeout(vvT);vvT=setTimeout(()=>{const t=document.activeElement;if(t&&t.closest&&t.closest(".sheet")&&/INPUT|SELECT|TEXTAREA/.test(t.tagName))t.scrollIntoView({block:"center"})},90)})}
+setTimeout(()=>milesEn(["meta","sMonto","pSueldo","pHex","pBono","pDesc","tJornal"]),0);
 $("fab").onclick=()=>openF(); $("close").onclick=closeF;
 $("ov").addEventListener("click",e=>{if(e.target===$("ov"))closeF()});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(!$("escaner").hidden)cerrarEscaner();else if(!$("ov").hidden)closeF();["ovMas","ovMov","ovInv","ovInvObra"].forEach(cerrarOv);$("app").classList.remove("abierto")}});
@@ -3316,14 +3327,19 @@ async function pinParaOtro(n){
 const SESA_K="cbo-sesion-admin";
 async function entrarComoAdmin(n){
   if(sinNube()){toast("En el modo de prueba no se cambia de usuario");return}
-  try{const j=await api("comoUsuario",{usuario:n,equipo:EQUIPO});guardarLS(SESA_K,sesion);ponerSesion(sesDe(j));
+  const ya=typeof accDe==="function"&&(accDe(n)||{}).tc;
+  // Al instante si este equipo ya tiene su sesión; si el servidor la rechaza después, se pide de nuevo sola
+  if(ya){if(!leerLS(SESA_K,null)||sesion.admin)guardarLS(SESA_K,sesion);const pp=PERSONAS.find(x=>x.n===n)||{};ponerSesion(Object.assign({},accDe(n).sc||{},pp.oc?{ocultas:pp.oc,descargar:!!pp.d}:{},{u:n,t:ya,admin:false}));cerrarOv("ovQuien");
+    toast(`Ahora estás como ${titulo(n)}. Lo que registres quedará a su nombre.`);cargar();return}
+  try{const j=await api("comoUsuario",{usuario:n,equipo:EQUIPO});guardarLS(SESA_K,sesion);const s=sesDe(j);ponerSesion(s);
+    if(typeof accPoner==="function")accPoner(n,{tc:s.t,sc:{ocultas:s.ocultas,descargar:s.descargar}});
     toast(`Ahora estás como ${titulo(j.usuario)}. Lo que registres quedará a su nombre.`);cargar()}catch(e){toast(e.message)}
 }
 function volverAdmin(){
   const a=leerLS(SESA_K,null);if(!a)return;try{localStorage.removeItem(SESA_K)}catch{}
   const prev=sesion;ponerSesion(a);
   // La sesión que se usó "como otro usuario" se cierra sola para no dejar equipos de más abiertos
-  try{const t=String(prev&&prev.t||"").split("~"),sid=t.length===3?t[1]:t[3];if(prev&&sid&&prev.u!==a.u)api("cerrarSesion",{usuario:prev.u,id:sid}).then(usarLista).catch(()=>{})}catch{}
+  if(prev&&prev.u!==a.u&&typeof accPoner==="function")accPoner(prev.u,{tc:prev.t,sc:{ocultas:prev.ocultas||[],descargar:!!prev.descargar}});
   cargarUsuarios();toast("Volviste a "+titulo(a.u));cargar();
 }
 // Quitar o devolver el acceso a la app (solo administrador). Sin acceso, su sesión se cierra en todos sus equipos.
@@ -3545,7 +3561,7 @@ entrarComo=async function(n){
 // Si el servidor rechaza la sesión guardada (PIN cambiado, acceso quitado), se olvida en este equipo
 let cambiandoUsr=false;
 const perderSesionBase=perderSesion;
-perderSesion=function(){if(sesion&&!cambiandoUsr){const a=accDe(sesion.u);if(a&&a.t)accPoner(sesion.u,{t:""})}return perderSesionBase()};
+perderSesion=function(){if(sesion&&!cambiandoUsr){const a=accDe(sesion.u);if(a&&(a.t||a.tc))accPoner(sesion.u,{t:a.t===sesion.t?"":a.t,tc:a.tc===sesion.t?"":a.tc})}return perderSesionBase()};
 function cambiarUsuario(){cambiandoUsr=true;try{salirSesion()}finally{cambiandoUsr=false}}
 
 // --- Panel del administrador: cómo entra cada uno y su huella ---
