@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="CBO Finanzas">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Geist:wght@400..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Geist:wght@400..700&display=swap" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Geist:wght@400..700&display=swap"></noscript>
 <style>
 /* Diseño 2026: tema oscuro único. Las paletas de Ajustes solo cambian --brand y --brand-2 */
 :root,:root[data-theme]{
@@ -3452,7 +3452,7 @@ var escAt=t=>esc(t).replace(/"/g,"&quot;");
 const accTodos=()=>{const a=leerLS(ACC_K,{});return a&&typeof a==="object"?a:{}};
 const accDe=n=>accTodos()[n]||null;
 function accPoner(n,o){const a=accTodos();a[n]=Object.assign({},a[n]||{},o);guardarLS(ACC_K,a)}
-var METODOS={pin:"Con PIN",huella:"Con huella",ambos:"PIN o huella"};
+var METODOS={pin:"Con PIN",huella:"Con huella",ambos:"PIN o huella",libre:"Sin PIN ni huella"};
 const metodoDe=n=>{const p=PERSONAS.find(x=>x.n===n);return (p&&p.m)||(accDe(n)||{}).m||"pin"};
 var IC_HUELLA='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M12 11v3c0 2.5-.6 4.6-1.8 6.4"/><path d="M8.5 9.6A3.6 3.6 0 0 1 15.6 11v2.2c0 2.6-.5 5-1.5 7.1"/><path d="M5.6 7.7A7 7 0 0 1 19 11v2c0 1.8-.2 3.5-.6 5.1"/><path d="M5 11v2.4c0 1.4-.3 2.7-.9 3.9"/><path d="M7.4 4.4A9.5 9.5 0 0 1 20.2 6.6"/></svg>';
 const b64u=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
@@ -3586,6 +3586,13 @@ async function revisarPinDe(n,pin){
   return s;
 }
 entrarComo=async function(n){
+  // Sin PIN ni huella: toca su nombre y entra al instante; la sesión del servidor llega por detrás
+  if(metodoDe(n)==="libre"){const a=accDe(n)||{},pp=PERSONAS.find(x=>x.n===n)||{};
+    const s=a.t?Object.assign({},a.ses||{},{u:n,t:a.t}):{u:n,t:"",admin:!!pp.admin,ocultas:pp.oc||[],descargar:!!(pp.admin||pp.d)};
+    if(!a.t&&!sinNube())tokPend=(async()=>{try{const r=await pedirEntrada(n,"");accPoner(n,{t:r.t,ses:{admin:!!r.admin,ocultas:r.ocultas||[],descargar:!!r.descargar},m:"libre"});
+        if(sesion&&sesion.u===n&&!sesion.t){Object.assign(sesion,{t:r.t,admin:!!r.admin,ocultas:r.ocultas||[],descargar:!!r.descargar});guardarLS(SES_K,sesion);aplicarPermisos()}return r.t}
+      catch(e){if(sesion&&sesion.u===n&&!sesion.t){perderSesion();toast(e.message||"No se pudo entrar")}throw e}finally{tokPend=null}})();
+    ponerSesion(s);cerrarOv("ovQuien");toast("Entraste como "+titulo(n));perfilUlt=0;sincPerfil(true);if(s.admin)cargarUsuarios();cargar();return}
   const m=metodoDe(n),a=accDe(n)||{},hay=await huellaDisponible();
   const conHuella=m!=="pin"&&!!a.cred&&!!a.t&&hay;
   const guardada=()=>Object.assign({},a.ses||{},{u:n,t:a.t});
@@ -3602,7 +3609,7 @@ entrarComo=async function(n){
   ponerSesion(Object.assign({u:n},s));cerrarOv("ovQuien");toast("Entraste como "+titulo(s.u||n));
   perfilUlt=0;sincPerfil(true);if(s.admin)cargarUsuarios();cargar();
   // Si el administrador pidió huella y este celular todavía no la tiene, se registra ahora
-  if(m!=="pin"&&hay&&!(accDe(n)||{}).cred){try{await registrarHuellaDe(n);toast("Huella registrada. La próxima vez entras con tu dedo.")}catch(e){toast(e.message)}}
+  if((m==="huella"||m==="ambos")&&hay&&!(accDe(n)||{}).cred){try{await registrarHuellaDe(n);toast("Huella registrada. La próxima vez entras con tu dedo.")}catch(e){toast(e.message)}}
 };
 // Si el servidor rechaza la sesión guardada (PIN cambiado, acceso quitado), se olvida en este equipo
 let cambiandoUsr=false;
@@ -3625,7 +3632,7 @@ function filaAcceso(p){
   if(!METODOS||!escAt)return ""; // aún cargando
   const hu=p.hu||[];
   return `<p class="pal-t">Cómo entra a la app</p><div class="line acc-met"><select data-metodo="${escAt(p.n)}" aria-label="Cómo entra ${escAt(titulo(p.n))}">${Object.entries(METODOS).map(([k,t])=>`<option value="${k}"${(p.m||"pin")===k?" selected":""}>${t}</option>`).join("")}</select></div>
-    <p class="hint acc-hu">${hu.length?`${IC_HUELLA}<span>Huella en: ${hu.map(h=>esc(nomEq(h.eq))).join(", ")}</span> <button class="btnlink" type="button" data-quitahu="${escAt(p.n)}">Quitar huella</button>`:(p.m||"pin")==="pin"?"Entra solo con su PIN.":"Su huella se registra sola la primera vez que entre en su celular."}</p>`;
+    <p class="hint acc-hu">${hu.length?`${IC_HUELLA}<span>Huella en: ${hu.map(h=>esc(nomEq(h.eq))).join(", ")}</span> <button class="btnlink" type="button" data-quitahu="${escAt(p.n)}">Quitar huella</button>`:(p.m||"pin")==="pin"?"Entra solo con su PIN.":p.m==="libre"?"Entra tocando su nombre, sin PIN ni huella. Cualquiera con ese celular puede entrar como él.":"Su huella se registra sola la primera vez que entre en su celular."}</p>`;
 }
 async function ponerMetodo(n,m){
   if(sinNube()){const p=PERSONAS.find(x=>x.n===n);if(p)p.m=m;accPoner(n,{m});guardarLS("cbo-personas",PERSONAS.map(({p,...r})=>r));pintarSesion();toast(`${nomCorto(n)}: ${METODOS[m]}`);return}
