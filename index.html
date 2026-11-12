@@ -347,8 +347,8 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
 /* Pago a trabajador */
 .pla-link{background:var(--in-bg)!important;color:var(--in)!important}
 .pla-masbtn{justify-self:start}
-.pla-mas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-@media (max-width:520px){.pla-mas{grid-template-columns:minmax(0,1fr)}}
+.pla-mas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+
 .pla-neto{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--brand);color:var(--brand-ink);border-radius:14px;padding:12px 16px;font-weight:600}
 .pla-neto b{font-family:var(--mono);font-size:1.45rem}
 .cp-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0 10px}
@@ -414,6 +414,24 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
 #comprobante .h4pago .estado b{color:#0D5C46;font-weight:800}
 #comprobante .celda b.pagado{color:#0D5C46;font-weight:800}
 #comprobante .pie{text-align:center;font-size:2mm;color:#8a968f;margin-top:2mm;font-style:italic}
+/* Marco exterior de cada ejemplar y asistencia de la semana (días marcados) */
+#comprobante .cp{margin:4mm;padding:3.2mm 6mm 1.6mm;border:.5mm solid #0D5C46;outline:.25mm solid #0D5C46;outline-offset:-1.3mm;box-sizing:border-box;height:calc(100% - 8mm)}
+#comprobante h4{margin:1.6mm 0 1mm}
+#comprobante .son{margin-top:1.2mm}#comprobante .decl{margin-top:1.8mm}#comprobante .lugar{margin-bottom:9.6mm}#comprobante .pie{margin-top:1.2mm}#comprobante .totales{margin-top:1.6mm}
+#comprobante .semana{display:grid;grid-template-columns:repeat(7,11mm);gap:2mm;justify-content:center}
+#comprobante .sd{text-align:center;padding:.7mm 0;border-radius:1mm;background:#EEF3EF;border:.25mm solid #e3e9e5}
+#comprobante .sd b{display:block;font-size:3.2mm;line-height:1.1}
+#comprobante .sd small{display:block;font-size:1.7mm;font-weight:600;color:#5b6b63}
+#comprobante .sd.si{background:#0D5C46;border-color:#0D5C46}#comprobante .sd.si b{color:#F4EDE0}#comprobante .sd.si small{color:#cfe0d6}
+#comprobante .sd.no b,#comprobante .sd.no small{color:#A8331F}
+/* Pago a trabajador: tocar los días trabajados */
+.pdias-cab{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.pdias-cab small{font-size:.75rem;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:500}
+.pdias{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.pdias button{display:grid;place-items:center;gap:2px;min-height:50px;padding:6px 0;border-radius:12px;border:1.5px solid var(--line);background:transparent;color:var(--muted);font:inherit;font-weight:700;font-size:.85rem;touch-action:manipulation;transition:background-color .15s ease,border-color .15s ease,color .15s ease}
+.pdias button small{font-size:.68rem;font-weight:500}
+.pdias button[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+@media (hover:hover) and (pointer:fine){.pdias button:hover{border-color:var(--brand-2)}}
 
 /* Pago a SUNAT */
 @media (max-width:520px){#f [data-paso="4"] .row2{grid-template-columns:minmax(0,1fr)}}
@@ -1674,18 +1692,18 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
       <label>Periodo del<input id="pIni" type="date"></label>
       <label>al<input id="pFin" type="date"></label>
     </div>
-    <div class="row2">
-      <label>Horas trabajadas<input id="pHoras" type="text" inputmode="decimal" maxlength="5" autocomplete="off" placeholder="Ej. 45"></label>
-      <label>De una semana de<input id="pHSem" type="text" inputmode="decimal" maxlength="5" autocomplete="off" placeholder="45"></label>
-    </div>
+    <label class="pdias-cab" id="pDiasL">Días trabajados <small>Toca los días</small></label>
+    <div class="pdias" id="pDias" role="group" aria-labelledby="pDiasL"><button type="button" aria-pressed="false">Lun<small>8 h</small></button><button type="button" aria-pressed="false">Mar<small>8 h</small></button><button type="button" aria-pressed="false">Mié<small>8 h</small></button><button type="button" aria-pressed="false">Jue<small>8 h</small></button><button type="button" aria-pressed="false">Vie<small>8 h</small></button><button type="button" aria-pressed="false">Sáb<small>5 h</small></button><button type="button" aria-pressed="false">Dom<small>8 h</small></button></div>
+    <div hidden><input id="pHoras" type="text" inputmode="decimal" maxlength="5" autocomplete="off"><input id="pHSem" type="text" inputmode="decimal" maxlength="5" autocomplete="off"></div>
     <p class="hint" id="pHorasInfo" style="margin:-4px 0 0"></p>
     <label for="pSueldo">Sueldo / jornal a pagar (S/)</label>
     <div class="monto-big"><span>S/</span><input id="pSueldo" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></div>
-    <button type="button" class="btnlink pla-masbtn" id="pMasBtn">+ Bono, horas extra o descuento</button>
+    <button type="button" class="btnlink pla-masbtn" id="pMasBtn">+ Horas extra, bono o descuento</button>
     <div class="pla-mas" id="pMas" hidden>
+      <label>Horas extra<input id="pHexH" type="text" inputmode="decimal" maxlength="5" autocomplete="off" placeholder="0 h"></label>
+      <label>Pago extra (S/)<input id="pHex" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></label>
       <label>Bonificación (S/)<input id="pBono" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></label>
-      <label>Horas extra (S/)<input id="pHex" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></label>
-      <label>Adelanto / descuento (S/)<input id="pDesc" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></label>
+      <label>Adelanto/desc. (S/)<input id="pDesc" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></label>
     </div>
     <div class="pla-neto"><span>Neto a pagar</span><b id="pNeto">S/ 0.00</b></div>
     <label>N° de operación (opcional)<input id="pOper" type="text" maxlength="24" inputmode="numeric" autocomplete="off" placeholder="De la transferencia o el Yape"></label>
@@ -3654,13 +3672,23 @@ function pintarTrab(){
 }
 // Pago por horas: semana completa = jornal exacto (700, 1100…); si faltó, jornal × horas trabajadas ÷ horas de la semana
 function jornalTrab(){const t=listaTrab().find(x=>String(x.dni)===$("pTrab").value);return t&&t.jornal?Number(t.jornal):0}
-function calcHoras(){
-  const j=jornalTrab(), h=numIn("pHoras"), hs=numIn("pHSem")||45;
-  if(!(h>0)||!j){$("pHorasInfo").textContent=j?`Semana completa (${hs} h): S/ ${fmtN(j)}. Escribe las horas si faltó.`:"";return}
+// Días trabajados: lunes a viernes 8 h, sábado 5 h, domingo 8 h (semana normal = 45 h = jornal completo)
+const HDIA=[8,8,8,8,8,5,8];
+const diasSel=()=>[...$("pDias").children].map(b=>b.getAttribute("aria-pressed")==="true"?"1":"0").join("");
+const ponerDias=m=>[...$("pDias").children].forEach((b,i)=>b.setAttribute("aria-pressed",String(m[i]==="1")));
+const horasDias=(m=diasSel())=>[...m].reduce((a,c,i)=>a+(c==="1"?HDIA[i]:0),0);
+function calcHoras(sinTocar){
+  const j=jornalTrab(), hs=numIn("pHSem")||45, nd=diasSel().replace(/0/g,"").length, h=horasDias();
+  $("pHoras").value=h&&h!==hs?h:"";
+  if(!j){$("pHorasInfo").textContent=nd?`${nd} ${nd===1?"día":"días"} · ${h} h`:"Toca los días que trabajó.";return}
+  if(!nd){if(!sinTocar)$("pSueldo").value="";$("pHorasInfo").textContent="Toca los días que trabajó.";return}
   const pago=h===hs?j:r2(j*h/hs);
-  $("pSueldo").value=pago.toFixed(2);
-  $("pHorasInfo").textContent=h===hs?`Semana completa: S/ ${fmtN(j)}`:`S/ ${fmtN(j)} × ${h} h ÷ ${hs} h = S/ ${fmtN(pago)}`;
+  if(!sinTocar)$("pSueldo").value=pago.toFixed(2);
+  // jornal por día (8 h) o por semana (45 h)
+  $("pHorasInfo").textContent=hs<=12?`${nd} ${nd===1?"día":"días"} · ${h} h · S/ ${fmtN(j)} por día de ${hs} h × ${h} ÷ ${hs} = S/ ${fmtN(pago)}`
+    :`${nd} ${nd===1?"día":"días"} · ${h} h de ${hs} h · `+(h===hs?`semana completa S/ ${fmtN(j)}`:`S/ ${fmtN(j)} × ${h} ÷ ${hs} = S/ ${fmtN(pago)}`);
 }
+function calcExtra(){const j=jornalTrab(),hs=numIn("pHSem")||45,x=numIn("pHexH");if(j&&x>0)$("pHex").value=r2(x*j/hs).toFixed(2);else if($("pHexH").value.trim()==="")$("pHex").value="";calcPla()}
 const fmtN=n=>Number(n).toLocaleString("es-PE",{minimumFractionDigits:2,maximumFractionDigits:2});
 function calcPla(){const n=r2(numIn("pSueldo")+numIn("pBono")+numIn("pHex")-numIn("pDesc"));$("pNeto").textContent=fmt(Math.max(0,n));return n}
 function abrirPagoPla(r){
@@ -3672,35 +3700,38 @@ function abrirPagoPla(r){
     $("pTrab").value=String(r.ruc||""); $("pFecha").value=r.fecha; $("pIni").value=r.inicio||isoMas(r.fecha,-6); $("pFin").value=r.fin||r.fecha;
     $("pSueldo").value=String(r.sueldo||r.monto); $("pBono").value=r.bono||""; $("pHex").value=r.horasExtra||""; $("pDesc").value=r.descuento||"";
     $("pOper").value=r.operacion||""; $("pObra").value=r.obra||"";
-    const tt=pintarTrab(), hs0=(tt&&tt.horas)||45; $("pHSem").value=hs0; $("pHoras").value=r.horasTrab||(r.horas&&r.horas!==hs0?r.horas:"");
+    const tt=pintarTrab(), hs0=(tt&&tt.horas)||45; $("pHSem").value=hs0; ponerDias(/^[01]{7}$/.test(r.dias||"")?r.dias:"1111110"); $("pHexH").value=r.hexH||"";
   }else{
     $("pFecha").value=hoyISO; $("pIni").value=isoMas(hoyISO,-6); $("pFin").value=hoyISO;
     ["pBono","pHex","pDesc","pOper","pObra"].forEach(k=>$(k).value="");
     const t=pintarTrab(); $("pSueldo").value=t&&t.jornal?Number(t.jornal).toFixed(2):"";
-    $("pHSem").value=t&&t.horas?t.horas:45; $("pHoras").value="";
+    $("pHSem").value=t&&t.horas?t.horas:45; ponerDias("1111110"); $("pHexH").value="";
   }
-  calcHoras();
-  const extras=numIn("pBono")||numIn("pHex")||numIn("pDesc");
+  calcHoras(!!r);
+  const extras=numIn("pBono")||numIn("pHex")||numIn("pHexH")||numIn("pDesc");
   $("pMas").hidden=!extras; $("pMasBtn").hidden=!!extras;
   $("plaTit").textContent=r?"Editar pago":"Pago a trabajador"; $("pMsg").textContent="";
   calcPla(); $("ovPla").hidden=false;
 }
-$("pTrab").addEventListener("change",()=>{const t=pintarTrab();if(t&&t.jornal&&!plaEditId){$("pSueldo").value=Number(t.jornal).toFixed(2);$("pHSem").value=t.horas||45}calcHoras();calcPla()});
+$("pTrab").addEventListener("change",()=>{const t=pintarTrab();if(t&&t.jornal&&!plaEditId){$("pSueldo").value=Number(t.jornal).toFixed(2);$("pHSem").value=t.horas||45}calcHoras();calcExtra()});
 ["pHoras","pHSem"].forEach(k=>$(k).addEventListener("input",()=>{if(!numIn("pHoras")){const j=jornalTrab();if(j)$("pSueldo").value=j.toFixed(2)}calcHoras();calcPla()}));
 ["pSueldo","pBono","pHex","pDesc"].forEach(k=>$(k).addEventListener("input",calcPla));
+$("pDias").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;b.setAttribute("aria-pressed",String(b.getAttribute("aria-pressed")!=="true"));calcHoras();calcPla()});
+$("pHexH").addEventListener("input",calcExtra);
 $("pFecha").addEventListener("change",()=>{if(!plaEditId&&$("pFecha").value){$("pFin").value=$("pFecha").value;$("pIni").value=isoMas($("pFecha").value,-6)}});
-$("pMasBtn").onclick=()=>{$("pMas").hidden=false;$("pMasBtn").hidden=true;$("pBono").focus()};
+$("pMasBtn").onclick=()=>{$("pMas").hidden=false;$("pMasBtn").hidden=true;$("pHexH").focus()};
 $("fPla").addEventListener("submit",async e=>{
   e.preventDefault();
   const t=listaTrab().find(x=>String(x.dni)===$("pTrab").value);
   if(!t){$("pMsg").textContent="Elige un trabajador.";return}
+  if(!diasSel().includes("1")){$("pMsg").textContent="Toca los días que trabajó.";return}
   if(!(numIn("pSueldo")>0)){$("pMsg").textContent="Escribe el sueldo o jornal.";return}
   const neto=calcPla();
   if(!(neto>0)){$("pMsg").textContent="El neto a pagar debe ser mayor a 0.";return}
   if(!$("pFecha").value){$("pMsg").textContent="Elige la fecha de pago.";return}
   const r={tipo:"gasto",categoria:"Planilla / jornales",comprobante:"ninguno",monto:neto,base:0,igv:0,noGravado:neto,
     ruc:String(t.dni),desc:t.nombre,cargo:t.cargo||"",fecha:$("pFecha").value,inicio:$("pIni").value,fin:$("pFin").value,
-    sueldo:numIn("pSueldo"),bono:numIn("pBono"),horasExtra:numIn("pHex"),descuento:numIn("pDesc"),horasTrab:numIn("pHoras")||0,horasSem:numIn("pHSem")||45,
+    sueldo:numIn("pSueldo"),bono:numIn("pBono"),horasExtra:numIn("pHex"),descuento:numIn("pDesc"),horasTrab:horasDias(),horasSem:numIn("pHSem")||45,dias:diasSel(),hexH:numIn("pHexH")||0,
     operacion:$("pOper").value.trim(),obra:$("pObra").value.trim(),medio:t.metodo||"",estado:"PAGADO",detraccion:false,detPct:0,detMonto:0};
   $("pMsg").textContent="Guardando…"; $("pGuardar").disabled=true;
   const editando=!!plaEditId;
@@ -3774,9 +3805,15 @@ function comprobantePDF(r,soloArmar,uno){
   const fF=iso=>iso?iso.split("-").reverse().join("/"):"";
   const periodo=r.inicio&&r.fin?`Semana del ${fF(r.inicio)} al ${fF(r.fin)}`:`Pago del ${fF(r.fecha)}`;
   // cantidad y precio unitario solo si cuadran con el sueldo (si se cambió el sueldo, no se muestran)
-  const cuadra=r.horas&&r.pagoHora&&Math.abs(r.horas*r.pagoHora-sueldo)<1;
-  const filas=`<tr><td>${esc(String(r.glosa||"JORNAL SEMANAL").toUpperCase())}</td><td class="n">${cuadra?r.horas+" h":""}</td><td class="n">${cuadra?fmt(r.pagoHora):""}</td><td class="n">${fmt(sueldo)}</td></tr>`
-    +[["BONIFICACIÓN",bono],["HORAS EXTRA",hex]].filter(([,v])=>v>0).map(([k,v])=>`<tr><td>${k}</td><td class="n"></td><td class="n"></td><td class="n">${fmt(v)}</td></tr>`).join("")
+  // días marcados al registrar (L a D): asistencia de la semana y glosa del jornal
+  const dias=/^[01]{7}$/.test(r.dias||"")?r.dias:"", DL=["LUN","MAR","MIÉ","JUE","VIE","SÁB","DOM"], HD=[8,8,8,8,8,5,8];
+  const idx=[...dias].map((c,i)=>c==="1"?i:-1).filter(i=>i>=0), hDias=idx.reduce((a,i)=>a+HD[i],0);
+  const seguidos=idx.length>2&&idx[idx.length-1]-idx[0]===idx.length-1;
+  const glosa=idx.length?`JORNAL — ${idx.length} ${idx.length===1?"DÍA":"DÍAS"} (${seguidos?DL[idx[0]]+" A "+DL[idx[idx.length-1]]:idx.map(i=>DL[i]).join(", ")})`:String(r.glosa||"JORNAL SEMANAL").toUpperCase();
+  const hrs=hDias||r.horas, ph=r.pagoHora||(hDias?sueldo/hDias:0), cuadra=hrs&&ph&&Math.abs(hrs*ph-sueldo)<1;
+  const hexH=Number(r.hexH)||0;
+  const filas=`<tr><td>${esc(glosa)}</td><td class="n">${cuadra?hrs+" h":""}</td><td class="n">${cuadra?fmt(ph):""}</td><td class="n">${fmt(sueldo)}</td></tr>`
+    +[["HORAS EXTRA",hex,hexH?hexH+" h":"",hexH?fmt(r2(hex/hexH)):""],["BONIFICACIÓN",bono,"",""]].filter(([,v])=>v>0).map(([k,v,c,p])=>`<tr><td>${k}</td><td class="n">${c}</td><td class="n">${p}</td><td class="n">${fmt(v)}</td></tr>`).join("")
     +(desc>0?`<tr><td>(−) ADELANTOS / DESCUENTOS</td><td class="n"></td><td class="n"></td><td class="n menos">− ${fmt(desc)}</td></tr>`:"");
   const totales=desc>0
     ?`<div class="totales tres"><div class="tot"><small>TOTAL INGRESOS</small><b>${fmt(sueldo+bono+hex)}</b></div><div class="tot"><small>TOTAL DESCUENTOS</small><b style="color:#A8331F">${fmt(desc)}</b></div><div class="tot neto"><small>NETO A RECIBIR</small><b>${fmt(neto)}</b></div></div>`
@@ -3792,7 +3829,8 @@ function comprobantePDF(r,soloArmar,uno){
     ${nombre?`<span class="ejemplar">${nombre}</span>`:""}
     <h4>DATOS DEL TRABAJADOR</h4>
     <div class="grid2"><div class="celda"><small>APELLIDOS Y NOMBRES</small><b>${esc(String(r.desc||"").toUpperCase())}</b></div><div class="celda"><small>PERIODO PAGADO</small><b>${periodo}</b></div>
-      <div class="celda"><small>DNI</small><b>${esc(r.ruc||"")}</b></div><div class="celda"><small>CARGO</small><b>${esc(String(r.cargo||t.cargo||"").toUpperCase())}</b></div></div>
+      <div class="celda"><small>DNI</small><b>${esc(r.ruc||"")}</b></div><div class="celda"><small>CARGO</small><b>${esc(String(r.cargo||t.cargo||"").toUpperCase().replace(/^AYUDANTE\b.*$/,"AYUDANTE"))}</b></div></div>
+    ${dias?`<h4>ASISTENCIA DE LA SEMANA</h4><div class="semana">${[...dias].map((c,i)=>`<div class="sd ${c==="1"?"si":i<6?"no":""}"><b>${DL[i][0]}</b><small>${c==="1"?HD[i]+" h":i<6?"falta":"—"}</small></div>`).join("")}</div>`:""}
     <h4>DETALLE DEL PAGO</h4>
     <table><thead><tr><th>CONCEPTO</th><th class="n">CANTIDAD</th><th class="n">PRECIO UNIT.</th><th class="n">IMPORTE</th></tr></thead><tbody>${filas}</tbody></table>
     ${totales}<div class="son">SON: ${enLetrasMay(neto)}</div>
