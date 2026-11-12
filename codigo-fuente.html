@@ -347,8 +347,8 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
 /* Pago a trabajador */
 .pla-link{background:var(--in-bg)!important;color:var(--in)!important}
 .pla-masbtn{justify-self:start}
-.pla-mas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-@media (max-width:520px){.pla-mas{grid-template-columns:minmax(0,1fr)}}
+.pla-mas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+
 .pla-neto{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--brand);color:var(--brand-ink);border-radius:14px;padding:12px 16px;font-weight:600}
 .pla-neto b{font-family:var(--mono);font-size:1.45rem}
 .cp-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0 10px}
@@ -414,6 +414,24 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
 #comprobante .h4pago .estado b{color:#0D5C46;font-weight:800}
 #comprobante .celda b.pagado{color:#0D5C46;font-weight:800}
 #comprobante .pie{text-align:center;font-size:2mm;color:#8a968f;margin-top:2mm;font-style:italic}
+/* Marco exterior de cada ejemplar y asistencia de la semana (días marcados) */
+#comprobante .cp{margin:4mm;padding:3.2mm 6mm 1.6mm;border:.5mm solid #0D5C46;outline:.25mm solid #0D5C46;outline-offset:-1.3mm;box-sizing:border-box;height:calc(100% - 8mm)}
+#comprobante h4{margin:1.6mm 0 1mm}
+#comprobante .son{margin-top:1.2mm}#comprobante .decl{margin-top:1.8mm}#comprobante .lugar{margin-bottom:9.6mm}#comprobante .pie{margin-top:1.2mm}#comprobante .totales{margin-top:1.6mm}
+#comprobante .semana{display:grid;grid-template-columns:repeat(7,11mm);gap:2mm;justify-content:center}
+#comprobante .sd{text-align:center;padding:.7mm 0;border-radius:1mm;background:#EEF3EF;border:.25mm solid #e3e9e5}
+#comprobante .sd b{display:block;font-size:3.2mm;line-height:1.1}
+#comprobante .sd small{display:block;font-size:1.7mm;font-weight:600;color:#5b6b63}
+#comprobante .sd.si{background:#0D5C46;border-color:#0D5C46}#comprobante .sd.si b{color:#F4EDE0}#comprobante .sd.si small{color:#cfe0d6}
+#comprobante .sd.no b,#comprobante .sd.no small{color:#A8331F}
+/* Pago a trabajador: tocar los días trabajados */
+.pdias-cab{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.pdias-cab small{font-size:.75rem;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:500}
+.pdias{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.pdias button{display:grid;place-items:center;gap:2px;min-height:50px;padding:6px 0;border-radius:12px;border:1.5px solid var(--line);background:transparent;color:var(--muted);font:inherit;font-weight:700;font-size:.85rem;touch-action:manipulation;transition:background-color .15s ease,border-color .15s ease,color .15s ease}
+.pdias button small{font-size:.68rem;font-weight:500}
+.pdias button[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+@media (hover:hover) and (pointer:fine){.pdias button:hover{border-color:var(--brand-2)}}
 
 /* Pago a SUNAT */
 @media (max-width:520px){#f [data-paso="4"] .row2{grid-template-columns:minmax(0,1fr)}}
@@ -1238,6 +1256,25 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
   body:is(.fiesta,.especial) .tecl-monto .borra,body:is(.fiesta,.especial) .tecl-monto button:active{background:var(--fi-g);background-size:var(--fi-s);color:#F6F7F9}
 }
 #monto.largo{font-size:clamp(1.5rem,7.5vw,2.2rem)}
+
+/* Entrada con huella */
+.pin-huella{display:flex;align-items:center;gap:10px;padding:12px 18px;border-radius:999px;border:1.5px solid currentColor;background:transparent;color:inherit;font:inherit;font-weight:700;cursor:pointer}
+.pin-huella[hidden]{display:none}
+.pin-huella svg{width:28px;height:28px;flex:none}
+.bloqueo.solo-huella .teclado,.bloqueo.solo-huella .puntos,.bloqueo.solo-huella #pinOlvido{display:none}
+.bloqueo.solo-huella .pin-huella{padding:18px 26px;font-size:1.1rem}.bloqueo.solo-huella .pin-huella svg{width:46px;height:46px}
+.hu-sim{position:fixed;inset:0;z-index:100000;display:grid;place-items:center;background:rgba(0,0,0,.55);padding:16px}
+.hu-sim[hidden]{display:none}
+.hu-card{background:var(--surface,#fff);border-radius:18px;padding:22px 18px;max-width:360px;width:100%;display:grid;gap:10px;justify-items:center;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.hu-card small{opacity:.75;line-height:1.3}
+.hu-ic svg{width:76px;height:76px;color:var(--brand-2,#7c3aed);transition:color .2s,transform .2s}.hu-ic.ok svg{color:#16a34a;transform:scale(1.08)}
+.fp-card canvas{width:100%;height:auto;aspect-ratio:600/260;background:#fff;border:1.5px dashed #999;border-radius:10px;touch-action:none}
+.fp-bts{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%}
+.conf-ops{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.conf-op{display:grid;justify-items:center;gap:6px;padding:14px 8px;border-radius:14px;border:1.5px solid color-mix(in srgb,var(--brand-2,#7c3aed) 45%,transparent);background:color-mix(in srgb,var(--brand-2,#7c3aed) 10%,transparent);color:inherit;font:inherit;cursor:pointer}
+.conf-op .hu-ic svg{width:48px;height:48px}
+.acc-met select{max-width:100%}
+.acc-hu{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:4px 0 0}.acc-hu svg{width:18px;height:18px;flex:none}
 </style>
 </head>
 <body data-barra="d">
@@ -1656,7 +1693,7 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
 <div class="overlay" id="ovQuien" hidden>
   <div class="sheet" style="max-width:420px">
     <h3>¿Quién eres?</h3>
-    <p class="hint" style="margin:0 0 12px">Toca tu nombre y escribe tu PIN. Lo que registres quedará con tu nombre, en la app y en el Excel. Se hace una sola vez en cada equipo.</p>
+    <p class="hint" style="margin:0 0 12px">Toca tu nombre y entra con tu PIN o tu huella, según lo que haya elegido el administrador. Lo que registres quedará con tu nombre, en la app y en el Excel.</p>
     <div style="display:grid;gap:10px" id="quienBtns"></div>
   </div>
 </div>
@@ -1674,18 +1711,18 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
       <label>Periodo del<input id="pIni" type="date"></label>
       <label>al<input id="pFin" type="date"></label>
     </div>
-    <div class="row2">
-      <label>Horas trabajadas<input id="pHoras" type="text" inputmode="decimal" maxlength="5" autocomplete="off" placeholder="Ej. 45"></label>
-      <label>De una semana de<input id="pHSem" type="text" inputmode="decimal" maxlength="5" autocomplete="off" placeholder="45"></label>
-    </div>
+    <label class="pdias-cab" id="pDiasL">Días trabajados <small>Toca los días</small></label>
+    <div class="pdias" id="pDias" role="group" aria-labelledby="pDiasL"><button type="button" aria-pressed="false">Lun<small>8 h</small></button><button type="button" aria-pressed="false">Mar<small>8 h</small></button><button type="button" aria-pressed="false">Mié<small>8 h</small></button><button type="button" aria-pressed="false">Jue<small>8 h</small></button><button type="button" aria-pressed="false">Vie<small>8 h</small></button><button type="button" aria-pressed="false">Sáb<small>5 h</small></button><button type="button" aria-pressed="false">Dom<small>8 h</small></button></div>
+    <div hidden><input id="pHoras" type="text" inputmode="decimal" maxlength="5" autocomplete="off"><input id="pHSem" type="text" inputmode="decimal" maxlength="5" autocomplete="off"></div>
     <p class="hint" id="pHorasInfo" style="margin:-4px 0 0"></p>
     <label for="pSueldo">Sueldo / jornal a pagar (S/)</label>
     <div class="monto-big"><span>S/</span><input id="pSueldo" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></div>
-    <button type="button" class="btnlink pla-masbtn" id="pMasBtn">+ Bono, horas extra o descuento</button>
+    <button type="button" class="btnlink pla-masbtn" id="pMasBtn">+ Horas extra, bono o descuento</button>
     <div class="pla-mas" id="pMas" hidden>
+      <label>Horas extra<input id="pHexH" type="text" inputmode="decimal" maxlength="5" autocomplete="off" placeholder="0 h"></label>
+      <label>Pago extra (S/)<input id="pHex" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></label>
       <label>Bonificación (S/)<input id="pBono" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></label>
-      <label>Horas extra (S/)<input id="pHex" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></label>
-      <label>Adelanto / descuento (S/)<input id="pDesc" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></label>
+      <label>Adelanto/desc. (S/)<input id="pDesc" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></label>
     </div>
     <div class="pla-neto"><span>Neto a pagar</span><b id="pNeto">S/ 0.00</b></div>
     <label>N° de operación (opcional)<input id="pOper" type="text" maxlength="24" inputmode="numeric" autocomplete="off" placeholder="De la transferencia o el Yape"></label>
@@ -3214,7 +3251,7 @@ function pintarQuien(){
 }
 const sinNube=()=>esDemo()&&!window.__nube; // modo de prueba sin servidor: no hay PIN que revisar
 // El PIN de cada uno (solo llega al administrador) se queda en memoria, no se guarda en el equipo
-const usarLista=j=>{PERSONAS=(j.usuarios||[]).map(x=>({n:x.usuario,pin:!!x.tienePin,admin:!!x.admin,p:x.pin||"",b:!!x.bloqueado,oc:x.ocultas||[],d:!!x.descargar,eq:x.equipos||[]}));guardarLS("cbo-personas",PERSONAS.map(({p,...r})=>r));pintarQuien()};
+const usarLista=j=>{PERSONAS=(j.usuarios||[]).map(x=>({n:x.usuario,pin:!!x.tienePin,admin:!!x.admin,p:x.pin||"",b:!!x.bloqueado,oc:x.ocultas||[],d:!!x.descargar,eq:x.equipos||[],m:x.metodo||"pin",hu:x.huellas||[]}));guardarLS("cbo-personas",PERSONAS.map(({p,...r})=>r));pintarQuien()};
 // Nombre del equipo para la lista "Equipos con sesión abierta" del administrador
 let EQUIPO=(()=>{const a=navigator.userAgent||"";const um=(a.match(/Android [\d.]+; ([^;)]+)\)/)||[])[1];const so=/Android/i.test(a)?"Celular Android":/iPhone/i.test(a)?"Apple iPhone":/iPad/i.test(a)?"Apple iPad":/Windows/i.test(a)?"PC Windows":/Mac/i.test(a)?"Apple Mac":"Equipo";const nav=/Edg\//.test(a)?"Edge":/Chrome\//.test(a)?"Chrome":/Safari\//.test(a)?"Safari":/Firefox\//.test(a)?"Firefox":"";let inst=false;try{inst=matchMedia("(display-mode: standalone)").matches}catch{}return so+(inst?" · app instalada":nav?" · "+nav:"")})();
 const sesDe=j=>({u:j.usuario,t:j.token,admin:!!j.admin,ocultas:j.ocultas||[],descargar:!!(j.admin||j.descargar)});
@@ -3318,11 +3355,11 @@ function pintarSesion(){
   const fila=p=>`<li class="usr-li${p.b?" off":""}"><div class="usr-cab"><span><b>${esc(titulo(p.n))}${p.n===quien?" (tú)":""}</b><small>${p.admin?"Administrador":p.b?"Sin acceso":"Usuario"} · PIN <span class="usr-pin" data-pin="${esc(p.p||"")}">••••</span></small></span><button class="btnlink" type="button" data-abrir="${esc(p.n)}">${usrAbierto===p.n?"Cerrar":"Opciones"}</button></div>
     <div class="usr-det"${usrAbierto===p.n?"":" hidden"}><div class="usr-acc">${p.p?`<button class="btnlink" type="button" data-verpin>Ver PIN</button>`:""}${p.n!==quien&&!p.b?`<button class="btnlink" type="button" data-como="${esc(p.n)}">Entrar como</button>`:""}<button class="btnlink" type="button" data-ponpin="${esc(p.n)}">Cambiar PIN</button><button class="btnlink" type="button" data-pinazar="${esc(p.n)}">PIN al azar</button>${!p.admin?`<button class="btnlink" type="button" data-acceso="${esc(p.n)}" data-permitir="${p.b?"1":""}">${p.b?"Dar acceso":"Quitar acceso"}</button>`:""}</div>
     ${!p.admin?`<p class="pal-t">Puede ver y usar</p><div class="usr-perm">${SECC_PERM.map(k=>`<label><input type="checkbox" data-secc="${k}"${(p.oc||[]).includes(k)?"":" checked"}> ${SECC_NOM[k]}</label>`).join("")}<label><input type="checkbox" data-desc${p.d?" checked":""}> Descargar reportes</label></div><div class="line"><button class="btn" type="button" data-guardperm="${esc(p.n)}">Guardar permisos</button></div>`:""}
-    <p class="pal-t">Equipos con sesión abierta</p>${(p.eq||[]).length?`<ul class="usr-eq">${p.eq.map(e=>`<li><i class="eq-ic" aria-hidden="true">${icoEq(e.eq)}</i><span>${esc(nomEq(e.eq))}<small>Usuario: ${esc(titulo(p.n))} · Entró ${fhUsr(e.c)} · último uso ${fhUsr(e.u)}</small></span><button class="btnlink" type="button" data-cerrarses="${esc(p.n)}" data-sid="${esc(e.id)}">Cerrar sesión</button></li>`).join("")}</ul>`:`<p class="hint" style="margin:0">Ninguno</p>`}</div></li>`;
+    ${filaAcceso(p)}<p class="pal-t">Equipos con sesión abierta</p>${(p.eq||[]).length?`<ul class="usr-eq">${p.eq.map(e=>`<li><i class="eq-ic" aria-hidden="true">${icoEq(e.eq)}</i><span>${esc(nomEq(e.eq))}<small>Usuario: ${esc(titulo(p.n))} · Entró ${fhUsr(e.c)} · último uso ${fhUsr(e.u)}</small></span><button class="btnlink" type="button" data-cerrarses="${esc(p.n)}" data-sid="${esc(e.id)}">Cerrar sesión</button></li>`).join("")}</ul>`:`<p class="hint" style="margin:0">Ninguno</p>`}</div></li>`;
   const adm=sesion.admin?`<p class="pal-t" style="margin:16px 0 6px">Usuarios</p><ul class="usr-lista">${PERSONAS.map(fila).join("")}</ul>
     <div class="line usr-nuevo"><input id="usrNombre" type="text" placeholder="Nombre y apellido" maxlength="40" autocomplete="off" aria-label="Nombre del usuario nuevo"><button class="btn" type="button" id="usrAgregar">Agregar usuario</button><label class="usr-azar"><input type="checkbox" id="usrAzar"> PIN al azar</label></div>
     <p class="pal-t" style="margin:16px 0 6px">Historial de cambios (solo lo ves tú)</p><button class="btn" type="button" id="verHist">Ver historial</button><ul class="usr-hist" id="usrHist" hidden></ul>`:"";
-  el.innerHTML=`<p class="usr-yo">Entraste como <b>${esc(titulo(quien))}</b> en este equipo.</p>${!sesion.admin&&leerLS(SESA_K,null)?`<div class="line" style="margin-bottom:10px"><button class="btn pri" type="button" id="sesVolver">Volver a ${esc(nomCorto(leerLS(SESA_K,{}).u))}</button></div>`:""}<div class="line"><button class="btnlink" type="button" id="sesSalir">Salir de este equipo</button></div>${adm}`;
+  el.innerHTML=`<p class="usr-yo">Entraste como <b>${esc(titulo(quien))}</b> en este equipo.</p>${!sesion.admin&&leerLS(SESA_K,null)?`<div class="line" style="margin-bottom:10px"><button class="btn pri" type="button" id="sesVolver">Volver a ${esc(nomCorto(leerLS(SESA_K,{}).u))}</button></div>`:""}<div class="line"><button class="btn" type="button" id="sesCambiar">Cambiar de usuario</button><button class="btnlink" type="button" id="sesSalir">Salir de este equipo</button></div>${adm}`;
   const vb=$("sesVolver");if(vb)vb.onclick=volverAdmin;
   $("sesSalir").onclick=salirSesion;
   const ag=$("usrAgregar");if(ag)ag.onclick=agregarUsuario;
@@ -3355,6 +3392,187 @@ async function verHistorial(){
     ul.innerHTML=h.length?h.map(x=>`<li><b>${esc(titulo(x.u)||"—")}</b> · ${esc(x.d)}<small>${fhUsr(x.f)}</small></li>`).join(""):"<li>Aún no hay cambios anotados.</li>";
     ul.hidden=false;b.textContent="Ocultar historial"}catch(e){b.textContent="Ver historial";toast(e.message)}
 }
+/* ===== Entrada instantánea con PIN o huella (igual en todas las apps CBO) =====
+   La primera vez en cada equipo el PIN lo revisa el servidor. Desde ahí el equipo guarda el PIN cifrado (PBKDF2, nunca el PIN)
+   y la sesión de esa persona, así que cambiar de usuario y entrar es al instante. El administrador decide cómo entra cada uno:
+   con PIN, con huella o con los dos (Más → Tu usuario y PIN → Opciones). La huella es la del propio celular (WebAuthn):
+   la app nunca la ve; el celular solo dice "es su dueño". Cada huella queda atada a un celular: otra solo con permiso del admin. */
+const ACC_K="cbo-accesos";
+var escAt=t=>esc(t).replace(/"/g,"&quot;");
+const accTodos=()=>{const a=leerLS(ACC_K,{});return a&&typeof a==="object"?a:{}};
+const accDe=n=>accTodos()[n]||null;
+function accPoner(n,o){const a=accTodos();a[n]=Object.assign({},a[n]||{},o);guardarLS(ACC_K,a)}
+var METODOS={pin:"Con PIN",huella:"Con huella",ambos:"PIN o huella"};
+const metodoDe=n=>{const p=PERSONAS.find(x=>x.n===n);return (p&&p.m)||(accDe(n)||{}).m||"pin"};
+var IC_HUELLA='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M12 11v3c0 2.5-.6 4.6-1.8 6.4"/><path d="M8.5 9.6A3.6 3.6 0 0 1 15.6 11v2.2c0 2.6-.5 5-1.5 7.1"/><path d="M5.6 7.7A7 7 0 0 1 19 11v2c0 1.8-.2 3.5-.6 5.1"/><path d="M5 11v2.4c0 1.4-.3 2.7-.9 3.9"/><path d="M7.4 4.4A9.5 9.5 0 0 1 20.2 6.6"/></svg>';
+const b64u=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+const deB64u=s=>{s=String(s||"");return Uint8Array.from(atob(s.replace(/-/g,"+").replace(/_/g,"/")+"===".slice((s.length+3)%4)),c=>c.charCodeAt(0))};
+const reto=()=>crypto.getRandomValues(new Uint8Array(32));
+async function hashLocal(sal,pin){
+  const k=await crypto.subtle.importKey("raw",new TextEncoder().encode(String(pin)),"PBKDF2",false,["deriveBits"]);
+  return b64u(await crypto.subtle.deriveBits({name:"PBKDF2",salt:new TextEncoder().encode("cbo|"+sal),iterations:60000,hash:"SHA-256"},k,256));
+}
+let huellaHay=null;
+async function huellaDisponible(){
+  if(esDemo())return true;
+  if(huellaHay!==null)return huellaHay;
+  try{huellaHay=!!(window.PublicKeyCredential&&await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())}catch{huellaHay=false}
+  return huellaHay;
+}
+huellaDisponible();
+// Vista previa: el simulador no tiene lector, así que muestra cómo se ve el aviso del celular
+function simHuella(texto){
+  return new Promise(ok=>{
+    let d=$("simHuella");if(!d){d=document.createElement("div");d.id="simHuella";d.className="hu-sim";document.body.appendChild(d)}
+    d.innerHTML=`<div class="hu-card" role="dialog" aria-label="${escAt(texto)}"><span class="hu-ic">${IC_HUELLA}</span><b>${esc(texto)}</b><small>Vista previa: así aparece el lector de huella del celular.</small><button type="button" class="btn" id="huSimOk">Tocar el sensor</button><button type="button" class="btnlink" id="huSimNo">Cancelar</button></div>`;
+    d.hidden=false;
+    const fin=v=>{d.hidden=true;ok(v)};
+    $("huSimOk").onclick=()=>{d.querySelector(".hu-ic").classList.add("ok");setTimeout(()=>fin(true),280)};
+    $("huSimNo").onclick=()=>fin(false);
+    if(window.__huAuto)setTimeout(()=>fin(window.__huAuto==="si"),20);
+  });
+}
+const APP_NOM=typeof MODO_OBRAS!=="undefined"&&MODO_OBRAS?"CBO Obras":"CBO Finanzas";
+async function huellaRegistrar(n){
+  if(esDemo()){if(!await simHuella("Registra tu huella"))throw new Error("No se registró la huella.");return "demo-"+n}
+  try{
+    const c=await navigator.credentials.create({publicKey:{challenge:reto(),rp:{name:APP_NOM,id:location.hostname},
+      user:{id:new TextEncoder().encode(String(n).slice(0,60)),name:n,displayName:titulo(n)},
+      pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}],
+      authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required",residentKey:"discouraged"},timeout:60000,attestation:"none"}});
+    return b64u(c.rawId);
+  }catch(e){throw new Error(e&&e.name==="NotAllowedError"?"Se canceló el registro de la huella.":"Este celular no pudo registrar la huella.")}
+}
+async function huellaVerificar(cred){
+  if(esDemo())return simHuella("Pon tu dedo en el sensor");
+  try{await navigator.credentials.get({publicKey:{challenge:reto(),rpId:location.hostname,allowCredentials:[{type:"public-key",id:deB64u(cred),transports:["internal"]}],userVerification:"required",timeout:60000}});return true}
+  catch(e){return false}
+}
+// Registra la huella en este celular y el servidor la ata a esta persona
+async function registrarHuellaDe(n){
+  const cred=await huellaRegistrar(n);
+  // En la vista previa solo se avisa al servidor de prueba si la sesión es de él
+  if(!sinNube()&&!(esDemo()&&!/^sim~/.test(String(sesion&&sesion.t||""))))await api("huellaReg",{cred,equipo:EQUIPO});
+  accPoner(n,{cred});return cred;
+}
+// Firma con el dedo: solo si el celular no tiene lector de huella
+function pedirFirma(n){
+  return new Promise(ok=>{
+    let d=$("asFirmaPad");if(!d){d=document.createElement("div");d.id="asFirmaPad";d.className="hu-sim";document.body.appendChild(d)}
+    d.innerHTML=`<div class="hu-card fp-card"><b>Firma de ${esc(nomCorto(n))}</b><small>Firma con tu dedo dentro del recuadro.</small><canvas id="fpLienzo" width="600" height="260" aria-label="Recuadro para firmar"></canvas><div class="line fp-bts"><button type="button" class="btnlink" id="fpBorrar">Borrar</button><button type="button" class="btnlink" id="fpNo">Cancelar</button><button type="button" class="btn" id="fpOk" disabled>Listo</button></div></div>`;
+    d.hidden=false;
+    const cv=$("fpLienzo"),cx=cv.getContext("2d");let dib=false,trazo=0;
+    cx.lineWidth=5;cx.lineCap="round";cx.lineJoin="round";cx.strokeStyle="#111";
+    const pt=e=>{const r=cv.getBoundingClientRect();return [(e.clientX-r.left)*cv.width/r.width,(e.clientY-r.top)*cv.height/r.height]};
+    cv.onpointerdown=e=>{dib=true;try{cv.setPointerCapture(e.pointerId)}catch{};const [x,y]=pt(e);cx.beginPath();cx.moveTo(x,y)};
+    cv.onpointermove=e=>{if(!dib)return;const [x,y]=pt(e);cx.lineTo(x,y);cx.stroke();if(++trazo>8)$("fpOk").disabled=false};
+    cv.onpointerup=cv.onpointercancel=()=>{dib=false};
+    const fin=v=>{d.hidden=true;ok(v)};
+    $("fpBorrar").onclick=()=>{cx.clearRect(0,0,cv.width,cv.height);trazo=0;$("fpOk").disabled=true};
+    $("fpNo").onclick=()=>fin(null);
+    $("fpOk").onclick=()=>{const c=document.createElement("canvas");c.width=300;c.height=130;const g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,300,130);g.drawImage(cv,0,0,300,130);fin(c.toDataURL("image/jpeg",.7))};
+  });
+}
+// Para marcar asistencia el trabajador elige: huella o firma (si el celular no tiene lector, solo firma)
+function elegirConfirmacion(){
+  return new Promise(ok=>{
+    let d=$("elegirConf");if(!d){d=document.createElement("div");d.id="elegirConf";d.className="hu-sim";document.body.appendChild(d)}
+    d.innerHTML=`<div class="hu-card"><b>¿Cómo quieres confirmar?</b><small>Elige la que te sea más cómoda.</small><div class="conf-ops"><button type="button" class="conf-op" data-conf="huella"><span class="hu-ic">${IC_HUELLA}</span><b>Con huella</b></button><button type="button" class="conf-op" data-conf="firma"><span class="hu-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17c3-1 4-8 6-8s0 7 2 7 2-4 4-4 1 3 3 3 2-1 3-2"/><path d="M3 21h18"/></svg></span><b>Con firma</b></button></div><button type="button" class="btnlink" id="confNo">Cancelar</button></div>`;
+    d.hidden=false;
+    const fin=v=>{d.hidden=true;ok(v)};
+    d.querySelectorAll("[data-conf]").forEach(b=>b.onclick=()=>fin(b.dataset.conf));
+    $("confNo").onclick=()=>fin(null);
+    if(window.__confAuto)setTimeout(()=>fin(window.__confAuto),20);
+  });
+}
+async function verificarPersona(n,prueba,aviso){
+  aviso=aviso||toast;
+  if(prueba)return {verif:"firma",firma:String(prueba)}; // solo la revisión automática
+  const hay=await huellaDisponible();
+  const modo=hay?await elegirConfirmacion():"firma";
+  if(!modo)throw new Error("Cancelaste. Vuelve a tocar Marcar cuando quieras.");
+  if(modo==="huella"){
+    let cred=(accDe(n)||{}).cred;
+    if(!cred){aviso("Primera vez en este celular: registra tu huella.",true);cred=await registrarHuellaDe(n)}
+    aviso("Pon tu dedo en el sensor…",true);
+    if(!await huellaVerificar(cred))throw new Error("No se reconoció tu huella. Vuelve a intentar.");
+    return {verif:"huella",cred};
+  }
+  aviso(hay?"Firma con tu dedo.":"Este celular no tiene lector de huella: firma con tu dedo.",true);
+  const f=await pedirFirma(n);if(!f)throw new Error("Sin firma no se marca. Vuelve a intentar.");
+  return {verif:"firma",firma:f};
+}
+
+// --- Teclado del PIN con botón de huella ---
+let pinHuellaFn=null;
+(function(){
+  const b=document.createElement("button");b.type="button";b.id="pinHuella";b.className="pin-huella";b.hidden=true;
+  b.innerHTML=`${IC_HUELLA}<span>Entrar con huella</span>`;
+  $("pinCancelar").before(b);
+  b.onclick=async()=>{if(!pinHuellaFn)return;const r=await pinHuellaFn();if(r)cerrarPin(r);else errorPin("No se reconoció la huella. Vuelve a intentar.")};
+})();
+const abrirPinBase=abrirPin;
+abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true;$("bloqueo").classList.remove("solo-huella");return abrirPinBase(modo,titulo,check)};
+
+// --- Entrar: primero lo guardado en este equipo (al instante); si no, el servidor ---
+async function revisarPinDe(n,pin){
+  const a=accDe(n)||{};
+  if(a.h&&a.s&&a.t&&await hashLocal(a.s,pin)===a.h)return Object.assign({},a.ses||{},{u:n,t:a.t});
+  const s=await pedirEntrada(n,pin);
+  const sal=b64u(reto());
+  accPoner(n,{s:sal,h:await hashLocal(sal,pin),t:s.t,ses:{admin:!!s.admin,ocultas:s.ocultas||[],descargar:!!s.descargar},m:metodoDe(n)});
+  return s;
+}
+entrarComo=async function(n){
+  const m=metodoDe(n),a=accDe(n)||{},hay=await huellaDisponible();
+  const conHuella=m!=="pin"&&!!a.cred&&!!a.t&&hay;
+  const guardada=()=>Object.assign({},a.ses||{},{u:n,t:a.t});
+  const tit=m==="huella"&&!conHuella?`${nomCorto(n)}, primera vez en este celular: escribe tu PIN`:`${nomCorto(n)}, escribe tu PIN`;
+  const p=abrirPin("externo",conHuella&&m==="huella"?`${nomCorto(n)}, pon tu dedo`:tit,pin=>revisarPinDe(n,pin));
+  if(conHuella){
+    pinHuellaFn=async()=>(await huellaVerificar(a.cred))?guardada():null;
+    $("pinHuella").hidden=false;
+    if(m==="huella")$("bloqueo").classList.add("solo-huella");
+    setTimeout(()=>{if(pinHuellaFn&&!$("bloqueo").hidden)$("pinHuella").click()},60);
+  }
+  const s=await p;
+  if(!s||!s.t)return;
+  ponerSesion(Object.assign({u:n},s));cerrarOv("ovQuien");toast("Entraste como "+titulo(s.u||n));
+  perfilUlt=0;sincPerfil(true);if(s.admin)cargarUsuarios();cargar();
+  // Si el administrador pidió huella y este celular todavía no la tiene, se registra ahora
+  if(m!=="pin"&&hay&&!(accDe(n)||{}).cred){try{await registrarHuellaDe(n);toast("Huella registrada. La próxima vez entras con tu dedo.")}catch(e){toast(e.message)}}
+};
+// Si el servidor rechaza la sesión guardada (PIN cambiado, acceso quitado), se olvida en este equipo
+let cambiandoUsr=false;
+const perderSesionBase=perderSesion;
+perderSesion=function(){if(sesion&&!cambiandoUsr){const a=accDe(sesion.u);if(a&&a.t)accPoner(sesion.u,{t:""})}return perderSesionBase()};
+function cambiarUsuario(){cambiandoUsr=true;try{salirSesion()}finally{cambiandoUsr=false}}
+
+// --- Panel del administrador: cómo entra cada uno y su huella ---
+function filaAcceso(p){
+  if(!METODOS||!escAt)return ""; // aún cargando
+  const hu=p.hu||[];
+  return `<p class="pal-t">Cómo entra a la app</p><div class="line acc-met"><select data-metodo="${escAt(p.n)}" aria-label="Cómo entra ${escAt(titulo(p.n))}">${Object.entries(METODOS).map(([k,t])=>`<option value="${k}"${(p.m||"pin")===k?" selected":""}>${t}</option>`).join("")}</select></div>
+    <p class="hint acc-hu">${hu.length?`${IC_HUELLA}<span>Huella en: ${hu.map(h=>esc(nomEq(h.eq))).join(", ")}</span> <button class="btnlink" type="button" data-quitahu="${escAt(p.n)}">Quitar huella</button>`:(p.m||"pin")==="pin"?"Entra solo con su PIN.":"Su huella se registra sola la primera vez que entre en su celular."}</p>`;
+}
+async function ponerMetodo(n,m){
+  if(sinNube()){const p=PERSONAS.find(x=>x.n===n);if(p)p.m=m;accPoner(n,{m});guardarLS("cbo-personas",PERSONAS.map(({p,...r})=>r));pintarSesion();toast(`${nomCorto(n)}: ${METODOS[m]}`);return}
+  try{usarLista(await api("metodo",{usuario:n,metodo:m}));toast(`${nomCorto(n)} entrará: ${METODOS[m].toLowerCase()}.`)}catch(e){toast(e.message)}
+}
+async function quitarHuella(n){
+  if(!confirm(`¿Quitar la huella de ${titulo(n)}? Tendrá que registrarla de nuevo en su celular.`))return;
+  if(n===quien||accDe(n))accPoner(n,{cred:""});
+  if(sinNube()){const p=PERSONAS.find(x=>x.n===n);if(p)p.hu=[];pintarSesion();toast("Huella quitada");return}
+  try{usarLista(await api("quitarHuella",{usuario:n}));toast(`Huella de ${nomCorto(n)} quitada.`)}catch(e){toast(e.message)}
+}
+const pintarSesionBase=pintarSesion;
+pintarSesion=function(){
+  pintarSesionBase();const el=$("quienSeg");if(!el)return;
+  const sc=$("sesCambiar");if(sc)sc.onclick=cambiarUsuario;
+  el.querySelectorAll("[data-metodo]").forEach(s=>s.onchange=()=>ponerMetodo(s.dataset.metodo,s.value));
+  el.querySelectorAll("[data-quitahu]").forEach(b=>b.onclick=()=>quitarHuella(b.dataset.quitahu));
+};
+
 document.addEventListener("click",e=>{const av=e.target.closest("[data-av]");if(av){ponerAv(av.dataset.av);return}const b=e.target.closest("[data-entrar]");if(b)entrarComo(b.dataset.entrar);else if(e.target.id==="ovPerfil"||e.target.id==="perfilCerrar")cerrarOv("ovPerfil")});
 pintarQuien();
 const sinCeros=v=>String(v||"").trim().replace(/^0+/,"");
@@ -3654,13 +3872,23 @@ function pintarTrab(){
 }
 // Pago por horas: semana completa = jornal exacto (700, 1100…); si faltó, jornal × horas trabajadas ÷ horas de la semana
 function jornalTrab(){const t=listaTrab().find(x=>String(x.dni)===$("pTrab").value);return t&&t.jornal?Number(t.jornal):0}
-function calcHoras(){
-  const j=jornalTrab(), h=numIn("pHoras"), hs=numIn("pHSem")||45;
-  if(!(h>0)||!j){$("pHorasInfo").textContent=j?`Semana completa (${hs} h): S/ ${fmtN(j)}. Escribe las horas si faltó.`:"";return}
+// Días trabajados: lunes a viernes 8 h, sábado 5 h, domingo 8 h (semana normal = 45 h = jornal completo)
+const HDIA=[8,8,8,8,8,5,8];
+const diasSel=()=>[...$("pDias").children].map(b=>b.getAttribute("aria-pressed")==="true"?"1":"0").join("");
+const ponerDias=m=>[...$("pDias").children].forEach((b,i)=>b.setAttribute("aria-pressed",String(m[i]==="1")));
+const horasDias=(m=diasSel())=>[...m].reduce((a,c,i)=>a+(c==="1"?HDIA[i]:0),0);
+function calcHoras(sinTocar){
+  const j=jornalTrab(), hs=numIn("pHSem")||45, nd=diasSel().replace(/0/g,"").length, h=horasDias();
+  $("pHoras").value=h&&h!==hs?h:"";
+  if(!j){$("pHorasInfo").textContent=nd?`${nd} ${nd===1?"día":"días"} · ${h} h`:"Toca los días que trabajó.";return}
+  if(!nd){if(!sinTocar)$("pSueldo").value="";$("pHorasInfo").textContent="Toca los días que trabajó.";return}
   const pago=h===hs?j:r2(j*h/hs);
-  $("pSueldo").value=pago.toFixed(2);
-  $("pHorasInfo").textContent=h===hs?`Semana completa: S/ ${fmtN(j)}`:`S/ ${fmtN(j)} × ${h} h ÷ ${hs} h = S/ ${fmtN(pago)}`;
+  if(!sinTocar)$("pSueldo").value=pago.toFixed(2);
+  // jornal por día (8 h) o por semana (45 h)
+  $("pHorasInfo").textContent=hs<=12?`${nd} ${nd===1?"día":"días"} · ${h} h · S/ ${fmtN(j)} por día de ${hs} h × ${h} ÷ ${hs} = S/ ${fmtN(pago)}`
+    :`${nd} ${nd===1?"día":"días"} · ${h} h de ${hs} h · `+(h===hs?`semana completa S/ ${fmtN(j)}`:`S/ ${fmtN(j)} × ${h} ÷ ${hs} = S/ ${fmtN(pago)}`);
 }
+function calcExtra(){const j=jornalTrab(),hs=numIn("pHSem")||45,x=numIn("pHexH");if(j&&x>0)$("pHex").value=r2(x*j/hs).toFixed(2);else if($("pHexH").value.trim()==="")$("pHex").value="";calcPla()}
 const fmtN=n=>Number(n).toLocaleString("es-PE",{minimumFractionDigits:2,maximumFractionDigits:2});
 function calcPla(){const n=r2(numIn("pSueldo")+numIn("pBono")+numIn("pHex")-numIn("pDesc"));$("pNeto").textContent=fmt(Math.max(0,n));return n}
 function abrirPagoPla(r){
@@ -3672,35 +3900,38 @@ function abrirPagoPla(r){
     $("pTrab").value=String(r.ruc||""); $("pFecha").value=r.fecha; $("pIni").value=r.inicio||isoMas(r.fecha,-6); $("pFin").value=r.fin||r.fecha;
     $("pSueldo").value=String(r.sueldo||r.monto); $("pBono").value=r.bono||""; $("pHex").value=r.horasExtra||""; $("pDesc").value=r.descuento||"";
     $("pOper").value=r.operacion||""; $("pObra").value=r.obra||"";
-    const tt=pintarTrab(), hs0=(tt&&tt.horas)||45; $("pHSem").value=hs0; $("pHoras").value=r.horasTrab||(r.horas&&r.horas!==hs0?r.horas:"");
+    const tt=pintarTrab(), hs0=(tt&&tt.horas)||45; $("pHSem").value=hs0; ponerDias(/^[01]{7}$/.test(r.dias||"")?r.dias:"1111110"); $("pHexH").value=r.hexH||"";
   }else{
     $("pFecha").value=hoyISO; $("pIni").value=isoMas(hoyISO,-6); $("pFin").value=hoyISO;
     ["pBono","pHex","pDesc","pOper","pObra"].forEach(k=>$(k).value="");
     const t=pintarTrab(); $("pSueldo").value=t&&t.jornal?Number(t.jornal).toFixed(2):"";
-    $("pHSem").value=t&&t.horas?t.horas:45; $("pHoras").value="";
+    $("pHSem").value=t&&t.horas?t.horas:45; ponerDias("1111110"); $("pHexH").value="";
   }
-  calcHoras();
-  const extras=numIn("pBono")||numIn("pHex")||numIn("pDesc");
+  calcHoras(!!r);
+  const extras=numIn("pBono")||numIn("pHex")||numIn("pHexH")||numIn("pDesc");
   $("pMas").hidden=!extras; $("pMasBtn").hidden=!!extras;
   $("plaTit").textContent=r?"Editar pago":"Pago a trabajador"; $("pMsg").textContent="";
   calcPla(); $("ovPla").hidden=false;
 }
-$("pTrab").addEventListener("change",()=>{const t=pintarTrab();if(t&&t.jornal&&!plaEditId){$("pSueldo").value=Number(t.jornal).toFixed(2);$("pHSem").value=t.horas||45}calcHoras();calcPla()});
+$("pTrab").addEventListener("change",()=>{const t=pintarTrab();if(t&&t.jornal&&!plaEditId){$("pSueldo").value=Number(t.jornal).toFixed(2);$("pHSem").value=t.horas||45}calcHoras();calcExtra()});
 ["pHoras","pHSem"].forEach(k=>$(k).addEventListener("input",()=>{if(!numIn("pHoras")){const j=jornalTrab();if(j)$("pSueldo").value=j.toFixed(2)}calcHoras();calcPla()}));
 ["pSueldo","pBono","pHex","pDesc"].forEach(k=>$(k).addEventListener("input",calcPla));
+$("pDias").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;b.setAttribute("aria-pressed",String(b.getAttribute("aria-pressed")!=="true"));calcHoras();calcPla()});
+$("pHexH").addEventListener("input",calcExtra);
 $("pFecha").addEventListener("change",()=>{if(!plaEditId&&$("pFecha").value){$("pFin").value=$("pFecha").value;$("pIni").value=isoMas($("pFecha").value,-6)}});
-$("pMasBtn").onclick=()=>{$("pMas").hidden=false;$("pMasBtn").hidden=true;$("pBono").focus()};
+$("pMasBtn").onclick=()=>{$("pMas").hidden=false;$("pMasBtn").hidden=true;$("pHexH").focus()};
 $("fPla").addEventListener("submit",async e=>{
   e.preventDefault();
   const t=listaTrab().find(x=>String(x.dni)===$("pTrab").value);
   if(!t){$("pMsg").textContent="Elige un trabajador.";return}
+  if(!diasSel().includes("1")){$("pMsg").textContent="Toca los días que trabajó.";return}
   if(!(numIn("pSueldo")>0)){$("pMsg").textContent="Escribe el sueldo o jornal.";return}
   const neto=calcPla();
   if(!(neto>0)){$("pMsg").textContent="El neto a pagar debe ser mayor a 0.";return}
   if(!$("pFecha").value){$("pMsg").textContent="Elige la fecha de pago.";return}
   const r={tipo:"gasto",categoria:"Planilla / jornales",comprobante:"ninguno",monto:neto,base:0,igv:0,noGravado:neto,
     ruc:String(t.dni),desc:t.nombre,cargo:t.cargo||"",fecha:$("pFecha").value,inicio:$("pIni").value,fin:$("pFin").value,
-    sueldo:numIn("pSueldo"),bono:numIn("pBono"),horasExtra:numIn("pHex"),descuento:numIn("pDesc"),horasTrab:numIn("pHoras")||0,horasSem:numIn("pHSem")||45,
+    sueldo:numIn("pSueldo"),bono:numIn("pBono"),horasExtra:numIn("pHex"),descuento:numIn("pDesc"),horasTrab:horasDias(),horasSem:numIn("pHSem")||45,dias:diasSel(),hexH:numIn("pHexH")||0,
     operacion:$("pOper").value.trim(),obra:$("pObra").value.trim(),medio:t.metodo||"",estado:"PAGADO",detraccion:false,detPct:0,detMonto:0};
   $("pMsg").textContent="Guardando…"; $("pGuardar").disabled=true;
   const editando=!!plaEditId;
@@ -3774,9 +4005,15 @@ function comprobantePDF(r,soloArmar,uno){
   const fF=iso=>iso?iso.split("-").reverse().join("/"):"";
   const periodo=r.inicio&&r.fin?`Semana del ${fF(r.inicio)} al ${fF(r.fin)}`:`Pago del ${fF(r.fecha)}`;
   // cantidad y precio unitario solo si cuadran con el sueldo (si se cambió el sueldo, no se muestran)
-  const cuadra=r.horas&&r.pagoHora&&Math.abs(r.horas*r.pagoHora-sueldo)<1;
-  const filas=`<tr><td>${esc(String(r.glosa||"JORNAL SEMANAL").toUpperCase())}</td><td class="n">${cuadra?r.horas+" h":""}</td><td class="n">${cuadra?fmt(r.pagoHora):""}</td><td class="n">${fmt(sueldo)}</td></tr>`
-    +[["BONIFICACIÓN",bono],["HORAS EXTRA",hex]].filter(([,v])=>v>0).map(([k,v])=>`<tr><td>${k}</td><td class="n"></td><td class="n"></td><td class="n">${fmt(v)}</td></tr>`).join("")
+  // días marcados al registrar (L a D): asistencia de la semana y glosa del jornal
+  const dias=/^[01]{7}$/.test(r.dias||"")?r.dias:"", DL=["LUN","MAR","MIÉ","JUE","VIE","SÁB","DOM"], HD=[8,8,8,8,8,5,8];
+  const idx=[...dias].map((c,i)=>c==="1"?i:-1).filter(i=>i>=0), hDias=idx.reduce((a,i)=>a+HD[i],0);
+  const seguidos=idx.length>2&&idx[idx.length-1]-idx[0]===idx.length-1;
+  const glosa=idx.length?`JORNAL — ${idx.length} ${idx.length===1?"DÍA":"DÍAS"} (${seguidos?DL[idx[0]]+" A "+DL[idx[idx.length-1]]:idx.map(i=>DL[i]).join(", ")})`:String(r.glosa||"JORNAL SEMANAL").toUpperCase();
+  const hrs=hDias||r.horas, ph=r.pagoHora||(hDias?sueldo/hDias:0), cuadra=hrs&&ph&&Math.abs(hrs*ph-sueldo)<1;
+  const hexH=Number(r.hexH)||0;
+  const filas=`<tr><td>${esc(glosa)}</td><td class="n">${cuadra?hrs+" h":""}</td><td class="n">${cuadra?fmt(ph):""}</td><td class="n">${fmt(sueldo)}</td></tr>`
+    +[["HORAS EXTRA",hex,hexH?hexH+" h":"",hexH?fmt(r2(hex/hexH)):""],["BONIFICACIÓN",bono,"",""]].filter(([,v])=>v>0).map(([k,v,c,p])=>`<tr><td>${k}</td><td class="n">${c}</td><td class="n">${p}</td><td class="n">${fmt(v)}</td></tr>`).join("")
     +(desc>0?`<tr><td>(−) ADELANTOS / DESCUENTOS</td><td class="n"></td><td class="n"></td><td class="n menos">− ${fmt(desc)}</td></tr>`:"");
   const totales=desc>0
     ?`<div class="totales tres"><div class="tot"><small>TOTAL INGRESOS</small><b>${fmt(sueldo+bono+hex)}</b></div><div class="tot"><small>TOTAL DESCUENTOS</small><b style="color:#A8331F">${fmt(desc)}</b></div><div class="tot neto"><small>NETO A RECIBIR</small><b>${fmt(neto)}</b></div></div>`
@@ -3792,7 +4029,8 @@ function comprobantePDF(r,soloArmar,uno){
     ${nombre?`<span class="ejemplar">${nombre}</span>`:""}
     <h4>DATOS DEL TRABAJADOR</h4>
     <div class="grid2"><div class="celda"><small>APELLIDOS Y NOMBRES</small><b>${esc(String(r.desc||"").toUpperCase())}</b></div><div class="celda"><small>PERIODO PAGADO</small><b>${periodo}</b></div>
-      <div class="celda"><small>DNI</small><b>${esc(r.ruc||"")}</b></div><div class="celda"><small>CARGO</small><b>${esc(String(r.cargo||t.cargo||"").toUpperCase())}</b></div></div>
+      <div class="celda"><small>DNI</small><b>${esc(r.ruc||"")}</b></div><div class="celda"><small>CARGO</small><b>${esc(String(r.cargo||t.cargo||"").toUpperCase().replace(/^AYUDANTE\b.*$/,"AYUDANTE"))}</b></div></div>
+    ${dias?`<h4>ASISTENCIA DE LA SEMANA</h4><div class="semana">${[...dias].map((c,i)=>`<div class="sd ${c==="1"?"si":i<6?"no":""}"><b>${DL[i][0]}</b><small>${c==="1"?HD[i]+" h":i<6?"falta":"—"}</small></div>`).join("")}</div>`:""}
     <h4>DETALLE DEL PAGO</h4>
     <table><thead><tr><th>CONCEPTO</th><th class="n">CANTIDAD</th><th class="n">PRECIO UNIT.</th><th class="n">IMPORTE</th></tr></thead><tbody>${filas}</tbody></table>
     ${totales}<div class="son">SON: ${enLetrasMay(neto)}</div>
