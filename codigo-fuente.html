@@ -2395,9 +2395,6 @@ $("firmados").addEventListener("click",e=>{const b=e.target.closest("[data-fid]"
   const cv=$("ftPad"), ctx=cv.getContext("2d"); let dib=false, hay=false, ult=null;
   const ajustar=()=>{const r=cv.getBoundingClientRect(),k=window.devicePixelRatio||1;if(!r.width)return;cv.width=Math.round(r.width*k);cv.height=Math.round(r.height*k);
     ctx.setTransform(k,0,0,k,0,0);ctx.fillStyle="#fff";ctx.fillRect(0,0,r.width,r.height);
-    // línea guía clarita (no sale en la firma guardada: el recorte solo toma lo oscuro)
-    const yb=Math.round(r.height*.74);ctx.strokeStyle="#DCDFE5";ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(24,yb);ctx.lineTo(r.width-24,yb);ctx.stroke();
-    ctx.fillStyle="#C9CDD5";ctx.font="600 13px system-ui,sans-serif";ctx.fillText("✕  Firma aquí",24,yb-10);
     ctx.lineCap="round";ctx.lineJoin="round";ctx.strokeStyle="#0B1F44";ctx.lineWidth=3.2;hay=false;$("ftMsg").textContent=""};
   const pos=e=>{const r=cv.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
   // Trazo suave como lapicero: curvas entre puntos medios y grosor según la velocidad
@@ -2406,7 +2403,7 @@ $("firmados").addEventListener("click",e=>{const b=e.target.closest("[data-fid]"
     ctx.fillStyle="#0B1F44";ctx.beginPath();ctx.arc(ult.x,ult.y,1.6,0,6.3);ctx.fill()});
   cv.addEventListener("pointermove",e=>{if(!dib)return;const pts=e.getCoalescedEvents?e.getCoalescedEvents():[e];
     for(const q of (pts.length?pts:[e])){const c=pos(q),p={x:ult.x+(c.x-ult.x)*.42,y:ult.y+(c.y-ult.y)*.42},m={x:(ult.x+p.x)/2,y:(ult.y+p.y)/2},v=Math.hypot(p.x-ult.x,p.y-ult.y);
-      gros=gros*.72+Math.max(1.8,Math.min(4.2,4.4-v*.16))*.28;ctx.strokeStyle="#0B1F44";ctx.lineWidth=gros;
+      gros=gros*.72+Math.max(1.8,Math.min(4.2,4.4-v*.16))*.28;const pr=q.pointerType==="pen"&&q.pressure>0?.5+q.pressure:1;ctx.strokeStyle="#0B1F44";ctx.lineWidth=gros*pr;
       ctx.beginPath();ctx.moveTo(med.x,med.y);ctx.quadraticCurveTo(ult.x,ult.y,m.x,m.y);ctx.stroke();med=m;ult=p}hay=true});
   ["pointerup","pointercancel"].forEach(t=>cv.addEventListener(t,()=>dib=false));
   const recortar=src=>{const w=src.width,h=src.height,d=src.getContext("2d").getImageData(0,0,w,h).data;let x0=w,y0=h,x1=0,y1=0;
@@ -3529,7 +3526,7 @@ function pedirFirma(n){
     cv.onpointerdown=e=>{dib=true;try{cv.setPointerCapture(e.pointerId)}catch{};const [x,y]=pt(e);u={x,y};md=u;gr=5.5;cx.fillStyle="#111";cx.beginPath();cx.arc(x,y,2.6,0,6.3);cx.fill()};
     cv.onpointermove=e=>{if(!dib)return;const L=e.getCoalescedEvents?e.getCoalescedEvents():[e];
       for(const q of (L.length?L:[e])){const [x,y]=pt(q),p={x:u.x+(x-u.x)*.42,y:u.y+(y-u.y)*.42},m={x:(u.x+p.x)/2,y:(u.y+p.y)/2},v=Math.hypot(p.x-u.x,p.y-u.y);
-        gr=gr*.72+Math.max(3,Math.min(7,7.4-v*.22))*.28;cx.lineWidth=gr;cx.beginPath();cx.moveTo(md.x,md.y);cx.quadraticCurveTo(u.x,u.y,m.x,m.y);cx.stroke();md=m;u=p}
+        gr=gr*.72+Math.max(3,Math.min(7,7.4-v*.22))*.28;const pr=q.pointerType==="pen"&&q.pressure>0?.5+q.pressure:1;cx.lineWidth=gr*pr;cx.beginPath();cx.moveTo(md.x,md.y);cx.quadraticCurveTo(u.x,u.y,m.x,m.y);cx.stroke();md=m;u=p}
       if(++trazo>8)$("fpOk").disabled=false};
     cv.onpointerup=cv.onpointercancel=()=>{dib=false};
     const fin=v=>{d.hidden=true;ok(v)};
