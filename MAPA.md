@@ -109,3 +109,4 @@ Actualizado: 11/11/2026 · caché: cbo-finanzas-v93-pago-dias
 - v105 (12/11/2026): pantalla de huella con escudo, logo y flecha al sensor; campos con datalist ya no abren el teclado del celular (sugerencias en el teclado propio).
 - v106 (12/11/2026): campos number/tel/email pasan a texto con teclado propio (Android ignoraba inputmode none); se marcan antes del foco; prompt/confirm reemplazados por cboVentana/cboPedir/cboConfirmar.
 - v107 (12/11/2026): alAtras cierra teclado propio, ventanas cbo-dlg, firma y elección; en Inicio "Desliza otra vez para salir"; ventanas propias arriba.
+- v108 (12/11/2026): un gesto de atrás con el teclado abierto cierra teclado y ventana juntos.
