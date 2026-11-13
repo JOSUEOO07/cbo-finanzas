@@ -113,3 +113,4 @@ Actualizado: 11/11/2026 · caché: cbo-finanzas-v93-pago-dias
 - v109 (12/11/2026): firma (ftPad y fpLienzo) con estabilizador, curvas y grosor según velocidad; línea guía "Firma aquí".
 - v110 (12/11/2026): firma sin "Firma aquí" ni línea guía; grosor con la presión del lápiz (pointerType pen).
 - v111 (13/11/2026): si el campo pierde el foco sin tocar la pantalla (gesto atrás de Android) se cierran teclado y ventana de una vez.
+- v112 (13/11/2026): el teclado propio espera 320 ms antes de cerrarse al tocar un botón (Atrás/Siguiente al primer toque); teclado oscuro con tinte de la paleta.

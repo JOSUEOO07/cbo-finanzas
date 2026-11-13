@@ -3782,6 +3782,8 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
   .tecl-g button.k2{background:transparent;border-color:transparent;box-shadow:none;font-size:1.35rem}
   .tecl-g button.off{visibility:hidden}
   .tecl-g .pin-onda{width:70px;height:70px;margin:-35px 0 0 -35px}
+  /* El teclado siempre oscuro, con solo un tinte de la paleta (con paletas claras se veía muy clarito) */
+  .tecl{--brand-ink:#F4F6F8;background:linear-gradient(165deg,color-mix(in srgb,var(--brand) 34%,#0B0D10),#07090C 78%)}.tecl .pin-fondo{opacity:.26}
   body.tecl-abierto{padding-bottom:var(--tecl-h,0px)}
   body.tecl-abierto .overlay .sheet{padding-bottom:calc(var(--tecl-h,0px) + 18px)!important}
   @media (prefers-reduced-motion:reduce){.tecl{transition:none}}
@@ -3798,12 +3800,12 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
   const visibles=()=>[...document.querySelectorAll(SEL2)].filter(i=>i.dataset.teclOk&&!i.disabled&&!i.readOnly&&i.getClientRects().length);
   const abrir=i=>{el=i;const dec=i.dataset.teclIm==="decimal";t.querySelector('[data-tk="."]').classList.toggle("off",!dec);
     t.querySelector(".tecl-bar b").textContent=etiqueta(i);
-    const lst=visibles(),k=lst.indexOf(i);t.querySelector(".tecl-sig").hidden=!(k>=0&&k<lst.length-1);
+    t.querySelector(".tecl-sig").hidden=!(window.__cboSigHay&&window.__cboSigHay(i));
     t.classList.add("on");document.body.classList.add("tecl-abierto");
     requestAnimationFrame(()=>{document.documentElement.style.setProperty("--tecl-h",t.offsetHeight+"px");try{i.scrollIntoView({block:"center",behavior:"smooth"})}catch{}})};
   const cerrar=()=>{el=null;t.classList.remove("on");document.body.classList.remove("tecl-abierto")};
-  document.addEventListener("focusin",e=>{const i=e.target;if(i.matches&&i.matches(SEL2)&&i.dataset.teclOk&&!i.readOnly&&!i.disabled&&activo())abrir(i);else if(el&&!t.contains(i))cerrar()});
-  document.addEventListener("focusout",()=>setTimeout(()=>{const a=document.activeElement;if(el&&(!a||a===document.body||!(a.matches&&a.matches(SEL2))))cerrar()},0));
+  document.addEventListener("focusin",e=>{const i=e.target;if(i.matches&&i.matches(SEL2)&&i.dataset.teclOk&&!i.readOnly&&!i.disabled&&activo())abrir(i);else if(el&&!t.contains(i))setTimeout(()=>{const a=document.activeElement;if(el&&!(a&&a.dataset&&(a.dataset.teclOk||a.dataset.letOk)))cerrar()},320)});
+  document.addEventListener("focusout",()=>setTimeout(()=>{const a=document.activeElement;if(el&&(!a||a===document.body||!(a.matches&&a.matches(SEL2))))cerrar()},320));
   // Tocar el teclado no quita el foco del campo
   t.addEventListener("pointerdown",e=>{e.preventDefault();const b=e.target.closest(".tecl-g button");if(!b)return;
     const r=b.getBoundingClientRect(),o=document.createElement("span");o.className="pin-onda";o.style.left=(e.clientX-r.left)+"px";o.style.top=(e.clientY-r.top)+"px";b.append(o);
@@ -3817,7 +3819,7 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
   t.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
     if(b.dataset.tk)return escribir(b.dataset.tk);
     if(b.classList.contains("tecl-ok")){const i=el;if(i){i.dispatchEvent(new Event("change",{bubbles:true}));i.blur()}cerrar();return}
-    if(b.classList.contains("tecl-sig")){const lst=visibles(),k=lst.indexOf(el);if(el)el.dispatchEvent(new Event("change",{bubbles:true}));if(k>=0&&lst[k+1])lst[k+1].focus()}});
+    if(b.classList.contains("tecl-sig")){const i=el;if(i)i.dispatchEvent(new Event("change",{bubbles:true}));if(window.__cboSiguiente)window.__cboSiguiente(i)}});
   // Si se pasa a computadora (o al revés) se devuelve el teclado normal
   matchMedia("(max-width:600px)").addEventListener("change",()=>{if(!activo()){cerrar();document.querySelectorAll("[data-tecl-ok]").forEach(i=>{i.setAttribute("inputmode",i.dataset.teclIm);if(i.dataset.teclType){try{i.type=i.dataset.teclType}catch{}delete i.dataset.teclType}delete i.dataset.teclOk})}else marcar(document)});
 })();
@@ -3854,8 +3856,8 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
     display:grid;place-items:center;transition:transform .1s cubic-bezier(.23,1,.32,1),background .12s;overflow:visible;padding:0}
   .tecl-l .tk.pr{transform:scale(.92);background:color-mix(in srgb,var(--brand-2) 42%,transparent)}
   .tecl-l .tk.esp{max-width:none;flex:1.6 1 0;font-size:.95rem;font-weight:700}
-  .tecl-l .tk.sp{max-width:none;flex:5 1 0;font-size:.85rem;opacity:.9}
-  .tecl-l .tk.ok{max-width:none;flex:1.8 1 0;background:var(--brand-ink);color:var(--brand-deep,#111);font-size:.95rem;font-weight:700}
+  .tecl-l .tk.sp{max-width:none;flex:4 1 0;font-size:.85rem;opacity:.9}
+  .tecl-l .tk.ok{max-width:none;flex:2.5 1 0;font-size:.74rem!important;letter-spacing:-.01em;white-space:nowrap;background:var(--brand-ink);color:var(--brand-deep,#111);font-size:.95rem;font-weight:700}
   .tecl-l .tk.on{background:var(--brand-ink);color:var(--brand-deep,#111)}
   .tecl-l .tk sup{position:absolute;top:3px;right:4px;font:600 .6rem/1 var(--display);opacity:.62}
   .tecl-l .tk.h::after{display:none}
@@ -3887,8 +3889,8 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
   const abrir=i=>{el=i;capa="abc";autoMay();pintar();sugs();t.querySelector(".tecl-bar b").textContent=etiqueta(i);t.classList.add("on");document.body.classList.add("tecl-abierto");
     requestAnimationFrame(()=>{document.documentElement.style.setProperty("--tecl-h",t.offsetHeight+"px");try{i.scrollIntoView({block:"center",behavior:"smooth"})}catch{}})};
   const cerrar=()=>{el=null;t.classList.remove("on");if(!document.querySelector(".tecl.on"))document.body.classList.remove("tecl-abierto")};
-  document.addEventListener("focusin",e=>{const i=e.target;if(i.matches&&i.dataset&&i.dataset.letOk&&!i.readOnly&&!i.disabled&&activo())abrir(i);else if(el&&!t.contains(i))cerrar()});
-  document.addEventListener("focusout",()=>setTimeout(()=>{const a=document.activeElement;if(el&&(!a||!a.dataset||!a.dataset.letOk))cerrar()},0));
+  document.addEventListener("focusin",e=>{const i=e.target;if(i.matches&&i.dataset&&i.dataset.letOk&&!i.readOnly&&!i.disabled&&activo())abrir(i);else if(el&&!t.contains(i))setTimeout(()=>{const a=document.activeElement;if(el&&!(a&&a.dataset&&(a.dataset.teclOk||a.dataset.letOk)))cerrar()},320)});
+  document.addEventListener("focusout",()=>setTimeout(()=>{const a=document.activeElement;if(el&&(!a||!a.dataset||!a.dataset.letOk))cerrar()},320));
   const poner=txt=>{const i=el;if(!i)return;let s=null,f=null;try{s=i.selectionStart;f=i.selectionEnd}catch{}const v=i.value;if(s==null){s=f=v.length}
     if(txt==="⌫"){if(s===f){if(s===0)return;s-=(/[\uD800-\uDFFF]/.test(v[s-1])?2:1)}try{i.setRangeText("",s,f,"end")}catch{i.value=v.slice(0,s)+v.slice(f)}}
     else{if(i.maxLength>0&&v.length-(f-s)+txt.length>i.maxLength)return;try{i.setRangeText(txt,s,f,"end")}catch{i.value=v.slice(0,s)+txt+v.slice(f)}}
@@ -3924,6 +3926,16 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
   t.addEventListener("pointerup",soltar);t.addEventListener("pointercancel",quitar);
   matchMedia("(max-width:600px)").addEventListener("change",()=>{if(!activo()){cerrar();document.querySelectorAll("[data-let-ok]").forEach(i=>{if(i.dataset.letIm)i.setAttribute("inputmode",i.dataset.letIm);else i.removeAttribute("inputmode");if(i.dataset.letList){i.setAttribute("list",i.dataset.letList);delete i.dataset.letList}delete i.dataset.letOk})}else marcar(document)});
   window.__tecLetra=tecla;
+})();
+// --- "Siguiente" del teclado propio: siguiente campo del mismo formulario; si es el último, pulsa su Siguiente / Guardar ---
+(function(){
+  const vis=x=>x&&x.getClientRects().length&&!x.disabled&&!x.hidden;
+  const caja=i=>i.closest(".cbo-dlg,.overlay,form,.sheet")||document.body;
+  const campos=i=>[...caja(i).querySelectorAll("input,textarea")].filter(x=>(x.dataset.teclOk||x.dataset.letOk)&&vis(x)&&!x.readOnly);
+  const boton=i=>{const bs=[...caja(i).querySelectorAll("button")].filter(b=>vis(b)&&!b.closest(".tecl")&&!b.classList.contains("x")&&!b.hasAttribute("data-cerrar")&&!b.hasAttribute("data-no"));
+    return bs.find(b=>b.id==="btnSig")||bs.find(b=>b.hasAttribute("data-si"))||bs.find(b=>/^(Siguiente|Guardar|Registrar|Crear|Aceptar|Confirmar)/i.test(b.textContent.trim()))||bs.find(b=>b.getAttribute("type")==="submit")};
+  window.__cboSigHay=i=>{if(!i)return false;const L=campos(i),k=L.indexOf(i);return (k>=0&&!!L[k+1])||!!boton(i)};
+  window.__cboSiguiente=i=>{if(!i)return false;const L=campos(i),k=L.indexOf(i);if(k>=0&&L[k+1]){L[k+1].focus();return true}const b=boton(i);if(b){b.click();return true}return false};
 })();
 // --- Teclado propio siempre: el campo queda sin teclado del celular antes de enfocarse (al tocarlo o si la app lo enfoca sola) ---
 (function(){
