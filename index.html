@@ -5261,12 +5261,23 @@ function alAtras(){
   document.addEventListener("pointerdown",arma,{capture:true,passive:true});
   addEventListener("popstate",()=>{if(alAtras())arma();else{try{history.back()}catch{}}});
 })();
+// Android usa el primer gesto de atrás para bajar el teclado y no avisa a la app: si el campo pierde el foco sin que se haya
+// tocado la pantalla, se toma como "atrás" y se cierra también la ventana donde se estaba escribiendo
+(function(){
+  let toque=0;["pointerdown","touchstart","keydown"].forEach(ev=>document.addEventListener(ev,()=>{toque=Date.now()},{capture:true,passive:true}));
+  document.addEventListener("focusout",e=>{const i=e.target;if(!(i.dataset&&(i.dataset.teclOk||i.dataset.letOk)))return;if(!document.querySelector(".tecl.on"))return;if(Date.now()-toque<600)return;
+    setTimeout(()=>{const a=document.activeElement;if(a&&a!==document.body&&a!==i)return;if(Date.now()-toque<600)return;
+      document.querySelectorAll(".tecl.on").forEach(x=>x.classList.remove("on"));document.body.classList.remove("tecl-abierto");
+      const dl=i.closest&&i.closest(".cbo-dlg");if(dl){const b=dl.querySelector("[data-no]");if(b)b.click();else dl.remove();return}
+      const ov=i.closest&&i.closest(".overlay");if(ov&&!ov.hidden){if(ov.id==="ov"&&typeof closeF==="function")closeF();else if(ov.id&&typeof cerrarOv==="function")cerrarOv(ov.id);else ov.hidden=true}},60)},true);
+})();
 // Atrás también cierra lo nuevo: ventanas propias, teclados, firma, elección huella/firma. En Inicio: "Desliza otra vez para salir".
 (function(){
   const base=alAtras;let aviso=0;
   alAtras=function(){
     // Un solo gesto: se cierra el teclado y también la ventana donde se estaba escribiendo
-    const tk=document.querySelector(".tecl.on");if(tk){const a=document.activeElement;if(a&&a.blur)a.blur();document.querySelectorAll(".tecl.on").forEach(x=>x.classList.remove("on"));document.body.classList.remove("tecl-abierto");
+    const tk=document.querySelector(".tecl.on"),aE=document.activeElement;if(tk&&!(aE&&aE.dataset&&(aE.dataset.teclOk||aE.dataset.letOk)&&aE.getClientRects().length)){document.querySelectorAll(".tecl.on").forEach(x=>x.classList.remove("on"));document.body.classList.remove("tecl-abierto")}
+    if(document.querySelector(".tecl.on")){const a=document.activeElement;if(a&&a.blur)a.blur();document.querySelectorAll(".tecl.on").forEach(x=>x.classList.remove("on"));document.body.classList.remove("tecl-abierto");
       const dl=a&&a.closest&&a.closest(".cbo-dlg");if(dl){const b=dl.querySelector("[data-no]");if(b)b.click();else dl.remove();return true}
       const ov=a&&a.closest&&a.closest(".overlay");if(ov){if(ov.id==="ov"&&typeof closeF==="function")closeF();else if(ov.id&&typeof cerrarOv==="function")cerrarOv(ov.id);else ov.hidden=true}
       return true}
