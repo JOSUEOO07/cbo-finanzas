@@ -106,3 +106,4 @@ Actualizado: 11/11/2026 · caché: cbo-finanzas-v93-pago-dias
 - v102 (12/11/2026): pago por horas = horas × precio por hora redondeado (29 h × 15.56 = 451.24); comprobante: monto fijo solo importe, por horas muestra horas y precio por hora; pagos viejos se corrigen al editarlos.
 - v103 (12/11/2026): pantalla de PIN y huella con movimiento; toma los colores de la paleta (normal, especial) y de la fiesta.
 - v104 (12/11/2026): teclados propios de números y letras (fila de números, símbolos en cada tecla, opciones al mantener: ½ ¼ ⅛ 1/2 100…); PIN 0 bajo el 8; huella abajo al centro con fondo de la paleta.
+- v105 (12/11/2026): pantalla de huella con escudo, logo y flecha al sensor; campos con datalist ya no abren el teclado del celular (sugerencias en el teclado propio).

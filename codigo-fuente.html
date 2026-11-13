@@ -3705,12 +3705,36 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
   .bloqueo.solo-huella .pin-cab{margin-top:8vh}
   .bloqueo.solo-huella .pin-huella{margin-top:auto;margin-bottom:calc(6vh + 8px)}
   .hu-fondo{place-items:stretch}
-  .hu-fondo-c{max-width:none;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:12px;padding-bottom:calc(9vh + env(safe-area-inset-bottom,0px))}
-  .hu-fondo-c .hu-circ{order:3;margin-top:26px}
+  .hu-fondo-c{max-width:none;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:10px;padding:calc(9vh + env(safe-area-inset-top,0px)) 20px 0;text-align:center}
+  .hu-fondo-c .pin-logo{height:34px;width:auto;margin-bottom:6vh;filter:var(--logo-f,none);opacity:.95;animation:pinEntra .5s .05s cubic-bezier(.23,1,.32,1) both}
+  .hu-escudo{position:relative;width:156px;height:178px;display:grid;place-items:center;margin-bottom:18px;animation:pinEntra .55s .1s cubic-bezier(.23,1,.32,1) both}
+  .hu-escudo::before{content:"";position:absolute;inset:-34px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--brand-2) 45%,transparent) 0%,transparent 65%);animation:huAura 2.6s ease-in-out infinite;pointer-events:none}
+  .hu-escudo>svg.esc{position:absolute;inset:0;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 14px 30px rgba(0,0,0,.35))}
+  .hu-escudo>svg.esc .rel{fill:color-mix(in srgb,var(--brand-ink) 11%,transparent)}
+  .hu-escudo>svg.esc .bor{fill:none;stroke-width:3;stroke-linejoin:round;stroke-dasharray:520;stroke-dashoffset:520;animation:huTraza 1.4s .2s cubic-bezier(.23,1,.32,1) forwards}
+  .hu-escudo>svg.esc .bri{fill:none;stroke:var(--brand-ink);stroke-width:3;stroke-linecap:round;stroke-dasharray:46 474;animation:huGira 3.2s linear infinite;opacity:.9}
+  .hu-escudo .hu-dedo{position:relative;z-index:1;display:grid;place-items:center;color:var(--brand-ink);margin-top:-8px}
+  .hu-escudo .hu-dedo svg{width:74px;height:74px}
+  .hu-escudo .hu-scan{left:27%;right:27%;top:30%;animation:huScan2 1.8s ease-in-out infinite alternate}
+  .hu-fondo-c b{font:700 1.45rem/1.25 var(--display);margin:0;animation:pinEntra .5s .18s cubic-bezier(.23,1,.32,1) both}
+  .hu-fondo-c small{font-size:.98rem;opacity:.82;max-width:300px;animation:pinEntra .5s .24s cubic-bezier(.23,1,.32,1) both}
+  .hu-baja{display:grid;justify-items:center;gap:2px;margin-top:3vh;font:600 .85rem var(--display);opacity:.85;animation:pinEntra .5s .3s cubic-bezier(.23,1,.32,1) both}
+  .hu-baja svg{width:26px;height:26px;animation:huBaja 1.3s ease-in-out infinite}
+  .hu-baja svg:nth-child(2){margin-top:-16px;opacity:.5;animation-delay:.15s}
+  @keyframes huAura{50%{transform:scale(1.12);opacity:.65}}
+  @keyframes huTraza{to{stroke-dashoffset:0}}
+  @keyframes huGira{to{stroke-dashoffset:-520}}
+  @keyframes huScan2{from{top:30%}to{top:66%}}
+  @keyframes huBaja{50%{transform:translateY(7px)}}
+  @media (prefers-reduced-motion:reduce){.hu-escudo::before,.hu-escudo>svg.esc .bri,.hu-escudo .hu-scan,.hu-baja svg{animation:none}.hu-escudo>svg.esc .bor{stroke-dashoffset:0;animation:none}}
   </style>`);
   let el=null,n=0;
   const mostrar=(t,s)=>{n++;if(!el){el=document.createElement("div");el.className="hu-fondo";el.setAttribute("role","status");document.body.append(el)}
-    el.innerHTML=`<div class="pin-fondo" aria-hidden="true"><i></i><i></i><i></i></div><div class="hu-fondo-c"><span class="hu-circ">${IC_HUELLA}<i class="hu-scan"></i></span><b>${esc(t)}</b><small>${esc(s)}</small></div>`;
+    const lg=$("marcaLogo"),esc_='M78 6 L142 30 V84 C142 124 114 156 78 172 C42 156 14 124 14 84 V30 Z',bajo='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+    el.innerHTML=`<div class="pin-fondo" aria-hidden="true"><i></i><i></i><i></i></div><div class="hu-fondo-c">${lg&&lg.src?`<img class="pin-logo" alt="" src="${lg.src}">`:""}
+      <span class="hu-escudo" aria-hidden="true"><svg class="esc" viewBox="0 0 156 178"><defs><linearGradient id="huEscG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:var(--brand-ink)"/><stop offset=".55" style="stop-color:var(--brand-2)"/><stop offset="1" style="stop-color:var(--z1,var(--brand-ink))"/></linearGradient></defs>
+        <path class="rel" d="${esc_}"/><path class="bor" d="${esc_}" stroke="url(#huEscG)"/><path class="bri" d="${esc_}"/></svg><span class="hu-dedo">${IC_HUELLA}</span><i class="hu-scan"></i></span>
+      <b>${esc(t)}</b><small>${esc(s)}</small><span class="hu-baja">${bajo}${bajo}El sensor está abajo</span></div>`;
     const f=el.querySelector(".pin-fondo");
     try{const fi=document.body.classList.contains("fiesta")&&typeof adorHoy==="function"&&typeof ZON!=="undefined"&&typeof zSvg==="function"?ZON[(adorHoy()||[])[0]]:null;
       for(let i=0;i<10;i++){const e=document.createElement("span");
@@ -3804,6 +3828,11 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
     sim:[["[","]","{","}","#","%","^","*","+","="],["_","\\","|","~","<",">","€","£","°","•"],["123",".",",","?","!","'","\"","⌫"],["ABC",",","␣",".","⏎"]]};
   document.head.insertAdjacentHTML("beforeend",`<style id="letCss">
   .tecl-l .tecl-bar .tecl-ok{display:none}
+  .tecl-l .tecl-bar{flex-wrap:wrap}
+  .tecl-sug{display:flex;gap:6px;overflow-x:auto;width:100%;scrollbar-width:none;padding-top:2px}.tecl-sug::-webkit-scrollbar{display:none}
+  .tecl-sug:empty{display:none}
+  .tecl-chip{flex:none;border:0;border-radius:999px;padding:8px 14px;font:600 .88rem var(--display);color:var(--brand-ink);background:color-mix(in srgb,var(--brand-ink) 17%,transparent);white-space:nowrap;max-width:80vw;overflow:hidden;text-overflow:ellipsis}
+  .tecl-chip:active{background:var(--brand-2);color:var(--brand-deep,#111)}
   .tecl-l .tecl-bar{padding-bottom:8px}
   .tecl-l .tecl-f{display:flex;gap:5px;justify-content:center;margin-bottom:7px}
   .tecl-l .tecl-f:last-child{margin-bottom:0}
@@ -3829,18 +3858,21 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
     color:var(--brand-deep,#111);background:var(--brand-ink);box-shadow:0 10px 26px rgba(0,0,0,.4)}
   </style>`);
   const t=document.createElement("div");t.className="tecl tecl-l";t.setAttribute("aria-hidden","true");
-  t.innerHTML=`<div class="pin-fondo"><i></i><i></i><i></i></div><div class="tecl-bar"><b></b><button type="button" class="tecl-ok">Listo</button></div><div class="tecl-filas"></div>`;
+  t.innerHTML=`<div class="pin-fondo"><i></i><i></i><i></i></div><div class="tecl-bar"><b></b><button type="button" class="tecl-ok">Listo</button><div class="tecl-sug"></div></div><div class="tecl-filas"></div>`;
   document.body.append(t);
   let el=null,capa="abc",may=0,ultMay=0; // may: 0 minúsculas, 1 una mayúscula, 2 bloqueo
   const pintar=()=>{t.querySelector(".tecl-filas").innerHTML=CAPA[capa].map(f=>`<div class="tecl-f">${f.map(k=>{
       const lbl=k==="␣"?"espacio":k==="⏎"?(el&&el.tagName==="TEXTAREA"?"↵":"Listo"):(capa==="abc"&&may&&k.length===1?k.toUpperCase():k);
       const cls=k==="␣"?"sp":k==="⏎"?"ok":["⇧","⌫","123","ABC","#+="].includes(k)?"esp":"";
       return `<button type="button" class="tk ${cls}${capa==="abc"&&HINT[k]?" h":""}${k==="⇧"&&may?" on":""}" data-k="${esc(k)}"${alts(k).length?' data-alt="1"':""}>${esc(lbl)}${capa==="abc"&&HINT[k]?`<sup>${esc(HINT[k])}</sup>`:""}</button>`}).join("")}</div>`).join("")};
-  const marcar=r=>{if(!activo())return;(r.querySelectorAll?r:document).querySelectorAll(SEL).forEach(i=>{if(i.dataset.letOk||ES_NUM(i)||i.readOnly)return;i.dataset.letOk="1";i.dataset.letIm=i.getAttribute("inputmode")||"";i.setAttribute("inputmode","none")})};
+  const marcar=r=>{if(!activo())return;(r.querySelectorAll?r:document).querySelectorAll(SEL).forEach(i=>{if(i.dataset.letOk||ES_NUM(i)||i.readOnly)return;i.dataset.letOk="1";i.dataset.letIm=i.getAttribute("inputmode")||"";i.setAttribute("inputmode","none");if(i.hasAttribute("list")){i.dataset.letList=i.getAttribute("list");i.removeAttribute("list")}})};
   marcar(document);new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1)marcar(n.matches&&n.matches(SEL)?(n.parentNode||document):n)}))).observe(document.body,{childList:true,subtree:true});
   const etiqueta=i=>{const l=i.closest("label")||(i.id&&document.querySelector(`label[for="${i.id}"]`));let s=l?[...l.childNodes].filter(n=>n!==i&&!(n.querySelector&&n.querySelector("input,textarea"))).map(n=>n.textContent).join(" "):"";return (s||i.placeholder||i.getAttribute("aria-label")||"").replace(/\s+/g," ").trim().slice(0,60)};
   const autoMay=()=>{if(!el||may===2)return;const v=el.value.slice(0,el.selectionStart==null?el.value.length:el.selectionStart);may=(el.type!=="email")&&(!v.trim()||/[.!?¿¡]\s$/.test(v))?1:0};
-  const abrir=i=>{el=i;capa="abc";autoMay();pintar();t.querySelector(".tecl-bar b").textContent=etiqueta(i);t.classList.add("on");document.body.classList.add("tecl-abierto");
+  const sugs=()=>{const c=t.querySelector(".tecl-sug");const dl=el&&el.dataset.letList&&document.getElementById(el.dataset.letList);if(!dl){c.innerHTML="";return}
+    const q=el.value.trim().toLowerCase(),vs=[...new Set([...dl.options].map(o=>o.value).filter(Boolean))].filter(v=>!q||(v.toLowerCase().includes(q)&&v.toLowerCase()!==q)).slice(0,10);
+    c.innerHTML=vs.map(v=>`<button type="button" class="tecl-chip">${esc(v)}</button>`).join("")};
+  const abrir=i=>{el=i;capa="abc";autoMay();pintar();sugs();t.querySelector(".tecl-bar b").textContent=etiqueta(i);t.classList.add("on");document.body.classList.add("tecl-abierto");
     requestAnimationFrame(()=>{document.documentElement.style.setProperty("--tecl-h",t.offsetHeight+"px");try{i.scrollIntoView({block:"center",behavior:"smooth"})}catch{}})};
   const cerrar=()=>{el=null;t.classList.remove("on");if(!document.querySelector(".tecl.on"))document.body.classList.remove("tecl-abierto")};
   document.addEventListener("focusin",e=>{const i=e.target;if(i.matches&&i.dataset&&i.dataset.letOk&&!i.readOnly&&!i.disabled&&activo())abrir(i);else if(el&&!t.contains(i))cerrar()});
@@ -3848,7 +3880,7 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
   const poner=txt=>{const i=el;if(!i)return;let s=null,f=null;try{s=i.selectionStart;f=i.selectionEnd}catch{}const v=i.value;if(s==null){s=f=v.length}
     if(txt==="⌫"){if(s===f){if(s===0)return;s-=(/[\uD800-\uDFFF]/.test(v[s-1])?2:1)}try{i.setRangeText("",s,f,"end")}catch{i.value=v.slice(0,s)+v.slice(f)}}
     else{if(i.maxLength>0&&v.length-(f-s)+txt.length>i.maxLength)return;try{i.setRangeText(txt,s,f,"end")}catch{i.value=v.slice(0,s)+txt+v.slice(f)}}
-    i.dispatchEvent(new Event("input",{bubbles:true}));try{navigator.vibrate&&navigator.vibrate(5)}catch{}};
+    i.dispatchEvent(new Event("input",{bubbles:true}));sugs();try{navigator.vibrate&&navigator.vibrate(5)}catch{}};
   const enter=()=>{const i=el;if(!i)return;if(i.tagName==="TEXTAREA"){poner("\n");return}
     const ev=new KeyboardEvent("keydown",{key:"Enter",code:"Enter",keyCode:13,bubbles:true,cancelable:true});const sigue=i.dispatchEvent(ev);
     i.dispatchEvent(new Event("change",{bubbles:true}));if(sigue&&document.activeElement===i)i.blur();cerrar()};
@@ -3870,6 +3902,7 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
         const opsM=capa==="abc"&&may?ops.map(x=>x.toUpperCase()):ops;
         pop=document.createElement("div");pop.className="tecl-pop";pop.innerHTML=opsM.map((x,j)=>`<b class="${j===0?"sel":""}">${esc(x)}</b>`).join("");document.body.append(pop);
         const w=pop.offsetWidth;pop.style.left=Math.max(6,Math.min(innerWidth-w-6,r.left+r.width/2-w/2))+"px";pop.style.top=(r.top-pop.offsetHeight-8)+"px";try{navigator.vibrate&&navigator.vibrate(12)}catch{}},420)}}
+    else if(e.target.closest(".tecl-chip")&&el){el.value=e.target.closest(".tecl-chip").textContent;el.dispatchEvent(new Event("input",{bubbles:true}));el.dispatchEvent(new Event("change",{bubbles:true}));sugs()}
     else if(e.target.closest(".tecl-ok")){const i=el;if(i){i.dispatchEvent(new Event("change",{bubbles:true}));i.blur()}cerrar()}});
   t.addEventListener("pointermove",e=>{if(!pop)return;const bs=[...pop.children];let m=bs[0],d=1e9;bs.forEach(x=>{const r=x.getBoundingClientRect(),c=Math.hypot(e.clientX-(r.left+r.width/2),(e.clientY-(r.top+r.height/2))*1.4);if(c<d){d=c;m=x}});bs.forEach(x=>x.classList.toggle("sel",x===m))});
   const soltar=e=>{if(!pr)return;const b=pr,k=b.dataset.k;
@@ -3877,7 +3910,7 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
     else if(!rep||k!=="⌫"){if(!(k==="⌫"&&rep))tecla(k)}
     quitar()};
   t.addEventListener("pointerup",soltar);t.addEventListener("pointercancel",quitar);
-  matchMedia("(max-width:600px)").addEventListener("change",()=>{if(!activo()){cerrar();document.querySelectorAll("[data-let-ok]").forEach(i=>{if(i.dataset.letIm)i.setAttribute("inputmode",i.dataset.letIm);else i.removeAttribute("inputmode");delete i.dataset.letOk})}else marcar(document)});
+  matchMedia("(max-width:600px)").addEventListener("change",()=>{if(!activo()){cerrar();document.querySelectorAll("[data-let-ok]").forEach(i=>{if(i.dataset.letIm)i.setAttribute("inputmode",i.dataset.letIm);else i.removeAttribute("inputmode");if(i.dataset.letList){i.setAttribute("list",i.dataset.letList);delete i.dataset.letList}delete i.dataset.letOk})}else marcar(document)});
   window.__tecLetra=tecla;
 })();
 
