@@ -3563,6 +3563,136 @@ let pinHuellaFn=null;
 })();
 const abrirPinBase=abrirPin;
 abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true;$("bloqueo").classList.remove("solo-huella");return abrirPinBase(modo,titulo,check)};
+// --- Pantalla del PIN y de la huella con movimiento (12/11/2026, igual en todas las apps CBO) ---
+// Fondo vivo con los colores de la paleta y de la temporada, aro que gira en la inicial, teclas que entran en cascada
+// y se iluminan al tocarlas, puntos que saltan y huella con línea que escanea. Nada de esto retrasa el PIN.
+(function(){
+  document.head.insertAdjacentHTML("beforeend",`<style id="pinBonito">
+  .bloqueo{gap:0;overflow:hidden;isolation:isolate;background:var(--brand-deep,var(--brand));padding:calc(26px + env(safe-area-inset-top,0px)) 24px calc(20px + env(safe-area-inset-bottom,0px))}
+  .pin-fondo{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none;background:linear-gradient(165deg,var(--brand) 0%,var(--brand-deep,var(--brand)) 100%)}
+  .pin-fondo i{position:absolute;border-radius:50%;filter:blur(56px);will-change:transform}
+  .pin-fondo i:nth-child(1){width:78vmax;height:78vmax;top:-38vmax;left:-30vmax;background:var(--z1,var(--brand-2));opacity:.5;animation:pinAur1 17s ease-in-out infinite alternate}
+  .pin-fondo i:nth-child(2){width:70vmax;height:70vmax;bottom:-40vmax;right:-32vmax;background:var(--z2,var(--brand-2));opacity:.42;animation:pinAur2 21s ease-in-out infinite alternate}
+  .pin-fondo i:nth-child(3){width:42vmax;height:42vmax;top:38%;left:30%;background:var(--brand-2);opacity:.22;animation:pinAur3 13s ease-in-out infinite alternate}
+  @keyframes pinAur1{to{transform:translate(22vmax,26vmax) scale(1.18)}}
+  @keyframes pinAur2{to{transform:translate(-24vmax,-20vmax) scale(1.12)}}
+  @keyframes pinAur3{to{transform:translate(-18vmax,-16vmax) scale(.82)}}
+  .pin-sim{position:absolute;bottom:-50px;color:var(--brand-ink);opacity:0;animation:pinSube linear infinite}
+  .pin-sim svg{display:block}
+  @keyframes pinSube{0%{transform:translateY(0) rotate(0);opacity:0}12%,85%{opacity:.5}100%{transform:translateY(-118vh) rotate(50deg);opacity:0}}
+  .bloqueo .pin-cab{display:grid;justify-items:center;gap:5px;text-align:center;margin-bottom:20px;max-width:320px}
+  .bloqueo .pin-logo{height:30px;width:auto;opacity:.92;margin-bottom:14px;filter:var(--logo-f,none)}
+  .bloqueo .pin-av{position:relative;width:70px;height:70px;border-radius:50%;display:grid;place-items:center;margin-bottom:10px;background:rgba(255,255,255,.12);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);box-shadow:0 12px 30px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.2);font:700 1.75rem/1 var(--display)}
+  .bloqueo .pin-av::before{content:"";position:absolute;inset:-6px;border-radius:50%;padding:3px;background:conic-gradient(var(--brand-2),var(--z1,var(--brand-ink)),transparent 55%,var(--z2,var(--brand-2)),var(--brand-2));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:pinGiro 3.6s linear infinite}
+  .bloqueo .pin-av svg{width:30px;height:30px}
+  @keyframes pinGiro{to{transform:rotate(1turn)}}
+  .bloqueo .pin-nom{font:700 1.4rem/1.2 var(--display);margin:0;letter-spacing:-.01em}
+  .bloqueo .pin-sub{font-size:.95rem;opacity:.8;margin:0;line-height:1.35}
+  .bloqueo #pinTit{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .bloqueo .puntos{gap:20px;height:18px;margin-bottom:30px}
+  .bloqueo .puntos i{width:15px;height:15px;border:2px solid rgba(255,255,255,.5);transition:background .18s,border-color .18s,box-shadow .18s}
+  .bloqueo .puntos i.on{background:linear-gradient(135deg,var(--brand-ink),var(--brand-2));border-color:transparent;box-shadow:0 0 14px var(--brand-2);transform:scale(1.12)}
+  .bloqueo .puntos i.nuevo{animation:pinSalta .34s cubic-bezier(.34,1.56,.64,1)}
+  @keyframes pinSalta{from{transform:scale(.3)}to{transform:scale(1.12)}}
+  .bloqueo .puntos.lleno i{animation:pinOla .5s ease-out both}
+  .bloqueo .puntos.lleno i:nth-child(2){animation-delay:.05s}.bloqueo .puntos.lleno i:nth-child(3){animation-delay:.1s}.bloqueo .puntos.lleno i:nth-child(4){animation-delay:.15s}
+  @keyframes pinOla{50%{transform:translateY(-6px) scale(1.25)}100%{transform:scale(1.12)}}
+  .teclado{grid-template-columns:repeat(3,76px);gap:16px 24px}
+  .teclado button{position:relative;overflow:hidden;height:76px;background:linear-gradient(160deg,rgba(255,255,255,.16),rgba(255,255,255,.05));border:1px solid rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 6px 18px rgba(0,0,0,.12);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-size:1.75rem;font-weight:500;transition:transform .14s cubic-bezier(.23,1,.32,1),background .2s,border-color .2s}
+  .teclado button:active{transform:scale(.92);border-color:var(--brand-2)}
+  .teclado button.sin,.teclado .pin-k-hu{background:transparent;border-color:transparent;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+  .teclado button.sin{font-size:1.5rem}
+  .teclado .pin-onda{position:absolute;width:76px;height:76px;margin:-38px 0 0 -38px;border-radius:50%;background:radial-gradient(circle,var(--brand-2) 0%,transparent 70%);pointer-events:none}
+  .teclado .pin-k-hu{display:grid;place-items:center;color:var(--brand-ink)}
+  .teclado .pin-k-hu svg{width:40px;height:40px;animation:pinRespira 2.4s ease-in-out infinite}
+  .teclado .pin-k-hu[hidden]{display:block;visibility:hidden}
+  @keyframes pinRespira{50%{opacity:.6;transform:scale(.94)}}
+  .bloqueo.entra .pin-cab,.bloqueo.entra .puntos,.bloqueo.entra .teclado>*,.bloqueo.entra .pin-pie,.bloqueo.entra .pin-huella{animation:pinEntra .44s cubic-bezier(.23,1,.32,1) both;animation-delay:var(--d,0ms)}
+  @keyframes pinEntra{from{opacity:0;transform:translateY(16px) scale(.94)}}
+  .bloqueo .msg{min-height:1.4em;margin:18px 0 4px;font-weight:600}
+  .bloqueo .pin-pie{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+  .bloqueo .olvido{text-decoration:none;font-weight:600;font-size:.92rem;opacity:.85;padding:8px 4px}
+  .bloqueo:not(.solo-huella) .pin-huella{display:none}
+  .bloqueo.solo-huella .pin-cab{margin-bottom:34px}
+  .bloqueo .pin-huella{flex-direction:column;gap:16px;border:0;padding:0;background:none;font-size:1rem;font-weight:600}
+  .hu-circ{position:relative;display:grid;place-items:center;width:128px;height:128px;border-radius:50%;background:linear-gradient(160deg,rgba(255,255,255,.18),rgba(255,255,255,.05));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 14px 36px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.2);overflow:visible;transition:transform .14s}
+  .hu-circ svg{width:64px!important;height:64px!important;position:relative;z-index:1}
+  .hu-circ::before{content:"";position:absolute;inset:-7px;border-radius:50%;padding:3px;background:conic-gradient(var(--brand-2),var(--z1,var(--brand-ink)),transparent 50%,var(--brand-2));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:pinGiro 2.8s linear infinite}
+  .hu-circ::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--brand-2);animation:pinOnda 2s cubic-bezier(.23,1,.32,1) infinite}
+  .hu-scan{position:absolute;left:24%;right:24%;top:26%;height:3px;border-radius:3px;z-index:2;background:linear-gradient(90deg,transparent,var(--brand-2),var(--brand-ink),var(--brand-2),transparent);box-shadow:0 0 12px var(--brand-2);animation:pinScan 1.9s ease-in-out infinite alternate}
+  @keyframes pinScan{to{top:72%}}
+  @keyframes pinOnda{from{transform:scale(1);opacity:.85}to{transform:scale(1.5);opacity:0}}
+  .pin-huella:active .hu-circ{transform:scale(.95)}
+  .hu-card{border-radius:24px;padding:28px 22px 20px;gap:12px;border:1px solid var(--line,rgba(0,0,0,.08));animation:pinEntra .36s cubic-bezier(.23,1,.32,1)}
+  .hu-card>b{font:700 1.15rem/1.25 var(--display,inherit)}
+  .hu-card>.hu-ic{position:relative;display:grid;place-items:center;width:108px;height:108px;border-radius:50%;background:color-mix(in srgb,var(--brand-2,#7c3aed) 14%,transparent);margin-bottom:6px;overflow:hidden}
+  .hu-card>.hu-ic::before{content:"";position:absolute;left:22%;right:22%;top:24%;height:3px;border-radius:3px;z-index:2;background:linear-gradient(90deg,transparent,var(--brand-2,#7c3aed),transparent);box-shadow:0 0 10px var(--brand-2,#7c3aed);animation:pinScan 1.9s ease-in-out infinite alternate}
+  .hu-card>.hu-ic svg{width:60px;height:60px}
+  .hu-card>.hu-ic.ok{background:rgba(22,163,74,.16)}.hu-card>.hu-ic.ok::before{display:none}
+  .hu-card>.btn{width:100%;margin-top:6px}
+  @media (prefers-reduced-motion:reduce){.pin-fondo i,.pin-sim,.bloqueo .pin-av::before,.hu-circ::before,.hu-circ::after,.hu-scan,.hu-card>.hu-ic::before,.teclado .pin-k-hu svg{animation:none}.pin-sim{display:none}.bloqueo.entra *{animation-duration:.01s!important}}
+  </style>`);
+  document.head.insertAdjacentHTML("beforeend",`<style id="pinPaleta">
+  .pin-fondo{background:var(--fi-g,linear-gradient(125deg,var(--brand-deep,var(--brand)) 0%,var(--brand) 36%,color-mix(in srgb,var(--brand) 50%,var(--brand-2)) 60%,var(--brand) 80%,var(--brand-deep,var(--brand)) 100%));background-size:320% 320%;animation:pinFluye 16s ease-in-out infinite alternate}
+  .pin-fondo::after{content:"";position:absolute;inset:0;background:radial-gradient(130% 85% at 50% 8%,transparent 42%,rgba(0,0,0,.30) 100%)}
+  @keyframes pinFluye{0%{background-position:0% 30%}50%{background-position:55% 75%}100%{background-position:100% 35%}}
+  .pin-fondo i:nth-child(1){background:var(--brand-2);opacity:.40}
+  .pin-fondo i:nth-child(2){background:var(--z1,color-mix(in srgb,var(--brand-2) 60%,var(--brand)));opacity:.34}
+  .pin-fondo i:nth-child(3){background:var(--brand-ink);opacity:.07}
+  .pin-bokeh{position:absolute;bottom:-40px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--brand-2) 85%,#fff) 0%,transparent 68%);opacity:0;animation:pinSube linear infinite}
+  .bloqueo .pin-av{background:color-mix(in srgb,var(--brand-ink) 14%,transparent);color:var(--brand-ink)}
+  .bloqueo .pin-av::before{background:conic-gradient(var(--brand-2),var(--brand-ink),transparent 52%,var(--z1,var(--brand-2)),var(--brand-2))}
+  .bloqueo .puntos i{border-color:color-mix(in srgb,var(--brand-ink) 55%,transparent)}
+  .bloqueo .puntos i.on{background:linear-gradient(135deg,var(--brand-ink),var(--brand-2));box-shadow:0 0 16px var(--brand-2),0 0 4px var(--brand-2)}
+  .teclado button{color:var(--brand-ink);background:linear-gradient(160deg,color-mix(in srgb,var(--brand-ink) 19%,transparent),color-mix(in srgb,var(--brand-ink) 5%,transparent));border-color:color-mix(in srgb,var(--brand-ink) 22%,transparent);box-shadow:inset 0 1px 0 color-mix(in srgb,var(--brand-ink) 22%,transparent),0 8px 20px rgba(0,0,0,.14)}
+  .teclado button:active{background:color-mix(in srgb,var(--brand-2) 38%,transparent)}
+  .teclado button:not(.sin):not(.pin-k-hu)::after{content:"";position:absolute;inset:0;border-radius:50%;background:linear-gradient(115deg,transparent 30%,color-mix(in srgb,var(--brand-ink) 38%,transparent) 50%,transparent 70%);transform:translateX(-130%);pointer-events:none}
+  .bloqueo.entra .teclado button:not(.sin):not(.pin-k-hu)::after{animation:pinBrillo 1s cubic-bezier(.23,1,.32,1) both;animation-delay:calc(var(--d,0ms) + 320ms)}
+  @keyframes pinBrillo{to{transform:translateX(130%)}}
+  .hu-circ{background:linear-gradient(160deg,color-mix(in srgb,var(--brand-ink) 20%,transparent),color-mix(in srgb,var(--brand-ink) 5%,transparent));color:var(--brand-ink)}
+  .hu-circ::before{background:conic-gradient(var(--brand-2),var(--brand-ink),transparent 50%,var(--z1,var(--brand-2)),var(--brand-2))}
+  @media (prefers-reduced-motion:reduce){.pin-fondo,.pin-bokeh,.bloqueo.entra .teclado button::after{animation:none}.pin-bokeh{display:none}}
+  </style>`);
+  const bl=$("bloqueo"),tit=$("pinTit"),hu=$("pinHuella"),tec=$("teclado"),pts=$("pinPuntos");if(!bl||!tit)return;
+  // Fondo vivo (y figuras de la temporada si hay fiesta)
+  const fondo=document.createElement("div");fondo.className="pin-fondo";fondo.setAttribute("aria-hidden","true");fondo.innerHTML="<i></i><i></i><i></i>";bl.prepend(fondo);
+  const figuras=()=>{fondo.querySelectorAll(".pin-sim,.pin-bokeh").forEach(e=>e.remove());
+    try{if(!document.body.classList.contains("fiesta")||typeof adorHoy!=="function"||typeof ZON==="undefined"||typeof zSvg!=="function"){for(let i=0;i<11;i++){const e=document.createElement("span"),z=8+Math.round(Math.random()*22);e.className="pin-bokeh";e.style.width=e.style.height=z+"px";e.style.left=(3+i*9+Math.random()*5)+"%";e.style.animationDuration=(9+Math.random()*9).toFixed(1)+"s";e.style.animationDelay=(-Math.random()*16).toFixed(1)+"s";fondo.append(e)}return}
+      const f=adorHoy(),c=f&&ZON[f[0]];if(!c||!c.s||!c.s.length)return;
+      for(let i=0;i<9;i++){const e=document.createElement("span");e.className="pin-sim";e.innerHTML=zSvg(c.s[i%c.s.length],16+(i%3)*7);
+        e.style.left=(6+i*10.5+Math.random()*4)+"%";e.style.animationDuration=(11+Math.random()*7).toFixed(1)+"s";e.style.animationDelay=(-Math.random()*14).toFixed(1)+"s";fondo.append(e)}}catch(e){}};
+  // Cabecera: logo de la app, inicial con aro de colores, nombre y lo que hay que hacer
+  const cab=document.createElement("div");cab.className="pin-cab";
+  const lg=$("marcaLogo");cab.innerHTML=(lg&&lg.src?`<img class="pin-logo" alt="" src="${lg.src}">`:"")+'<span class="pin-av" aria-hidden="true"></span><p class="pin-nom"></p><p class="pin-sub"></p>';
+  tit.before(cab);cab.append(tit);
+  const candado='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+  const pintarCab=()=>{const t=tit.textContent.trim(),i=t.indexOf(", ");
+    const nom=i>0?t.slice(0,i):t, sub=i>0?t.slice(i+2):"";
+    cab.querySelector(".pin-nom").textContent=nom;
+    const s=cab.querySelector(".pin-sub");s.textContent=sub?sub.charAt(0).toUpperCase()+sub.slice(1):"";s.hidden=!sub;
+    cab.querySelector(".pin-av").innerHTML=i>0?esc(nom.charAt(0).toUpperCase()):candado};
+  new MutationObserver(pintarCab).observe(tit,{childList:true,characterData:true,subtree:true});pintarCab();
+  // Puntos: solo salta el que se acaba de llenar; al completar, una ola
+  let antes=0;new MutationObserver(()=>{const on=pts.querySelectorAll("i.on");if(on.length>antes&&on.length)on[on.length-1].classList.add("nuevo");
+    pts.classList.toggle("lleno",on.length>0&&on.length===pts.children.length);antes=on.length}).observe(pts,{childList:true});
+  // Teclas: brillo de color donde se toca
+  tec.addEventListener("pointerdown",e=>{const b=e.target.closest("button");if(!b||b.classList.contains("pin-k-hu"))return;
+    const r=b.getBoundingClientRect(),o=document.createElement("span");o.className="pin-onda";o.style.left=(e.clientX-r.left)+"px";o.style.top=(e.clientY-r.top)+"px";b.append(o);
+    const a=o.animate([{transform:"scale(.2)",opacity:.75},{transform:"scale(1.6)",opacity:0}],{duration:420,easing:"cubic-bezier(.23,1,.32,1)"});a.onfinish=()=>o.remove()});
+  [...tec.children].forEach((k,i)=>k.style.setProperty("--d",(90+i*26)+"ms"));
+  // Huella: tecla abajo a la izquierda; si solo entra con huella, círculo grande que escanea
+  const vacio=tec.querySelector("span:not(.pin-onda)");
+  if(hu){hu.innerHTML=`<span class="hu-circ">${IC_HUELLA}<i class="hu-scan"></i></span><span>Entrar con huella</span>`;hu.style.setProperty("--d","120ms")}
+  if(hu&&vacio){const k=document.createElement("button");k.type="button";k.className="pin-k-hu";k.setAttribute("aria-label","Entrar con huella");k.innerHTML=IC_HUELLA;k.hidden=true;k.style.setProperty("--d",(90+9*26)+"ms");vacio.replaceWith(k);
+    k.onclick=e=>{e.stopPropagation();hu.click()};
+    const sync=()=>{k.hidden=hu.hidden};new MutationObserver(sync).observe(hu,{attributes:true,attributeFilter:["hidden"]});sync()}
+  // Olvidé mi PIN y Cancelar en una fila abajo
+  const pie=document.createElement("div");pie.className="pin-pie";pie.style.setProperty("--d","380ms");$("pinOlvido").before(pie);if(hu)pie.before(hu);pie.append($("pinOlvido"),$("pinCancelar"));
+  // Cada vez que aparece: entrada en cascada y figuras de la temporada del día
+  const entrar=()=>{figuras();bl.classList.remove("entra");void bl.offsetWidth;bl.classList.add("entra");antes=0;pts.classList.remove("lleno")};
+  const abrirAntes=abrirPin;abrirPin=function(){const r=abrirAntes.apply(this,arguments);entrar();return r};
+  if(!bl.hidden)entrar();
+})();
 
 // --- Entrar: primero lo guardado en este equipo (al instante); si no, el servidor ---
 var tokPend=null;   // sesión que se está pidiendo al servidor mientras la app ya se abrió
