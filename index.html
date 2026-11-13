@@ -3605,7 +3605,7 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
   .teclado .pin-onda{position:absolute;width:76px;height:76px;margin:-38px 0 0 -38px;border-radius:50%;background:radial-gradient(circle,var(--brand-2) 0%,transparent 70%);pointer-events:none}
   .teclado .pin-k-hu{display:grid;place-items:center;color:var(--brand-ink)}
   .teclado .pin-k-hu svg{width:40px;height:40px;animation:pinRespira 2.4s ease-in-out infinite}
-  .teclado .pin-k-hu[hidden]{display:block;visibility:hidden}
+  .teclado .pin-k-hu.off{visibility:hidden;pointer-events:none}
   @keyframes pinRespira{50%{opacity:.6;transform:scale(.94)}}
   .bloqueo.entra .pin-cab,.bloqueo.entra .puntos,.bloqueo.entra .teclado>*,.bloqueo.entra .pin-pie,.bloqueo.entra .pin-huella{animation:pinEntra .44s cubic-bezier(.23,1,.32,1) both;animation-delay:var(--d,0ms)}
   @keyframes pinEntra{from{opacity:0;transform:translateY(16px) scale(.94)}}
@@ -3683,15 +3683,202 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
   // Huella: tecla abajo a la izquierda; si solo entra con huella, círculo grande que escanea
   const vacio=tec.querySelector("span:not(.pin-onda)");
   if(hu){hu.innerHTML=`<span class="hu-circ">${IC_HUELLA}<i class="hu-scan"></i></span><span>Entrar con huella</span>`;hu.style.setProperty("--d","120ms")}
-  if(hu&&vacio){const k=document.createElement("button");k.type="button";k.className="pin-k-hu";k.setAttribute("aria-label","Entrar con huella");k.innerHTML=IC_HUELLA;k.hidden=true;k.style.setProperty("--d",(90+9*26)+"ms");vacio.replaceWith(k);
+  if(hu&&vacio){const k=document.createElement("button");k.type="button";k.className="pin-k-hu";k.setAttribute("aria-label","Entrar con huella");k.innerHTML=IC_HUELLA;k.classList.add("off");k.tabIndex=-1;k.style.setProperty("--d",(90+9*26)+"ms");vacio.replaceWith(k);
     k.onclick=e=>{e.stopPropagation();hu.click()};
-    const sync=()=>{k.hidden=hu.hidden};new MutationObserver(sync).observe(hu,{attributes:true,attributeFilter:["hidden"]});sync()}
+    const sync=()=>{k.classList.toggle("off",hu.hidden);k.tabIndex=hu.hidden?-1:0};new MutationObserver(sync).observe(hu,{attributes:true,attributeFilter:["hidden"]});sync()}
   // Olvidé mi PIN y Cancelar en una fila abajo
   const pie=document.createElement("div");pie.className="pin-pie";pie.style.setProperty("--d","380ms");$("pinOlvido").before(pie);if(hu)pie.before(hu);pie.append($("pinOlvido"),$("pinCancelar"));
   // Cada vez que aparece: entrada en cascada y figuras de la temporada del día
   const entrar=()=>{figuras();bl.classList.remove("entra");void bl.offsetWidth;bl.classList.add("entra");antes=0;pts.classList.remove("lleno")};
   const abrirAntes=abrirPin;abrirPin=function(){const r=abrirAntes.apply(this,arguments);entrar();return r};
   if(!bl.hidden)entrar();
+})();
+// --- Mientras el celular pide la huella (marcar asistencia, registrar o entrar): detrás va la pantalla con los colores de la app ---
+(function(){
+  document.head.insertAdjacentHTML("beforeend",`<style id="huFondoCss">
+  .hu-fondo{position:fixed;inset:0;z-index:99990;display:grid;place-items:center;padding:24px;color:var(--brand-ink);isolation:isolate;overflow:hidden;animation:pinEntra .32s cubic-bezier(.23,1,.32,1)}
+  .hu-fondo[hidden]{display:none}
+  .hu-fondo-c{display:grid;justify-items:center;gap:16px;text-align:center;max-width:320px}
+  .hu-fondo-c b{font:700 1.35rem/1.25 var(--display);margin-top:8px}
+  .hu-fondo-c small{font-size:.95rem;opacity:.82;line-height:1.35}
+  .bloqueo.solo-huella{justify-content:flex-start}
+  .bloqueo.solo-huella .pin-cab{margin-top:8vh}
+  .bloqueo.solo-huella .pin-huella{margin-top:auto;margin-bottom:calc(6vh + 8px)}
+  .hu-fondo{place-items:stretch}
+  .hu-fondo-c{max-width:none;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:12px;padding-bottom:calc(9vh + env(safe-area-inset-bottom,0px))}
+  .hu-fondo-c .hu-circ{order:3;margin-top:26px}
+  </style>`);
+  let el=null,n=0;
+  const mostrar=(t,s)=>{n++;if(!el){el=document.createElement("div");el.className="hu-fondo";el.setAttribute("role","status");document.body.append(el)}
+    el.innerHTML=`<div class="pin-fondo" aria-hidden="true"><i></i><i></i><i></i></div><div class="hu-fondo-c"><span class="hu-circ">${IC_HUELLA}<i class="hu-scan"></i></span><b>${esc(t)}</b><small>${esc(s)}</small></div>`;
+    const f=el.querySelector(".pin-fondo");
+    try{const fi=document.body.classList.contains("fiesta")&&typeof adorHoy==="function"&&typeof ZON!=="undefined"&&typeof zSvg==="function"?ZON[(adorHoy()||[])[0]]:null;
+      for(let i=0;i<10;i++){const e=document.createElement("span");
+        if(fi&&fi.s&&fi.s.length){e.className="pin-sim";e.innerHTML=zSvg(fi.s[i%fi.s.length],16+(i%3)*7)}else{const z=8+Math.round(Math.random()*22);e.className="pin-bokeh";e.style.width=e.style.height=z+"px"}
+        e.style.left=(4+i*9.5+Math.random()*4)+"%";e.style.animationDuration=(10+Math.random()*8).toFixed(1)+"s";e.style.animationDelay=(-Math.random()*15).toFixed(1)+"s";f.append(e)}}catch(e){}
+    el.hidden=false};
+  const ocultar=()=>{if(--n<=0){n=0;if(el)el.hidden=true}};
+  const conFondo=(fn,t,s)=>async function(){const b=$("bloqueo"),ver=!b||b.hidden;if(ver)mostrar(t,s);try{return await fn.apply(this,arguments)}finally{if(ver)ocultar()}};
+  huellaVerificar=conFondo(huellaVerificar,"Pon tu dedo en el sensor","Confirma que eres tú con tu huella.");
+  huellaRegistrar=conFondo(huellaRegistrar,"Registra tu huella","Pon tu dedo en el sensor. Es solo la primera vez en este celular.");
+})();
+// --- Teclado numérico propio: en el celular, los campos de números (montos, horas, DNI, teléfono…) usan este teclado
+//     con los colores de la paleta en vez del teclado del celular. En la computadora sigue el teclado físico. ---
+(function(){
+  const activo=()=>matchMedia("(pointer:coarse)").matches||matchMedia("(max-width:600px)").matches;
+  const SEL='input[inputmode="decimal"],input[inputmode="numeric"],input[inputmode="tel"],input[type="number"],input[type="tel"],input[data-tecl]', SEL2=SEL+',input[data-tecl-ok]';
+  document.head.insertAdjacentHTML("beforeend",`<style id="teclCss">
+  .tecl{position:fixed;left:0;right:0;bottom:0;z-index:99980;color:var(--brand-ink);isolation:isolate;overflow:hidden;
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));border-radius:22px 22px 0 0;box-shadow:0 -12px 40px rgba(0,0,0,.35);
+    transform:translateY(105%);transition:transform .24s cubic-bezier(.23,1,.32,1);touch-action:manipulation;user-select:none;-webkit-user-select:none}
+  .tecl.on{transform:none}
+  .tecl .pin-fondo{border-radius:inherit}
+  .tecl-bar{display:flex;align-items:center;gap:10px;padding:2px 4px 10px}
+  .tecl-bar b{flex:1;min-width:0;font:600 .9rem/1.2 var(--display);opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tecl-bar button{border:0;border-radius:999px;padding:9px 18px;font:700 .95rem var(--display);color:var(--brand-deep,#111);background:var(--brand-ink);box-shadow:0 4px 14px rgba(0,0,0,.2)}
+  .tecl-bar .tecl-sig{background:color-mix(in srgb,var(--brand-ink) 16%,transparent);color:var(--brand-ink);box-shadow:none}
+  .tecl-g{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:480px;margin:0 auto}
+  .tecl-g button{position:relative;overflow:hidden;height:54px;border-radius:16px;color:var(--brand-ink);font:500 1.55rem/1 var(--display);
+    background:linear-gradient(160deg,color-mix(in srgb,var(--brand-ink) 19%,transparent),color-mix(in srgb,var(--brand-ink) 6%,transparent));
+    border:1px solid color-mix(in srgb,var(--brand-ink) 20%,transparent);box-shadow:inset 0 1px 0 color-mix(in srgb,var(--brand-ink) 22%,transparent);
+    transition:transform .12s cubic-bezier(.23,1,.32,1),background .15s}
+  .tecl-g button:active{transform:scale(.94);background:color-mix(in srgb,var(--brand-2) 40%,transparent)}
+  .tecl-g button.k2{background:transparent;border-color:transparent;box-shadow:none;font-size:1.35rem}
+  .tecl-g button.off{visibility:hidden}
+  .tecl-g .pin-onda{width:70px;height:70px;margin:-35px 0 0 -35px}
+  body.tecl-abierto{padding-bottom:var(--tecl-h,0px)}
+  body.tecl-abierto .overlay .sheet{padding-bottom:calc(var(--tecl-h,0px) + 18px)!important}
+  @media (prefers-reduced-motion:reduce){.tecl{transition:none}}
+  </style>`);
+  const t=document.createElement("div");t.className="tecl";t.setAttribute("aria-hidden","true");
+  t.innerHTML=`<div class="pin-fondo"><i></i><i></i><i></i></div><div class="tecl-bar"><b></b><button type="button" class="tecl-sig">Siguiente ›</button><button type="button" class="tecl-ok">Listo</button></div>
+    <div class="tecl-g">${["1","2","3","4","5","6","7","8","9",".","0","⌫"].map(k=>`<button type="button" data-tk="${k}"${k==="⌫"?' class="k2" aria-label="Borrar"':k==="."?' class="k2"':""}>${k}</button>`).join("")}</div>`;
+  document.body.append(t);
+  let el=null;
+  // Los campos de números no abren el teclado del celular
+  const marcar=r=>{if(!activo())return;(r.querySelectorAll?r:document).querySelectorAll(SEL).forEach(i=>{if(i.dataset.teclOk)return;i.dataset.teclOk="1";i.dataset.teclIm=i.getAttribute("inputmode")||(i.type==="tel"?"tel":i.type==="number"?"decimal":"numeric");i.setAttribute("inputmode","none")})};
+  marcar(document);new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1){if(n.matches&&n.matches(SEL))marcar(n.parentNode||document);else marcar(n)}}))).observe(document.body,{childList:true,subtree:true});
+  const etiqueta=i=>{const l=i.closest("label")||(i.id&&document.querySelector(`label[for="${i.id}"]`));let s=l?[...l.childNodes].filter(n=>n!==i&&!(n.querySelector&&n.querySelector("input"))).map(n=>n.textContent).join(" "):"";s=(s||i.placeholder||i.getAttribute("aria-label")||"").replace(/\s+/g," ").trim();return s.slice(0,60)};
+  const visibles=()=>[...document.querySelectorAll(SEL2)].filter(i=>i.dataset.teclOk&&!i.disabled&&!i.readOnly&&i.getClientRects().length);
+  const abrir=i=>{el=i;const dec=i.dataset.teclIm==="decimal";t.querySelector('[data-tk="."]').classList.toggle("off",!dec);
+    t.querySelector(".tecl-bar b").textContent=etiqueta(i);
+    const lst=visibles(),k=lst.indexOf(i);t.querySelector(".tecl-sig").hidden=!(k>=0&&k<lst.length-1);
+    t.classList.add("on");document.body.classList.add("tecl-abierto");
+    requestAnimationFrame(()=>{document.documentElement.style.setProperty("--tecl-h",t.offsetHeight+"px");try{i.scrollIntoView({block:"center",behavior:"smooth"})}catch{}})};
+  const cerrar=()=>{el=null;t.classList.remove("on");document.body.classList.remove("tecl-abierto")};
+  document.addEventListener("focusin",e=>{const i=e.target;if(i.matches&&i.matches(SEL2)&&i.dataset.teclOk&&!i.readOnly&&!i.disabled&&activo())abrir(i);else if(el&&!t.contains(i))cerrar()});
+  document.addEventListener("focusout",()=>setTimeout(()=>{const a=document.activeElement;if(el&&(!a||a===document.body||!(a.matches&&a.matches(SEL2))))cerrar()},0));
+  // Tocar el teclado no quita el foco del campo
+  t.addEventListener("pointerdown",e=>{e.preventDefault();const b=e.target.closest(".tecl-g button");if(!b)return;
+    const r=b.getBoundingClientRect(),o=document.createElement("span");o.className="pin-onda";o.style.left=(e.clientX-r.left)+"px";o.style.top=(e.clientY-r.top)+"px";b.append(o);
+    o.animate([{transform:"scale(.2)",opacity:.7},{transform:"scale(1.7)",opacity:0}],{duration:400,easing:"cubic-bezier(.23,1,.32,1)"}).onfinish=()=>o.remove()});
+  const escribir=k=>{const i=el;if(!i)return;let s=null,f=null;try{s=i.selectionStart;f=i.selectionEnd}catch{}
+    const v=i.value;if(s==null){s=f=v.length}
+    if(k==="⌫"){if(s===f){if(s===0)return;s--}try{i.setRangeText("",s,f,"end")}catch{i.value=v.slice(0,s)+v.slice(f)}}
+    else{if(k==="."&&/[.]/.test(v.slice(0,s)+v.slice(f)))return;if(i.maxLength>0&&v.length-(f-s)>=i.maxLength)return;
+      try{i.setRangeText(k,s,f,"end")}catch{i.value=v.slice(0,s)+k+v.slice(f)}}
+    i.dispatchEvent(new Event("input",{bubbles:true}));try{navigator.vibrate&&navigator.vibrate(6)}catch{}};
+  t.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+    if(b.dataset.tk)return escribir(b.dataset.tk);
+    if(b.classList.contains("tecl-ok")){const i=el;if(i){i.dispatchEvent(new Event("change",{bubbles:true}));i.blur()}cerrar();return}
+    if(b.classList.contains("tecl-sig")){const lst=visibles(),k=lst.indexOf(el);if(el)el.dispatchEvent(new Event("change",{bubbles:true}));if(k>=0&&lst[k+1])lst[k+1].focus()}});
+  // Si se pasa a computadora (o al revés) se devuelve el teclado normal
+  matchMedia("(max-width:600px)").addEventListener("change",()=>{if(!activo()){cerrar();document.querySelectorAll("[data-tecl-ok]").forEach(i=>{i.setAttribute("inputmode",i.dataset.teclIm);delete i.dataset.teclOk})}else marcar(document)});
+})();
+// --- Teclado de letras propio: en el celular, los campos de texto usan este teclado con la paleta. Al mantener presionada
+//     una tecla salen sus opciones (a → á, n → ñ, 1 → ½ ¼ ⅛, 3 → ¾ ⅜…). En la computadora sigue el teclado físico. ---
+(function(){
+  const activo=()=>matchMedia("(pointer:coarse)").matches||matchMedia("(max-width:600px)").matches;
+  const SEL='input:not([type]),input[type="text"],input[type="search"],input[type="email"],textarea';
+  const ES_NUM=i=>/^(decimal|numeric|tel|none)$/.test(i.getAttribute("inputmode")||"")&&!i.dataset.letOk;
+  const ALT={a:"áàäâª",e:"éèëê€",i:"íìïî",o:"óòöôº",u:"úùüû",n:"ñ",c:"ç",s:"$ß",y:"ý",
+    "1":["½","¼","⅛","1/2","1/4","1/8","100","1000","1\"","¹"],"2":["²","⅔","2/3","200","2\""],"3":["¾","⅜","⅓","3/4","3/8","300","3\"","³"],
+    "4":["¼","1/4","400","4\""],"5":["⅝","⅕","5/8","500","50"],"6":["⅙","600","60"],"7":["⅞","7/8","700"],"8":["⅛","1/8","800"],"9":["900","90"],
+    "0":["00","000","°","º","Ø"],"-":"–—_","/":"\\|","\"":"″“”","'":"′‘’","?":"¿","!":"¡","$":["S/","€","£","US$"],".":"…","%":"‰","&":"§","@":"©®","*":"×÷","+":"±","=":"≈≠"};
+  // Como el teclado del celular: cada letra muestra su símbolo en la esquina; al mantenerla salen el símbolo y los acentos
+  const HINT={q:"%",w:"\\",e:"|",r:"=",t:"[",y:"]",u:"<",i:">",o:"{",p:"}",a:"@",s:"#",d:"$",f:"-",g:"&",h:"_",j:"+",k:"(",l:")",ñ:"/",z:"*",x:"\"",c:"'",v:":",b:";",n:"!",m:"?"};
+  const sp=x=>!x?[]:Array.isArray(x)?x:[...x], alts=k=>[...sp(HINT[k]),...sp(ALT[k])];
+  const CAPA={
+    abc:[["1","2","3","4","5","6","7","8","9","0"],["q","w","e","r","t","y","u","i","o","p"],["a","s","d","f","g","h","j","k","l","ñ"],["⇧","z","x","c","v","b","n","m","⌫"],["123",",","␣",".","⏎"]],
+    num:[["1","2","3","4","5","6","7","8","9","0"],["-","/",":",";","(",")","$","&","@","\""],["#+=",".",",","?","!","'","%","⌫"],["ABC",",","␣",".","⏎"]],
+    sim:[["[","]","{","}","#","%","^","*","+","="],["_","\\","|","~","<",">","€","£","°","•"],["123",".",",","?","!","'","\"","⌫"],["ABC",",","␣",".","⏎"]]};
+  document.head.insertAdjacentHTML("beforeend",`<style id="letCss">
+  .tecl-l .tecl-bar .tecl-ok{display:none}
+  .tecl-l .tecl-bar{padding-bottom:8px}
+  .tecl-l .tecl-f{display:flex;gap:5px;justify-content:center;margin-bottom:7px}
+  .tecl-l .tecl-f:last-child{margin-bottom:0}
+  .tecl-l .tk{position:relative;flex:1 1 0;min-width:0;max-width:46px;height:44px;border-radius:12px;color:var(--brand-ink);font:500 1.25rem/1 var(--display);
+    background:linear-gradient(160deg,color-mix(in srgb,var(--brand-ink) 19%,transparent),color-mix(in srgb,var(--brand-ink) 6%,transparent));
+    border:1px solid color-mix(in srgb,var(--brand-ink) 20%,transparent);box-shadow:inset 0 1px 0 color-mix(in srgb,var(--brand-ink) 22%,transparent);
+    display:grid;place-items:center;transition:transform .1s cubic-bezier(.23,1,.32,1),background .12s;overflow:visible;padding:0}
+  .tecl-l .tk.pr{transform:scale(.92);background:color-mix(in srgb,var(--brand-2) 42%,transparent)}
+  .tecl-l .tk.esp{max-width:none;flex:1.6 1 0;font-size:.95rem;font-weight:700}
+  .tecl-l .tk.sp{max-width:none;flex:5 1 0;font-size:.85rem;opacity:.9}
+  .tecl-l .tk.ok{max-width:none;flex:1.8 1 0;background:var(--brand-ink);color:var(--brand-deep,#111);font-size:.95rem;font-weight:700}
+  .tecl-l .tk.on{background:var(--brand-ink);color:var(--brand-deep,#111)}
+  .tecl-l .tk sup{position:absolute;top:3px;right:4px;font:600 .6rem/1 var(--display);opacity:.62}
+  .tecl-l .tk.h::after{display:none}
+  .tecl-l .tecl-f:first-child .tk{height:40px;font-size:1.1rem}
+  .tecl-l .tk[data-alt]::after{content:"";position:absolute;top:5px;right:5px;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.45}
+  .tecl-pop{position:fixed;z-index:99995;display:flex;flex-wrap:wrap;justify-content:center;max-width:calc(100vw - 12px);gap:4px;padding:6px;border-radius:16px;color:var(--brand-ink);
+    background:color-mix(in srgb,var(--brand-deep,#111) 88%,var(--brand-2));border:1px solid color-mix(in srgb,var(--brand-ink) 25%,transparent);
+    box-shadow:0 14px 34px rgba(0,0,0,.45);animation:pinEntra .18s cubic-bezier(.23,1,.32,1)}
+  .tecl-pop b{min-width:40px;height:48px;border-radius:11px;display:grid;place-items:center;font:600 1.35rem var(--display);padding:0 6px}
+  .tecl-pop b.sel{background:var(--brand-2);color:var(--brand-deep,#111)}
+  .tecl-glob{position:fixed;z-index:99994;pointer-events:none;min-width:48px;height:58px;border-radius:14px;display:grid;place-items:center;font:600 1.6rem var(--display);
+    color:var(--brand-deep,#111);background:var(--brand-ink);box-shadow:0 10px 26px rgba(0,0,0,.4)}
+  </style>`);
+  const t=document.createElement("div");t.className="tecl tecl-l";t.setAttribute("aria-hidden","true");
+  t.innerHTML=`<div class="pin-fondo"><i></i><i></i><i></i></div><div class="tecl-bar"><b></b><button type="button" class="tecl-ok">Listo</button></div><div class="tecl-filas"></div>`;
+  document.body.append(t);
+  let el=null,capa="abc",may=0,ultMay=0; // may: 0 minúsculas, 1 una mayúscula, 2 bloqueo
+  const pintar=()=>{t.querySelector(".tecl-filas").innerHTML=CAPA[capa].map(f=>`<div class="tecl-f">${f.map(k=>{
+      const lbl=k==="␣"?"espacio":k==="⏎"?(el&&el.tagName==="TEXTAREA"?"↵":"Listo"):(capa==="abc"&&may&&k.length===1?k.toUpperCase():k);
+      const cls=k==="␣"?"sp":k==="⏎"?"ok":["⇧","⌫","123","ABC","#+="].includes(k)?"esp":"";
+      return `<button type="button" class="tk ${cls}${capa==="abc"&&HINT[k]?" h":""}${k==="⇧"&&may?" on":""}" data-k="${esc(k)}"${alts(k).length?' data-alt="1"':""}>${esc(lbl)}${capa==="abc"&&HINT[k]?`<sup>${esc(HINT[k])}</sup>`:""}</button>`}).join("")}</div>`).join("")};
+  const marcar=r=>{if(!activo())return;(r.querySelectorAll?r:document).querySelectorAll(SEL).forEach(i=>{if(i.dataset.letOk||ES_NUM(i)||i.readOnly)return;i.dataset.letOk="1";i.dataset.letIm=i.getAttribute("inputmode")||"";i.setAttribute("inputmode","none")})};
+  marcar(document);new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1)marcar(n.matches&&n.matches(SEL)?(n.parentNode||document):n)}))).observe(document.body,{childList:true,subtree:true});
+  const etiqueta=i=>{const l=i.closest("label")||(i.id&&document.querySelector(`label[for="${i.id}"]`));let s=l?[...l.childNodes].filter(n=>n!==i&&!(n.querySelector&&n.querySelector("input,textarea"))).map(n=>n.textContent).join(" "):"";return (s||i.placeholder||i.getAttribute("aria-label")||"").replace(/\s+/g," ").trim().slice(0,60)};
+  const autoMay=()=>{if(!el||may===2)return;const v=el.value.slice(0,el.selectionStart==null?el.value.length:el.selectionStart);may=(el.type!=="email")&&(!v.trim()||/[.!?¿¡]\s$/.test(v))?1:0};
+  const abrir=i=>{el=i;capa="abc";autoMay();pintar();t.querySelector(".tecl-bar b").textContent=etiqueta(i);t.classList.add("on");document.body.classList.add("tecl-abierto");
+    requestAnimationFrame(()=>{document.documentElement.style.setProperty("--tecl-h",t.offsetHeight+"px");try{i.scrollIntoView({block:"center",behavior:"smooth"})}catch{}})};
+  const cerrar=()=>{el=null;t.classList.remove("on");if(!document.querySelector(".tecl.on"))document.body.classList.remove("tecl-abierto")};
+  document.addEventListener("focusin",e=>{const i=e.target;if(i.matches&&i.dataset&&i.dataset.letOk&&!i.readOnly&&!i.disabled&&activo())abrir(i);else if(el&&!t.contains(i))cerrar()});
+  document.addEventListener("focusout",()=>setTimeout(()=>{const a=document.activeElement;if(el&&(!a||!a.dataset||!a.dataset.letOk))cerrar()},0));
+  const poner=txt=>{const i=el;if(!i)return;let s=null,f=null;try{s=i.selectionStart;f=i.selectionEnd}catch{}const v=i.value;if(s==null){s=f=v.length}
+    if(txt==="⌫"){if(s===f){if(s===0)return;s-=(/[\uD800-\uDFFF]/.test(v[s-1])?2:1)}try{i.setRangeText("",s,f,"end")}catch{i.value=v.slice(0,s)+v.slice(f)}}
+    else{if(i.maxLength>0&&v.length-(f-s)+txt.length>i.maxLength)return;try{i.setRangeText(txt,s,f,"end")}catch{i.value=v.slice(0,s)+txt+v.slice(f)}}
+    i.dispatchEvent(new Event("input",{bubbles:true}));try{navigator.vibrate&&navigator.vibrate(5)}catch{}};
+  const enter=()=>{const i=el;if(!i)return;if(i.tagName==="TEXTAREA"){poner("\n");return}
+    const ev=new KeyboardEvent("keydown",{key:"Enter",code:"Enter",keyCode:13,bubbles:true,cancelable:true});const sigue=i.dispatchEvent(ev);
+    i.dispatchEvent(new Event("change",{bubbles:true}));if(sigue&&document.activeElement===i)i.blur();cerrar()};
+  const tecla=k=>{
+    if(k==="⇧"){const ahora=Date.now();may=may===0?(ahora-ultMay<350?2:1):(may===1&&ahora-ultMay<350?2:0);ultMay=ahora;pintar();return}
+    if(k==="123"){capa="num";pintar();return}if(k==="ABC"){capa="abc";autoMay();pintar();return}if(k==="#+="){capa="sim";pintar();return}
+    if(k==="⏎")return enter();if(k==="⌫"){poner("⌫");if(capa==="abc"){autoMay();pintar()}return}
+    poner(k==="␣"?" ":(capa==="abc"&&may?k.toUpperCase():k));
+    if(capa==="abc"&&may===1){may=0;if(k==="␣")autoMay();pintar()}else if(k==="␣"&&capa==="abc"){autoMay();if(may)pintar()}};
+  // Tocar: globo con la letra. Mantener: opciones (se desliza el dedo y se suelta en la que se quiere)
+  let pr=null,timer=null,pop=null,glob=null,rep=null;
+  const quitar=()=>{clearTimeout(timer);clearInterval(rep);timer=rep=null;if(pop)pop.remove();if(glob)glob.remove();pop=glob=null;if(pr)pr.classList.remove("pr");pr=null};
+  t.addEventListener("pointerdown",e=>{e.preventDefault();const b=e.target.closest(".tk");if(b&&b.closest(".tecl-l")){quitar();pr=b;b.classList.add("pr");const k=b.dataset.k;
+      try{b.setPointerCapture(e.pointerId)}catch{}
+      if(k.length===1&&k!=="⇧"){const r=b.getBoundingClientRect();glob=document.createElement("div");glob.className="tecl-glob";glob.textContent=capa==="abc"&&may?k.toUpperCase():k;
+        glob.style.left=(r.left+r.width/2-24)+"px";glob.style.top=(r.top-64)+"px";document.body.append(glob)}
+      if(k==="⌫"){timer=setTimeout(()=>{rep=setInterval(()=>poner("⌫"),70)},420)}
+      else if(alts(k).length){timer=setTimeout(()=>{if(glob){glob.remove();glob=null}const r=b.getBoundingClientRect(),ops=alts(k);
+        const opsM=capa==="abc"&&may?ops.map(x=>x.toUpperCase()):ops;
+        pop=document.createElement("div");pop.className="tecl-pop";pop.innerHTML=opsM.map((x,j)=>`<b class="${j===0?"sel":""}">${esc(x)}</b>`).join("");document.body.append(pop);
+        const w=pop.offsetWidth;pop.style.left=Math.max(6,Math.min(innerWidth-w-6,r.left+r.width/2-w/2))+"px";pop.style.top=(r.top-pop.offsetHeight-8)+"px";try{navigator.vibrate&&navigator.vibrate(12)}catch{}},420)}}
+    else if(e.target.closest(".tecl-ok")){const i=el;if(i){i.dispatchEvent(new Event("change",{bubbles:true}));i.blur()}cerrar()}});
+  t.addEventListener("pointermove",e=>{if(!pop)return;const bs=[...pop.children];let m=bs[0],d=1e9;bs.forEach(x=>{const r=x.getBoundingClientRect(),c=Math.hypot(e.clientX-(r.left+r.width/2),(e.clientY-(r.top+r.height/2))*1.4);if(c<d){d=c;m=x}});bs.forEach(x=>x.classList.toggle("sel",x===m))});
+  const soltar=e=>{if(!pr)return;const b=pr,k=b.dataset.k;
+    if(pop){const s=pop.querySelector(".sel");if(s){poner(s.textContent);if(capa==="abc"&&may===1){may=0;pintar()}}}
+    else if(!rep||k!=="⌫"){if(!(k==="⌫"&&rep))tecla(k)}
+    quitar()};
+  t.addEventListener("pointerup",soltar);t.addEventListener("pointercancel",quitar);
+  matchMedia("(max-width:600px)").addEventListener("change",()=>{if(!activo()){cerrar();document.querySelectorAll("[data-let-ok]").forEach(i=>{if(i.dataset.letIm)i.setAttribute("inputmode",i.dataset.letIm);else i.removeAttribute("inputmode");delete i.dataset.letOk})}else marcar(document)});
+  window.__tecLetra=tecla;
 })();
 
 // --- Entrar: primero lo guardado en este equipo (al instante); si no, el servidor ---
