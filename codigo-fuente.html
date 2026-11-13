@@ -3041,9 +3041,9 @@ function cerrarPin(res){$("bloqueo").hidden=true;pinBuf="";const f=pinOk;pinOk=n
 $("teclado").addEventListener("click",e=>{const b=e.target.closest("[data-k]");if(b)teclaPin(b.dataset.k)});
 document.addEventListener("keydown",e=>{if($("bloqueo").hidden)return;if(/^\d$/.test(e.key))teclaPin(e.key);else if(e.key==="Backspace")teclaPin("⌫")});
 $("pinCancelar").onclick=()=>cerrarPin(false);
-$("pinOlvido").onclick=()=>{
+$("pinOlvido").onclick=async()=>{
   if(pinModo==="externo"){$("pinErr").textContent="Pídele a un administrador que te ponga un PIN nuevo (Más → Tu usuario y PIN).";return}
-  const c=prompt("Para quitar el PIN, escribe tu clave de acceso de Google (la del servidor):");
+  const c=await cboPedir("Quitar el PIN",{texto:"Escribe tu clave de acceso de Google (la del servidor).",si:"Quitar PIN"});
   if(c==null)return;
   if(cfg&&c.trim()===cfg.clave){try{localStorage.removeItem(PIN_K)}catch{}cerrarPin(true);pintarPinCfg();toast("PIN quitado")}
   else errorPin("Esa no es tu clave de acceso.");
@@ -3337,7 +3337,7 @@ const pinUsadoPor=(pin,n)=>(PERSONAS.find(p=>p.n!==n&&p.p&&p.p===pin)||{}).n||""
 async function pinAzarPara(n){
   if(sinNube()){toast("En el modo de prueba no hay PIN");return}
   const pin=pinAlAzar(n);if(!pin){toast("No se encontró un PIN libre");return}
-  if(!confirm(`PIN al azar para ${titulo(n)}: ${pin}\n\nNo lo usa ningún otro usuario. Anótalo y dáselo. ¿Lo pongo?`))return;
+  if(!await cboConfirmar(`PIN al azar para ${titulo(n)}: ${pin}\n\nNo lo usa ningún otro usuario. Anótalo y dáselo. ¿Lo pongo?`))return;
   try{const j=await api("ponerPin",{usuario:n,pin,equipo:EQUIPO});if(j.token)ponerSesion(Object.assign({},sesion,{t:j.token}));usarLista(j);toast(`PIN de ${nomCorto(n)}: ${pin}`)}catch(e){toast(e.message)}
 }
 async function pinParaOtro(n){
@@ -3376,7 +3376,7 @@ function volverAdmin(){
 // Quitar o devolver el acceso a la app (solo administrador). Sin acceso, su sesión se cierra en todos sus equipos.
 async function cambiarAcceso(n,permitir){
   if(sinNube()){toast("En el modo de prueba no se cambia el acceso");return}
-  if(!permitir&&!confirm(`¿Quitarle el acceso a ${titulo(n)}? No podrá entrar a la app hasta que se lo devuelvas.`))return;
+  if(!permitir&&!await cboConfirmar(`¿Quitarle el acceso a ${titulo(n)}? No podrá entrar a la app hasta que se lo devuelvas.`))return;
   try{usarLista(await api("acceso",{usuario:n,permitir}));toast(permitir?`${nomCorto(n)} puede entrar otra vez.`:`${nomCorto(n)} ya no puede entrar a la app.`)}catch(e){toast(e.message)}
 }
 async function agregarUsuario(){
@@ -3420,7 +3420,7 @@ function pintarSesion(){
   el.querySelectorAll("[data-pinazar]").forEach(b=>b.onclick=()=>pinAzarPara(b.dataset.pinazar));
   el.querySelectorAll("[data-acceso]").forEach(b=>b.onclick=()=>cambiarAcceso(b.dataset.acceso,!!b.dataset.permitir));
   el.querySelectorAll("[data-guardperm]").forEach(b=>b.onclick=()=>guardarPermisos(b.dataset.guardperm,b.closest("li")));
-  el.querySelectorAll("[data-cerrarses]").forEach(b=>b.onclick=async()=>{const ids=String(b.dataset.sids||b.dataset.sid||"").split(",").filter(Boolean);if(sinNube()||!ids.length||!confirm(`¿Cerrar la sesión de ${titulo(b.dataset.cerrarses)} en ese equipo? Tendrá que entrar otra vez con su PIN.`))return;for(const id of ids)await cerrarSesionDe(b.dataset.cerrarses,id,true)});
+  el.querySelectorAll("[data-cerrarses]").forEach(b=>b.onclick=async()=>{const ids=String(b.dataset.sids||b.dataset.sid||"").split(",").filter(Boolean);if(sinNube()||!ids.length||!await cboConfirmar(`¿Cerrar la sesión de ${titulo(b.dataset.cerrarses)} en ese equipo? Tendrá que entrar otra vez con su PIN.`))return;for(const id of ids)await cerrarSesionDe(b.dataset.cerrarses,id,true)});
   el.querySelectorAll("[data-verpin]").forEach(b=>b.onclick=()=>{const sp=b.closest(".usr-li").querySelector(".usr-pin"),ver=b.textContent==="Ver PIN";sp.textContent=ver?sp.dataset.pin:"••••";b.textContent=ver?"Ocultar":"Ver PIN"});
 }
 async function guardarPermisos(n,li){
@@ -3430,7 +3430,7 @@ async function guardarPermisos(n,li){
 }
 async function cerrarSesionDe(n,id,ya){
   if(sinNube())return;
-  if(!ya&&!confirm(`¿Cerrar esa sesión de ${titulo(n)}? Tendrá que entrar otra vez con su PIN en ese equipo.`))return;
+  if(!ya&&!await cboConfirmar(`¿Cerrar esa sesión de ${titulo(n)}? Tendrá que entrar otra vez con su PIN en ese equipo.`))return;
   try{usarLista(await api("cerrarSesion",{usuario:n,id}));toast("Sesión cerrada")}catch(e){toast(e.message)}
 }
 async function verHistorial(){
@@ -3780,8 +3780,8 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
   document.body.append(t);
   let el=null;
   // Los campos de números no abren el teclado del celular
-  const marcar=r=>{if(!activo())return;(r.querySelectorAll?r:document).querySelectorAll(SEL).forEach(i=>{if(i.dataset.teclOk)return;i.dataset.teclOk="1";i.dataset.teclIm=i.getAttribute("inputmode")||(i.type==="tel"?"tel":i.type==="number"?"decimal":"numeric");i.setAttribute("inputmode","none")})};
-  marcar(document);new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1){if(n.matches&&n.matches(SEL))marcar(n.parentNode||document);else marcar(n)}}))).observe(document.body,{childList:true,subtree:true});
+  const marcar=r=>{if(!activo())return;(r.querySelectorAll?r:document).querySelectorAll(SEL).forEach(i=>{if(i.dataset.teclOk)return;i.dataset.teclOk="1";i.dataset.teclIm=i.getAttribute("inputmode")||(i.type==="tel"?"tel":i.type==="number"?"decimal":"numeric");if(i.type==="number"||i.type==="tel"){i.dataset.teclType=i.type;try{i.type="text"}catch{}}i.setAttribute("inputmode","none")})};
+  window.__teclMarcar=marcar;marcar(document);new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1){if(n.matches&&n.matches(SEL))marcar(n.parentNode||document);else marcar(n)}}))).observe(document.body,{childList:true,subtree:true});
   const etiqueta=i=>{const l=i.closest("label")||(i.id&&document.querySelector(`label[for="${i.id}"]`));let s=l?[...l.childNodes].filter(n=>n!==i&&!(n.querySelector&&n.querySelector("input"))).map(n=>n.textContent).join(" "):"";s=(s||i.placeholder||i.getAttribute("aria-label")||"").replace(/\s+/g," ").trim();return s.slice(0,60)};
   const visibles=()=>[...document.querySelectorAll(SEL2)].filter(i=>i.dataset.teclOk&&!i.disabled&&!i.readOnly&&i.getClientRects().length);
   const abrir=i=>{el=i;const dec=i.dataset.teclIm==="decimal";t.querySelector('[data-tk="."]').classList.toggle("off",!dec);
@@ -3807,7 +3807,7 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
     if(b.classList.contains("tecl-ok")){const i=el;if(i){i.dispatchEvent(new Event("change",{bubbles:true}));i.blur()}cerrar();return}
     if(b.classList.contains("tecl-sig")){const lst=visibles(),k=lst.indexOf(el);if(el)el.dispatchEvent(new Event("change",{bubbles:true}));if(k>=0&&lst[k+1])lst[k+1].focus()}});
   // Si se pasa a computadora (o al revés) se devuelve el teclado normal
-  matchMedia("(max-width:600px)").addEventListener("change",()=>{if(!activo()){cerrar();document.querySelectorAll("[data-tecl-ok]").forEach(i=>{i.setAttribute("inputmode",i.dataset.teclIm);delete i.dataset.teclOk})}else marcar(document)});
+  matchMedia("(max-width:600px)").addEventListener("change",()=>{if(!activo()){cerrar();document.querySelectorAll("[data-tecl-ok]").forEach(i=>{i.setAttribute("inputmode",i.dataset.teclIm);if(i.dataset.teclType){try{i.type=i.dataset.teclType}catch{}delete i.dataset.teclType}delete i.dataset.teclOk})}else marcar(document)});
 })();
 // --- Teclado de letras propio: en el celular, los campos de texto usan este teclado con la paleta. Al mantener presionada
 //     una tecla salen sus opciones (a → á, n → ñ, 1 → ½ ¼ ⅛, 3 → ¾ ⅜…). En la computadora sigue el teclado físico. ---
@@ -3865,8 +3865,8 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
       const lbl=k==="␣"?"espacio":k==="⏎"?(el&&el.tagName==="TEXTAREA"?"↵":"Listo"):(capa==="abc"&&may&&k.length===1?k.toUpperCase():k);
       const cls=k==="␣"?"sp":k==="⏎"?"ok":["⇧","⌫","123","ABC","#+="].includes(k)?"esp":"";
       return `<button type="button" class="tk ${cls}${capa==="abc"&&HINT[k]?" h":""}${k==="⇧"&&may?" on":""}" data-k="${esc(k)}"${alts(k).length?' data-alt="1"':""}>${esc(lbl)}${capa==="abc"&&HINT[k]?`<sup>${esc(HINT[k])}</sup>`:""}</button>`}).join("")}</div>`).join("")};
-  const marcar=r=>{if(!activo())return;(r.querySelectorAll?r:document).querySelectorAll(SEL).forEach(i=>{if(i.dataset.letOk||ES_NUM(i)||i.readOnly)return;i.dataset.letOk="1";i.dataset.letIm=i.getAttribute("inputmode")||"";i.setAttribute("inputmode","none");if(i.hasAttribute("list")){i.dataset.letList=i.getAttribute("list");i.removeAttribute("list")}})};
-  marcar(document);new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1)marcar(n.matches&&n.matches(SEL)?(n.parentNode||document):n)}))).observe(document.body,{childList:true,subtree:true});
+  const marcar=r=>{if(!activo())return;(r.querySelectorAll?r:document).querySelectorAll(SEL).forEach(i=>{if(i.dataset.letOk||ES_NUM(i)||i.readOnly)return;i.dataset.letOk="1";i.dataset.letIm=i.getAttribute("inputmode")||"";if(i.type==="email"||i.type==="search"){i.dataset.letType=i.type;try{i.type="text"}catch{}}i.setAttribute("inputmode","none");if(i.hasAttribute("list")){i.dataset.letList=i.getAttribute("list");i.removeAttribute("list")}})};
+  window.__letMarcar=marcar;marcar(document);new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1)marcar(n.matches&&n.matches(SEL)?(n.parentNode||document):n)}))).observe(document.body,{childList:true,subtree:true});
   const etiqueta=i=>{const l=i.closest("label")||(i.id&&document.querySelector(`label[for="${i.id}"]`));let s=l?[...l.childNodes].filter(n=>n!==i&&!(n.querySelector&&n.querySelector("input,textarea"))).map(n=>n.textContent).join(" "):"";return (s||i.placeholder||i.getAttribute("aria-label")||"").replace(/\s+/g," ").trim().slice(0,60)};
   const autoMay=()=>{if(!el||may===2)return;const v=el.value.slice(0,el.selectionStart==null?el.value.length:el.selectionStart);may=(el.type!=="email")&&(!v.trim()||/[.!?¿¡]\s$/.test(v))?1:0};
   const sugs=()=>{const c=t.querySelector(".tecl-sug");const dl=el&&el.dataset.letList&&document.getElementById(el.dataset.letList);if(!dl){c.innerHTML="";return}
@@ -3913,6 +3913,36 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
   matchMedia("(max-width:600px)").addEventListener("change",()=>{if(!activo()){cerrar();document.querySelectorAll("[data-let-ok]").forEach(i=>{if(i.dataset.letIm)i.setAttribute("inputmode",i.dataset.letIm);else i.removeAttribute("inputmode");if(i.dataset.letList){i.setAttribute("list",i.dataset.letList);delete i.dataset.letList}delete i.dataset.letOk})}else marcar(document)});
   window.__tecLetra=tecla;
 })();
+// --- Teclado propio siempre: el campo queda sin teclado del celular antes de enfocarse (al tocarlo o si la app lo enfoca sola) ---
+(function(){
+  const esCampo=i=>i&&(i.tagName==="INPUT"||i.tagName==="TEXTAREA")&&!i.readOnly&&!i.disabled&&!/^(date|time|datetime-local|month|week|checkbox|radio|file|range|color|hidden|button|submit|password)$/.test(i.type||"");
+  const marcarYa=i=>{if(!esCampo(i)||i.dataset.teclOk||i.dataset.letOk)return;const r=i.parentNode||document;try{window.__teclMarcar&&window.__teclMarcar(r)}catch{}try{window.__letMarcar&&window.__letMarcar(r)}catch{}};
+  ["touchstart","pointerdown","mousedown"].forEach(ev=>document.addEventListener(ev,e=>{const i=e.target&&e.target.closest&&e.target.closest("input,textarea");if(i)marcarYa(i)},{capture:true,passive:true}));
+  [HTMLInputElement.prototype,HTMLTextAreaElement.prototype].forEach(P=>{const f=P.focus;P.focus=function(){marcarYa(this);return f.apply(this,arguments)}});
+  document.addEventListener("focusin",e=>{const i=e.target;if(!esCampo(i)||i.dataset.teclOk||i.dataset.letOk)return;marcarYa(i);
+    if(i.dataset.teclOk||i.dataset.letOk){i.blur();setTimeout(()=>{try{i.focus({preventScroll:true})}catch{i.focus()}},0)}},true);
+})();
+// --- Ventanas propias en vez de las grises del navegador (prompt / confirm), con el diseño de la app ---
+const confNativo=window.confirm;
+function cboVentana(titulo,{texto="",campo=false,valor="",ejemplo="",si="Aceptar",no="Cancelar",peligro=false}={}){
+  const at=v=>String(v).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
+  return new Promise(ok=>{
+    const o=document.createElement("div");o.className="overlay cbo-dlg";o.style.zIndex="99970";
+    o.innerHTML=`<div class="sheet" role="dialog" aria-modal="true"><h3>${esc(titulo)}</h3>${texto?`<p class="cbo-dlg-t">${esc(texto).replace(/\n/g,"<br>")}</p>`:""}
+      ${campo?`<input class="cbo-dlg-in" type="text" maxlength="120" autocomplete="off" value="${at(valor)}" placeholder="${at(ejemplo)}">`:""}
+      <div class="line cbo-dlg-b"><button type="button" class="btn2" data-no>${esc(no)}</button><button type="button" class="btn${peligro?" peligro":""}" data-si>${esc(si)}</button></div></div>`;
+    document.body.append(o);
+    const inp=o.querySelector(".cbo-dlg-in"),fin=v=>{o.remove();ok(v)};
+    o.querySelector("[data-si]").onclick=()=>fin(campo?(inp.value.trim()||null):true);
+    o.querySelector("[data-no]").onclick=()=>fin(campo?null:false);
+    o.addEventListener("click",e=>{if(e.target===o)fin(campo?null:false)});
+    if(inp){inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();o.querySelector("[data-si]").click()}});setTimeout(()=>inp.focus(),60)}
+  });
+}
+document.head.insertAdjacentHTML("beforeend",`<style id="cboDlgCss">.cbo-dlg{display:grid;place-items:end center}.cbo-dlg .sheet{display:grid;gap:12px;animation:pinEntra .28s cubic-bezier(.23,1,.32,1)}.cbo-dlg h3{margin:0}.cbo-dlg-t{margin:0;opacity:.85;line-height:1.4}.cbo-dlg-in{width:100%;box-sizing:border-box}.cbo-dlg-b{justify-content:flex-end;gap:10px}.cbo-dlg-b .btn,.cbo-dlg-b .btn2{flex:1}.cbo-dlg .btn.peligro{background:#C0392B;color:#fff}</style>`);
+// La revisión automática reemplaza confirm: si está reemplazado, se respeta
+const cboConfirmar=(t,o)=>window.confirm!==confNativo?Promise.resolve(window.confirm(t)):cboVentana(o&&o.titulo||"Confirma",Object.assign({texto:t,si:"Sí",no:"No"},o||{}));
+const cboPedir=(t,o)=>cboVentana(t,Object.assign({campo:true},o||{}));
 
 // --- Entrar: primero lo guardado en este equipo (al instante); si no, el servidor ---
 var tokPend=null;   // sesión que se está pidiendo al servidor mientras la app ya se abrió
@@ -3970,7 +4000,7 @@ let cambiandoUsr=false;
 function pintarPerfilSes(){const ps=document.querySelector(".perfil-ses");if(ps)ps.hidden=!esAdmin()}
 $("usuarioBtn").addEventListener("click",pintarPerfilSes,true);pintarPerfilSes();
 $("perfilCambiar").onclick=()=>{if(!esAdmin())return;cerrarOv("ovPerfil");cambiarUsuario()};
-$("perfilSalir").onclick=()=>{if(!sesion||!esAdmin())return;if(!confirm(`¿Cerrar la sesión de ${titulo(sesion.u)} en este equipo? La próxima vez entrará con su PIN.`))return;
+$("perfilSalir").onclick=async()=>{if(!sesion||!esAdmin())return;if(!await cboConfirmar(`¿Cerrar la sesión de ${titulo(sesion.u)} en este equipo? La próxima vez entrará con su PIN.`))return;
   const yo=sesion.u,t=String(sesion.t||"").split("~"),sid=t.length===3?t[1]:t[3];
   if(sid&&!sinNube())api("cerrarSesion",{usuario:yo,id:sid}).catch(()=>{});   // por detrás, sin esperar
   accPoner(yo,{t:"",h:"",s:"",tc:""});try{localStorage.removeItem(SESA_K)}catch{}
@@ -3991,7 +4021,7 @@ async function ponerMetodo(n,m){
   try{usarLista(await api("metodo",{usuario:n,metodo:m}));toast(`${nomCorto(n)} entrará: ${METODOS[m].toLowerCase()}.`)}catch(e){toast(e.message)}
 }
 async function quitarHuella(n){
-  if(!confirm(`¿Quitar la huella de ${titulo(n)}? Tendrá que registrarla de nuevo en su celular.`))return;
+  if(!await cboConfirmar(`¿Quitar la huella de ${titulo(n)}? Tendrá que registrarla de nuevo en su celular.`))return;
   if(n===quien||accDe(n))accPoner(n,{cred:""});
   if(sinNube()){const p=PERSONAS.find(x=>x.n===n);if(p)p.hu=[];pintarSesion();toast("Huella quitada");return}
   try{usarLista(await api("quitarHuella",{usuario:n}));toast(`Huella de ${nomCorto(n)} quitada.`)}catch(e){toast(e.message)}
@@ -4017,16 +4047,16 @@ function dupLocal(r){
     &&String(x.ruc||"").replace(/\D/g,"")===String(r.ruc||"").replace(/\D/g,""));
   return rows.find(x=>!esPlanilla(x)&&x.tipo===r.tipo&&x.fecha===r.fecha&&Math.abs((+x.monto||0)-(+r.monto||0))<0.01&&String(x.desc||"").trim().toUpperCase()===String(r.desc||"").trim().toUpperCase());
 }
-function revisarDup(r){
+async function revisarDup(r){
   const d=dupLocal(r); if(!d) return;
   const [y,m,dd]=d.fecha.split("-"), por=d.por?` por ${nomCorto(d.por)}`:"";
   const txt=`${d.desc||d.categoria} · ${fmt(d.monto)} del ${dd}/${m}/${y}`;
   // Factura o boleta repetida: nunca se registra dos veces
   if(!esPlanilla(r)&&(r.comprobante||"ninguno")!=="ninguno") throw Object.assign(new Error(`este comprobante ya está registrado${por} (${txt}). No se guardó de nuevo.`),{code:"dup"});
-  if(!confirm(`Ojo: ya hay un ${esPlanilla(r)?"pago a este trabajador":"movimiento igual"} registrado${por}:\n${txt}\n\n¿Registrarlo de todas formas?`)) throw Object.assign(new Error(`ya estaba registrado${por}. No se guardó de nuevo.`),{code:"dup"});
+  if(!await cboConfirmar(`Ojo: ya hay un ${esPlanilla(r)?"pago a este trabajador":"movimiento igual"} registrado${por}:\n${txt}\n\n¿Registrarlo de todas formas?`)) throw Object.assign(new Error(`ya estaba registrado${por}. No se guardó de nuevo.`),{code:"dup"});
   r.forzar=true;
 }
-store={add:r=>{revisarDup(r);if(quien&&!r.por)r.por=quien;return (esDemo()?storeDemo:storeGoogle).add(r).then(id=>{try{celebrarRegistro(r)}catch{}return id})},remove:id=>(esDemo()?storeDemo:storeGoogle).remove(id),edit:(id,r)=>(esDemo()?storeDemo:storeGoogle).edit(id,r)};
+store={add:async r=>{await revisarDup(r);if(quien&&!r.por)r.por=quien;return (esDemo()?storeDemo:storeGoogle).add(r).then(id=>{try{celebrarRegistro(r)}catch{}return id})},remove:id=>(esDemo()?storeDemo:storeGoogle).remove(id),edit:(id,r)=>(esDemo()?storeDemo:storeGoogle).edit(id,r)};
 function abrirSetup(msg){$("setup").hidden=false;$("setupMsg").textContent=msg||"";if(cfg)$("cfgUrl").value=cfg.url||""}
 $("setupF").addEventListener("submit",async e=>{
   e.preventDefault();
