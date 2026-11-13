@@ -103,3 +103,4 @@ Actualizado: 11/11/2026 · caché: cbo-finanzas-v93-pago-dias
 - v100: PIN al instante también la primera vez en el equipo (revisarPinDe abre ya y Google revisa por detrás; PIN equivocado vuelve a pedirlo).
 
 - v101 (12/11/2026): el pago a trabajador abarca de lunes a sábado (lunesDe); el domingo sigue en el comprobante pero no entra solo. Conectar con código ya no da falso "sin internet".
+- v102 (12/11/2026): pago por horas = horas × precio por hora redondeado (29 h × 15.56 = 451.24); comprobante: monto fijo solo importe, por horas muestra horas y precio por hora; pagos viejos se corrigen al editarlos.

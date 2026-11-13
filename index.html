@@ -3966,13 +3966,13 @@ function calcHoras(sinTocar){
   $("pHoras").value=h&&h!==hs?h:"";
   if(!j){$("pHorasInfo").textContent=nd?`${nd} ${nd===1?"día":"días"} · ${h} h`:"Toca los días que trabajó.";return}
   if(!nd){if(!sinTocar)$("pSueldo").value="";$("pHorasInfo").textContent="Toca los días que trabajó.";return}
-  const pago=h===hs?j:r2(j*h/hs);
+  const ph=r2(j/hs), pago=h===hs?j:r2(ph*h);   // precio por hora redondeado a céntimos y luego × horas (29 h × 15.56 = 451.24)
   if(!sinTocar)$("pSueldo").value=pago.toFixed(2);
   // jornal por día (8 h) o por semana (45 h)
-  $("pHorasInfo").textContent=hs<=12?`${nd} ${nd===1?"día":"días"} · ${h} h · S/ ${fmtN(j)} por día de ${hs} h × ${h} ÷ ${hs} = S/ ${fmtN(pago)}`
-    :`${nd} ${nd===1?"día":"días"} · ${h} h de ${hs} h · `+(h===hs?`semana completa S/ ${fmtN(j)}`:`S/ ${fmtN(j)} × ${h} ÷ ${hs} = S/ ${fmtN(pago)}`);
+  $("pHorasInfo").textContent=hs<=12?`${nd} ${nd===1?"día":"días"} · ${h} h × S/ ${fmtN(ph)} por hora = S/ ${fmtN(pago)}`
+    :`${nd} ${nd===1?"día":"días"} · ${h} h de ${hs} h · `+(h===hs?`semana completa S/ ${fmtN(j)}`:`${h} h × S/ ${fmtN(ph)} por hora = S/ ${fmtN(pago)}`);
 }
-function calcExtra(){const j=jornalTrab(),hs=numIn("pHSem")||45,x=numIn("pHexH");if(j&&x>0)$("pHex").value=r2(x*j/hs).toFixed(2);else if($("pHexH").value.trim()==="")$("pHex").value="";calcPla()}
+function calcExtra(){const j=jornalTrab(),hs=numIn("pHSem")||45,x=numIn("pHexH");if(j&&x>0)$("pHex").value=r2(x*r2(j/hs)).toFixed(2);else if($("pHexH").value.trim()==="")$("pHex").value="";calcPla()}
 const fmtN=n=>Number(n).toLocaleString("es-PE",{minimumFractionDigits:2,maximumFractionDigits:2});
 function calcPla(){const n=r2(numIn("pSueldo")+numIn("pBono")+numIn("pHex")-numIn("pDesc"));$("pNeto").textContent=fmt(Math.max(0,n));return n}
 function abrirPagoPla(r){
@@ -3992,6 +3992,8 @@ function abrirPagoPla(r){
     $("pHSem").value=t&&t.horas?t.horas:45; ponerDias("1111110"); $("pHexH").value="";
   }
   calcHoras(!!r);
+  // Pagos guardados con el cálculo anterior (jornal × h ÷ 45 sin redondear): al editarlos se corrigen a horas × precio por hora
+  if(r){const j=jornalTrab(),hs=numIn("pHSem")||45,h=horasDias();if(j&&h&&h!==hs&&Math.abs(numIn("pSueldo")-r2(j*h/hs))<0.005)calcHoras(false)}
   const extras=numIn("pBono")||numIn("pHex")||numIn("pHexH")||numIn("pDesc");
   $("pMas").hidden=!extras; $("pMasBtn").hidden=!!extras;
   $("plaTit").textContent=r?"Editar pago":"Pago a trabajador"; $("pMsg").textContent="";
@@ -4094,7 +4096,10 @@ function comprobantePDF(r,soloArmar,uno){
   const idx=[...dias].map((c,i)=>c==="1"?i:-1).filter(i=>i>=0), hDias=idx.reduce((a,i)=>a+HD[i],0);
   const seguidos=idx.length>2&&idx[idx.length-1]-idx[0]===idx.length-1;
   const glosa=idx.length?`JORNAL — ${idx.length} ${idx.length===1?"DÍA":"DÍAS"} (${seguidos?DL[idx[0]]+" A "+DL[idx[idx.length-1]]:idx.map(i=>DL[i]).join(", ")})`:String(r.glosa||"JORNAL SEMANAL").toUpperCase();
-  const hrs=hDias||r.horas, ph=r.pagoHora||(hDias?sueldo/hDias:0), cuadra=hrs&&ph&&Math.abs(hrs*ph-sueldo)<1;
+  // Monto fijo (semana completa): solo el importe. Por horas (faltó o jornal por día): horas × precio por hora
+  const hs=Number(r.horasSem)||Number(t.horas)||45, hrs=hDias||Number(r.horasTrab)||0, fijo=!hrs||hrs===hs;
+  const ph=r.pagoHora||(Number(t.jornal)&&Math.abs(r2(Number(t.jornal)/hs)*hrs-sueldo)<1?r2(Number(t.jornal)/hs):hrs?r2(sueldo/hrs):0);
+  const cuadra=!fijo&&hrs&&ph&&Math.abs(hrs*ph-sueldo)<1;
   const hexH=Number(r.hexH)||0;
   const filas=`<tr><td>${esc(glosa)}</td><td class="n">${cuadra?hrs+" h":""}</td><td class="n">${cuadra?fmt(ph):""}</td><td class="n">${fmt(sueldo)}</td></tr>`
     +[["HORAS EXTRA",hex,hexH?hexH+" h":"",hexH?fmt(r2(hex/hexH)):""],["BONIFICACIÓN",bono,"",""]].filter(([,v])=>v>0).map(([k,v,c,p])=>`<tr><td>${k}</td><td class="n">${c}</td><td class="n">${p}</td><td class="n">${fmt(v)}</td></tr>`).join("")
