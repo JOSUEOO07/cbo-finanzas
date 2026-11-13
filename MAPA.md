@@ -101,3 +101,5 @@ Actualizado: 11/11/2026 · caché: cbo-finanzas-v93-pago-dias
 - v98: Entrar como al instante (la sesión del servidor llega por detrás); Sus equipos: un renglón por tipo de equipo (eqAgrupados) con último uso; Agregar usuario en su propio recuadro; foto de arriba con Cambiar de usuario y Cerrar sesión solo para el administrador; cortina de apertura de 1.6 s a menos de 0.5 s.
 - v99: sw.js abre desde lo guardado en el celular y actualiza por detrás (antes bajaba la app entera en cada apertura); fuentes sin bloquear; opción Sin PIN ni huella (metodo libre; servidor v20 lo acepta).
 - v100: PIN al instante también la primera vez en el equipo (revisarPinDe abre ya y Google revisa por detrás; PIN equivocado vuelve a pedirlo).
+
+- v101 (12/11/2026): el pago a trabajador abarca de lunes a sábado (lunesDe); el domingo sigue en el comprobante pero no entra solo. Conectar con código ya no da falso "sin internet".

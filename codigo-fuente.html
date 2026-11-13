@@ -3706,8 +3706,9 @@ $("copiarCon").onclick=async()=>{
 $("usarCodigo").onclick=async()=>{
   let o;try{o=deCodigo($("cfgCodigo").value)}catch(e){$("setupMsg").textContent="Ese código no es válido. Cópialo completo, empieza con CBO1:";return}
   $("setupMsg").textContent="Conectando…";
-  try{await api("datos",null,o);cfg={url:o.url,clave:o.clave};guardarLS(CFG_K,cfg);$("setup").hidden=true;$("cfgCodigo").value="";cargar()}
-  catch(err){$("setupMsg").textContent=err.code==="clave"?"La clave del código no es correcta.":"No se pudo conectar. Revisa tu internet."}
+  try{await api("datos",null,o)}
+  catch(err){if(err.code!=="sesion"){$("setupMsg").textContent=err.code==="clave"?"La clave del código no es correcta.":"No se pudo conectar. Revisa tu internet.";return}}   // "sesion" = conectado, falta el PIN
+  cfg={url:o.url,clave:o.clave};guardarLS(CFG_K,cfg);$("setup").hidden=true;$("cfgCodigo").value="";cargar()
 };
 document.querySelectorAll(".recargar").forEach(b=>b.onclick=()=>cargar());
 $("desconectar").onclick=()=>abrirSetup("");
@@ -3772,7 +3773,7 @@ async function repetirMov(r){
   if(esPagoSun(r)){abrirPagoSun();return}
   const c=Object.assign({},r); ["id","creado","editado","fotoUrl"].forEach(k=>delete c[k]);
   c.fecha=hoyISO; c.serie=""; c.numero="";
-  if(esPlanilla(c)){c.fin=hoyISO;c.inicio=isoMas(hoyISO,-6);c.operacion=""} if(c.detraccion)c.detMonto=Math.round(c.monto*(c.detPct||4)/100);
+  if(esPlanilla(c)){c.fin=hoyISO;c.inicio=lunesDe(hoyISO);c.operacion=""} if(c.detraccion)c.detMonto=Math.round(c.monto*(c.detPct||4)/100);
   try{await store.add(c); mes=hoyISO.slice(0,7); render(); toast(`Repetido hoy: ${c.desc||c.categoria} ${fmt(c.monto)}`)}
   catch(e){toast("No se pudo repetir. Revisa tu internet.")}
 }
@@ -3955,6 +3956,8 @@ function pintarTrab(){
 function jornalTrab(){const t=listaTrab().find(x=>String(x.dni)===$("pTrab").value);return t&&t.jornal?Number(t.jornal):0}
 // Días trabajados: lunes a viernes 8 h, sábado 5 h, domingo 8 h (semana normal = 45 h = jornal completo)
 const HDIA=[8,8,8,8,8,5,8];
+// El pago abarca de lunes a sábado: el periodo empieza el lunes de la semana del pago (el domingo se ve en el comprobante, pero no entra solo)
+function lunesDe(iso){const d=new Date(iso+"T12:00:00");return isoMas(iso,-((d.getDay()+6)%7))}
 const diasSel=()=>[...$("pDias").children].map(b=>b.getAttribute("aria-pressed")==="true"?"1":"0").join("");
 const ponerDias=m=>[...$("pDias").children].forEach((b,i)=>b.setAttribute("aria-pressed",String(m[i]==="1")));
 const horasDias=(m=diasSel())=>[...m].reduce((a,c,i)=>a+(c==="1"?HDIA[i]:0),0);
@@ -3978,12 +3981,12 @@ function abrirPagoPla(r){
   $("pTrab").innerHTML=ts.length?ts.map(t=>`<option value="${esc(t.dni)}">${esc(titulo(t.nombre))}</option>`).join("")
     :`<option value="">Toca “+ Nuevo trabajador”</option>`;
   if(r){
-    $("pTrab").value=String(r.ruc||""); $("pFecha").value=r.fecha; $("pIni").value=r.inicio||isoMas(r.fecha,-6); $("pFin").value=r.fin||r.fecha;
+    $("pTrab").value=String(r.ruc||""); $("pFecha").value=r.fecha; $("pIni").value=r.inicio||lunesDe(r.fecha); $("pFin").value=r.fin||r.fecha;
     $("pSueldo").value=String(r.sueldo||r.monto); $("pBono").value=r.bono||""; $("pHex").value=r.horasExtra||""; $("pDesc").value=r.descuento||"";
     $("pOper").value=r.operacion||""; $("pObra").value=r.obra||"";
     const tt=pintarTrab(), hs0=(tt&&tt.horas)||45; $("pHSem").value=hs0; ponerDias(/^[01]{7}$/.test(r.dias||"")?r.dias:"1111110"); $("pHexH").value=r.hexH||"";
   }else{
-    $("pFecha").value=hoyISO; $("pIni").value=isoMas(hoyISO,-6); $("pFin").value=hoyISO;
+    $("pFecha").value=hoyISO; $("pIni").value=lunesDe(hoyISO); $("pFin").value=hoyISO;
     ["pBono","pHex","pDesc","pOper","pObra"].forEach(k=>$(k).value="");
     const t=pintarTrab(); $("pSueldo").value=t&&t.jornal?Number(t.jornal).toFixed(2):"";
     $("pHSem").value=t&&t.horas?t.horas:45; ponerDias("1111110"); $("pHexH").value="";
@@ -3999,7 +4002,7 @@ $("pTrab").addEventListener("change",()=>{const t=pintarTrab();if(t&&t.jornal&&!
 ["pSueldo","pBono","pHex","pDesc"].forEach(k=>$(k).addEventListener("input",calcPla));
 $("pDias").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;b.setAttribute("aria-pressed",String(b.getAttribute("aria-pressed")!=="true"));calcHoras();calcPla()});
 $("pHexH").addEventListener("input",calcExtra);
-$("pFecha").addEventListener("change",()=>{if(!plaEditId&&$("pFecha").value){$("pFin").value=$("pFecha").value;$("pIni").value=isoMas($("pFecha").value,-6)}});
+$("pFecha").addEventListener("change",()=>{if(!plaEditId&&$("pFecha").value){$("pFin").value=$("pFecha").value;$("pIni").value=lunesDe($("pFecha").value)}});
 $("pMasBtn").onclick=()=>{$("pMas").hidden=false;$("pMasBtn").hidden=true;$("pHexH").focus()};
 $("fPla").addEventListener("submit",async e=>{
   e.preventDefault();
