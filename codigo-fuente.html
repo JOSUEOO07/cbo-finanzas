@@ -25,6 +25,7 @@
   --ease:cubic-bezier(.22,1,.36,1); --spring:cubic-bezier(.34,1.56,.64,1);
   color-scheme:dark;
 }
+:root[data-apariencia="claro"]{--bg:#F3F5F7;--surface:#FFFFFF;--ink:#1B2430;--muted:#657284;--line:#DCE2E8;--soft:#E9EEF3;--fab-ink:#17212D;--in:#168457;--out:#C74738;--in-bg:#E6F5EC;--out-bg:#FCEBE8;--warn:#8A6200;--warn-bg:#FFF4D6;color-scheme:light}
 
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
@@ -897,7 +898,7 @@ button.ud-card{cursor:pointer;width:100%}
 .ud-card small.h{color:var(--muted);font-size:.72rem;font-weight:600;display:block;margin-top:2px}
 .ud-sun{background:linear-gradient(160deg,#F6E3A9 0%,#E9C96B 100%);border-color:#E0BE5C;color:#4E3A08}
 .ud-sun .k{color:#7A5A12}
-[data-theme="oscuro"] .ud-sun,[data-theme="oceano"] .ud-sun,[data-theme="negro"] .ud-sun{background:linear-gradient(160deg,#3A2F12,#2A220C);border-color:#4A3B14;color:#F2D27A}
+:root[data-apariencia="oscuro"] .ud-sun{background:linear-gradient(160deg,#3A2F12,#2A220C);border-color:#4A3B14;color:#F2D27A}
 .ud-sun.ok{background:linear-gradient(160deg,#D9F2E6,#B6E3CC);border-color:#9ED2B8;color:#0D4D3B}.ud-sun.ok .k{color:#0D5C46}
 .ud-seg{display:flex;background:color-mix(in srgb,var(--brand) 7%,transparent);border-radius:13px;padding:4px;gap:2px;margin-bottom:6px}
 .ud-seg button{flex:1;text-align:center!important;font-size:.74rem;padding:7px 0;border-radius:10px;color:var(--muted)!important;border:0;background:transparent;font-weight:700;cursor:pointer}
@@ -1501,8 +1502,9 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
       <section data-sec="config" hidden>
         <div class="cfg-lista">
           <p class="cfg-grupo">Apariencia</p>
+          <details class="cfg-item" data-cfg="apariencia"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg></i><span class="cfg-t"><b>Modo de pantalla</b><small class="cfg-v" id="cfgv-apariencia"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body"><p class="hint" style="margin:0 0 10px">Automático sigue el modo de pantalla de este celular o computadora.</p><div class="seg" id="aparienciaSeg"><button type="button" data-apariencia="claro">Claro</button><button type="button" data-apariencia="oscuro">Oscuro</button><button type="button" data-apariencia="auto">Automático</button></div></div></details>
           <details class="cfg-item" data-cfg="tema"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r="1.5"/><circle cx="17.5" cy="10.5" r="1.5"/><circle cx="8.5" cy="7.5" r="1.5"/><circle cx="6.5" cy="12.5" r="1.5"/><path d="M12 2a10 10 0 0 0 0 20c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4A5.6 5.6 0 0 0 22 9.8C22 5.5 17.5 2 12 2z"/></svg></i><span class="cfg-t"><b>Colores de la app</b><small class="cfg-v" id="cfgv-tema"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
-            <p class="hint" style="margin:0 0 10px">El fondo siempre es oscuro. Elige el color principal:</p>
+            <p class="hint" style="margin:0 0 10px">Elige el color principal:</p>
             <div id="paletas"></div>
           </div></details>
           <details class="cfg-item" data-cfg="barra"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><rect x="3" y="14" width="18" height="7" rx="3"/><path d="M7 17.5h.01M12 17.5h.01M17 17.5h.01"/><path d="M12 3v7M9 7l3 3 3-3"/></svg></i><span class="cfg-t"><b>Barra de abajo</b><small class="cfg-v" id="cfgv-barra"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
@@ -1933,7 +1935,7 @@ const guardarLS=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}};
 let mes=hoyISO.slice(0,7), filtro="todos", rows=[], store=null, pendingDel=null, seccion="inicio", periodoTer="mes";
 let fTipo="ingreso", fComp="factura";
 const PAL_DEF="esp-38"; // Noche (Especiales) es el color por defecto
-let ajustes=Object.assign({tema:"calido",meta:300000,paleta:PAL_DEF},leerLS("cbo-ajustes",{}));
+let ajustes=Object.assign({tema:"calido",meta:300000,paleta:PAL_DEF,apariencia:"auto"},leerLS("cbo-ajustes",{}));
 // Quien seguía con el Grafito de antes (era el color por defecto) pasa una sola vez a Noche
 if(!ajustes.v5){if(ajustes.paleta==="grafito")ajustes.paleta=PAL_DEF;ajustes.v5=1;guardarLS("cbo-ajustes",ajustes)}
 // v4: el tema predeterminado pasa a "Cálido" aunque antes se hubiera guardado "auto"
@@ -2318,12 +2320,16 @@ function aplicarTema(){
   const P=PALETAS.find(x=>x[0]===ajustes.paleta)||PALETAS.find(x=>x[0]===PAL_DEF);
   let st=document.getElementById("cboVars"); if(!st){st=document.createElement("style");st.id="cboVars";document.head.appendChild(st)}
   const CT=fiestaCol||[P[2],P[3],P[4]],T=temaDe(CT[0]);document.body.classList.toggle("especial",!fiestaCol&&!!P[4]);st.textContent=`:root:root{--brand:${CT[0]};--brand-2:${CT[1]};--brand-ink:${T.ink};--brand-deep:${T.deep};--logo-f:${T.claro?"invert(1)":"none"}${CT[2]?`;--fi-g:${CT[2]};--fi-b:${(fiestaCol&&fiestaCol[3])||CT[2]};--fi-s:${(fiestaCol&&fiestaCol[4])||"240% 100%"}`:""}}`;
-  document.querySelector('meta[name="theme-color"]').setAttribute("content","#0B0D10");
+  aplicarApariencia();
   const box=$("paletas"); if(box){const F=FAMILIAS.find(f=>f.k===palFam)||FAMILIAS[0];
     box.innerHTML=`${fiestaCol?`<p class="note" style="margin:0 0 10px">Durante esta festividad manda su color. Lo que elijas aquí se guarda y se verá cuando termine.</p>`:""}<p class="pal-t">Color principal</p><div class="pal-fams" role="group" aria-label="Color principal">${FAMILIAS.filter(f=>f.k!=="especial").map(f=>`<button type="button" class="pal-fam" data-fam="${f.k}" aria-pressed="${f.k===F.k}"><i style="background:${f.t[0][2]}"></i><span>${f.n}</span></button>`).join("")}</div>
     <button type="button" class="pal-esp" data-fam="especial" aria-pressed="${F.k==="especial"}"><span>Especiales</span><small>Combinaciones y degradados</small></button>
     <p class="pal-t">${F.k==="especial"?`Especiales: ${F.t.length} combinaciones`:`${F.n}: del más clarito al más intenso`}</p><div class="pal-esc" role="group" aria-label="Tonos de ${F.n}">${(F.k==="especial"?F.t:F.t.slice(1)).map(([k,n,a,b,g])=>`<button type="button" class="pal-tono" data-pal="${k}" aria-pressed="${k===P[0]}" aria-label="${n}"><i style="background:${g||a}"></i><span>${n}</span></button>`).join("")}</div>${F.k==="especial"?`<button type="button" class="btn pal-gen" id="espGen">Crear otra combinación</button>`:""}`}
 }
+const aparQuery=matchMedia("(prefers-color-scheme: dark)");
+function aplicarApariencia(){const modo=ajustes.apariencia||"auto",efectivo=modo==="auto"?(aparQuery.matches?"oscuro":"claro"):modo,raiz=document.documentElement;raiz.setAttribute("data-apariencia",efectivo);const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.setAttribute("content",efectivo==="claro"?"#F3F5F7":"#0B0D10");const s=$("aparienciaSeg");if(s)s.querySelectorAll("[data-apariencia]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.apariencia===modo)));const t=$("cfgv-apariencia");if(t)t.textContent=modo==="auto"?`Automático · ${efectivo}`:modo==="claro"?"Claro":"Oscuro"}
+$("aparienciaSeg").addEventListener("click",e=>{const b=e.target.closest("[data-apariencia]");if(!b)return;ajustes.apariencia=b.dataset.apariencia;guardarLS("cbo-ajustes",ajustes);aplicarApariencia();pintarResumenCfg()});
+aparQuery.addEventListener("change",()=>{if((ajustes.apariencia||"auto")==="auto")aplicarApariencia()});
 // Teclado de la app para el monto: en celular reemplaza al del sistema; en computadora se sigue escribiendo normal
 (function(){const m=$("monto"),t=$("teclMonto");if(!m||!t)return;const mq=matchMedia("(max-width:980px)"),ajusta=()=>m.setAttribute("inputmode",mq.matches?"none":"decimal");ajusta();mq.addEventListener("change",ajusta);
   t.addEventListener("mousedown",e=>e.preventDefault());
@@ -3304,7 +3310,7 @@ async function pedirEntrada(n,pin){
 /* ===== Permisos que da el administrador: secciones, configuración, reportes y lo registrado por otros ===== */
 const SECC_PERM=["movimientos","sunat","terceros","planilla","obras","inventario","anual"];
 const SECC_NOM={movimientos:"Movimientos",sunat:"Impuestos SUNAT",terceros:"Clientes y proveedores",planilla:"Planilla",obras:"Obras",inventario:"Inventario",anual:"Resumen anual"};
-const CFG_LIBRE=["quien","tema","barra","son","seg","acerca"]; // lo demás de Configuración es solo del administrador
+const CFG_LIBRE=["quien","tema","apariencia","barra","son","seg","acerca"]; // lo demás de Configuración es solo del administrador
 const esAdmin=()=>!!(sesion&&sesion.admin);
 function secOculta(s){return !!(sesion&&!sesion.admin&&(sesion.ocultas||[]).includes(s))}
 function puedeDescargar(){return !!(sesion&&(sesion.admin||sesion.descargar))}
@@ -4911,6 +4917,7 @@ function pintarResumenCfg(){
   const v=(k,h)=>{const e=document.getElementById("cfgv-"+k);if(e)e.innerHTML=h};
   const P=PALETAS.find(x=>x[0]===ajustes.paleta)||PALETAS.find(x=>x[0]===PAL_DEF);
   v("tema",`<i style="background:${P[4]||P[2]}"></i> ${P[1]}`);
+  v("apariencia",(ajustes.apariencia||"auto")==="auto"?`Automático · ${document.documentElement.dataset.apariencia||"claro"}`:(ajustes.apariencia==="claro"?"Claro":"Oscuro"));
   const nb=k=>(BAR_DEF[k]||[""])[0].replace("Movim.","Movimientos");
   v("barra",`${nb(ajustes.barA||"movimientos")} y ${nb(ajustes.barB||"planilla")}`);
   v("son",ajustes.sonido===0?"Desactivados":"Activados");
