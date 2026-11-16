@@ -576,6 +576,7 @@ body.escribiendo .tabbar,body.escribiendo .fab{display:none!important}
 .usr-eq{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .usr-eq li>span{flex:1}
 .perfil-ses[hidden]{display:none!important}
+.perfil-ses:has(#perfilCambiar[hidden]){grid-template-columns:1fr}
 .perfil-ses{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}.perfil-ses .btn2{min-height:46px}
 .perfil-salir{color:#E5534B!important;border-color:color-mix(in srgb,#E5534B 45%,transparent)!important}
 @media (max-width:340px){.perfil-ses{grid-template-columns:1fr}}
@@ -595,6 +596,83 @@ body.escribiendo .tabbar,body.escribiendo .fab{display:none!important}
 .usr-pin{font-variant-numeric:tabular-nums;letter-spacing:.08em}
 .usr-li.off .usr-cab>span{opacity:.55}
 #ovQuien{background:var(--bg)} /* sin sesión no se ve lo guardado detrás */
+#ovQuien:has(#accesoCorreo:not([hidden])) {
+  align-items:center; justify-content:center;
+  overflow-y:auto; padding:28px;
+  background:color-mix(in srgb,var(--brand) 14%,var(--bg));
+}
+html:has(#ovQuien:not([hidden]) #accesoCorreo:not([hidden])),
+body:has(#ovQuien:not([hidden]) #accesoCorreo:not([hidden])) { overflow:hidden; }
+
+#accesoCorreo {
+  display:grid; grid-template-columns:minmax(0,1fr); gap:0;
+  width:min(100%,550px); max-width:none; max-height:none;
+  margin:auto; padding:0; border:1px solid var(--line); border-radius:22px;
+  color:var(--ink); background:var(--surface); overflow:hidden; animation:none;
+}
+.acceso-marca {
+  display:grid; justify-items:center; align-content:center; gap:13px;
+  position:relative; isolation:isolate; overflow:hidden;
+  padding:33px 25px 43px; color:#f6f7fb;
+  background:linear-gradient(118deg,var(--brand-deep),color-mix(in srgb,var(--brand-deep) 67%,var(--brand-2)));
+  border-radius:0 0 50% 50% / 0 0 23px 23px;
+}
+.acceso-marca::before {
+  content:""; position:absolute; inset:-18% -15%; z-index:-1; pointer-events:none;
+  background:linear-gradient(110deg,transparent 35%,#ffffff14 49%,transparent 64%);
+  transform:translateX(-58%); animation:luzAccesoCbo 8s ease-in-out infinite;
+}
+@keyframes luzAccesoCbo {
+  0%,22% { transform:translateX(-58%); opacity:0; }
+  35% { opacity:1; }
+  59%,100% { transform:translateX(58%); opacity:0; }
+}
+body:is(.especial,.fiesta) .acceso-marca {
+  background:linear-gradient(#0003,#0003),var(--fi-g);
+}
+.acceso-identidad { display:grid; justify-items:center; gap:11px; text-align:center; font-weight:780; font-size:1.34rem; line-height:1.14; }
+.acceso-identidad img { width:53px; height:53px; object-fit:contain; }
+.acceso-identidad small { display:block; margin-top:4px; color:#edf0f8; font-size:.77rem; font-weight:500; }
+.acceso-saludo { text-align:center; margin:0; }
+.acceso-saludo #saludoCorreo { margin:0; font-size:1.03rem; font-weight:650; overflow-wrap:anywhere; }
+@media (prefers-reduced-motion:reduce) { .acceso-marca::before { animation:none; opacity:0; } }
+
+.acceso-datos { display:grid; gap:13px; width:min(100%,440px); justify-self:center; min-width:0; padding:26px 27px 30px; }
+.acceso-datos h3 { font-size:clamp(1.6rem,3vw,2rem); letter-spacing:-.045em; line-height:1.08; margin:0; }
+.acceso-datos p { margin:0; }
+.acceso-datos .hint,.acceso-datos .acceso-paso { color:var(--muted); line-height:1.44; overflow-wrap:anywhere; }
+.acceso-datos .acceso-paso { font-size:.83rem; }
+.acceso-campos { display:grid; gap:11px; padding:0; margin:0; border:0; min-width:0; }
+.acceso-datos label { font-size:.84rem; text-transform:none; letter-spacing:0; color:var(--ink); }
+.acceso-datos input {
+  min-height:49px; padding-inline:13px; font-size:1rem; color:var(--ink);
+  border:1px solid var(--line); border-radius:10px; background:var(--bg);
+}
+.acceso-datos input::placeholder { color:var(--muted); opacity:1; }
+.acceso-datos input:focus-visible,.acceso-datos button:focus-visible {
+  outline:2px solid color-mix(in srgb,var(--brand) 55%,var(--ink)); outline-offset:3px;
+}
+.acceso-datos .acceso-principal { width:100%; min-height:49px; border:0; border-radius:10px; background:var(--brand); color:var(--brand-ink); box-shadow:none; }
+.acceso-datos button.btnlink { min-height:44px; justify-self:start; padding-inline:0; background:none; border:0; color:var(--ink); text-decoration:underline; text-underline-offset:4px; }
+.acceso-datos .acceso-pie { color:var(--muted); font-size:.73rem; margin-top:2px; }
+.acceso-datos .acceso-mensaje:empty { display:none; }
+.acceso-datos #bandejaCorreo { font-size:.82rem; }
+.acceso-confirmacion {
+  display:grid; justify-items:center; text-align:center; gap:13px;
+  min-height:205px; align-content:center; padding:24px;
+}
+.acceso-confirmacion .acceso-confirmado-icono {
+  display:grid; place-items:center; width:52px; height:52px; border-radius:50%;
+  background:var(--in-bg); color:var(--in); font-size:1.5rem; font-weight:750;
+}
+.acceso-confirmacion h3 { margin:0; font-size:1.7rem; letter-spacing:-.035em; overflow-wrap:anywhere; }
+.acceso-confirmacion p { margin:0; color:var(--muted); }
+@media (max-width:670px) {
+  #ovQuien:has(#accesoCorreo:not([hidden])) { padding:12px 11px 16px; align-items:start; }
+  #accesoCorreo { margin:0 auto; border-radius:16px; }
+  .acceso-marca { gap:12px; padding:27px 18px 34px; }
+  .acceso-datos { padding:22px 21px 26px; gap:11px; }
+}
 .usr-nuevo input{flex:1 1 160px;min-width:0}
 .usr-azar{display:flex;align-items:center;gap:6px;font-size:.84rem;color:var(--muted);white-space:nowrap}.usr-nuevo .usr-azar input{flex:0 0 18px;width:18px;height:18px;min-width:0;margin:0}
 .bloqueo{position:fixed;inset:0;z-index:60;background:var(--brand);color:var(--brand-ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px}
@@ -1700,12 +1778,38 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
 <div class="overlay" id="ovPerfil" hidden>
   <div class="sheet" style="max-width:420px">
     <div id="perfilAv" hidden></div>
-    <div class="perfil-ses"><button type="button" class="btn2" id="perfilCambiar">Cambiar de usuario</button><button type="button" class="btn2 perfil-salir" id="perfilSalir">Cerrar sesión</button></div>
+    <div class="perfil-ses"><button type="button" class="btn2" id="perfilCambiar" hidden>Cambiar de usuario</button><button type="button" class="btn2 perfil-salir" id="perfilSalir">Cerrar sesión</button></div>
     <button type="button" class="btnlink" id="perfilCerrar" style="display:block;margin:12px auto 0;min-height:44px">Cerrar</button>
   </div>
 </div>
 <div class="overlay" id="ovQuien" hidden>
-  <div class="sheet" style="max-width:420px">
+  <form class="sheet" id="accesoCorreo" hidden>
+    <div class="acceso-marca" id="marcaCorreo">
+      <div class="acceso-identidad"><img src="logo-blanco.png" alt=""><span>CBO Finanzas<small>Casa Bonita Oregón</small></span></div>
+      <div class="acceso-saludo"><p id="saludoCorreo">Te damos la bienvenida.</p></div>
+    </div>
+    <div class="acceso-datos" id="camposAcceso">
+      <p class="acceso-paso" id="pasoCorreo" hidden></p>
+      <h3 id="tituloCorreo">Inicia sesión</h3>
+      <p class="hint" id="ayudaCorreo">Te enviaremos un código para confirmar tu correo.</p>
+      <label>Correo electrónico<input id="correoAcceso" type="email" inputmode="email" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="nombre@ejemplo.com" required></label>
+      <fieldset class="acceso-campos" id="perfilCorreo" hidden disabled>
+        <label>Código del correo<input id="codigoCorreoAcceso" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required></label>
+        <label id="nombreRegistro">Nombre y apellidos<input id="nombreCorreoAcceso" required maxlength="60" autocomplete="name" autocapitalize="words"></label>
+        <p class="hint" id="nombreCuenta" hidden></p>
+        <button class="btnlink" id="enviarCodigo" type="button">Reenviar código</button>
+      </fieldset>
+      <p class="hint acceso-mensaje" id="mensajeCorreo" role="status"></p>
+      <button class="btn acceso-principal" id="entrarCorreo" type="submit">Enviarme un código</button>
+      <button class="btnlink" id="activarCorreo" type="button" hidden>Cambiar correo</button>
+    </div>
+    <div class="acceso-confirmacion" id="accesoConfirmado" role="status" hidden>
+      <span class="acceso-confirmado-icono" aria-hidden="true">✓</span>
+      <h3 id="accesoConfirmadoNombre">Acceso confirmado</h3>
+      <p>Abriendo Inicio…</p>
+    </div>
+  </form>
+  <div class="sheet" id="accesoAnterior" style="max-width:420px" hidden>
     <h3>¿Quién eres?</h3>
     <p class="hint" style="margin:0 0 12px">Toca tu nombre y entra con tu PIN o tu huella, según lo que haya elegido el administrador. Lo que registres quedará con tu nombre, en la app y en el Excel.</p>
     <div style="display:grid;gap:10px" id="quienBtns"></div>
@@ -3080,10 +3184,27 @@ document.addEventListener("visibilitychange",()=>{if(document.visibilityState===
 /* ===== Conexión privada con tu Google Sheets ===== */
 const CFG_K="cbo-config", CACHE_K="cbo-cache";
 let cfg=leerLS(CFG_K,null);
+const esURLServidorCorreo = url => /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(url);
 // Enlace de acceso: quien abre la app con #conectar=CBO1:... queda conectado sin escribir enlace ni clave
 try{const m=location.hash.match(/conectar=(CBO1%3A[^&]+|CBO1:[^&]+)/);if(m){const t=decodeURIComponent(m[1]),o=JSON.parse(decodeURIComponent(escape(atob(t.slice(5)))));
   if(o.url&&o.clave){cfg={url:o.url,clave:o.clave};guardarLS(CFG_K,cfg)}history.replaceState(null,"",location.pathname+"#inicio")}}catch(e){console.warn("enlace de acceso",e)}
 const SES_K="cbo-sesion";
+const parametrosAcceso = new URLSearchParams(location.hash.slice(1));
+const enlaceServidor = parametrosAcceso.get("servidor");
+const invitacionEnlace = parametrosAcceso.get("invitacion") || "";
+const invitacionCorreoKey = "cbo-invitacion-correo";
+if (enlaceServidor && esURLServidorCorreo(enlaceServidor) && (!cfg || cfg.url === enlaceServidor)) {
+  if (!cfg) {
+    cfg = {url: enlaceServidor};
+    guardarLS(CFG_K, cfg);
+  }
+  if (/^[a-f0-9]{64}$/.test(invitacionEnlace)) guardarLS(invitacionCorreoKey, {url: enlaceServidor, token: invitacionEnlace});
+  history.replaceState(null, "", location.pathname + "#inicio");
+}
+function invitacionCorreoActual() {
+  const guardada = leerLS(invitacionCorreoKey, null);
+  return guardada && guardada.url === cfg?.url ? guardada.token : "";
+}
 let sesion=leerLS(SES_K,null); if(!(sesion&&sesion.u&&sesion.t))sesion=null;
 async function api(accion,extra,conf){
   const c=conf||cfg;
@@ -3095,7 +3216,7 @@ async function api(accion,extra,conf){
   finally{clearTimeout(to)}
   const j=await res.json();
   if(!j.ok&&j.error==="sesion"&&!conf)perderSesion();
-  if(!j.ok){const e=new Error(j.error==="duplicado"?"ya está registrado"+(j.por?" por "+nomCorto(j.por):""):j.error==="sesion"?"Entra con tu PIN para continuar":(j.error||"Error"));e.code=j.error;e.por=j.por;throw e}
+  if(!j.ok){const e=new Error(j.error==="duplicado"?"ya está registrado"+(j.por?" por "+nomCorto(j.por):""):j.error==="sesion"?"Entra a tu cuenta para continuar":(j.error||"Error"));e.code=j.error;e.por=j.por;throw e}
   return j;
 }
 // Modo de prueba: solo cuando el enlace apunta a 127.0.0.1 (el simulador). Guarda en este equipo y no llama a Google.
@@ -3137,8 +3258,9 @@ const COLA_K="cbo-cola";
 // Hasta el 04/11/2026 todos los comprobantes los registró Josué Villar; desde ahí, cada equipo registra con su nombre
 const CORTE_POR="2026-11-04", CORTE_POR_MS=new Date("2026-11-05T00:00:00-05:00").getTime();
 function porHistorico(r){const antes=r.creado?(+r.creado<CORTE_POR_MS):(String(r.fecha||"")<=CORTE_POR);if(!r.por||antes)r.por="JOSUÉ VILLAR";return r}
-let cola=leerLS(COLA_K,[]), servidorRows=leerLS(CACHE_K,[]).map(porHistorico), enviando=false;
-const guardarCola=()=>{guardarLS(COLA_K,cola);pintarCola()};
+const colaDeSesion = s => typeof s?.t === "string" && s.t.startsWith("correo~") ? COLA_K + ":" + s.u : COLA_K;
+let cola=leerLS(colaDeSesion(sesion),[]), servidorRows=leerLS(CACHE_K,[]).map(porHistorico), enviando=false;
+const guardarCola=()=>{guardarLS(colaDeSesion(sesion),cola);pintarCola()};
 // Error de red (sin señal, tiempo agotado) frente a error del servidor (clave, datos inválidos)
 // Ojo: el corte por tiempo (AbortError) trae un "code" numérico del navegador; solo los errores del servidor traen code de texto
 const esErrorRed=e=>!e||(typeof e.code!=="string"&&(e.name==="TypeError"||e.name==="SyntaxError"||e.name==="AbortError"||/fetch|network|red|load failed|abort/i.test(e.message||"")));
@@ -3167,10 +3289,11 @@ const mismoReg=(a,b)=>a.tipo===b.tipo&&a.fecha===b.fecha&&Math.abs((+a.monto||0)
   &&String(a.serie||"")===String(b.serie||"")&&String(a.numero||"")===String(b.numero||"")
   &&String(a.ruc||"").replace(/\D/g,"")===String(b.ruc||"").replace(/\D/g,"")&&(a.categoria||"")===(b.categoria||"");
 async function enviarCola(){
-  if(enviando||!cola.length||esDemo())return;
+  if(enviando||!sesion||!cola.length||esDemo())return;
+  const sesionEnvio = sesion;
   enviando=true; pintarCola();
   try{
-    while(cola.length){
+    while(cola.length && sesion===sesionEnvio){
       const op=cola[0];
       try{
         if(op.op==="agregar"){
@@ -3193,7 +3316,7 @@ async function enviarCola(){
         else if(op.op==="borrar") await api("borrar",{id:op.id});
         else if(op.op==="foto"&&op.id&&!String(op.id).startsWith("tmp")) await api("subirFoto",{id:op.id,nombre:op.nombre,tipo:"image/jpeg",base64:op.base64});
       }catch(e){
-        if(esErrorRed(e)) break;              // sigue sin señal: se intentará después
+        if(e.code==="sesion" || esErrorRed(e)) break; // conserva el cambio hasta que pueda enviarse
         if(e.code==="clave") throw e;
         if(e.code==="duplicado"){toast(`Ya estaba registrado${e.por?" por "+nomCorto(e.por):""}: no se guardó dos veces.`);cola.shift();guardarCola();continue}
         toast("No se pudo enviar un cambio pendiente: "+(e.message||"error"));  // dato rechazado: se descarta para no bloquear la cola
@@ -3299,7 +3422,7 @@ function pintarQuien(){
 }
 const sinNube=()=>esDemo()&&!window.__nube; // modo de prueba sin servidor: no hay PIN que revisar
 // El PIN de cada uno (solo llega al administrador) se queda en memoria, no se guarda en el equipo
-const usarLista=j=>{PERSONAS=(j.usuarios||[]).map(x=>({n:x.usuario,pin:!!x.tienePin,admin:!!x.admin,p:x.pin||"",b:!!x.bloqueado,oc:x.ocultas||[],d:!!x.descargar,eq:x.equipos||[],m:x.metodo||"pin",hu:x.huellas||[]}));guardarLS("cbo-personas",PERSONAS.map(({p,...r})=>r));pintarQuien()};
+const usarLista=j=>{PERSONAS=(j.usuarios||[]).map(x=>({n:x.usuario,pin:!!x.tienePin,admin:!!x.admin,p:x.pin||"",correo:x.correo||"",alta:x.altaCorreo||0,b:!!x.bloqueado,oc:x.ocultas||[],d:!!x.descargar,eq:x.equipos||[],m:x.metodo||"pin",hu:x.huellas||[]}));guardarLS("cbo-personas",PERSONAS.map(({p,...r})=>r));pintarQuien()};
 // Nombre del equipo para la lista "Equipos con sesión abierta" del administrador
 let EQUIPO=(()=>{const a=navigator.userAgent||"";const um=(a.match(/Android [\d.]+; ([^;)]+)\)/)||[])[1];const so=/Android/i.test(a)?"Celular Android":/iPhone/i.test(a)?"Apple iPhone":/iPad/i.test(a)?"Apple iPad":/Windows/i.test(a)?"PC Windows":/Mac/i.test(a)?"Apple Mac":"Equipo";const nav=/Edg\//.test(a)?"Edge":/Chrome\//.test(a)?"Chrome":/Safari\//.test(a)?"Safari":/Firefox\//.test(a)?"Firefox":"";let inst=false;try{inst=matchMedia("(display-mode: standalone)").matches}catch{}return so+(inst?" · app instalada":nav?" · "+nav:"")})();
 const sesDe=j=>({u:j.usuario,t:j.token,admin:!!j.admin,ocultas:j.ocultas||[],descargar:!!(j.admin||j.descargar)});
@@ -3332,13 +3455,228 @@ async function entrarComo(n){
   perfilUlt=0;sincPerfil(true);if(s.admin)cargarUsuarios();cargar();
 }
 async function cargarUsuarios(){if(!cfg||sinNube())return;try{usarLista(await api("usuarios"))}catch(e){}}
-let pidiendo=false;
-async function pedirUsuario(){
-  if(!cfg||sesion||pidiendo||!$("ovQuien").hidden)return;
-  pidiendo=true;pintarQuien();abrirOv("ovQuien");await cargarUsuarios();pidiendo=false;
+let pidiendo = false;
+let accesoPorCorreo = !!sesion?.t.startsWith("correo~");
+
+function abrirAccesoCorreo() {
+  const form = $("accesoCorreo");
+  const correo = $("correoAcceso");
+  const codigo = $("codigoCorreoAcceso");
+  const nombreCampo = $("nombreCorreoAcceso");
+  const marca = $("marcaCorreo");
+  const saludo = $("saludoCorreo");
+  const aviso = $("mensajeCorreo");
+  const enviar = $("enviarCodigo");
+  const aceptar = $("entrarCorreo");
+  const cambiar = $("activarCorreo");
+  const campos = $("camposAcceso");
+  const confirmacion = $("accesoConfirmado");
+  const medios = matchMedia("(prefers-reduced-motion: reduce)");
+  let paso = "correo", ocupado = false, nombreExistente = "";
+  function animarMarca() {
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const [logo, nombre] = marca.querySelector(".acceso-identidad").children;
+    const animaciones = [
+      [logo, [{transform:"translateY(9px) scale(.89)",opacity:.3},{transform:"translateY(-2px) scale(1.035)",opacity:1,offset:.75},{transform:"none",opacity:1}], 0, 450],
+      [nombre, [{transform:"translateY(6px)",opacity:0},{transform:"none",opacity:1}], 90, 340]
+    ];
+    for (const [elemento, fotogramas, delay, duration] of animaciones) {
+      elemento.getAnimations().forEach(animacion => animacion.cancel());
+      elemento.animate(fotogramas, {delay,duration,easing:"cubic-bezier(.2,.65,.25,1)",fill:"backwards"});
+    }
+  }
+  function saludar(usarNombre) {
+    const hora = new Date().getHours();
+    const saludoDelDia = hora < 12 ? "Buenos días" : hora < 19 ? "Buenas tardes" : "Buenas noches";
+    const nombre = usarNombre ? nombreCampo.value.trim().split(/\s+/, 1)[0] : "";
+    saludo.textContent = nombre ? saludoDelDia + ", " + nombre + "." : saludoDelDia + ". Te damos la bienvenida.";
+  }
+  nombreCampo.oninput = evento => {
+    if (evento.isComposing) return;
+    const cursor = nombreCampo.selectionStart;
+    const nombre = nombreCampo.value.replace(/(^|[\s'’-])\p{Ll}/gu, letra => letra.toLocaleUpperCase("es"));
+    if (nombre !== nombreCampo.value) {
+      nombreCampo.value = nombre;
+      nombreCampo.setSelectionRange(cursor, cursor);
+    }
+    saludar(true);
+  };
+  function mostrarPaso(nuevo, mensaje = "") {
+    paso = nuevo;
+    const esRegistro = paso === "perfil";
+    const esEntrada = paso === "entrar";
+    if (marca.dataset.paso !== paso) animarMarca();
+    marca.dataset.paso = paso;
+    saludar(esRegistro);
+    correo.readOnly = paso !== "correo";
+    $("perfilCorreo").hidden = $("perfilCorreo").disabled = paso === "correo";
+    $("nombreRegistro").hidden = nombreCampo.disabled = !esRegistro;
+    $("nombreCuenta").hidden = !esEntrada || !nombreExistente;
+    $("nombreCuenta").textContent = nombreExistente ? "Cuenta de " + nombreExistente : "";
+    $("pasoCorreo").hidden = paso === "correo";
+    $("pasoCorreo").textContent = "Código enviado a " + correo.value.trim();
+    $("tituloCorreo").textContent = {correo:"Inicia sesión", codigo:"Verifica tu correo", perfil:"Completa tu registro", entrar:"Entra con tu PIN"}[paso];
+    $("ayudaCorreo").textContent = {
+      correo:"Te enviaremos un código para confirmar tu correo.",
+      codigo:"Ingresa los seis números del mensaje.",
+      perfil:"Escribe tu nombre y crea tu PIN.",
+      entrar:"Usa tu PIN para autorizar este dispositivo."
+    }[paso];
+    aceptar.textContent = {correo:"Enviarme un código", codigo:"Verificar código", perfil:"Crear mi PIN", entrar:"Ingresar PIN"}[paso];
+    cambiar.hidden = paso === "correo";
+    aviso.textContent = mensaje;
+  }
+  function bloquear(valor) {
+    ocupado = valor;
+    for (const control of [enviar, aceptar, cambiar]) control.disabled = valor;
+  }
+  form.reset();
+  campos.hidden = false;
+  confirmacion.hidden = true;
+  form.hidden = false;
+  mostrarPaso("correo");
+
+  function datosCorreo() {
+    return {correo:correo.value.trim(), codigo:codigo.value, invitacion:invitacionCorreoActual()};
+  }
+  async function pedirCodigo() {
+    if (!correo.reportValidity()) return;
+    await api("enviarCodigoCorreo", datosCorreo());
+    codigo.value = "";
+    mostrarPaso("codigo", "Revisa tu correo. El código vence en 10 minutos.");
+    codigo.focus();
+  }
+  cambiar.onclick = () => {
+    codigo.value = "";
+    nombreExistente = "";
+    mostrarPaso("correo");
+    correo.focus();
+  };
+  enviar.onclick = async () => {
+    if (ocupado) return;
+    bloquear(true);
+    try { await pedirCodigo(); }
+    catch (error) { aviso.textContent = error.message; }
+    finally { bloquear(false); }
+  };
+  codigo.oninput = () => {
+    if (paso === "perfil" || paso === "entrar") mostrarPaso("codigo");
+    if (paso === "codigo" && !ocupado && /^[0-9]{6}$/.test(codigo.value)) form.requestSubmit();
+  };
+
+  async function mostrarInicio(respuesta, nombre) {
+    if (!respuesta?.token?.startsWith("correo~")) throw new Error("El servidor no devolvió una sesión válida");
+      // Evita conservar la copia descargada de la cuenta anterior.
+      servidorRows = [];
+      rows = [];
+      guardarLS(CACHE_K, []);
+      guardarLS("cbo-ver", "");
+      PERSONAS = [];
+      const nuevaSesion = sesDe(respuesta);
+      const destinoCola = colaDeSesion(nuevaSesion);
+      cola = leerLS(destinoCola, []);
+      const colaAnterior = leerLS(COLA_K, []);
+      if (colaAnterior.length) {
+        const claveTitular = COLA_K + ":titular-anterior";
+        const titular = leerLS(claveTitular, null) ?? (quienAntes || "");
+        guardarLS(claveTitular, titular);
+        if (!cola.length && nuevaSesion.u === titular) {
+          guardarLS(destinoCola, colaAnterior);
+          if (leerLS(destinoCola, []).length === colaAnterior.length) {
+            cola = colaAnterior;
+            guardarLS(COLA_K, []);
+          }
+        }
+      }
+      ponerSesion(nuevaSesion);
+    $("accesoConfirmadoNombre").textContent = "Todo listo, " + (nombre.split(/\s+/,1)[0] || nomCorto(quien)) + ".";
+    campos.hidden = true;
+    confirmacion.hidden = false;
+    ir("inicio");
+    if (!medios.matches) {
+      await confirmacion.animate(
+        [{opacity:.12,transform:"translateY(8px)"},{opacity:1,transform:"none",offset:.5},{opacity:1,transform:"none"}],
+        {duration:540,easing:"ease-out"}
+      ).finished.catch(() => {});
+      await $("ovQuien").animate([{opacity:1},{opacity:0}], {duration:230,easing:"ease-in-out"}).finished.catch(() => {});
+    }
+    cerrarOv("ovQuien");
+    form.reset();
+    perfilUlt = 0;
+    sincPerfil(true);
+    if (esAdmin()) cargarUsuarios();
+    cargar();
+  }
+  form.onsubmit = async evento => {
+    evento.preventDefault();
+    if (ocupado) return;
+    bloquear(true);
+    aviso.textContent = "";
+    try {
+      if (paso === "correo") { await pedirCodigo(); return; }
+      if (paso === "codigo") {
+        const estado = await api("verificarCodigoCorreo", datosCorreo());
+        nombreExistente = estado.nombre || "";
+        mostrarPaso(estado.registro ? "perfil" : "entrar");
+        if (estado.registro) nombreCampo.focus();
+        return;
+      }
+      if (enviando || cargando) throw new Error("Espera a que termine la actualización");
+      const alta = paso === "perfil";
+      const datos = {...datosCorreo(), equipo:EQUIPO};
+      const nombre = alta ? nombreCampo.value.trim() : nombreExistente;
+      if (alta && !nombre) throw new Error("Escribe tu nombre y apellidos");
+      document.activeElement?.blur();
+      form.inert = true;
+      let resultado;
+      try {
+        const solicitud = alta
+          ? abrirPin("elegir", "Elige tu PIN de 4 números")
+          : abrirPin("externo", "Escribe tu PIN", pin => api("entrarCorreo",{...datos,pin}));
+        $("pinCancelar").focus({preventScroll:true});
+        resultado = await solicitud;
+      } finally { form.inert = false; }
+      if (!resultado) return;
+      if (alta) {
+        resultado = await api("registrarCorreo", {...datos,nombre,pin:resultado});
+        try { localStorage.removeItem(invitacionCorreoKey); } catch {}
+      }
+      await mostrarInicio(resultado, nombre);
+    } catch(error) { aviso.textContent = error.message; }
+    finally { bloquear(false); }
+  };
+}
+async function pedirUsuario() {
+  if (!cfg || sesion || pidiendo || !$("ovQuien").hidden) return;
+  pidiendo = true;
+  abrirOv("ovQuien");
+  try {
+    if (!esDemo()) {
+      try {
+        const estado = await api("estadoAcceso");
+        accesoPorCorreo = estado.correo === true;
+      } catch (error) {
+        // La versión anterior exige sesión para las acciones que desconoce.
+        if (!["sesion", "Acción desconocida"].includes(error.code)) throw error;
+      }
+    }
+    $("accesoAnterior").hidden = accesoPorCorreo;
+    $("accesoCorreo").hidden = !accesoPorCorreo;
+    if (accesoPorCorreo) { abrirAccesoCorreo(); }
+    else {
+      pintarQuien();
+      await cargarUsuarios();
+    }
+  } catch (error) {
+    abrirAccesoCorreo();
+    const aviso = $("mensajeAccesoCorreo");
+    aviso.textContent = "No se pudo conectar con Finanzas. Vuelve a cargar la página para reintentar.";
+  } finally {
+    pidiendo = false;
+  }
 }
 function perderSesion(){if(!sesion)return;sesion=null;try{localStorage.removeItem(SES_K);localStorage.removeItem("cbo-sesion-admin")}catch{};quien="";pintarQuien();setTimeout(pedirUsuario,0)}
-function salirSesion(){perderSesion();$("app").classList.remove("abierto");document.body.classList.remove("menu")}
+function salirSesion(){if(enviando||cargando){toast("Espera a que termine la actualización");return}perderSesion();$("app").classList.remove("abierto");document.body.classList.remove("menu")}
 function pinAlAzar(n){
   const usados=new Set(PERSONAS.filter(p=>p.n!==n).map(p=>p.p).filter(Boolean));
   const facil=x=>/^(\d)\1{3}$/.test(x)||"01234567890".includes(x)||"09876543210".includes(x);
@@ -3415,12 +3753,12 @@ const fhUsr=ms=>{try{return ms?new Date(ms).toLocaleString("es-PE",{day:"2-digit
 function pintarSesion(){
   const el=$("quienSeg");if(!el)return;
   if(!sesion){el.innerHTML=`<button class="btn pri" type="button" id="sesEntrar">Entrar con mi PIN</button>`;$("sesEntrar").onclick=pedirUsuario;return}
-  const fila=p=>`<li class="usr-li${p.b?" off":""}"><div class="usr-cab"><span><b>${esc(titulo(p.n))}${p.n===quien?" (tú)":""}</b><small>${p.admin?"Administrador":p.b?"Sin acceso":"Usuario"} · PIN <span class="usr-pin" data-pin="${esc(p.p||"")}">••••</span></small></span><button class="btnlink" type="button" data-abrir="${esc(p.n)}">${usrAbierto===p.n?"Cerrar":"Opciones"}</button></div>
-    <div class="usr-det"${usrAbierto===p.n?"":" hidden"}><div class="usr-acc">${p.p?`<button class="btnlink" type="button" data-verpin>Ver PIN</button>`:""}${p.n!==quien&&!p.b?`<button class="btnlink" type="button" data-como="${esc(p.n)}">Entrar como</button>`:""}<button class="btnlink" type="button" data-ponpin="${esc(p.n)}">Cambiar PIN</button><button class="btnlink" type="button" data-pinazar="${esc(p.n)}">PIN al azar</button>${!p.admin?`<button class="btnlink" type="button" data-acceso="${esc(p.n)}" data-permitir="${p.b?"1":""}">${p.b?"Dar acceso":"Quitar acceso"}</button>`:""}</div>
+  const fila=p=>`<li class="usr-li${p.b?" off":""}"><div class="usr-cab"><span><b>${esc(titulo(p.n))}${p.n===quien?" (tú)":""}</b><small>${p.admin?"Administrador":p.b?"Sin acceso":"Usuario"}${p.correo?" · "+esc(p.correo):""}${p.alta?" · Alta "+esc(fhUsr(p.alta)):""} · PIN <span class="usr-pin" data-pin="${esc(p.p||"")}">••••</span></small></span><button class="btnlink" type="button" data-abrir="${esc(p.n)}">${usrAbierto===p.n?"Cerrar":"Opciones"}</button></div>
+    <div class="usr-det"${usrAbierto===p.n?"":" hidden"}><div class="usr-acc">${p.p?`<button class="btnlink" type="button" data-verpin>Ver PIN</button>`:""}${!accesoPorCorreo&&p.n!==quien&&!p.b?`<button class="btnlink" type="button" data-como="${esc(p.n)}">Entrar como</button>`:""}<button class="btnlink" type="button" data-ponpin="${esc(p.n)}">Cambiar PIN</button><button class="btnlink" type="button" data-pinazar="${esc(p.n)}">PIN al azar</button>${!p.admin?`<button class="btnlink" type="button" data-acceso="${esc(p.n)}" data-permitir="${p.b?"1":""}">${p.b?"Dar acceso":"Quitar acceso"}</button>`:""}</div>
     ${!p.admin?`<p class="pal-t">Puede ver y usar</p><div class="usr-perm">${SECC_PERM.map(k=>`<label><input type="checkbox" data-secc="${k}"${(p.oc||[]).includes(k)?"":" checked"}> ${SECC_NOM[k]}</label>`).join("")}<label><input type="checkbox" data-desc${p.d?" checked":""}> Descargar reportes</label></div><div class="line"><button class="btn" type="button" data-guardperm="${esc(p.n)}">Guardar permisos</button></div>`:""}
     ${filaAcceso(p)}<p class="pal-t">Sus equipos</p>${eqAgrupados(p.eq).length?`<ul class="usr-eq">${eqAgrupados(p.eq).map(g=>`<li><i class="eq-ic" aria-hidden="true">${icoEq(g.e.eq)}</i><span>${esc(nomEq(g.e.eq).replace(/^Administrador · /,""))}<small>Último uso ${fhUsr(g.u)}</small></span><button class="btnlink" type="button" data-cerrarses="${esc(p.n)}" data-sids="${esc(g.ids.join(","))}">Cerrar sesión</button></li>`).join("")}</ul>`:`<p class="hint" style="margin:0">Ninguno</p>`}</div></li>`;
   const adm=sesion.admin?`<p class="pal-t" style="margin:16px 0 6px">Usuarios</p><ul class="usr-lista">${PERSONAS.map(fila).join("")}</ul>
-    <p class="pal-t" style="margin:22px 0 8px">Agregar usuario</p><div class="usr-nuevo"><input id="usrNombre" type="text" placeholder="Nombre y apellido" maxlength="40" autocomplete="off" aria-label="Nombre del usuario nuevo"><div class="usr-fila"><label class="usr-azar"><input type="checkbox" id="usrAzar"> PIN al azar</label><button class="btn" type="button" id="usrAgregar">Agregar usuario</button></div></div>
+    ${accesoPorCorreo ? `<p class="hint">Los usuarios que se registran con una invitación entran de inmediato. Su alta queda en el historial.</p>` : `<p class="pal-t" style="margin:22px 0 8px">Agregar usuario</p><div class="usr-nuevo"><input id="usrNombre" type="text" placeholder="Nombre y apellido" maxlength="40" autocomplete="off" aria-label="Nombre del usuario nuevo"><div class="usr-fila"><label class="usr-azar"><input type="checkbox" id="usrAzar"> PIN al azar</label><button class="btn" type="button" id="usrAgregar">Agregar usuario</button></div></div>`}
     <p class="pal-t" style="margin:16px 0 6px">Historial de cambios (solo lo ves tú)</p><button class="btn" type="button" id="verHist">Ver historial</button><ul class="usr-hist" id="usrHist" hidden></ul>`:"";
   el.innerHTML=`<p class="usr-yo">Entraste como <b>${esc(titulo(quien))}</b> en este equipo.</p>${!sesion.admin&&leerLS(SESA_K,null)?`<div class="line" style="margin-bottom:10px"><button class="btn pri" type="button" id="sesVolver">Volver a ${esc(nomCorto(leerLS(SESA_K,{}).u))}</button></div>`:""}<div class="line"><button class="btn" type="button" id="sesCambiar">Cambiar de usuario</button><button class="btnlink" type="button" id="sesSalir">Salir de este equipo</button></div>${adm}`;
   const vb=$("sesVolver");if(vb)vb.onclick=volverAdmin;
@@ -3800,7 +4138,7 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
   document.body.append(t);
   let el=null;
   // Los campos de números no abren el teclado del celular
-  const marcar=r=>{if(!activo())return;(r.querySelectorAll?r:document).querySelectorAll(SEL).forEach(i=>{if(i.dataset.teclOk)return;i.dataset.teclOk="1";i.dataset.teclIm=i.getAttribute("inputmode")||(i.type==="tel"?"tel":i.type==="number"?"decimal":"numeric");if(i.type==="number"||i.type==="tel"){i.dataset.teclType=i.type;try{i.type="text"}catch{}}i.setAttribute("inputmode","none")})};
+  const marcar=r=>{if(!activo())return;(r.querySelectorAll?r:document).querySelectorAll(SEL).forEach(i=>{if(i.dataset.teclOk||i.closest("#accesoCorreo"))return;i.dataset.teclOk="1";i.dataset.teclIm=i.getAttribute("inputmode")||(i.type==="tel"?"tel":i.type==="number"?"decimal":"numeric");if(i.type==="number"||i.type==="tel"){i.dataset.teclType=i.type;try{i.type="text"}catch{}}i.setAttribute("inputmode","none")})};
   window.__teclMarcar=marcar;marcar(document);new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1){if(n.matches&&n.matches(SEL))marcar(n.parentNode||document);else marcar(n)}}))).observe(document.body,{childList:true,subtree:true});
   const etiqueta=i=>{const l=i.closest("label")||(i.id&&document.querySelector(`label[for="${i.id}"]`));let s=l?[...l.childNodes].filter(n=>n!==i&&!(n.querySelector&&n.querySelector("input"))).map(n=>n.textContent).join(" "):"";s=(s||i.placeholder||i.getAttribute("aria-label")||"").replace(/\s+/g," ").trim();return s.slice(0,60)};
   const visibles=()=>[...document.querySelectorAll(SEL2)].filter(i=>i.dataset.teclOk&&!i.disabled&&!i.readOnly&&i.getClientRects().length);
@@ -3885,7 +4223,7 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
       const lbl=k==="␣"?"espacio":k==="⏎"?(el&&el.tagName==="TEXTAREA"?"↵":"Listo"):(capa==="abc"&&may&&k.length===1?k.toUpperCase():k);
       const cls=k==="␣"?"sp":k==="⏎"?"ok":["⇧","⌫","123","ABC","#+="].includes(k)?"esp":"";
       return `<button type="button" class="tk ${cls}${capa==="abc"&&HINT[k]?" h":""}${k==="⇧"&&may?" on":""}" data-k="${esc(k)}"${alts(k).length?' data-alt="1"':""}>${esc(lbl)}${capa==="abc"&&HINT[k]?`<sup>${esc(HINT[k])}</sup>`:""}</button>`}).join("")}</div>`).join("")};
-  const marcar=r=>{if(!activo())return;(r.querySelectorAll?r:document).querySelectorAll(SEL).forEach(i=>{if(i.dataset.letOk||ES_NUM(i)||i.readOnly)return;i.dataset.letOk="1";i.dataset.letIm=i.getAttribute("inputmode")||"";if(i.type==="email"||i.type==="search"){i.dataset.letType=i.type;try{i.type="text"}catch{}}i.setAttribute("inputmode","none");if(i.hasAttribute("list")){i.dataset.letList=i.getAttribute("list");i.removeAttribute("list")}})};
+  const marcar=r=>{if(!activo())return;(r.querySelectorAll?r:document).querySelectorAll(SEL).forEach(i=>{if(i.dataset.letOk||ES_NUM(i)||i.readOnly||i.closest("#accesoCorreo"))return;i.dataset.letOk="1";i.dataset.letIm=i.getAttribute("inputmode")||"";if(i.type==="email"||i.type==="search"){i.dataset.letType=i.type;try{i.type="text"}catch{}}i.setAttribute("inputmode","none");if(i.hasAttribute("list")){i.dataset.letList=i.getAttribute("list");i.removeAttribute("list")}})};
   window.__letMarcar=marcar;marcar(document);new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1)marcar(n.matches&&n.matches(SEL)?(n.parentNode||document):n)}))).observe(document.body,{childList:true,subtree:true});
   const etiqueta=i=>{const l=i.closest("label")||(i.id&&document.querySelector(`label[for="${i.id}"]`));let s=l?[...l.childNodes].filter(n=>n!==i&&!(n.querySelector&&n.querySelector("input,textarea"))).map(n=>n.textContent).join(" "):"";return (s||i.placeholder||i.getAttribute("aria-label")||"").replace(/\s+/g," ").trim().slice(0,60)};
   const autoMay=()=>{if(!el||may===2)return;const v=el.value.slice(0,el.selectionStart==null?el.value.length:el.selectionStart);may=(el.type!=="email")&&(!v.trim()||/[.!?¿¡]\s$/.test(v))?1:0};
@@ -4025,16 +4363,48 @@ entrarComo=async function(n){
 };
 // Si el servidor rechaza la sesión guardada (PIN cambiado, acceso quitado), se olvida en este equipo
 let cambiandoUsr=false;
-// Desde la foto de arriba: cambiar de usuario (al instante) o cerrar la sesión de este equipo (la próxima vez pide el PIN)
-// Solo el administrador ve "Cambiar de usuario" y "Cerrar sesión" en su foto
-function pintarPerfilSes(){const ps=document.querySelector(".perfil-ses");if(ps)ps.hidden=!esAdmin()}
-$("usuarioBtn").addEventListener("click",pintarPerfilSes,true);pintarPerfilSes();
-$("perfilCambiar").onclick=()=>{if(!esAdmin())return;cerrarOv("ovPerfil");cambiarUsuario()};
-$("perfilSalir").onclick=async()=>{if(!sesion||!esAdmin())return;if(!await cboConfirmar(`¿Cerrar la sesión de ${titulo(sesion.u)} en este equipo? La próxima vez entrará con su PIN.`))return;
-  const yo=sesion.u,t=String(sesion.t||"").split("~"),sid=t.length===3?t[1]:t[3];
-  if(sid&&!sinNube())api("cerrarSesion",{usuario:yo,id:sid}).catch(()=>{});   // por detrás, sin esperar
-  accPoner(yo,{t:"",h:"",s:"",tc:""});try{localStorage.removeItem(SESA_K)}catch{}
-  cerrarOv("ovPerfil");cambiandoUsr=true;try{salirSesion()}finally{cambiandoUsr=false}toast("Sesión cerrada en este equipo")};
+// Cambiar de usuario sigue reservado al administrador.
+$("usuarioBtn").addEventListener("click", () => {
+  $("perfilCambiar").hidden = !esAdmin();
+}, true);
+$("perfilCambiar").onclick = () => {
+  if (!esAdmin()) return;
+  cerrarOv("ovPerfil");
+  cambiarUsuario();
+};
+$("perfilSalir").onclick = async () => {
+  if (!sesion || $("perfilSalir").disabled) return;
+  if (enviando || cargando) {
+    toast("Espera a que termine la actualización");
+    return;
+  }
+  const actual = sesion;
+  const botones = $("perfilSalir");
+  botones.disabled = true;
+  try {
+    if (!sinNube()) {
+      if (actual.t.startsWith("correo~")) await api("cerrarMiSesion").catch(() => {});
+      else if (actual.admin) {
+        const partes = actual.t.split("~");
+        const id = partes.length === 3 ? partes[1] : partes[3];
+        if (id) await api("cerrarSesion", {usuario:actual.u, id}).catch(() => {});
+      }
+    }
+    accPoner(actual.u, {t:"", h:"", s:"", tc:""});
+    try { localStorage.removeItem(SESA_K); } catch {}
+    cerrarOv("ovPerfil");
+    cambiandoUsr = true;
+    try {
+      perderSesion();
+      $("app").classList.remove("abierto");
+      document.body.classList.remove("menu");
+    } finally {
+      cambiandoUsr = false;
+    }
+  } finally {
+    botones.disabled = false;
+  }
+};
 const perderSesionBase=perderSesion;
 perderSesion=function(){if(sesion&&!cambiandoUsr){const a=accDe(sesion.u);if(a&&(a.t||a.tc))accPoner(sesion.u,{t:a.t===sesion.t?"":a.t,tc:a.tc===sesion.t?"":a.tc})}return perderSesionBase()};
 function cambiarUsuario(){cambiandoUsr=true;try{salirSesion()}finally{cambiandoUsr=false}}
@@ -4101,7 +4471,20 @@ $("setupF").addEventListener("submit",async e=>{
 /* Código de conexión: guarda enlace y clave en un texto para recuperarlos sin buscarlos (queda solo en manos del dueño) */
 const aCodigo=c=>"CBO1:"+btoa(unescape(encodeURIComponent(JSON.stringify({url:c.url,clave:c.clave}))));
 const deCodigo=t=>{const s=String(t||"").trim();if(!s.startsWith("CBO1:"))throw new Error("formato");const o=JSON.parse(decodeURIComponent(escape(atob(s.slice(5)))));if(!o.url||!o.clave)throw new Error("formato");return o};
-$("compartirAcceso").onclick=()=>{
+async function enlaceDeRegistroCorreo() {
+  const alta = await api("crearInvitacionCorreo");
+  const parametros = new URLSearchParams({servidor: cfg.url, invitacion: alta.invitacion});
+  return location.origin + location.pathname + "#" + parametros;
+}
+$("compartirAcceso").onclick=async()=>{
+  if (accesoPorCorreo && cfg?.url) {
+    try {
+      const enlace = await enlaceDeRegistroCorreo();
+      const texto = "Crea tu cuenta en CBO Finanzas. Invitación válida una vez durante 7 días: " + enlace;
+      if (!window.open("https://wa.me/?text=" + encodeURIComponent(texto), "_blank")) window.prompt("Copia este enlace para compartirlo", enlace);
+    } catch (error) { toast(error.message); }
+    return;
+  }
   if(!cfg||!cfg.clave){toast("Primero conecta la app");return}
   const enlace=location.origin+location.pathname+"#conectar="+encodeURIComponent(aCodigo(cfg));
   const txt="Entra a CBO Finanzas con este enlace (ya queda conectada, no pide clave). Solo para personal de confianza: "+enlace;
@@ -4109,7 +4492,9 @@ $("compartirAcceso").onclick=()=>{
 };
 $("copiarCon").onclick=async()=>{
   if(!cfg||!cfg.url){$("copiarConMsg").textContent="Primero conecta la app.";return}
-  const cod=aCodigo(cfg);
+  let cod;
+  try { cod=accesoPorCorreo ? await enlaceDeRegistroCorreo() : aCodigo(cfg); }
+  catch(error) { $("copiarConMsg").textContent=error.message; return; }
   try{await navigator.clipboard.writeText(cod);$("copiarConMsg").textContent="Copiado. Pégalo en tus notas o en WhatsApp a ti mismo."}
   catch(e){window.prompt("Copia este código y guárdalo:",cod)}
 };
