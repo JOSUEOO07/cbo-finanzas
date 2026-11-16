@@ -1199,7 +1199,7 @@ body.fiesta #titulo{background:linear-gradient(90deg,currentColor 0%,currentColo
 .pal-tono i{height:38px;border-radius:9px;display:block;box-shadow:0 0 0 1px rgba(255,255,255,.12)}
 .pal-tono[aria-pressed="true"]{border-color:var(--brand-2);color:var(--ink);background:var(--soft)}
 .pal-tono:active{transform:scale(.96)}
-#marcaLogo,#adorPrevImg,.bloqueo img,.setup img{filter:var(--logo-f,none)}
+#marcaLogo,#logoHImg,#adorPrevImg,.bloqueo img,.setup img{filter:var(--logo-f,none)}
 
 /* Casillas de color: cada nombre dentro de la suya */
 .pal-esc{grid-template-columns:repeat(4,minmax(0,1fr))}
@@ -2327,7 +2327,7 @@ function aplicarTema(){
     <p class="pal-t">${F.k==="especial"?`Especiales: ${F.t.length} combinaciones`:`${F.n}: del más clarito al más intenso`}</p><div class="pal-esc" role="group" aria-label="Tonos de ${F.n}">${(F.k==="especial"?F.t:F.t.slice(1)).map(([k,n,a,b,g])=>`<button type="button" class="pal-tono" data-pal="${k}" aria-pressed="${k===P[0]}" aria-label="${n}"><i style="background:${g||a}"></i><span>${n}</span></button>`).join("")}</div>${F.k==="especial"?`<button type="button" class="btn pal-gen" id="espGen">Crear otra combinación</button>`:""}`}
 }
 const aparQuery=matchMedia("(prefers-color-scheme: dark)");
-function aplicarApariencia(){const modo=ajustes.apariencia||"auto",efectivo=modo==="auto"?(aparQuery.matches?"oscuro":"claro"):modo,raiz=document.documentElement;raiz.setAttribute("data-apariencia",efectivo);const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.setAttribute("content",efectivo==="claro"?"#F3F5F7":"#0B0D10");const s=$("aparienciaSeg");if(s)s.querySelectorAll("[data-apariencia]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.apariencia===modo)));const t=$("cfgv-apariencia");if(t)t.textContent=modo==="auto"?`Automático · ${efectivo}`:modo==="claro"?"Claro":"Oscuro"}
+function aplicarApariencia(){const modo=ajustes.apariencia||"auto",efectivo=modo==="auto"?(aparQuery.matches?"oscuro":"claro"):modo,raiz=document.documentElement;raiz.setAttribute("data-apariencia",efectivo);const lp=PALETAS.find(x=>x[0]===ajustes.paleta)||PALETAS.find(x=>x[0]===PAL_DEF),lc=fiestaCol||[lp[2],lp[3],lp[4]];raiz.style.setProperty("--logo-f",efectivo==="claro"?"invert(1)":temaDe(lc[0]).claro?"invert(1)":"none");const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.setAttribute("content",efectivo==="claro"?"#F3F5F7":"#0B0D10");const s=$("aparienciaSeg");if(s)s.querySelectorAll("[data-apariencia]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.apariencia===modo)));const t=$("cfgv-apariencia");if(t)t.textContent=modo==="auto"?`Automático · ${efectivo}`:modo==="claro"?"Claro":"Oscuro"}
 $("aparienciaSeg").addEventListener("click",e=>{const b=e.target.closest("[data-apariencia]");if(!b)return;ajustes.apariencia=b.dataset.apariencia;guardarLS("cbo-ajustes",ajustes);aplicarApariencia();pintarResumenCfg()});
 aparQuery.addEventListener("change",()=>{if((ajustes.apariencia||"auto")==="auto")aplicarApariencia()});
 // Teclado de la app para el monto: en celular reemplaza al del sistema; en computadora se sigue escribiendo normal
