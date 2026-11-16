@@ -3669,7 +3669,7 @@ async function pedirUsuario() {
     }
   } catch (error) {
     abrirAccesoCorreo();
-    const aviso = $("mensajeAccesoCorreo");
+    const aviso = $("mensajeCorreo");
     aviso.textContent = "No se pudo conectar con Finanzas. Vuelve a cargar la página para reintentar.";
   } finally {
     pidiendo = false;
