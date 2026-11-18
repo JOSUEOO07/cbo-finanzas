@@ -1643,7 +1643,7 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
       </section>
 
       <!-- CONFIGURACIÓN -->
-      <section data-sec="documentos" hidden><iframe class="docs-fr" id="docsFr" title="CBO Documentos" loading="lazy" data-src="documentos/"></iframe></section>
+      <section data-sec="documentos" hidden><div class="mdl" id="docsCbo"></div></section>
       <section data-sec="config" hidden>
         <div class="cfg-lista">
           <p class="cfg-grupo">Apariencia</p>
@@ -7012,6 +7012,59 @@ async function buscarEnMapa(v){
   .usr-perm-ob{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))!important;border:1px solid var(--line);border-radius:12px;padding:6px 10px}
   </style>`);
 })();
+/* ===== CBO: Documentos SST como sección propia (mismo diseño que los módulos). Archivos en documentos/docs/ ===== */
+let DOCS_CBO=null,docsF="",docsQ="";
+const DOCS_SEC={gasfiteria:"Gasfitería",electricidad:"Electricidad",generales:"Generales"};
+function docsFav(){return leerLS("cbo-doc-fav",[])}
+function docsAbrir(){
+  const el=$("docsCbo");if(!el)return;
+  if(!DOCS_CBO){el.innerHTML=`<p class="hint" style="margin:18px 4px">Cargando documentos…</p>`;
+    if(!window.CATALOGO){const sc=document.createElement("script");sc.src="documentos/docs/catalogo.js";sc.onload=()=>{DOCS_CBO=window.CATALOGO||[];docsPintar()};sc.onerror=()=>{el.innerHTML=`<p class="hint" style="margin:18px 4px">No se pudieron cargar los documentos. Revisa tu conexión.</p>`};document.head.append(sc)}
+    else{DOCS_CBO=window.CATALOGO;docsPintar()}return}
+  docsPintar();
+}
+function docsPintar(){
+  const el=$("docsCbo");if(!el||!DOCS_CBO)return;
+  const fav=docsFav(),n=k=>DOCS_CBO.filter(d=>d.seccion===k).length;
+  // La cabecera y el buscador se arman una sola vez (así el teclado no pierde la casilla); luego solo cambia la lista
+  if(!$("docsLista")){
+    el.innerHTML=`<div class="mdl-cab"><div class="mdl-res"><div class="mdl-kpi"><small>Documentos</small><b>${DOCS_CBO.length}</b></div><div class="mdl-kpi"><small>Gasfitería</small><b>${n("gasfiteria")}</b></div><div class="mdl-kpi"><small>Electricidad</small><b>${n("electricidad")}</b></div><div class="mdl-kpi"><small>Generales</small><b>${n("generales")}</b></div></div></div>
+    <div class="mdl-fil"><input class="mdl-q" id="docsQ" placeholder="Buscar documento…" maxlength="40"><div class="mdl-chips">${[["","Todos"],["gasfiteria","Gasfitería"],["electricidad","Electricidad"],["generales","Generales"],["fav","★ Favoritos"]].map(([k,t])=>`<button type="button" data-docf="${k}">${t}</button>`).join("")}</div></div>
+    <div id="docsLista"></div>`;
+  }
+  el.querySelectorAll("[data-docf]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.docf===docsF)));
+  const q=sinTildes(docsQ.trim());
+  let L=DOCS_CBO.filter(d=>docsF==="fav"?fav.includes(d.id):!docsF||d.seccion===docsF);
+  if(q)L=L.filter(d=>q.split(/\s+/).every(p=>sinTildes(`${d.titulo} ${d.id} ${d.grupo} ${DOCS_SEC[d.seccion]||""}`).includes(p)));
+  const grupos=[];L.forEach(d=>{const g=(DOCS_SEC[d.seccion]||"")+" · "+d.grupo;let x=grupos.find(y=>y[0]===g);if(!x)grupos.push(x=[g,[]]);x[1].push(d)});
+  $("docsLista").innerHTML=grupos.length?grupos.map(([g,ds])=>`<p class="pal-t docs-g">${esc(g)}</p><div class="mdl-lista">${ds.map(d=>`<article class="panel mdl-it docs-it" data-docid="${escA(d.id)}"><div class="mdl-tx"><b>${esc(d.titulo)}</b><small>${esc(d.id)} · ${d.paginas} pág${d.paginas>1?"s":""}.</small></div><button type="button" class="docs-fav${fav.includes(d.id)?" on":""}" data-docfav aria-label="Favorito">★</button>
+      <div class="mdl-acc"><button type="button" class="btn2" data-docacc="ver">Ver PDF</button><button type="button" class="btn2" data-docacc="enviar">Enviar</button><button type="button" class="btnlink" data-docacc="word">Word</button></div></article>`).join("")}</div>`).join(""):`<p class="hint" style="margin:18px 4px">${docsF==="fav"?"Aún no tienes favoritos. Toca ★ en un documento.":"No hay documentos con esa búsqueda."}</p>`;
+}
+const docsBlob=new Map();
+function docsTraer(id,ext){const k=id+"."+ext;if(!docsBlob.has(k))docsBlob.set(k,fetch(`documentos/docs/${encodeURIComponent(id)}.${ext}`).then(r=>{if(!r.ok)throw new Error(r.status);return r.blob()}).catch(e=>{docsBlob.delete(k);throw e}));return docsBlob.get(k)}
+const docsNombre=(d,ext)=>`${d.id} ${d.titulo}`.replace(/[\/:*?"<>|]/g,"-").replace(/\s+/g," ")+"."+ext;
+async function docsDescargar(d,ext){try{const u=URL.createObjectURL(await docsTraer(d.id,ext));const a=Object.assign(document.createElement("a"),{href:u,download:docsNombre(d,ext)});document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),20000)}catch(e){toast("No se pudo descargar. Revisa tu conexión.")}}
+async function docsEnviar(d,ext){
+  let f;try{f=new File([await docsTraer(d.id,ext)],docsNombre(d,ext),{type:ext==="pdf"?"application/pdf":"application/vnd.openxmlformats-officedocument.wordprocessingml.document"})}catch(e){toast("No se pudo cargar el archivo. Revisa tu conexión.");return}
+  if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:d.titulo})}catch(e){if(e.name==="NotAllowedError")toast("Toca otra vez para enviar.")}return}
+  docsDescargar(d,ext);toast("Se descargó el archivo: adjúntalo en WhatsApp.");
+}
+document.addEventListener("input",e=>{if(e.target.id==="docsQ"){docsQ=e.target.value;docsPintar()}});
+document.addEventListener("click",e=>{
+  const c=e.target.closest("[data-docf]");if(c){docsF=c.dataset.docf;docsPintar();return}
+  const it=e.target.closest(".docs-it");if(!it||!DOCS_CBO)return;const d=DOCS_CBO.find(x=>x.id===it.dataset.docid);if(!d)return;
+  if(e.target.closest("[data-docfav]")){const L=docsFav(),i=L.indexOf(d.id);i>=0?L.splice(i,1):L.unshift(d.id);guardarLS("cbo-doc-fav",L);docsPintar();return}
+  const a=e.target.closest("[data-docacc]");if(!a){docsTraer(d.id,"pdf").catch(()=>{});return}
+  if(a.dataset.docacc==="ver"){window.open(`documentos/docs/${encodeURIComponent(d.id)}.pdf`,"_blank")}
+  else if(a.dataset.docacc==="enviar")docsEnviar(d,"pdf");
+  else docsDescargar(d,"docx");
+});
+document.head.insertAdjacentHTML("beforeend",`<style id="docsCboCss">
+  .docs-g{margin:16px 2px 8px}
+  .docs-it{position:relative}.docs-it .mdl-tx{padding-right:34px}
+  .docs-fav{position:absolute;top:10px;right:10px;width:32px;height:32px;border:0;border-radius:50%;background:none;color:inherit;opacity:.35;font-size:1.1rem;cursor:pointer}
+  .docs-fav.on{opacity:1;color:#f5c542}
+</style>`);
 /* ===== CBO: sala de espera para quien recién creó su cuenta y aún no tiene permisos ===== */
 function salaEspera(){
   const nom=sesion?titulo(String(sesion.u||"").split(" ")[0]):"";
@@ -7335,7 +7388,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-vernuevo]"
       cb.onclick=()=>{ctlVista="menu";if(seccion==="control")ctlRender();else ir("control");marcar()};
       const rB=ctlRender;ctlRender=function(){const r=rB.apply(this,arguments);marcar();return r};
       const irB=ir;ir=function(s){const r=irB(s);marcar();return r}}}
-  const irD=ir;ir=function(s){const r=irD(s);if(s==="documentos"){const f=$("docsFr");if(f&&!f.src)f.src=f.dataset.src}return r};
+  const irD=ir;ir=function(s){const r=irD(s);if(s==="documentos"&&seccion==="documentos")try{docsAbrir()}catch(e){console.error(e)}return r};
   // Botón + : con Finanzas registra un movimiento; sin Finanzas pero con Control de obra registra lo de la obra; sin nada no aparece
   const plus=()=>{const r=$("tabReg"),f=$("fab"),sinF=secOculta("movimientos"),sinC=secOculta("control");[r,f].forEach(x=>{if(x)x.hidden=sinF&&sinC})};
   [$("tabReg"),$("fab")].forEach(x=>{if(x)x.addEventListener("click",e=>{if(secOculta("movimientos")&&!secOculta("control")){e.stopImmediatePropagation();e.preventDefault();document.body.classList.remove("abanico");abrirOv("ovCtlNuevo")}},true)});
@@ -7354,7 +7407,6 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-vernuevo]"
   .nav .nav-sub{padding:7px 12px 7px 30px;font-weight:500;font-size:.9rem}.nav .nav-sub svg{width:17px;height:17px}.nav .nav-sub[hidden]{display:none}
   @media (max-width:980px){.nav .nav-sub{display:none}}
   .cbo-sin-fin>:not(#cboMods){display:none!important}.cbo-nada{grid-column:1/-1;margin:24px 4px;text-align:center}
-  .docs-fr{display:block;width:100%;height:calc(100vh - 150px);min-height:520px;border:0;border-radius:16px;background:#fff}
   </style>`);
   pintarMods();try{aplicarPermisos()}catch{}
 })();
