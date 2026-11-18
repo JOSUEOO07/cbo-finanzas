@@ -1866,14 +1866,14 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
     <div class="acceso-datos" id="camposAcceso">
       <p class="acceso-paso" id="pasoCorreo" hidden></p>
       <h3 id="tituloCorreo">Inicia sesión</h3>
-      <p class="hint" id="ayudaCorreo">Te enviaremos un enlace para confirmar tu correo.</p>
-      <label>Correo electrónico<input id="correoAcceso" type="email" inputmode="email" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="nombre@ejemplo.com" required></label>
+      <p class="hint" id="ayudaCorreo">Escribe tu correo para entrar o crear tu cuenta.</p>
+      <label>Correo electrónico<input id="correoAcceso" type="email" inputmode="email" autocomplete="off" data-lpignore="true" autocapitalize="none" spellcheck="false" placeholder="nombre@ejemplo.com" required></label>
       <fieldset class="acceso-campos" id="perfilCorreo" hidden disabled>
-        <div id="nombreRegistro" class="acceso-nombre"><label>Nombres<input id="nombreCorreoAcceso" required maxlength="30" autocomplete="given-name" autocapitalize="words" placeholder="Ej.: Jesús"></label><label>Apellidos<input id="apellidoCorreoAcceso" required maxlength="30" autocomplete="family-name" autocapitalize="words" placeholder="Ej.: Villar"></label></div>
+        <div id="nombreRegistro" class="acceso-nombre"><label>Nombres<input id="nombreCorreoAcceso" required maxlength="30" autocomplete="off" autocapitalize="words" placeholder="Ej.: Jesús"></label><label>Apellidos<input id="apellidoCorreoAcceso" required maxlength="30" autocomplete="off" autocapitalize="words" placeholder="Ej.: Villar"></label></div>
         <p class="hint" id="nombreCuenta" hidden></p>
       </fieldset>
       <p class="hint acceso-mensaje" id="mensajeCorreo" role="status"></p>
-      <button class="btn acceso-principal" id="entrarCorreo" type="submit">Enviarme un enlace</button>
+      <button class="btn acceso-principal" id="entrarCorreo" type="submit">Continuar</button>
       <button class="btnlink" id="activarCorreo" type="button" hidden>Cambiar correo</button>
     </div>
     <div class="acceso-confirmacion" id="accesoConfirmado" role="status" hidden>
@@ -2060,7 +2060,7 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
     <h2>CBO Obras</h2>
     <p>Conecta la app con tu archivo de Google Sheets. Solo se hace una vez en este equipo.</p>
     <label>Enlace del servidor (termina en /exec)<input id="cfgUrl" type="url" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off"></label>
-    <label>Clave de acceso<input id="cfgClave" type="password" autocomplete="off"></label>
+    <label>Clave de acceso<input id="cfgClave" type="text" autocomplete="off" spellcheck="false" autocapitalize="none" style="-webkit-text-security:disc"></label>
     <p class="msg" id="setupMsg"></p>
     <button class="btn" type="submit">Conectar</button>
     <p class="hint" style="margin:6px 0 0">¿Guardaste un <b>código de conexión</b>? Pégalo aquí y conecta con un toque:</p>
@@ -3627,12 +3627,12 @@ function abrirAccesoCorreo() {
     $("pasoCorreo").textContent = correo.value.trim();
     $("tituloCorreo").textContent = {correo:"Inicia sesión", espera:"Revisa tu correo", perfil:"Completa tu registro", entrar:"Entra con tu PIN"}[paso];
     $("ayudaCorreo").textContent = {
-      correo:"Te enviaremos un enlace para confirmar tu correo.",
+      correo:"Escribe tu correo para entrar o crear tu cuenta.",
       espera:"Abre el mensaje de CBO y toca «Confirmar mi correo».",
       perfil:"Escribe tus nombres y apellidos, y crea tu PIN.",
-      entrar:"Usa tu PIN para autorizar este dispositivo."
+      entrar:"Escribe tu PIN para entrar."
     }[paso];
-    aceptar.textContent = {correo:"Enviarme un enlace", espera:"Reenviar enlace", perfil:"Crear mi PIN", entrar:"Ingresar PIN"}[paso];
+    aceptar.textContent = {correo:"Continuar", espera:"Continuar", perfil:"Crear mi PIN", entrar:"Escribir mi PIN"}[paso];
     cambiar.hidden = paso === "correo";
     aviso.textContent = mensaje;
   }
@@ -3652,8 +3652,11 @@ function abrirAccesoCorreo() {
   async function pedirEnlace() {
     if (!correo.reportValidity()) return;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo.value.trim())) { aviso.textContent = "Escribe un correo válido, por ejemplo nombre@gmail.com"; return; }
-    await api("enviarEnlaceCorreo", {correo:correo.value.trim(), invitacion:invitacionCorreoActual()});
-    mostrarPaso("espera", "El enlace vence en 10 minutos.");
+    // CBO: sin enlace. Si el correo ya tiene cuenta pide el PIN; si no, nombres, apellidos y PIN nuevo
+    const estado = await api("estadoCorreo", {correo:correo.value.trim()});
+    nombreExistente = estado.nombre || "";
+    mostrarPaso(estado.registro ? "perfil" : "entrar");
+    if (!estado.registro) setTimeout(() => { if (paso === "entrar" && !ocupado) form.requestSubmit(); }, 60);
   }
   cambiar.onclick = () => {
     confirmacionActual = "";
@@ -4337,7 +4340,7 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
       const lbl=k==="␣"?"espacio":k==="⏎"?(el&&el.tagName==="TEXTAREA"?"↵":"Listo"):k==="123"?"?123":(capa==="abc"&&may&&k.length===1?k.toUpperCase():k);
       const cls=k==="␣"?"sp":k==="⏎"?"ok":["123","ABC"].includes(k)?"esp cap":["⇧","⌫","#+="].includes(k)?"esp":"";
       return `<button type="button" class="tk ${cls}${capa==="abc"&&HINT[k]?" h":""}${k==="⇧"&&may?" on":""}" data-k="${esc(k)}"${alts(k).length?' data-alt="1"':""}>${esc(lbl)}${capa==="abc"&&HINT[k]?`<sup>${esc(HINT[k])}</sup>`:""}</button>`}).join("")}</div>`).join("")};
-  const marcar=r=>{if(!activo())return;(r.querySelectorAll?r:document).querySelectorAll(SEL).forEach(i=>{if(i.dataset.letOk||ES_NUM(i)||i.readOnly)return;i.dataset.letOk="1";i.dataset.letIm=i.getAttribute("inputmode")||"";if(i.type==="email"||i.type==="search"){i.dataset.letType=i.type;try{i.type="text"}catch{}}i.setAttribute("inputmode","none");if(i.hasAttribute("list")){i.dataset.letList=i.getAttribute("list");i.removeAttribute("list")}})};
+  const marcar=r=>{if(!activo())return;(r.querySelectorAll?r:document).querySelectorAll(SEL).forEach(i=>{if(i.dataset.letOk||ES_NUM(i)||i.readOnly)return;i.dataset.letOk="1";i.dataset.letIm=i.getAttribute("inputmode")||"";if(i.type==="email"||i.type==="search"){i.dataset.letType=i.type;try{i.type="text"}catch{}}i.setAttribute("inputmode","none");i.setAttribute("autocomplete","off");i.setAttribute("autocorrect","off");if(i.hasAttribute("list")){i.dataset.letList=i.getAttribute("list");i.removeAttribute("list")}})};
   window.__letMarcar=marcar;marcar(document);new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1)marcar(n.matches&&n.matches(SEL)?(n.parentNode||document):n)}))).observe(document.body,{childList:true,subtree:true});
   const etiqueta=i=>{const l=i.closest("label")||(i.id&&document.querySelector(`label[for="${i.id}"]`));let s=l?[...l.childNodes].filter(n=>n!==i&&!(n.querySelector&&n.querySelector("input,textarea"))).map(n=>n.textContent).join(" "):"";return (s||i.placeholder||i.getAttribute("aria-label")||"").replace(/\s+/g," ").trim().slice(0,60)};
   const autoMay=()=>{if(!el||may===2)return;const v=el.value.slice(0,el.selectionStart==null?el.value.length:el.selectionStart);may=(el.type!=="email"&&el.dataset.letType!=="email")&&(!v.trim()||/[.!?¿¡]\s$/.test(v))?1:0};
@@ -6984,7 +6987,7 @@ function salaEspera(){
     <h2>¡Hola${nom?", "+esc(nom):""}!</h2>
     <p class="espera-sub">Bienvenido al equipo de Casa Bonita Oregón.</p>
     <ol class="espera-pasos">
-      <li class="hecho"><i>${ok}</i><span>Correo confirmado</span></li>
+      <li class="hecho"><i>${ok}</i><span>Cuenta creada con tu correo</span></li>
       <li class="hecho"><i>${ok}</i><span>Nombre y PIN listos</span></li>
       <li class="actual"><i><b></b></i><span>Estamos preparando tu espacio de trabajo<small>El administrador te asignará tus tareas muy pronto</small></span></li>
     </ol>
