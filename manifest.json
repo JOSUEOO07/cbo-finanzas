@@ -1,7 +1,7 @@
 {
-  "name": "CBO Finanzas",
-  "short_name": "CBO Finanzas",
-  "description": "Finanzas de Casa Bonita Oregón S.A.C.",
+  "name": "CBO",
+  "short_name": "CBO",
+  "description": "CBO — Finanzas, Obras y Documentos de Casa Bonita Oregón S.A.C.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

@@ -114,3 +114,4 @@ Actualizado: 11/11/2026 · caché: cbo-finanzas-v93-pago-dias
 - v110 (12/11/2026): firma sin "Firma aquí" ni línea guía; grosor con la presión del lápiz (pointerType pen).
 - v111 (13/11/2026): si el campo pierde el foco sin tocar la pantalla (gesto atrás de Android) se cierran teclado y ventana de una vez.
 - v112 (13/11/2026): el teclado propio espera 320 ms antes de cerrarse al tocar un botón (Atrás/Siguiente al primer toque); teclado oscuro con tinte de la paleta.
+- v117 (18/11/2026): CBO Finanzas pasa a ser CBO: una sola app con Finanzas, Obras, Documentos y módulos nuevos (Presupuestos, Clientes, Compras, Empleados, Gastos, Servicio técnico, Agenda, Flota). Entrada con enlace al correo; el usuario empieza sin ver nada y el administrador le da cada parte.
