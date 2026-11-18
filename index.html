@@ -3302,6 +3302,12 @@ if (enlaceServidor && esURLServidorCorreo(enlaceServidor) && (!cfg || cfg.url ==
 // CBO: su propio servidor. Con solo abrir el enlace de la app ya sabe a dónde conectarse (la seguridad es el correo y el PIN de cada uno).
 const SERVIDOR_CBO = "https://script.google.com/macros/s/AKfycbyndqmhkr3uSefQEr0do8mu_Nqfha8hxvf58GDVvef2jlNgsG9zzE2pNgAfJ24M41MO/exec";
 if (!cfg || !cfg.url) { cfg = {url: SERVIDOR_CBO}; guardarLS(CFG_K, cfg); }
+// Cuentas de correo que ya entraron en este celular: correo + llave cifrada del PIN (nunca el PIN) para entrar al instante
+function accPorCorreo(c) { c = String(c || "").trim().toLowerCase(); if (!c) return null; const e = Object.entries(accTodos()).find(([u, a]) => a && a.correo === c); return e ? Object.assign({u:e[0]}, e[1]) : null; }
+async function recordarCorreo(correo, r, pin) {
+  try { if (!r || !r.usuario || !pin) return; const sal = b64u(reto());
+    accPoner(r.usuario, {correo:String(correo || "").trim().toLowerCase(), nombre:r.usuario, s:sal, h:await hashLocal(sal, pin), t:r.token || "", ses:{admin:!!r.admin, ocultas:r.ocultas || [], descargar:!!r.descargar}}); } catch (e) {}
+}
 function invitacionCorreoActual() {
   const guardada = leerLS(invitacionCorreoKey, null);
   return guardada && guardada.url === cfg?.url ? guardada.token : "";
@@ -3310,7 +3316,7 @@ let sesion=leerLS(SES_K,null); if(!(sesion&&sesion.u&&sesion.t))sesion=null;
 async function api(accion,extra,conf){
   const ob=null, deOb=false; // CBO: un solo servidor para todo
   const c=conf||(deOb?ob:cfg);
-  if(typeof tokPend!=="undefined"&&tokPend&&accion!=="entrar"&&accion!=="comoUsuario"&&!conf&&sesion&&!sesion.t){try{await tokPend}catch(e){}}   // espera la sesión que se está pidiendo por detrás
+  if(typeof tokPend!=="undefined"&&tokPend&&accion!=="entrar"&&accion!=="entrarCorreo"&&accion!=="comoUsuario"&&!conf&&sesion&&!sesion.t){try{await tokPend}catch(e){}}   // espera la sesión que se está pidiendo por detrás
   // Con señal débil la petición puede quedarse colgada: se corta a los 30 s y cuenta como "sin internet"
   const ctl=new AbortController(), to=setTimeout(()=>ctl.abort(),45000);
   let res;
@@ -3653,7 +3659,8 @@ function abrirAccesoCorreo() {
     if (!correo.reportValidity()) return;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo.value.trim())) { aviso.textContent = "Escribe un correo válido, por ejemplo nombre@gmail.com"; return; }
     // CBO: sin enlace. Si el correo ya tiene cuenta pide el PIN; si no, nombres, apellidos y PIN nuevo
-    const estado = await api("estadoCorreo", {correo:correo.value.trim()});
+    const conocido = accPorCorreo(correo.value.trim());
+    const estado = conocido ? {registro:false, nombre:conocido.nombre || conocido.u} : await api("estadoCorreo", {correo:correo.value.trim()});
     nombreExistente = estado.nombre || "";
     mostrarPaso(estado.registro ? "perfil" : "entrar");
     if (!estado.registro) setTimeout(() => { if (paso === "entrar" && !ocupado) form.requestSubmit(); }, 60);
@@ -3680,13 +3687,16 @@ function abrirAccesoCorreo() {
   }
 
   async function mostrarInicio(respuesta, nombre) {
-    if (!respuesta?.token?.startsWith("correo~")) throw new Error("El servidor no devolvió una sesión válida");
+    if (!respuesta?.instant && !respuesta?.token?.startsWith("correo~")) throw new Error("El servidor no devolvió una sesión válida");
+    const mismaPersona = (() => { try { return localStorage.getItem("cbo-quien") === respuesta.usuario; } catch { return false; } })();
+    if (!mismaPersona) {
       // Evita conservar la copia descargada de la cuenta anterior.
       servidorRows = [];
       rows = [];
       guardarLS(CACHE_K, []);
       guardarLS("cbo-ver", "");
       PERSONAS = [];
+    }
       const nuevaSesion = sesDe(respuesta);
       const destinoCola = colaDeSesion(nuevaSesion);
       cola = leerLS(destinoCola, []);
@@ -3745,15 +3755,37 @@ function abrirAccesoCorreo() {
       try {
         const solicitud = alta
           ? abrirPin("elegir", "Elige tu PIN de 4 números")
-          : abrirPin("externo", "Escribe tu PIN", pin => api("entrarCorreo",{...datos,pin}));
+          : abrirPin("externo", "Escribe tu PIN", async pin => {
+              const a = accPorCorreo(datos.correo);
+              if (a && a.s && a.h && a.ses && await hashLocal(a.s, pin) === a.h)
+                return {instant:true, usuario:a.u, token:"", admin:!!a.ses.admin, ocultas:a.ses.ocultas || [], descargar:!!a.ses.descargar, __pin:pin};
+              const r = await api("entrarCorreo", {...datos, pin}); r.__pin = pin; return r;
+            });
         $("pinCancelar").focus({preventScroll:true});
         resultado = await solicitud;
       } finally { form.inert = false; }
       if (!resultado) return;
       if (alta) {
-        resultado = await api("registrarCorreo", {...datos,nombre,nombres,apellidos,pin:resultado});
+        const pinNuevo = resultado;
+        resultado = await api("registrarCorreo", {...datos,nombre,nombres,apellidos,pin:pinNuevo});
+        resultado.__pin = pinNuevo;
         try { localStorage.removeItem(invitacionCorreoKey); } catch {}
       }
+      const pinUsado = resultado.__pin;
+      if (resultado.instant) {
+        // Entró al instante con la llave del celular: la sesión del servidor llega por detrás
+        tokPend = (async () => {
+          try {
+            const r = await api("entrarCorreo", {...datos, pin:pinUsado});
+            if (sesion && sesion.u === r.usuario) { ponerSesion(Object.assign({}, sesion, {t:r.token, admin:!!r.admin, ocultas:r.ocultas || [], descargar:!!r.descargar})); try { aplicarPermisos(); } catch {} }
+            recordarCorreo(datos.correo, r, pinUsado);
+          } catch (e) {
+            if (e.code || /PIN|bloquead|acceso|intentos/i.test(e.message || "")) { accPoner(resultado.usuario, {h:"", s:""}); perderSesion(); toast(e.message || "No se pudo entrar"); }
+            else toast("Sin conexión: ves lo guardado. Se actualiza al volver la señal.");
+          } finally { tokPend = null; }
+        })();
+        tokPend.catch(() => {});
+      } else recordarCorreo(datos.correo, resultado, pinUsado);
       await mostrarInicio(resultado, nombre);
     } catch(error) { aviso.textContent = error.message; }
     finally { bloquear(false); }
@@ -3883,7 +3915,9 @@ function pintarSesion(){
 async function guardarPermisos(n,li){
   if(sinNube()){toast("En el modo de prueba no se guardan permisos");return}
   const oc=(CBO_UNIDA?[...li.querySelectorAll("[data-secc]")].filter(c=>c.checked).map(c=>"ve-"+c.dataset.secc):[...li.querySelectorAll("[data-secc]")].filter(c=>!c.checked).map(c=>c.dataset.secc)).concat([...li.querySelectorAll("[data-obrap]")].filter(c=>c.checked).map(c=>c.dataset.obrap)),d=!!(li.querySelector("[data-desc]")||{}).checked;
-  try{usarLista(await api("permisos",{usuario:n,ocultas:oc,descargar:d}));toast(`Permisos de ${nomCorto(n)} guardados. Se aplican cuando abra la app.`)}catch(e){toast(e.message)}
+  const p=PERSONAS.find(x=>x.n===n);if(p){p.oc=oc;p.d=d;p.nv=false;try{pintarAvisoNuevos()}catch(e){}}
+  toast(`Permisos de ${nomCorto(n)} guardados.`);
+  api("permisos",{usuario:n,ocultas:oc,descargar:d}).then(usarLista).catch(e=>{toast("No se guardaron los permisos: "+e.message);cargarUsuarios()})
 }
 async function cerrarSesionDe(n,id,ya){
   if(sinNube())return;
@@ -4500,14 +4534,14 @@ $("perfilSalir").onclick = async () => {
   botones.disabled = true;
   try {
     if (!sinNube()) {
-      if (actual.t.startsWith("correo~")) await api("cerrarMiSesion").catch(() => {});
+      if (actual.t.startsWith("correo~")) api("cerrarMiSesion").catch(() => {});
       else if (actual.admin) {
         const partes = actual.t.split("~");
         const id = partes.length === 3 ? partes[1] : partes[3];
-        if (id) await api("cerrarSesion", {usuario:actual.u, id}).catch(() => {});
+        if (id) api("cerrarSesion", {usuario:actual.u, id}).catch(() => {});
       }
     }
-    accPoner(actual.u, {t:"", h:"", s:"", tc:""});
+    accPoner(actual.u, {t:"", tc:""}); // se queda la llave del PIN (cifrada) para volver a entrar al instante
     try { localStorage.removeItem(SESA_K); } catch {}
     cerrarOv("ovPerfil");
     cambiandoUsr = true;
