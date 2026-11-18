@@ -1642,7 +1642,7 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
       </section>
 
       <!-- CONFIGURACIÓN -->
-      <section data-sec="documentos" hidden><iframe class="docs-fr" id="docsFr" title="CBO Documentos" loading="lazy" data-src="https://casabonitaoregon.github.io/cbo-documentos/"></iframe></section>
+      <section data-sec="documentos" hidden><iframe class="docs-fr" id="docsFr" title="CBO Documentos" loading="lazy" data-src="documentos/"></iframe></section>
       <section data-sec="config" hidden>
         <div class="cfg-lista">
           <p class="cfg-grupo">Apariencia</p>
@@ -2072,7 +2072,7 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
     const ob=[];for(let i=0;i<LS.length;i++){const k=LS.key(i);if(k&&k.startsWith("obras:"))ob.push(k.slice(6))}
     const solo=["cbo-config","cbo-sesion","cbo-accesos","cbo-sesion-admin","cbo-personas","cbo-cola","cbo-firmas-pend","cbo-firmas-borr","_ok"];
     ob.forEach(k=>{if(!solo.includes(k)&&G.call(LS,P+k)===null)S.call(LS,P+k,G.call(LS,"obras:"+k))});
-    const oc=G.call(LS,"obras:cbo-config");if(oc)S.call(LS,P+"cbo-config-obras",oc);const os=G.call(LS,"obras:cbo-sesion");if(os)S.call(LS,P+"cbo-sesion-obras",os);
+    
     S.call(LS,P+"_ok","1")}
   SPr.getItem=function(k){return G.call(this,esLS(this)?P+k:k)};SPr.setItem=function(k,v){return S.call(this,esLS(this)?P+k:k,v)};SPr.removeItem=function(k){return R.call(this,esLS(this)?P+k:k)};
 }catch(e){}})();
@@ -3296,7 +3296,7 @@ function invitacionCorreoActual() {
 }
 let sesion=leerLS(SES_K,null); if(!(sesion&&sesion.u&&sesion.t))sesion=null;
 async function api(accion,extra,conf){
-  const ob=!conf&&/^(ctl|inv|enlaceMapa)/.test(accion)?leerLS("cbo-config-obras",null):null, deOb=!!(ob&&ob.url);
+  const ob=null, deOb=false; // CBO: un solo servidor para todo
   const c=conf||(deOb?ob:cfg);
   if(typeof tokPend!=="undefined"&&tokPend&&accion!=="entrar"&&accion!=="comoUsuario"&&!conf&&sesion&&!sesion.t){try{await tokPend}catch(e){}}   // espera la sesión que se está pidiendo por detrás
   // Con señal débil la petición puede quedarse colgada: se corta a los 30 s y cuenta como "sin internet"
@@ -3305,8 +3305,6 @@ async function api(accion,extra,conf){
   try{res=await fetch(c.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({clave:c.clave,accion,token:sesion?sesion.t:""},extra||{})),redirect:"follow",signal:ctl.signal})}
   finally{clearTimeout(to)}
   const j=await res.json();
-  // CBO: una sola sesión. El servidor de Finanzas entrega la conexión de Obras a quien ya entró (no va dentro de la app pública).
-  if(j&&j.ok&&j.obras&&j.obras.url&&!deOb){const v=leerLS("cbo-config-obras",null);if(!v||v.url!==j.obras.url||v.clave!==j.obras.clave)guardarLS("cbo-config-obras",{url:j.obras.url,clave:j.obras.clave})}
   if(!j.ok&&j.error==="sesion"&&!conf&&!deOb)perderSesion();
   if(!j.ok){const e=new Error(j.error==="duplicado"?"ya está registrado"+(j.por?" por "+nomCorto(j.por):""):j.error==="sesion"?"Entra a tu cuenta para continuar":(j.error||"Error"));e.code=j.error;e.por=j.por;throw e}
   return j;
@@ -3551,7 +3549,7 @@ async function entrarComo(n){
 }
 async function cargarUsuarios(){if(!cfg||sinNube())return;try{usarLista(await api("usuarios"))}catch(e){}}
 let pidiendo = false;
-let accesoPorCorreo = !!sesion?.t.startsWith("correo~");
+let accesoPorCorreo = true;
 
 function abrirAccesoCorreo() {
   const form = $("accesoCorreo");
@@ -3738,16 +3736,8 @@ async function pedirUsuario() {
   pidiendo = true;
   abrirOv("ovQuien");
   try {
-    if (retornoCorreo) accesoPorCorreo = true;
-    else if (!esDemo()) {
-      try {
-        const estado = await api("estadoAcceso");
-        accesoPorCorreo = estado.correo === true;
-      } catch (error) {
-        // La versión anterior exige sesión para las acciones que desconoce.
-        if (!["sesion", "Acción desconocida"].includes(error.code)) throw error;
-      }
-    }
+    // CBO: siempre se entra con el correo de cada uno; la lista de usuarios del sistema anterior ya no se muestra
+    accesoPorCorreo = true;
     $("accesoAnterior").hidden = accesoPorCorreo;
     $("accesoCorreo").hidden = !accesoPorCorreo;
     if (accesoPorCorreo) { abrirAccesoCorreo(); }
