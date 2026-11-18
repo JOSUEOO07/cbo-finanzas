@@ -1660,7 +1660,7 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
           </div></details>
           <details class="cfg-item" data-cfg="ador"><summary><i class="cfg-ic"><svg viewBox="0 0 24 24"><path d="M12 3l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4-3.9-3.8 5.4-.8z"/></svg></i><span class="cfg-t"><b>Adornos de temporada</b><small class="cfg-v" id="cfgv-ador"></small></span><svg class="cfg-ch" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></summary><div class="cfg-body">
               <div class="deco-fila"><span><b>Adornos de temporada</b><small class="hint" style="display:block">En el logo, desde 7 días antes de cada fiesta</small></span><div class="seg" id="adorSeg" style="min-width:190px"><button type="button" data-ador="1">Activados</button><button type="button" data-ador="0">Desactivados</button></div></div>
-              <div class="deco-fila"><span><b>Ver cómo se ve</b><small class="hint" style="display:block">Solo es una vista previa: no cambia la fecha</small></span><span style="display:flex"><select id="adorVer" class="selbar" aria-label="Ver cómo se ve un adorno"></select></span></div>
+              <div class="deco-fila"><span><b>Temporada</b><small class="hint" style="display:block">Automático: cambia sola según la fecha. Si eliges una, se queda hasta que la cambies.</small></span><span style="display:flex"><select id="adorVer" class="selbar" aria-label="Temporada"></select></span></div>
               <div class="ador-prev" id="adorPrev"><img id="adorPrevImg" alt=""><span><b>Casa Bonita Oregón</b><small>Así se ve arriba a la izquierda</small></span></div>
           </div></details>
           <p class="cfg-grupo">Tu empresa</p>
@@ -3651,6 +3651,7 @@ function abrirAccesoCorreo() {
   }
   async function pedirEnlace() {
     if (!correo.reportValidity()) return;
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo.value.trim())) { aviso.textContent = "Escribe un correo válido, por ejemplo nombre@gmail.com"; return; }
     await api("enviarEnlaceCorreo", {correo:correo.value.trim(), invitacion:invitacionCorreoActual()});
     mostrarPaso("espera", "El enlace vence en 10 minutos.");
   }
@@ -4316,19 +4317,30 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
   .tecl-pop b.sel{background:var(--brand-2);color:var(--brand-deep,#111)}
   .tecl-glob{position:fixed;z-index:99994;pointer-events:none;min-width:48px;height:58px;border-radius:14px;display:grid;place-items:center;font:600 1.6rem var(--display);
     color:var(--brand-deep,#111);background:var(--brand-ink);box-shadow:0 10px 26px rgba(0,0,0,.4)}
+  /* Formato como el teclado del celular (Gboard): misma distribución, con el diseño de CBO */
+  .tecl-l .tecl-f{gap:6px;margin-bottom:9px}
+  .tecl-l .tk{max-width:none;height:50px;border-radius:12px;font-size:1.42rem}
+  .tecl-l .tecl-f:first-child .tk{height:46px;font-size:1.3rem}
+  .tecl-l .tk sup{top:4px;right:5px;font-size:.66rem}
+  .tecl-l .tk.esp{flex:1.5 1 0;font-size:1.25rem;background:color-mix(in srgb,var(--brand-ink) 8%,transparent)}
+  .tecl-l .tk.cap{flex:1.7 1 0;border-radius:999px;font-size:.98rem;font-weight:600}
+  .tecl-l .tk.sp{flex:4.6 1 0;font-size:.95rem}
+  .tecl-l .tk.ok{flex:1.9 1 0;border-radius:999px;font-size:.95rem!important;background:var(--brand-2);color:var(--brand-deep,#111);border-color:transparent}
+  .tecl-l .tk.on{background:var(--brand-ink)}
+  @media (max-width:360px){.tecl-l .tk{height:46px;font-size:1.28rem}.tecl-l .tecl-f{gap:4px}}
   </style>`);
   const t=document.createElement("div");t.className="tecl tecl-l";t.setAttribute("aria-hidden","true");
   t.innerHTML=`<div class="pin-fondo"><i></i><i></i><i></i></div><div class="tecl-bar"><b></b><button type="button" class="tecl-ok">Listo</button><div class="tecl-sug"></div></div><div class="tecl-filas"></div>`;
   document.body.append(t);
   let el=null,capa="abc",may=0,ultMay=0; // may: 0 minúsculas, 1 una mayúscula, 2 bloqueo
-  const pintar=()=>{t.querySelector(".tecl-filas").innerHTML=CAPA[capa].map(f=>`<div class="tecl-f">${f.map(k=>{
-      const lbl=k==="␣"?"espacio":k==="⏎"?(el&&el.tagName==="TEXTAREA"?"↵":"Listo"):(capa==="abc"&&may&&k.length===1?k.toUpperCase():k);
-      const cls=k==="␣"?"sp":k==="⏎"?"ok":["⇧","⌫","123","ABC","#+="].includes(k)?"esp":"";
+  const pintar=()=>{const em=el&&el.dataset.letType==="email";t.querySelector(".tecl-filas").innerHTML=CAPA[capa].map(f=>`<div class="tecl-f">${f.map(k=>{if(em&&capa==="abc"&&k===",")k="@";
+      const lbl=k==="␣"?"espacio":k==="⏎"?(el&&el.tagName==="TEXTAREA"?"↵":"Listo"):k==="123"?"?123":(capa==="abc"&&may&&k.length===1?k.toUpperCase():k);
+      const cls=k==="␣"?"sp":k==="⏎"?"ok":["123","ABC"].includes(k)?"esp cap":["⇧","⌫","#+="].includes(k)?"esp":"";
       return `<button type="button" class="tk ${cls}${capa==="abc"&&HINT[k]?" h":""}${k==="⇧"&&may?" on":""}" data-k="${esc(k)}"${alts(k).length?' data-alt="1"':""}>${esc(lbl)}${capa==="abc"&&HINT[k]?`<sup>${esc(HINT[k])}</sup>`:""}</button>`}).join("")}</div>`).join("")};
-  const marcar=r=>{if(!activo())return;(r.querySelectorAll?r:document).querySelectorAll(SEL).forEach(i=>{if(i.dataset.letOk||ES_NUM(i)||i.readOnly)return;i.dataset.letOk="1";i.dataset.letIm=i.getAttribute("inputmode")||"";if((i.type==="email"&&i.id!=="correoAcceso")||i.type==="search"){i.dataset.letType=i.type;try{i.type="text"}catch{}}i.setAttribute("inputmode","none");if(i.hasAttribute("list")){i.dataset.letList=i.getAttribute("list");i.removeAttribute("list")}})};
+  const marcar=r=>{if(!activo())return;(r.querySelectorAll?r:document).querySelectorAll(SEL).forEach(i=>{if(i.dataset.letOk||ES_NUM(i)||i.readOnly)return;i.dataset.letOk="1";i.dataset.letIm=i.getAttribute("inputmode")||"";if(i.type==="email"||i.type==="search"){i.dataset.letType=i.type;try{i.type="text"}catch{}}i.setAttribute("inputmode","none");if(i.hasAttribute("list")){i.dataset.letList=i.getAttribute("list");i.removeAttribute("list")}})};
   window.__letMarcar=marcar;marcar(document);new MutationObserver(ms=>ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===1)marcar(n.matches&&n.matches(SEL)?(n.parentNode||document):n)}))).observe(document.body,{childList:true,subtree:true});
   const etiqueta=i=>{const l=i.closest("label")||(i.id&&document.querySelector(`label[for="${i.id}"]`));let s=l?[...l.childNodes].filter(n=>n!==i&&!(n.querySelector&&n.querySelector("input,textarea"))).map(n=>n.textContent).join(" "):"";return (s||i.placeholder||i.getAttribute("aria-label")||"").replace(/\s+/g," ").trim().slice(0,60)};
-  const autoMay=()=>{if(!el||may===2)return;const v=el.value.slice(0,el.selectionStart==null?el.value.length:el.selectionStart);may=(el.type!=="email")&&(!v.trim()||/[.!?¿¡]\s$/.test(v))?1:0};
+  const autoMay=()=>{if(!el||may===2)return;const v=el.value.slice(0,el.selectionStart==null?el.value.length:el.selectionStart);may=(el.type!=="email"&&el.dataset.letType!=="email")&&(!v.trim()||/[.!?¿¡]\s$/.test(v))?1:0};
   const sugs=()=>{const c=t.querySelector(".tecl-sug");const dl=el&&el.dataset.letList&&document.getElementById(el.dataset.letList);if(!dl){c.innerHTML="";return}
     const q=el.value.trim().toLowerCase(),vs=[...new Set([...dl.options].map(o=>o.value).filter(Boolean))].filter(v=>!q||(v.toLowerCase().includes(q)&&v.toLowerCase()!==q)).slice(0,10);
     c.innerHTML=vs.map(v=>`<button type="button" class="tecl-chip">${esc(v)}</button>`).join("")};
@@ -5719,7 +5731,8 @@ function zEstallar(z,x,y){
     ],{duration:760+i*22,delay:i*14,fill:"backwards"});
     an.onfinish=()=>e.remove()}
 }
-let adorVista="";
+// La temporada elegida a mano se guarda y se queda (aunque se cierre la app) hasta que se cambie; "" = Automático
+let adorVista=(typeof ajustes!=="undefined"&&ajustes&&ajustes.temporada)||"";
 // Ícono que reemplaza a la + de la barra durante cada fiesta
 const FI_IC={anio:"est",chino:"far",valentin:"cor",carnaval:"masc",patricio:"tre",santa:"cruzS",trabajo:"cas",madre:"flo",cumple:"tor",padre:"cbt",mundial:"cop",patrias:"esc",rosa:"flo",primavera:"mar",halloween:"cal",muertos:"cal2",navidad:"arb"};
 function pintarFiestaBarra(k){
@@ -5791,7 +5804,7 @@ function alAtras(){
 })();
 function adorResumen(){if(ajustes.adornos===0)return "Desactivados";const f=adorHoy();return "Activados"+(f?" · "+f[1]:"")}
 function pintarAdornos(){
-  const on=ajustes.adornos!==0, f=on?(adorVista?ADOR_F.find(x=>x[0]===adorVista):adorHoy()):null, k=f?f[0]:"";
+  adorVista=ajustes.temporada||"";const on=ajustes.adornos!==0, f=on?(adorVista?ADOR_F.find(x=>x[0]===adorVista):adorHoy()):null, k=f?f[0]:"";
   document.querySelectorAll(".adw").forEach(w=>{const a=w.querySelector(".adorno");if(!a||a.dataset.k===k)return;a.dataset.k=k;
     a.innerHTML=k?`<svg viewBox="0 0 60 48" aria-hidden="true" focusable="false">${ADOR_ART[k]()}</svg>`:"";w.title=f?f[1]:""});
   document.querySelectorAll("#side .marca,#logoH,#adorPrev,#tbZona").forEach(z=>zPintar(z,matchMedia("(prefers-reduced-motion: reduce)").matches?"":k));
@@ -5812,9 +5825,9 @@ function pintarAdornos(){
     z.addEventListener("pointermove",e=>{if(e.pointerType!=="mouse"||!z.dataset.zk||quieto.matches)return;const c=z.querySelector(":scope > .adz-capa");if(!c)return;const b=z.getBoundingClientRect();c.style.transform=`translate(${(((e.clientX-b.left)/b.width-.5)*7).toFixed(1)}px,${(((e.clientY-b.top)/b.height-.5)*5).toFixed(1)}px)`});
     z.addEventListener("pointerleave",()=>{const c=z.querySelector(":scope > .adz-capa");if(c)c.style.transform=""})});
   document.addEventListener("animationend",e=>{if(e.animationName==="adSalta"){const w=e.target.closest(".adw");if(w)w.classList.remove("salta")}});
-  document.addEventListener("click",e=>{const b=e.target.closest("[data-ador]");if(!b)return;ajustes.adornos=+b.dataset.ador;if(!ajustes.adornos)adorVista="";guardarLS("cbo-ajustes",ajustes);pintarAdornos()});
+  document.addEventListener("click",e=>{const b=e.target.closest("[data-ador]");if(!b)return;ajustes.adornos=+b.dataset.ador;if(!ajustes.adornos){adorVista="";ajustes.temporada=""}guardarLS("cbo-ajustes",ajustes);pintarAdornos()});
   const s=$("adorVer");
-  if(s){s.innerHTML=`<option value="">Automático (según la fecha)</option>`+ADOR_F.map(f=>`<option value="${f[0]}">${adorNombreMes(f)} · ${f[1]}</option>`).join("");s.onchange=()=>{adorVista=s.value;pintarAdornos()}}
+  if(s){s.innerHTML=`<option value="">Automático (según la fecha)</option>`+ADOR_F.map(f=>`<option value="${f[0]}">${adorNombreMes(f)} · ${f[1]}</option>`).join("");s.onchange=()=>{adorVista=s.value;ajustes.temporada=s.value;guardarLS("cbo-ajustes",ajustes);pintarAdornos();toast(s.value?"Temporada fijada: se queda hasta que la cambies":"Temporada automática, según la fecha")}}
   pintarAdornos(); setInterval(pintarAdornos,36e5);
 })();
 $("metaMes").onclick=()=>{ir("config");setTimeout(()=>{const m=$("meta");if(m){m.scrollIntoView({block:"center"});m.focus()}},350)};
@@ -6969,13 +6982,13 @@ function salaEspera(){
   return `<div class="espera" role="status">
     <div class="espera-logo" aria-hidden="true"><span class="espera-halo"></span><img src="logo-blanco.png" alt=""></div>
     <h2>¡Hola${nom?", "+esc(nom):""}!</h2>
-    <p class="espera-sub">Tu cuenta de CBO ya está creada.</p>
+    <p class="espera-sub">Bienvenido al equipo de Casa Bonita Oregón.</p>
     <ol class="espera-pasos">
       <li class="hecho"><i>${ok}</i><span>Correo confirmado</span></li>
       <li class="hecho"><i>${ok}</i><span>Nombre y PIN listos</span></li>
-      <li class="actual"><i><b></b></i><span>El administrador elige qué puedes ver<small>Te avisamos aquí apenas te dé acceso</small></span></li>
+      <li class="actual"><i><b></b></i><span>Estamos preparando tu espacio de trabajo<small>El administrador te asignará tus tareas muy pronto</small></span></li>
     </ol>
-    <p class="espera-nota">No tienes que hacer nada más. Cuando te den acceso, tus módulos aparecen aquí solos.</p>
+    <p class="espera-nota">No tienes que hacer nada más. Tus tareas y herramientas aparecerán aquí solas.</p>
     <button class="btn2 espera-btn" type="button" data-espera-revisar>Revisar ahora</button>
   </div>`;
 }
@@ -6983,7 +6996,7 @@ function salaEspera(){
   let ult=0;
   const sinNada=()=>!!document.querySelector("#cboMods .espera");
   const revisar=(forzar)=>{if(!sesion||sesion.admin||!sinNada())return;if(!forzar&&Date.now()-ult<45000)return;ult=Date.now();try{cargar()}catch(e){}};
-  document.addEventListener("click",e=>{const b=e.target.closest("[data-espera-revisar]");if(!b)return;b.disabled=true;b.textContent="Revisando…";revisar(true);setTimeout(()=>{b.disabled=false;b.textContent="Revisar ahora";if(sinNada())toast("Aún no tienes acceso. Te avisamos aquí.")},2500)});
+  document.addEventListener("click",e=>{const b=e.target.closest("[data-espera-revisar]");if(!b)return;b.disabled=true;b.textContent="Revisando…";revisar(true);setTimeout(()=>{b.disabled=false;b.textContent="Revisar ahora";if(sinNada())toast("Tu espacio se sigue preparando. Te avisamos aquí.")},2500)});
   setInterval(()=>{if(!document.hidden)revisar(false)},60000);
   document.addEventListener("visibilitychange",()=>{if(!document.hidden)revisar(false)});
   document.head.insertAdjacentHTML("beforeend",`<style id="esperaCss">
@@ -7010,6 +7023,24 @@ function salaEspera(){
   @media (prefers-reduced-motion:reduce){.espera-halo,.espera-pasos .actual b{animation:none}}
   </style>`);
 })();
+/* ===== CBO: sin ninguna tarea asignada solo ve la sala de espera (ni Más, ni colores, ni configuración, ni +). Solo puede cerrar sesión. ===== */
+const enEspera=()=>!!(sesion&&!sesion.admin&&!(sesion.ocultas||[]).some(k=>/^ve-/.test(String(k))));
+(function(){
+  const marcar=()=>{const e=enEspera();document.documentElement.classList.toggle("cbo-espera",e);if(e){["ovMas"].forEach(id=>{const o=$(id);if(o&&!o.hidden)cerrarOv(id)});if(seccion!=="inicio")try{ir("inicio")}catch(x){}}};
+  const irB=ir;ir=function(s){if(enEspera())s="inicio";return irB.apply(this,[s].concat([].slice.call(arguments,1)))};
+  const ap=aplicarPermisos;aplicarPermisos=function(){const r=ap.apply(this,arguments);try{marcar()}catch(x){}return r};
+  const ps=ponerSesion;ponerSesion=function(){const r=ps.apply(this,arguments);try{marcar()}catch(x){}return r};
+  const pe=perderSesion;perderSesion=function(){const r=pe.apply(this,arguments);try{marcar()}catch(x){}return r};
+  // Ningún toque abre otra cosa mientras espera (salvo su foto de usuario para cerrar sesión)
+  document.addEventListener("click",e=>{if(!enEspera())return;
+    if(e.target.closest('#tabbar button:not([data-s="inicio"]),#tabbar a,#fab,#tabReg,#hamb,#nav button,#side button,[data-ir],[data-mod],#prev,#next,#buzonBtn')){e.preventDefault();e.stopImmediatePropagation()}},true);
+  document.head.insertAdjacentHTML("beforeend",`<style id="esperaBloqueo">
+  .cbo-espera #tabbar,.cbo-espera #fab,.cbo-espera #tabReg,.cbo-espera #hamb,.cbo-espera #side,.cbo-espera #monthsel,.cbo-espera #buzonBtn,.cbo-espera #ovMas{display:none!important}
+  .cbo-espera .main,.cbo-espera main{margin-left:0!important}
+  .cbo-espera body{padding-bottom:0}
+  </style>`);
+  setTimeout(marcar,0);
+})();
 /* ===== CBO: aviso al administrador cuando alguien nuevo se registra, y compartir CBO por WhatsApp (solo administrador) ===== */
 let avisadosNuevos=new Set();
 function pintarAvisoNuevos(){
@@ -7023,11 +7054,15 @@ function pintarAvisoNuevos(){
     el.innerHTML=`<div class="aviso-nuevo-f"><span class="aviso-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 4.5 2 6 2 6H4s2-1.5 2-6"/><path d="M10 19a2 2 0 0 0 4 0"/></svg></span><p><b>${L.length===1?esc(titulo(L[0].n))+" quiere entrar a CBO":L.length+" personas quieren entrar a CBO"}</b><span>Elige qué puede ver cada uno.</span></p><button class="btn" type="button" data-abrir-buzon>Ver buzón</button></div>`}
   L.forEach(p=>{if(!avisadosNuevos.has(p.n)){avisadosNuevos.add(p.n);toast("Nueva solicitud: "+titulo(p.n))}});
 }
+// La campanita y el aviso se recalculan cada vez que cambia la sesión: nunca se quedan para otro usuario
+(function(){const ap=aplicarPermisos;aplicarPermisos=function(){const r=ap.apply(this,arguments);try{pintarAvisoNuevos()}catch(e){}return r};
+  const ps=ponerSesion;ponerSesion=function(){const r=ps.apply(this,arguments);try{pintarAvisoNuevos()}catch(e){}return r};
+  const pe=perderSesion;perderSesion=function(){const r=pe.apply(this,arguments);try{pintarAvisoNuevos()}catch(e){}return r}})();
 document.addEventListener("click",async e=>{
   if(e.target.closest("#buzonBtn,[data-abrir-buzon]")){pintarAvisoNuevos();abrirOv("ovBuzon");if(esAdmin())cargarUsuarios();return}
   if(e.target.closest("#buzonCerrar")){cerrarOv("ovBuzon");return}
   const r=e.target.closest("[data-rechazar]");
-  if(r){const n=r.dataset.rechazar;if(!confirm(`¿Rechazar a ${titulo(n)}? No podrá entrar a CBO. Luego puedes darle acceso desde Usuarios.`))return;
+  if(r){const n=r.dataset.rechazar;if(!(await cboConfirmar(`${titulo(n)} no podrá entrar a CBO. Luego puedes darle acceso desde Usuarios.`,{titulo:"¿Rechazar solicitud?",si:"Rechazar",no:"Cancelar"})))return;
     r.disabled=true;try{usarLista(await api("acceso",{usuario:n,permitir:false}));toast(`${titulo(n)} no podrá entrar`)}catch(err){toast(err.message);r.disabled=false}return}
 });
 document.addEventListener("click",e=>{const b=e.target.closest("[data-vernuevo]");if(!b)return;cerrarOv("ovBuzon");
@@ -7240,7 +7275,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-vernuevo]"
   if(lmas)["sunat","movimientos","terceros","planilla","tablero","control","inventario","anual","documentos"].forEach(k=>lmas.querySelectorAll(`[data-ir="${k}"]`).forEach(x=>x.remove()));
   if(lmas)lmas.insertAdjacentHTML("beforebegin",`<p class="pal-t cbo-mas-t">Módulos</p><div class="cbo-mods cbo-mods-mas" id="cboModsMas"></div>`);
   const pintarMods=()=>{const L=MODS.filter(ve),t=L.map(m=>`<button type="button" class="cbo-mod cbo-mod-${m[0]}" data-mod="${m[0]}"><i>${ic(m[3])}</i><b>${m[1]}</b><small>${m[2]}</small></button>`).join("");
-    const mm=$("cboModsMas");if(mm)mm.innerHTML=t||`<p class="hint" style="margin:0">Todavía no tienes módulos asignados.</p>`;
+    const mm=$("cboModsMas");if(mm)mm.innerHTML=t||`<p class="hint" style="margin:0">Aquí aparecerán tus herramientas cuando el administrador te asigne tus tareas.</p>`;{const ps=$("masPagoSun");if(ps)ps.hidden=secOculta("sunat")}
     // Inicio como siempre; solo quien no tiene Finanzas (Inicio vacío) ve ahí sus módulos o el aviso
     const sinF=secOculta("movimientos"),el=$("cboMods");if(ini)ini.classList.toggle("cbo-sin-fin",sinF);
     document.documentElement.classList.toggle("cbo-sinfin",sinF);if(!document.getElementById("cboSinFinCss"))document.head.insertAdjacentHTML("beforeend",`<style id="cboSinFinCss">.cbo-sinfin #monthsel{display:none!important}</style>`);
