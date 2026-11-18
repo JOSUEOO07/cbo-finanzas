@@ -1459,6 +1459,7 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
         <span id="mesLbl"></span>
         <button id="next" aria-label="Mes siguiente">›</button>
       </div>
+      <button type="button" class="buzon-btn" id="buzonBtn" aria-label="Buzón de solicitudes" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 4.5 2 6 2 6H4s2-1.5 2-6"/><path d="M10 19a2 2 0 0 0 4 0"/></svg><span class="buzon-n" id="buzonN" hidden></span></button>
       <button type="button" class="usuario" id="usuarioBtn"></button>
     </header>
     
@@ -1841,6 +1842,14 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
 </div>
 
 <!-- Pago a trabajador: sueldo + bono, horas extra o descuento (solo si se usan) -->
+<div class="overlay" id="ovBuzon" hidden>
+  <div class="sheet buzon-sheet" style="max-width:460px">
+    <h2 class="buzon-t">Buzón de solicitudes</h2>
+    <p class="hint" style="margin:0 0 12px">Personas que crearon su cuenta en CBO. Elige qué puede ver cada una.</p>
+    <div id="buzonLista"></div>
+    <button type="button" class="btnlink" id="buzonCerrar" style="display:block;margin:12px auto 0;min-height:44px">Cerrar</button>
+  </div>
+</div>
 <div class="overlay" id="ovPerfil" hidden>
   <div class="sheet" style="max-width:420px">
     <div id="perfilAv" hidden></div>
@@ -1860,7 +1869,7 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
       <p class="hint" id="ayudaCorreo">Te enviaremos un enlace para confirmar tu correo.</p>
       <label>Correo electrónico<input id="correoAcceso" type="email" inputmode="email" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="nombre@ejemplo.com" required></label>
       <fieldset class="acceso-campos" id="perfilCorreo" hidden disabled>
-        <label id="nombreRegistro">Nombre y apellidos<input id="nombreCorreoAcceso" required maxlength="60" autocomplete="name" autocapitalize="words"></label>
+        <div id="nombreRegistro" class="acceso-nombre"><label>Nombres<input id="nombreCorreoAcceso" required maxlength="30" autocomplete="given-name" autocapitalize="words" placeholder="Ej.: Jesús"></label><label>Apellidos<input id="apellidoCorreoAcceso" required maxlength="30" autocomplete="family-name" autocapitalize="words" placeholder="Ej.: Villar"></label></div>
         <p class="hint" id="nombreCuenta" hidden></p>
       </fieldset>
       <p class="hint acceso-mensaje" id="mensajeCorreo" role="status"></p>
@@ -3290,6 +3299,9 @@ if (enlaceServidor && esURLServidorCorreo(enlaceServidor) && (!cfg || cfg.url ==
   }
   history.replaceState(null, "", location.pathname + "#inicio");
 }
+// CBO: su propio servidor. Con solo abrir el enlace de la app ya sabe a dónde conectarse (la seguridad es el correo y el PIN de cada uno).
+const SERVIDOR_CBO = "https://script.google.com/macros/s/AKfycbyndqmhkr3uSefQEr0do8mu_Nqfha8hxvf58GDVvef2jlNgsG9zzE2pNgAfJ24M41MO/exec";
+if (!cfg || !cfg.url) { cfg = {url: SERVIDOR_CBO}; guardarLS(CFG_K, cfg); }
 function invitacionCorreoActual() {
   const guardada = leerLS(invitacionCorreoKey, null);
   return guardada && guardada.url === cfg?.url ? guardada.token : "";
@@ -3514,7 +3526,7 @@ function pintarQuien(){
 }
 const sinNube=()=>esDemo()&&!window.__nube; // modo de prueba sin servidor: no hay PIN que revisar
 // El PIN de cada uno (solo llega al administrador) se queda en memoria, no se guarda en el equipo
-const usarLista=j=>{PERSONAS=(j.usuarios||[]).map(x=>({n:x.usuario,pin:!!x.tienePin,admin:!!x.admin,p:x.pin||"",correo:x.correo||"",alta:x.altaCorreo||0,b:!!x.bloqueado,oc:x.ocultas||[],d:!!x.descargar,eq:x.equipos||[],m:x.metodo||"pin",hu:x.huellas||[]}));guardarLS("cbo-personas",PERSONAS.map(({p,...r})=>r));pintarQuien()};
+const usarLista=j=>{PERSONAS=(j.usuarios||[]).map(x=>({n:x.usuario,pin:!!x.tienePin,admin:!!x.admin,p:x.pin||"",correo:x.correo||"",alta:x.altaCorreo||0,b:!!x.bloqueado,oc:x.ocultas||[],d:!!x.descargar,eq:x.equipos||[],m:x.metodo||"pin",hu:x.huellas||[],nv:x.revisado===false}));guardarLS("cbo-personas",PERSONAS.map(({p,...r})=>r));pintarQuien();try{pintarAvisoNuevos()}catch(e){}};
 // Nombre del equipo para la lista "Equipos con sesión abierta" del administrador
 let EQUIPO=(()=>{const a=navigator.userAgent||"";const um=(a.match(/Android [\d.]+; ([^;)]+)\)/)||[])[1];const so=/Android/i.test(a)?"Celular Android":/iPhone/i.test(a)?"Apple iPhone":/iPad/i.test(a)?"Apple iPad":/Windows/i.test(a)?"PC Windows":/Mac/i.test(a)?"Apple Mac":"Equipo";const nav=/Edg\//.test(a)?"Edge":/Chrome\//.test(a)?"Chrome":/Safari\//.test(a)?"Safari":/Firefox\//.test(a)?"Firefox":"";let inst=false;try{inst=matchMedia("(display-mode: standalone)").matches}catch{}return so+(inst?" · app instalada":nav?" · "+nav:"")})();
 const sesDe=j=>({u:j.usuario,t:j.token,admin:!!j.admin,ocultas:j.ocultas||[],descargar:!!(j.admin||j.descargar)});
@@ -3555,6 +3567,7 @@ function abrirAccesoCorreo() {
   const form = $("accesoCorreo");
   const correo = $("correoAcceso");
   const nombreCampo = $("nombreCorreoAcceso");
+  const apellidoCampo = $("apellidoCorreoAcceso");
   const marca = $("marcaCorreo");
   const saludo = $("saludoCorreo");
   const aviso = $("mensajeCorreo");
@@ -3592,6 +3605,12 @@ function abrirAccesoCorreo() {
     }
     saludar(true);
   };
+  apellidoCampo.oninput = evento => {
+    if (evento.isComposing) return;
+    const cursor = apellidoCampo.selectionStart;
+    const v = apellidoCampo.value.replace(/(^|[\s'’-])\p{Ll}/gu, letra => letra.toLocaleUpperCase("es"));
+    if (v !== apellidoCampo.value) { apellidoCampo.value = v; apellidoCampo.setSelectionRange(cursor, cursor); }
+  };
   function mostrarPaso(nuevo, mensaje = "") {
     paso = nuevo;
     const esRegistro = paso === "perfil";
@@ -3601,7 +3620,7 @@ function abrirAccesoCorreo() {
     saludar(esRegistro);
     correo.readOnly = paso !== "correo";
     $("perfilCorreo").hidden = $("perfilCorreo").disabled = paso === "correo" || paso === "espera";
-    $("nombreRegistro").hidden = nombreCampo.disabled = !esRegistro;
+    $("nombreRegistro").hidden = nombreCampo.disabled = apellidoCampo.disabled = !esRegistro;
     $("nombreCuenta").hidden = !esEntrada || !nombreExistente;
     $("nombreCuenta").textContent = nombreExistente ? "Cuenta de " + nombreExistente : "";
     $("pasoCorreo").hidden = paso === "correo";
@@ -3610,7 +3629,7 @@ function abrirAccesoCorreo() {
     $("ayudaCorreo").textContent = {
       correo:"Te enviaremos un enlace para confirmar tu correo.",
       espera:"Abre el mensaje de CBO y toca «Confirmar mi correo».",
-      perfil:"Escribe tu nombre y crea tu PIN.",
+      perfil:"Escribe tus nombres y apellidos, y crea tu PIN.",
       entrar:"Usa tu PIN para autorizar este dispositivo."
     }[paso];
     aceptar.textContent = {correo:"Enviarme un enlace", espera:"Reenviar enlace", perfil:"Crear mi PIN", entrar:"Ingresar PIN"}[paso];
@@ -3709,8 +3728,13 @@ function abrirAccesoCorreo() {
       if (enviando || cargando) throw new Error("Espera a que termine la actualización");
       const alta = paso === "perfil";
       const datos = {...datosCorreo(), equipo:EQUIPO};
-      const nombre = alta ? nombreCampo.value.trim() : nombreExistente;
-      if (alta && !nombre) throw new Error("Escribe tu nombre y apellidos");
+      const limpio = t => t.trim().replace(/\s+/g, " ").replace(/’/g, "'");
+      const nombres = limpio(nombreCampo.value), apellidos = limpio(apellidoCampo.value);
+      const valido = t => /^\p{L}[\p{L} '-]{1,29}$/u.test(t) && (t.match(/\p{L}/gu) || []).length >= 2;
+      if (alta && !nombres) throw new Error("Escribe tus nombres");
+      if (alta && !apellidos) throw new Error("Escribe tus apellidos");
+      if (alta && (!valido(nombres) || !valido(apellidos))) throw new Error("Usa solo letras en tus nombres y apellidos (mínimo 2 letras cada uno)");
+      const nombre = alta ? nombres + " " + apellidos : nombreExistente;
       document.activeElement?.blur();
       form.inert = true;
       let resultado;
@@ -3723,7 +3747,7 @@ function abrirAccesoCorreo() {
       } finally { form.inert = false; }
       if (!resultado) return;
       if (alta) {
-        resultado = await api("registrarCorreo", {...datos,nombre,pin:resultado});
+        resultado = await api("registrarCorreo", {...datos,nombre,nombres,apellidos,pin:resultado});
         try { localStorage.removeItem(invitacionCorreoKey); } catch {}
       }
       await mostrarInicio(resultado, nombre);
@@ -4555,8 +4579,15 @@ async function enlaceDeRegistroCorreo() {
   const parametros = new URLSearchParams({servidor: cfg.url, invitacion: alta.invitacion});
   return location.origin + location.pathname + "#" + parametros;
 }
+function compartirCBO(){
+  if(!esAdmin()){toast("Solo el administrador comparte CBO");return}
+  const enlace="https://josueoo07.github.io/cbo-finanzas/";
+  const texto="Instala CBO, la app de Casa Bonita Oregón:\n"+enlace+"\n\n1. Ábrelo en Chrome y toca «Instalar» (o «Agregar a pantalla principal»).\n2. Entra con tu correo personal.\n3. Escribe tus nombres y apellidos y crea tu PIN.";
+  if(!window.open("https://wa.me/?text="+encodeURIComponent(texto),"_blank"))window.prompt("Copia este enlace para compartirlo",enlace);
+}
 $("compartirAcceso").onclick=async()=>{
-  if (accesoPorCorreo && cfg?.url) {
+  if (accesoPorCorreo && cfg?.url) { compartirCBO(); return; }
+  if (false) {
     try {
       const enlace = await enlaceDeRegistroCorreo();
       const texto = "Crea tu cuenta en CBO. Invitación válida una vez durante 7 días: " + enlace;
@@ -6931,6 +6962,110 @@ async function buscarEnMapa(v){
   .usr-perm-ob{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))!important;border:1px solid var(--line);border-radius:12px;padding:6px 10px}
   </style>`);
 })();
+/* ===== CBO: sala de espera para quien recién creó su cuenta y aún no tiene permisos ===== */
+function salaEspera(){
+  const nom=sesion?titulo(String(sesion.u||"").split(" ")[0]):"";
+  const ok='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg>';
+  return `<div class="espera" role="status">
+    <div class="espera-logo" aria-hidden="true"><span class="espera-halo"></span><img src="logo-blanco.png" alt=""></div>
+    <h2>¡Hola${nom?", "+esc(nom):""}!</h2>
+    <p class="espera-sub">Tu cuenta de CBO ya está creada.</p>
+    <ol class="espera-pasos">
+      <li class="hecho"><i>${ok}</i><span>Correo confirmado</span></li>
+      <li class="hecho"><i>${ok}</i><span>Nombre y PIN listos</span></li>
+      <li class="actual"><i><b></b></i><span>El administrador elige qué puedes ver<small>Te avisamos aquí apenas te dé acceso</small></span></li>
+    </ol>
+    <p class="espera-nota">No tienes que hacer nada más. Cuando te den acceso, tus módulos aparecen aquí solos.</p>
+    <button class="btn2 espera-btn" type="button" data-espera-revisar>Revisar ahora</button>
+  </div>`;
+}
+(function(){
+  let ult=0;
+  const sinNada=()=>!!document.querySelector("#cboMods .espera");
+  const revisar=(forzar)=>{if(!sesion||sesion.admin||!sinNada())return;if(!forzar&&Date.now()-ult<45000)return;ult=Date.now();try{cargar()}catch(e){}};
+  document.addEventListener("click",e=>{const b=e.target.closest("[data-espera-revisar]");if(!b)return;b.disabled=true;b.textContent="Revisando…";revisar(true);setTimeout(()=>{b.disabled=false;b.textContent="Revisar ahora";if(sinNada())toast("Aún no tienes acceso. Te avisamos aquí.")},2500)});
+  setInterval(()=>{if(!document.hidden)revisar(false)},60000);
+  document.addEventListener("visibilitychange",()=>{if(!document.hidden)revisar(false)});
+  document.head.insertAdjacentHTML("beforeend",`<style id="esperaCss">
+  .espera{grid-column:1/-1;max-width:440px;margin:28px auto 12px;padding:28px 22px 22px;border-radius:24px;text-align:center;
+    background:radial-gradient(120% 80% at 50% 0%,color-mix(in srgb,var(--brand-2) 22%,transparent),transparent 70%),var(--surface);border:1px solid color-mix(in srgb,var(--brand-2) 30%,var(--line))}
+  .espera-logo{position:relative;width:78px;height:78px;margin:0 auto 14px;display:grid;place-items:center}
+  .espera-logo img{position:relative;width:56px;height:56px;object-fit:contain}
+  .espera-halo{position:absolute;inset:0;border-radius:50%;background:color-mix(in srgb,var(--brand-2) 30%,transparent);animation:esperaHalo 2.6s cubic-bezier(.23,1,.32,1) infinite}
+  @keyframes esperaHalo{0%{transform:scale(.82);opacity:.75}70%{transform:scale(1.25);opacity:0}100%{transform:scale(1.25);opacity:0}}
+  .espera h2{margin:0;font:700 1.45rem var(--display)}.espera-sub{margin:4px 0 18px;opacity:.8}
+  .espera-pasos{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:10px;text-align:left}
+  .espera-pasos li{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:14px;background:color-mix(in srgb,var(--ink) 4%,transparent)}
+  .espera-pasos i{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center}
+  .espera-pasos .hecho i{background:color-mix(in srgb,#2fbf71 22%,transparent);color:#2fbf71}
+  .espera-pasos svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+  .espera-pasos .actual{border:1px solid color-mix(in srgb,var(--brand-2) 45%,transparent)}
+  .espera-pasos .actual i{background:color-mix(in srgb,var(--brand-2) 20%,transparent)}
+  .espera-pasos .actual b{width:10px;height:10px;border-radius:50%;background:var(--brand-2);animation:esperaPunto 1.6s ease-in-out infinite}
+  @keyframes esperaPunto{50%{opacity:.35;transform:scale(.8)}}
+  .espera-pasos span{font-weight:600;font-size:.92rem;line-height:1.25}.espera-pasos small{display:block;font-weight:400;font-size:.78rem;opacity:.7;margin-top:2px}
+  .espera-nota{margin:0 0 14px;font-size:.86rem;opacity:.75;line-height:1.4}
+  .espera-btn{min-width:160px}
+  [data-apariencia="claro"] .espera-logo img{filter:invert(1) brightness(.3)}
+  @media (prefers-reduced-motion:reduce){.espera-halo,.espera-pasos .actual b{animation:none}}
+  </style>`);
+})();
+/* ===== CBO: aviso al administrador cuando alguien nuevo se registra, y compartir CBO por WhatsApp (solo administrador) ===== */
+let avisadosNuevos=new Set();
+function pintarAvisoNuevos(){
+  const adm=esAdmin(),L=adm?PERSONAS.filter(p=>p.nv&&!p.admin&&!p.b):[];
+  const bb=$("buzonBtn"),bn=$("buzonN");if(bb)bb.hidden=!adm;if(bn){bn.hidden=!L.length;bn.textContent=L.length>9?"9+":String(L.length)}
+  const lista=$("buzonLista");
+  if(lista)lista.innerHTML=L.length?L.map(p=>`<div class="buzon-f"><span class="usr-av" aria-hidden="true">${esc((titulo(p.n).trim()[0]||"?").toUpperCase())}</span><div class="buzon-d"><b>${esc(titulo(p.n))}</b>${p.correo?`<small>${esc(p.correo)}</small>`:""}<small>Se registró${p.alta?" el "+esc(fhUsr(p.alta)):""}</small><div class="buzon-acc"><button class="btn" type="button" data-vernuevo="${escA(p.n)}">Elegir qué ve</button><button class="btn2" type="button" data-rechazar="${escA(p.n)}">Rechazar</button></div></div></div>`).join(""):`<div class="buzon-vacio"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13l2-8h12l2 8v6H4z"/><path d="M4 13h5l1 2h4l1-2h5"/></svg><p>No hay solicitudes nuevas.</p></div>`;
+  const ini=document.querySelector('[data-sec="inicio"]');let el=$("avisoNuevos");
+  if(!L.length||!ini){if(el)el.remove()}
+  else{if(!el){ini.insertAdjacentHTML("afterbegin",`<div class="aviso-nuevo" id="avisoNuevos" role="status"></div>`);el=$("avisoNuevos")}
+    el.innerHTML=`<div class="aviso-nuevo-f"><span class="aviso-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 4.5 2 6 2 6H4s2-1.5 2-6"/><path d="M10 19a2 2 0 0 0 4 0"/></svg></span><p><b>${L.length===1?esc(titulo(L[0].n))+" quiere entrar a CBO":L.length+" personas quieren entrar a CBO"}</b><span>Elige qué puede ver cada uno.</span></p><button class="btn" type="button" data-abrir-buzon>Ver buzón</button></div>`}
+  L.forEach(p=>{if(!avisadosNuevos.has(p.n)){avisadosNuevos.add(p.n);toast("Nueva solicitud: "+titulo(p.n))}});
+}
+document.addEventListener("click",async e=>{
+  if(e.target.closest("#buzonBtn,[data-abrir-buzon]")){pintarAvisoNuevos();abrirOv("ovBuzon");if(esAdmin())cargarUsuarios();return}
+  if(e.target.closest("#buzonCerrar")){cerrarOv("ovBuzon");return}
+  const r=e.target.closest("[data-rechazar]");
+  if(r){const n=r.dataset.rechazar;if(!confirm(`¿Rechazar a ${titulo(n)}? No podrá entrar a CBO. Luego puedes darle acceso desde Usuarios.`))return;
+    r.disabled=true;try{usarLista(await api("acceso",{usuario:n,permitir:false}));toast(`${titulo(n)} no podrá entrar`)}catch(err){toast(err.message);r.disabled=false}return}
+});
+document.addEventListener("click",e=>{const b=e.target.closest("[data-vernuevo]");if(!b)return;cerrarOv("ovBuzon");
+  usrAbierto=b.dataset.vernuevo;ir("config");
+  setTimeout(()=>{const it=$("quienSeg")&&$("quienSeg").closest(".cfg-item");const sm=it&&it.querySelector("summary");if(it&&!it.classList.contains("activo")&&sm)sm.click();
+    try{pintarSesion()}catch(e){}
+    setTimeout(()=>{const li=[...document.querySelectorAll("#quienSeg .usr-li")].find(x=>x.querySelector(`[data-abrir="${CSS.escape(usrAbierto)}"]`));if(li){li.scrollIntoView({block:"start",behavior:"smooth"});const g=li.querySelector(".perm-g");if(g)g.open=true}},120)},60)});
+(function(){
+  const base=pintarSesion;
+  pintarSesion=function(){base.apply(this,arguments);
+    const adm=esAdmin();["compartirAcceso","copiarCon"].forEach(id=>{const b=$(id);if(b)b.hidden=!adm});
+    const el=$("quienSeg");if(!adm||!el||$("cboWa"))return;
+    const t=el.querySelector(".usr-tools")||el.querySelector(".usr-lista");if(!t)return;
+    t.insertAdjacentHTML("beforebegin",`<button class="btn cbo-wa" id="cboWa" type="button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 0 1-11.8 7L4 20l1.1-4A8 8 0 1 1 20 12z"/><path d="M9 9.5c.5 2.3 2.2 4 4.5 4.6l1-1 1.6.7-.3 1.4c-3.5.4-7.6-3.7-7.2-7.2l1.4-.3.7 1.6z"/></svg>Compartir CBO por WhatsApp</button><p class="hint" style="margin:6px 0 12px">Les llega el enlace para instalar CBO. Entran con su correo y tú eliges qué ve cada uno.</p>`);
+    $("cboWa").onclick=compartirCBO};
+  // El administrador revisa si hay alguien nuevo al abrir la app y al volver a ella
+  let ult=0;const revisar=()=>{if(esAdmin()&&Date.now()-ult>90000){ult=Date.now();cargarUsuarios()}};
+  setTimeout(revisar,1500);document.addEventListener("visibilitychange",()=>{if(!document.hidden)revisar()});
+  document.head.insertAdjacentHTML("beforeend",`<style id="avisoNuevoCss">
+  .aviso-nuevo{display:grid;gap:8px;margin:0 0 14px}
+  .aviso-ic{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--brand-2) 25%,transparent)}
+  .aviso-ic svg,.buzon-btn svg,.buzon-vacio svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .buzon-btn{position:relative;flex:none;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:inherit;display:grid;place-items:center;margin-left:6px}
+  .buzon-n{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#e5484d;color:#fff;font:700 .7rem/18px var(--display,inherit);text-align:center}
+  .buzon-t{margin:0 0 4px;font:700 1.2rem var(--display)}
+  .buzon-f{display:flex;gap:12px;padding:12px;border-radius:16px;border:1px solid var(--line);background:color-mix(in srgb,var(--ink) 3%,transparent);margin-bottom:10px}
+  .buzon-d{flex:1;min-width:0}.buzon-d b{display:block}.buzon-d small{display:block;opacity:.7;font-size:.78rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .buzon-acc{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.buzon-acc button{flex:1;min-width:120px}
+  .buzon-vacio{text-align:center;padding:22px 0;opacity:.7}.buzon-vacio svg{width:34px;height:34px}.buzon-vacio p{margin:8px 0 0}
+  .aviso-nuevo-f{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:color-mix(in srgb,var(--brand-2) 14%,var(--surface));border:1px solid color-mix(in srgb,var(--brand-2) 45%,var(--line))}
+  .aviso-nuevo-f p{flex:1;margin:0;min-width:0;line-height:1.3}.aviso-nuevo-f p small{display:block;opacity:.7;font-size:.76rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .aviso-nuevo-f p span{display:block;font-size:.84rem;opacity:.85;margin-top:2px}.aviso-nuevo-f .btn{flex:none;padding:9px 14px;min-height:0}
+  .cbo-wa{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:#1f8f4e!important;color:#fff!important;border-color:transparent!important}
+  .cbo-wa svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round}
+  .acceso-nombre{display:grid;gap:10px}
+  @media (max-width:380px){.aviso-nuevo-f{flex-wrap:wrap}.aviso-nuevo-f .btn{width:100%}}
+  </style>`);
+})();
 /* ===== CBO: módulos nuevos con un solo motor (se guardan como los registros de obra: primero en el equipo, luego en Google) ===== */
 (function(){
   if(!CBO_UNIDA)return;
@@ -7109,7 +7244,7 @@ async function buscarEnMapa(v){
     // Inicio como siempre; solo quien no tiene Finanzas (Inicio vacío) ve ahí sus módulos o el aviso
     const sinF=secOculta("movimientos"),el=$("cboMods");if(ini)ini.classList.toggle("cbo-sin-fin",sinF);
     document.documentElement.classList.toggle("cbo-sinfin",sinF);if(!document.getElementById("cboSinFinCss"))document.head.insertAdjacentHTML("beforeend",`<style id="cboSinFinCss">.cbo-sinfin #monthsel{display:none!important}</style>`);
-    if(el){el.hidden=!sinF;el.innerHTML=sinF?(t||`<p class="hint cbo-nada">Todavía no tienes módulos asignados. Pídele al administrador que te dé acceso.</p>`):""}};
+    if(el){el.hidden=!sinF;el.innerHTML=sinF?(t||salaEspera()):""}};
   document.addEventListener("click",e=>{if(e.target.closest("#cboModsMas [data-mod]"))cerrarOv("ovMas")},true);
   document.addEventListener("click",e=>{const b=e.target.closest("[data-mod]");if(!b)return;const m=MODS.find(x=>x[0]===b.dataset.mod);if(!m)return;
     if(m[5]){ctlVista=m[5];ir("control");try{ctlRender()}catch{}}else ir(m[4]);window.scrollTo(0,0)});
