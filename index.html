@@ -6416,7 +6416,7 @@ const CTL_MOD=[
 // Josué (12/11/2026): se quitan Avance por partidas, Cuaderno de obra y Observaciones y pendientes (los datos guardados no se borran)
 CTL_MOD.splice(0,CTL_MOD.length,...CTL_MOD.filter(m=>!["avance","notas","pend"].includes(m[0])));
 const CTL_NOM=Object.fromEntries(CTL_MOD.map(m=>[m[0],m[1]]));
-let ctl=Object.assign({avance:[],notas:[],fotos:[],pedidos:[],herr:[],pruebas:[],pend:[],minimos:{},presup:[],crm:[],compras:[],emp:[],gastos:[],serv:[],agenda:[],flota:[]},leerLS(CTL_K,{})||{});
+let ctl=Object.assign({informes:[],avance:[],notas:[],fotos:[],pedidos:[],herr:[],pruebas:[],pend:[],minimos:{},presup:[],crm:[],compras:[],emp:[],gastos:[],serv:[],agenda:[],flota:[]},leerLS(CTL_K,{})||{});
 let ctlVista="menu", ctlEdit=null;
 const ctlGuardarLS=()=>guardarLS(CTL_K,ctl);
 const ctlId=()=>"k"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
@@ -7269,6 +7269,122 @@ document.head.insertAdjacentHTML("beforeend",`<style id="plaSemCss">
   .pla-tx{min-width:0;display:grid;gap:2px}.pla-tx small{color:var(--muted);font-size:.78rem}.pla-tx .pla-inf{color:var(--ink);font-size:.84rem}.pla-t.ok .pla-inf{color:#4ade80}
   .pla-b{grid-column:1/-1;display:flex;justify-content:flex-end}.pla-b .btn,.pla-b .btn2,.pla-b select{width:100%}
   @media (min-width:600px){.pla-t{grid-template-columns:auto 1fr auto}.pla-b{grid-column:auto}.pla-b .btn,.pla-b .btn2,.pla-b select{width:auto}}
+</style>`);
+/* ===== CBO: avisos con la app cerrada (notificaciones push) ===== */
+const avisosIDB=()=>new Promise((ok,mal)=>{const r=indexedDB.open("cbo-avisos",1);r.onupgradeneeded=()=>r.result.createObjectStore("k");r.onsuccess=()=>ok(r.result);r.onerror=()=>mal(r.error)});
+async function avisosConf(v){try{const db=await avisosIDB();await new Promise(ok=>{const t=db.transaction("k","readwrite");t.objectStore("k").put(v,"conf");t.oncomplete=ok;t.onerror=ok})}catch(e){}}
+const pushPosible=()=>"serviceWorker" in navigator&&"PushManager" in window&&"Notification" in window&&!esDemo();
+function b64uABytes(t){const s=(t+"===".slice((t.length+3)%4)).replace(/-/g,"+").replace(/_/g,"/");return Uint8Array.from(atob(s),c=>c.charCodeAt(0))}
+async function activarAvisos(silencioso){
+  if(!pushPosible()){if(!silencioso)toast("Este celular o navegador no permite avisos. Usa Chrome en Android o en la computadora.");return false}
+  try{
+    const perm=Notification.permission==="granted"?"granted":await Notification.requestPermission();
+    if(perm!=="granted"){if(!silencioso)toast("Para recibir avisos, permite las notificaciones de CBO.");return false}
+    const reg=await navigator.serviceWorker.ready,{clave}=await api("pushClave");
+    let sub=await reg.pushManager.getSubscription();
+    if(sub&&sub.options&&sub.options.applicationServerKey){const a=new Uint8Array(sub.options.applicationServerKey),b=b64uABytes(clave);if(a.length!==b.length||a.some((x,i)=>x!==b[i])){await sub.unsubscribe();sub=null}}
+    if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64uABytes(clave)});
+    await api("pushSuscribir",{sub:sub.toJSON()});
+    await avisosConf({url:cfg.url,token:sesion.t,desde:Date.now()});
+    guardarLS("cbo-avisos-on",1);pintarBannerAvisos();
+    if(!silencioso){toast("Avisos activados en este equipo");api("probarAviso").catch(()=>{})}
+    return true;
+  }catch(e){if(!silencioso)toast("No se pudieron activar los avisos: "+(e.message||e));return false}
+}
+function pintarBannerAvisos(){
+  const ini=document.querySelector('[data-sec="inicio"]');if(!ini)return;let b=$("bannerAvisos");
+  const mostrar=pushPosible()&&sesion&&!enEspera()&&!leerLS("cbo-avisos-on",0)&&!leerLS("cbo-avisos-no",0)&&Notification.permission!=="denied";
+  if(!mostrar){if(b)b.remove();return}
+  if(!b){ini.insertAdjacentHTML("afterbegin",`<div class="aviso-nuevo" id="bannerAvisos"><div class="aviso-nuevo-f"><span class="aviso-ic" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 4.5 2 6 2 6H4s2-1.5 2-6"/><path d="M10 19a2 2 0 0 0 4 0"/></svg></span><p><b>Activa los avisos de CBO</b><span>Te llegan al celular aunque la app esté cerrada.</span></p><button class="btn" type="button" id="avisosSi">Activar</button><button class="btnlink" type="button" id="avisosNo" aria-label="Ahora no">✕</button></div></div>`);
+    $("avisosSi").onclick=()=>activarAvisos(false);$("avisosNo").onclick=()=>{guardarLS("cbo-avisos-no",1);pintarBannerAvisos()}}
+}
+function irAviso(k){
+  k=String(k||"");if(!sesion)return;
+  if(k==="buzon"&&esAdmin()){ir("inicio");setTimeout(()=>{try{pintarAvisoNuevos();abrirOv("ovBuzon");cargarUsuarios()}catch(e){}},200);return}
+  if(k==="pedidos"||k==="asist"){ctlVista=k;ir("control");try{ctlRender()}catch(e){}return}
+  if(k==="gastos"){ir("m-gastos");return}
+  if(k)ir(k==="inicio"?"inicio":k);
+}
+(function(){
+  if("serviceWorker" in navigator)navigator.serviceWorker.addEventListener("message",e=>{if(e.data&&"cboIr" in e.data)irAviso(e.data.cboIr)});
+  const m=location.hash.match(/aviso=([a-z-]+)/);if(m){history.replaceState(null,"",location.pathname+"#inicio");setTimeout(()=>irAviso(m[1]),1500)}
+  // La sesión del aviso se mantiene al día (el celular la usa para saber qué pasó)
+  const ps=ponerSesion;ponerSesion=function(s){const r=ps.apply(this,arguments);try{if(leerLS("cbo-avisos-on",0)&&s&&s.t&&cfg)avisosConf({url:cfg.url,token:s.t,desde:Date.now()});pintarBannerAvisos()}catch(e){}return r};
+  const ap=aplicarPermisos;aplicarPermisos=function(){const r=ap.apply(this,arguments);try{pintarBannerAvisos()}catch(e){}return r};
+  setTimeout(()=>{try{pintarBannerAvisos();if(leerLS("cbo-avisos-on",0)&&sesion&&sesion.t&&Notification.permission==="granted")activarAvisos(true)}catch(e){}},2500);
+})();
+
+/* ===== Informe semanal para el cliente: las fotos de la semana, la IA cuenta qué se hizo, paso a paso y corto ===== */
+let infSem=0,infSel=null;
+function infFotosSemana(){const d=diasSemana(infSem);return (ctl.fotos||[]).filter(r=>ctlU(r.obra)===ctlU(invObra)&&r.foto&&r.fecha>=d[0]&&r.fecha<=d[6]).sort((a,b)=>String(a.fecha).localeCompare(b.fecha)||a.ts-b.ts)}
+function infGuardado(){const d=diasSemana(infSem);return (ctl.informes||[]).find(r=>ctlU(r.obra)===ctlU(invObra)&&r.semana===d[0])}
+function abrirInforme(){
+  let ov=$("ovInforme");
+  if(!ov){document.body.insertAdjacentHTML("beforeend",`<div class="overlay" id="ovInforme" hidden><div class="sheet inf-sheet"><div class="inf-cab"><h2>Informe para el cliente</h2><button type="button" class="btnlink" id="infCerrar" aria-label="Cerrar">✕</button></div><div id="infCuerpo"></div></div></div>`);
+    ov=$("ovInforme");$("infCerrar").onclick=()=>cerrarOv("ovInforme")}
+  infSel=null;pintarInforme();abrirOv("ovInforme");
+}
+function pintarInforme(){
+  const el=$("infCuerpo");if(!el)return;const d=diasSemana(infSem),F=infFotosSemana(),g=infGuardado();
+  if(!infSel)infSel=new Set(F.slice(-8).map(r=>r.id));
+  const nav=`<div class="pla-nav inf-nav"><button type="button" class="btn2" data-infsem="-1">‹</button><span>${esc(invObra||"Sin obra")} · ${fCorta(d[0])} – ${fCorta(d[6])}</span><button type="button" class="btn2" data-infsem="1"${infSem>=0?" disabled":""}>›</button></div>`;
+  if(g){el.innerHTML=nav+informeHTML(g)+`<div class="inf-acc"><button type="button" class="btn" data-infwa>Enviar por WhatsApp</button><button type="button" class="btn2" data-infpdf>PDF / imprimir</button><button type="button" class="btnlink" data-infrehacer>Volver a generar</button></div>`;return}
+  el.innerHTML=nav+(F.length?`<p class="hint">Elige hasta 8 fotos de la semana. La IA describe lo que se ve y arma un informe corto para el cliente.</p>
+    <div class="inf-fotos">${F.map(r=>`<label class="inf-f${infSel.has(r.id)?" on":""}"><input type="checkbox" data-inff="${escA(r.id)}"${infSel.has(r.id)?" checked":""}><img src="${r.foto}" alt=""><small>${esc(r.ambiente||"")} · ${esc(r.momento==="antes"?"Antes":"Avance")}</small></label>`).join("")}</div>
+    <p class="hint" id="infMsg"></p><button type="button" class="btn inf-gen" data-infgen>Generar informe con IA (${infSel.size})</button>`
+    :`<p class="hint" style="margin:16px 0">No hay fotos de esta obra en esa semana. Súbelas en Control de obra → Fotos antes y después.</p>`);
+}
+function informeHTML(g){const I=g.informe||{},F=(ctl.fotos||[]);const fotoDe=n=>{const id=(g.fotos||[])[n-1];const r=F.find(x=>x.id===id);return r?r.foto:""};
+  return `<article class="inf-doc"><header><img src="logo-blanco.png" alt="" class="inf-logo"><div><b>Casa Bonita Oregón S.A.C.</b><small>Informe semanal de avance</small></div></header>
+    <h3>${esc(I.titulo||"Avance de la semana")}</h3><p class="inf-obra">${esc(g.obra)} · ${fCorta(g.semana)} – ${fCorta(isoMas(g.semana,6))}</p>
+    <p class="inf-res">${esc(I.resumen||"")}</p>
+    <ol class="inf-pasos">${(I.pasos||[]).map((p,i)=>`<li>${fotoDe(p.foto)?`<img src="${fotoDe(p.foto)}" alt="">`:""}<div><b>${i+1}. ${esc(p.titulo||"")}</b><p>${esc(p.detalle||"")}</p></div></li>`).join("")}</ol>
+    ${I.siguiente?`<p class="inf-sig"><b>Lo que sigue:</b> ${esc(I.siguiente)}</p>`:""}</article>`}
+function redimFoto(src,max){return new Promise(ok=>{const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.naturalWidth,im.naturalHeight));const c=document.createElement("canvas");c.width=Math.round(im.naturalWidth*k);c.height=Math.round(im.naturalHeight*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);ok(c.toDataURL("image/jpeg",.72).split(",")[1])};im.onerror=()=>ok("");im.src=src})}
+async function generarInforme(){
+  const F=infFotosSemana().filter(r=>infSel.has(r.id)).slice(0,8),msg=$("infMsg"),b=document.querySelector("[data-infgen]");if(!F.length){msg.textContent="Elige al menos una foto.";return}
+  b.disabled=true;b.textContent="La IA está mirando las fotos…";msg.textContent="Puede tardar hasta un minuto.";
+  try{
+    const fotos=[];for(const r of F){const data=await redimFoto(r.foto,1024);if(data)fotos.push({data,ambiente:r.ambiente||"",momento:r.momento==="antes"?"antes":"avance",fecha:r.fecha})}
+    const d=diasSemana(infSem),j=await api("informeIA",{obra:invObra,semana:`${fCorta(d[0])} al ${fCorta(d[6])}`,fotos});
+    ctlGuardarRec("informes",{id:"inf:"+ctlU(invObra)+"|"+d[0],obra:invObra,semana:d[0],informe:j.informe,fotos:F.map(r=>r.id),ts:Date.now()});
+    pintarInforme();
+  }catch(e){
+    if(e.message==="falta_clave"){msg.innerHTML=esAdmin()?`Falta la clave de la IA. Pégala aquí una sola vez (de console.anthropic.com → API Keys):<input id="infClave" placeholder="sk-ant-…" autocomplete="off" style="width:100%;margin:8px 0"><button type="button" class="btn2" data-infclave>Guardar clave</button>`:"Pídele al administrador que active la IA.";}
+    else msg.textContent=e.message||"No se pudo generar el informe";
+    b.disabled=false;b.textContent=`Generar informe con IA (${infSel.size})`}
+}
+function textoInformeWA(g){const I=g.informe||{};return `*${I.titulo||"Avance de la semana"}*\n${g.obra} · ${fCorta(g.semana)} – ${fCorta(isoMas(g.semana,6))}\n\n${I.resumen||""}\n\n${(I.pasos||[]).map((p,i)=>`${i+1}. *${p.titulo}*: ${p.detalle}`).join("\n")}${I.siguiente?`\n\n*Lo que sigue:* ${I.siguiente}`:""}\n\n— Casa Bonita Oregón S.A.C.`}
+function imprimirInforme(g){const f=document.createElement("iframe");f.style.cssText="position:fixed;width:0;height:0;border:0;right:0;bottom:0";document.body.append(f);
+  const css=`body{font-family:Arial,sans-serif;color:#111;margin:24px}header{display:flex;gap:12px;align-items:center;border-bottom:2px solid #14305f;padding-bottom:10px}header img{width:48px;filter:invert(1)}header b{display:block;font-size:16px}h3{margin:16px 0 4px;color:#14305f}.inf-obra{color:#555;margin:0 0 10px}.inf-res{font-size:14px}ol{list-style:none;padding:0}li{display:flex;gap:12px;margin:12px 0;page-break-inside:avoid}li img{width:180px;height:130px;object-fit:cover;border-radius:8px}li p{margin:4px 0;font-size:13px}.inf-sig{background:#eef3fb;padding:10px;border-radius:8px}`;
+  f.contentDocument.write(`<!doctype html><html><head><meta charset="utf-8"><title>Informe ${esc(g.obra)}</title><base href="${location.href}"><style>${css}</style></head><body>${informeHTML(g)}</body></html>`);f.contentDocument.close();
+  setTimeout(()=>{try{f.contentWindow.print()}catch(e){}setTimeout(()=>f.remove(),2000)},500)}
+document.addEventListener("click",e=>{
+  if(e.target.closest("[data-informe]")){abrirInforme();return}
+  const s=e.target.closest("[data-infsem]");if(s){infSem=Math.min(0,infSem+(+s.dataset.infsem));infSel=null;pintarInforme();return}
+  if(e.target.closest("[data-infgen]")){generarInforme();return}
+  if(e.target.closest("[data-infrehacer]")){const d=diasSemana(infSem);ctl.informes=(ctl.informes||[]).filter(r=>!(ctlU(r.obra)===ctlU(invObra)&&r.semana===d[0]));infSel=null;pintarInforme();return}
+  if(e.target.closest("[data-infwa]")){const g=infGuardado();if(g)window.open("https://wa.me/?text="+encodeURIComponent(textoInformeWA(g)),"_blank");return}
+  if(e.target.closest("[data-infpdf]")){const g=infGuardado();if(g)imprimirInforme(g);return}
+  const k=e.target.closest("[data-infclave]");if(k){const v=($("infClave")||{}).value||"";api("guardarClaveIA",{clave:v.trim()}).then(()=>{toast("Clave guardada. Ya puedes generar informes.");pintarInforme()}).catch(err=>toast(err.message));return}
+});
+document.addEventListener("change",e=>{const c=e.target.closest("[data-inff]");if(!c)return;const id=c.dataset.inff;if(c.checked){if(infSel.size>=8){c.checked=false;toast("Máximo 8 fotos por informe");return}infSel.add(id)}else infSel.delete(id);c.closest(".inf-f").classList.toggle("on",c.checked);const b=document.querySelector("[data-infgen]");if(b)b.textContent=`Generar informe con IA (${infSel.size})`});
+(function(){const vf=vFotos;vFotos=function(){const h=vf.apply(this,arguments);const ok=!sesion||sesion.admin||!secOculta("fotos");return (ok&&invObra?`<button type="button" class="btn inf-abrir" data-informe><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h4"/></svg>Informe semanal para el cliente</button>`:"")+h}})();
+document.head.insertAdjacentHTML("beforeend",`<style id="infCss">
+  .inf-abrir{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:0 0 12px}.inf-abrir svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9}
+  .inf-sheet{max-width:760px;max-height:92vh;overflow:auto}.inf-cab{display:flex;align-items:center;justify-content:space-between}.inf-cab h2{margin:0;font:700 1.2rem var(--display)}
+  .inf-nav{justify-content:space-between;margin:10px 0}
+  .inf-fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin:8px 0}
+  .inf-f{position:relative;border-radius:12px;overflow:hidden;border:2px solid transparent;cursor:pointer;display:block}.inf-f.on{border-color:var(--brand-2)}
+  .inf-f input{position:absolute;top:6px;left:6px;width:20px;height:20px}.inf-f img{width:100%;height:96px;object-fit:cover;display:block}.inf-f small{display:block;padding:4px 6px;font-size:.72rem;background:var(--surface)}
+  .inf-gen{width:100%}
+  .inf-doc{background:#fff;color:#111;border-radius:16px;padding:18px;margin:8px 0 12px}.inf-doc header{display:flex;gap:10px;align-items:center;border-bottom:2px solid #14305f;padding-bottom:8px}
+  .inf-logo{width:40px;filter:invert(1)}.inf-doc header b{display:block}.inf-doc header small{color:#555}.inf-doc h3{margin:14px 0 2px;color:#14305f}.inf-obra{color:#666;margin:0 0 8px;font-size:.85rem}
+  .inf-res{font-size:.95rem;line-height:1.45}.inf-pasos{list-style:none;padding:0;margin:10px 0;display:grid;gap:12px}
+  .inf-pasos li{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:start}.inf-pasos img{width:120px;height:90px;object-fit:cover;border-radius:10px}.inf-pasos p{margin:4px 0 0;font-size:.9rem;line-height:1.4}
+  .inf-sig{background:#eef3fb;padding:10px 12px;border-radius:10px;font-size:.9rem}
+  .inf-acc{display:flex;flex-wrap:wrap;gap:8px}.inf-acc .btn,.inf-acc .btn2{flex:1 1 160px}
+  @media (max-width:420px){.inf-pasos li{grid-template-columns:1fr}.inf-pasos img{width:100%;height:160px}}
 </style>`);
 /* ===== CBO: sala de espera para quien recién creó su cuenta y aún no tiene permisos ===== */
 function salaEspera(){
