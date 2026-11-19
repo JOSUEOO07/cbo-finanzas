@@ -6417,7 +6417,7 @@ const CTL_MOD=[
 // Josué (12/11/2026): se quitan Avance por partidas, Cuaderno de obra y Observaciones y pendientes (los datos guardados no se borran)
 CTL_MOD.splice(0,CTL_MOD.length,...CTL_MOD.filter(m=>!["avance","notas","pend"].includes(m[0])));
 const CTL_NOM=Object.fromEntries(CTL_MOD.map(m=>[m[0],m[1]]));
-let ctl=Object.assign({adel:[],lic:[],epp:[],docpers:[],informes:[],avance:[],notas:[],fotos:[],pedidos:[],herr:[],pruebas:[],pend:[],minimos:{},presup:[],crm:[],compras:[],emp:[],gastos:[],serv:[],agenda:[],flota:[]},leerLS(CTL_K,{})||{});
+let ctl=Object.assign({conform:[],plazos:[],codigos:[],adel:[],lic:[],epp:[],docpers:[],informes:[],avance:[],notas:[],fotos:[],pedidos:[],herr:[],pruebas:[],pend:[],minimos:{},presup:[],crm:[],compras:[],emp:[],gastos:[],serv:[],agenda:[],flota:[]},leerLS(CTL_K,{})||{});
 let ctlVista="menu", ctlEdit=null;
 const ctlGuardarLS=()=>guardarLS(CTL_K,ctl);
 const ctlId=()=>"k"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
@@ -6667,11 +6667,11 @@ function vEntrega(){
   const r=resumenObra(invObra);
   return `<div class="panel ctl-it"><p class="ctl-txt">Arma el PDF de entrega de <b>${esc(invObra||"")}</b> con las pruebas, el material usado y las fotos de antes y después, con espacio para la firma de conformidad.</p>
     <div class="ctl-res"><span>Pruebas observadas <b>${r.obs}</b></span></div>
-    <label class="lbl-s">Cliente<input id="entCli" type="text" maxlength="60" placeholder="Nombre del cliente o empresa"></label>
+    <label class="lbl-s">Cliente<input id="entCli" type="text" maxlength="60" placeholder="Nombre del cliente o empresa" value="${escA((conformDe(invObra)||{}).cli||"")}"></label>${conformHTML()}
     <div class="line"><button type="button" class="btn" id="entPdf">Generar PDF de entrega</button></div></div>`;
 }
 function generarEntrega(){
-  const o=invObra||"",cli=($("entCli")||{}).value||"",r=resumenObra(o);
+  const o=invObra||"",cli=($("entCli")||{}).value||(conformDe(invObra||"")||{}).cli||"",r=resumenObra(o);
   const av=deObra("avance"),pr=deObra("pruebas"),pe=deObra("pend"),fo=deObra("fotos");
   const usado=new Map();movsDe(o).filter(m=>m.tipo==="usa").forEach(m=>{const k=m.item+"|"+m.medida;usado.set(k,(usado.get(k)||0)+(+m.cant||0))});
   const tr=a=>`<tr>${a.map(x=>`<td>${x}</td>`).join("")}</tr>`;
@@ -6680,7 +6680,7 @@ function generarEntrega(){
     <h2>Material usado</h2>${usado.size?`<table><tr><th>Material</th><th>Medida</th><th class="n">Cantidad</th></tr>${[...usado].map(([k,c])=>{const [it,med]=k.split("|"),inf=INV_IDX[it]||{n:it,u:"und"};return tr([esc(inf.n),esc(med||""),`<span class="n">${invNum(c)}${invU(inf.u,c)}</span>`])}).join("")}</table>`:"<p>Sin material registrado.</p>"}
     ${fo.length?`<h2>Fotos antes y después</h2><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">${fo.slice(0,24).map(x=>`<figure style="margin:0"><img src="${x.foto}" style="width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:4px"><figcaption style="font-size:9px">${esc(x.ambiente)} · ${x.momento==="antes"?"Antes":"Después"}</figcaption></figure>`).join("")}</div>`:""}
     <h2>Conformidad</h2><p>El cliente declara recibir la obra conforme.</p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:50px"><div style="border-top:1px solid #333;padding-top:6px;text-align:center">Casa Bonita Oregón S.A.C.</div><div style="border-top:1px solid #333;padding-top:6px;text-align:center">Cliente${cli?": "+esc(cli):""}</div></div>`;
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:50px"><div style="border-top:1px solid #333;padding-top:6px;text-align:center">Casa Bonita Oregón S.A.C.</div><div style="text-align:center">${(()=>{const cf=conformDe(o);return cf&&cf.firma?`<img alt="Firma del cliente" src="${cf.firma}" style="height:70px;display:block;margin:-74px auto 4px"><small style="display:block;margin-top:-4px">Firmó el ${fCorta(cf.fecha)}</small>`:""})()}<div style="border-top:1px solid #333;padding-top:6px">Cliente${cli?": "+esc(cli):""}${(()=>{const cf=conformDe(o);return cf&&cf.dni?" · DNI "+esc(cf.dni):""})()}</div></div></div>`;
   const t0=document.title;document.title=`Entrega de obra ${o}`;setTimeout(()=>{window.print();document.title=t0},60);
 }
 /* --- Formularios --- */
@@ -7461,6 +7461,130 @@ async function enviarInformePDF(btn){
 document.addEventListener("click",e=>{const b=e.target.closest("[data-infpdfwa]");if(b)enviarInformePDF(b)});
 
 /* ===== Inicio (administrador): lo pendiente del equipo ===== */
+/* ===== v128: firma del cliente al entregar, plazo de obra con aviso de atraso y código de barras en inventario ===== */
+function conformDe(o){return (ctl.conform||[]).find(r=>ctlU(r.obra)===ctlU(o))}
+function plazoDe(o){return (ctl.plazos||[]).find(r=>ctlU(r.obra)===ctlU(o))}
+function diasEntre(a,b){return Math.round((new Date(b+"T12:00:00")-new Date(a+"T12:00:00"))/864e5)}
+function estadoPlazo(o){
+  const p=plazoDe(o);if(!p||!p.fin)return null;
+  const cf=conformDe(o);if(cf&&cf.firma)return {t:"Entregada",cl:"ok",d:null};
+  const d=diasEntre(hoyISO,p.fin),dd=n=>n===1?"día":"días";
+  return d<0?{t:`Atrasada ${-d} ${dd(-d)}`,cl:"al",d}:d===0?{t:"Se entrega hoy",cl:"al",d}:{t:`Faltan ${d} ${dd(d)}`,cl:d<=7?"pr":"",d};
+}
+function obrasAtrasadas(){try{return invObrasLista().filter(o=>{const e=estadoPlazo(o);return e&&e.d!==null&&e.d<0})}catch{return []}}
+function conformHTML(){
+  const cf=conformDe(invObra);
+  if(cf&&cf.firma)return `<div class="cf-ok"><img alt="Firma del cliente" src="${cf.firma}"><span><b>Firmado por ${esc(cf.cli||"el cliente")}</b><small>${fCorta(cf.fecha)}${cf.dni?" · DNI "+esc(cf.dni):""}${cf.obs?" · "+esc(cf.obs):""}</small></span>${esAdmin()?'<button type="button" class="btnlink" id="cfRehacer">Volver a firmar</button>':""}</div>`;
+  return `<div class="cf-box"><label class="lbl-s">DNI del cliente (opcional)<input id="entDni" type="text" inputmode="numeric" maxlength="11" placeholder="DNI o RUC"></label>
+    <label class="lbl-s">Observaciones del cliente (opcional)<input id="entObs" type="text" maxlength="120" placeholder="Ej.: conforme, sin observaciones"></label>
+    <button type="button" class="btn2" id="cfFirmar">${IC.edit} Firma del cliente</button><small class="hint">El cliente firma con su dedo aquí mismo y la firma sale en el PDF.</small></div>`;
+}
+async function firmarCliente(){
+  const cli=(($("entCli")||{}).value||"").trim();
+  if(!cli){toast("Escribe el nombre del cliente");$("entCli")&&$("entCli").focus();return}
+  const firma=await pedirFirma(cli);if(!firma)return;
+  const prev=conformDe(invObra)||{};
+  const rec={id:prev.id||ctlId(),obra:invObra,ts:Date.now(),por:quien||"",fecha:hoyISO,cli,dni:(($("entDni")||{}).value||"").trim(),obs:(($("entObs")||{}).value||"").trim(),firma};
+  ctlGuardarRec("conform",rec,["Obra entregada",cli+" firmó la conformidad"]);
+}
+document.addEventListener("click",e=>{
+  if(e.target.closest("#cfFirmar")){firmarCliente();return}
+  if(e.target.closest("#cfRehacer")){const cf=conformDe(invObra);if(cf){cf.firma="";ctlGuardarRec("conform",cf)}return}
+});
+/* Plazo: chip en el tablero y campos en Control de obra */
+(function(){
+  const baseT=ctlTablero;
+  ctlTablero=function(){const r=baseT.apply(this,arguments);try{
+    document.querySelectorAll("#ctlTab [data-ctlobra]").forEach(b=>{const e=estadoPlazo(b.dataset.ctlobra);const ch=b.querySelector(".ctl-chips");
+      if(e&&ch){ch.insertAdjacentHTML("afterbegin",`<span class="ctl-ch pz ${e.cl}">${e.t}</span>`);if(e.d!==null&&e.d<0)[...ch.children].forEach(x=>{if(/Todo en orden/.test(x.textContent))x.remove()})}})}catch(x){console.warn(x)}return r};
+  const baseR=ctlRender;
+  ctlRender=function(){const r=baseR.apply(this,arguments);try{
+    if(ctlVista!=="menu"||!invObra)return r;const sel=document.querySelector("#ctlApp .ctl-obrasel");if(!sel)return r;
+    const p=plazoDe(invObra)||{},e=estadoPlazo(invObra),ad=esAdmin();
+    sel.insertAdjacentHTML("afterend",`<div class="panel pz-box"><div class="pz-cab"><b>Plazo de la obra</b>${e?`<span class="ctl-ch pz ${e.cl}">${e.t}</span>`:'<small class="hint">Sin fecha de entrega</small>'}</div>
+      ${ad?`<div class="pz-f"><label class="lbl-s">Inicio<input type="date" id="pzIni" value="${escA(p.ini||"")}"></label><label class="lbl-s">Entrega<input type="date" id="pzFin" value="${escA(p.fin||"")}"></label></div>`
+        :(p.ini||p.fin?`<p class="hint" style="margin:6px 0 0">${p.ini?"Inicio "+fCorta(p.ini):""}${p.ini&&p.fin?" · ":""}${p.fin?"Entrega "+fCorta(p.fin):""}</p>`:"")}</div>`);
+    const g=()=>{const ini=$("pzIni").value,fin=$("pzFin").value;if(ini&&fin&&fin<ini){toast("La entrega no puede ser antes del inicio");return}
+      const pr=plazoDe(invObra)||{};ctlGuardarRec("plazos",{id:pr.id||ctlId(),obra:invObra,ts:Date.now(),por:quien||"",fecha:hoyISO,ini,fin});toast("Plazo guardado")};
+    if(ad){$("pzIni").onchange=g;$("pzFin").onchange=g}
+  }catch(x){console.warn(x)}return r};
+})();
+/* Código de barras: escanear la pieza y registrar que llegó */
+function codigoDe(c){return (ctl.codigos||[]).find(r=>r.cod===c)}
+let codDet=null;
+async function detectorBarras(){
+  if(codDet)return codDet;
+  if(!("BarcodeDetector" in window))return null;
+  try{const ok=await BarcodeDetector.getSupportedFormats(),q=["ean_13","ean_8","upc_a","upc_e","code_128","code_39","code_93","itf","codabar","qr_code"].filter(f=>ok.includes(f));
+    if(!q.length)return null;const d=new BarcodeDetector({formats:q});codDet=async v=>{const r=await d.detect(v);return r[0]&&r[0].rawValue};return codDet}catch{return null}
+}
+async function abrirCodigo(){
+  if(!invObra){toast("Primero elige la obra");return}
+  let st=null,tm=null,vivo=true;
+  const d=document.createElement("div");d.className="cam cod";
+  d.innerHTML=`<video playsinline muted autoplay></video><div class="cod-marco" aria-hidden="true"><i></i></div>
+    <div class="cam-top"><button type="button" class="cam-b" data-cod="cerrar" aria-label="Cerrar">✕</button><span class="cam-n">Código de barras</span><span style="width:46px"></span></div>
+    <div class="cod-msg">Abriendo la cámara…</div>
+    <div class="cam-bot cod-bot"><div class="cod-man"><input id="codMan" type="text" inputmode="numeric" maxlength="40" placeholder="O escribe los números del código" autocomplete="off"><button type="button" class="cam-ok" data-cod="buscar">Buscar</button></div></div>`;
+  document.body.append(d);const v=d.querySelector("video"),msg=d.querySelector(".cod-msg");
+  const cerrar=()=>{vivo=false;clearTimeout(tm);if(st)st.getTracks().forEach(t=>t.stop());st=null;d.remove()};
+  const listo=c=>{c=String(c||"").trim();if(!c)return;try{navigator.vibrate&&navigator.vibrate(30)}catch{};cerrar();usarCodigo(c)};
+  d.addEventListener("click",e=>{const b=e.target.closest("[data-cod]");if(!b)return;if(b.dataset.cod==="cerrar")cerrar();else listo($("codMan").value)});
+  $("codMan").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();listo($("codMan").value)}});
+  const det=await detectorBarras();
+  if(!det){msg.textContent="Este celular no lee códigos con la cámara. Escribe los números que están debajo de las barras.";return}
+  try{st=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"environment"}},audio:false});if(!vivo){st.getTracks().forEach(t=>t.stop());return}
+    v.srcObject=st;await v.play();msg.textContent="Apunta a las barras de la caja o de la etiqueta.";
+    const ciclo=async()=>{if(!vivo)return;try{const c=await det(v);if(c)return listo(c)}catch{}tm=setTimeout(ciclo,160)};ciclo();
+  }catch{msg.textContent="No se pudo abrir la cámara. Escribe los números del código."}
+}
+function usarCodigo(c){
+  const r=codigoDe(c);
+  if(r&&INV_IDX[r.item]){invForm.tipo="entra";invAbrirItem(r.item);if(r.medida&&INV_IDX[r.item].m.includes(r.medida)){invForm.medida=r.medida;invPintarItem()}toast("Código reconocido: "+INV_IDX[r.item].n+(r.medida?" "+r.medida:""));return}
+  enlazarCodigo(c);
+}
+function enlazarCodigo(c){
+  let d=$("ovCod");if(!d){d=document.createElement("div");d.id="ovCod";d.className="hu-sim";document.body.appendChild(d)}
+  let q="",sel=null;const todos=Object.values(INV_IDX).filter(I=>!secOculta("inv-"+I.cat.id));
+  const pinta=()=>{
+    const Q=sinTildes(q),L=Q?todos.filter(I=>sinTildes(I.n).includes(Q)).slice(0,30):[];
+    d.innerHTML=`<div class="hu-card cod-card"><b>Código nuevo</b><small>${esc(c)} · Dinos qué pieza es y la próxima vez se reconoce sola.</small>
+      ${sel?`<div class="cod-sel"><span>${esc(sel.n)}</span><button type="button" class="btnlink" data-cx="otra">Cambiar</button></div>
+        ${sel.m.length>1?`<label class="lbl-s">Medida<select id="codMed">${sel.m.map(m=>`<option>${esc(m)}</option>`).join("")}</select></label>`:""}`
+      :`<input id="codQ" type="text" maxlength="40" placeholder="Busca la pieza, ej. codo, cable" value="${escA(q)}" autocomplete="off"><div class="cod-lista">${L.map(I=>`<button type="button" data-ci="${escA(I.k)}"><b>${esc(I.n)}</b><small>${esc(I.cat.n)} · ${esc(I.g.n)}</small></button>`).join("")||`<p class="hint">${Q?"No hay piezas con ese nombre.":"Escribe para buscar."}</p>`}</div>`}
+      <div class="line"><button type="button" class="btnlink" data-cx="no">Cancelar</button><button type="button" class="btn" data-cx="ok"${sel?"":" disabled"}>Guardar y registrar</button></div></div>`;
+    const i=$("codQ");if(i){i.oninput=()=>{q=i.value;const p=i.selectionStart;pinta();const j=$("codQ");j.focus();try{j.setSelectionRange(p,p)}catch{}}}
+  };
+  d.onclick=e=>{const b=e.target.closest("[data-ci],[data-cx]");if(!b)return;
+    if(b.dataset.ci){sel=INV_IDX[b.dataset.ci];pinta();return}
+    if(b.dataset.cx==="otra"){sel=null;pinta();return}
+    if(b.dataset.cx==="no"){d.hidden=true;return}
+    if(b.dataset.cx==="ok"&&sel){const med=($("codMed")||{}).value||(sel.m.length===1?sel.m[0]:"");
+      ctlGuardarRec("codigos",{id:"cod"+c.replace(/[^\w-]/g,"").slice(0,30)+ctlId().slice(-4),cod:c,item:sel.k,medida:med,obra:"",ts:Date.now(),por:quien||"",fecha:hoyISO});
+      d.hidden=true;usarCodigo(c)}};
+  d.hidden=false;pinta();setTimeout(()=>{const i=$("codQ");i&&i.focus()},50);
+}
+(function(){const base=invRenderHome;invRenderHome=function(el){const r=base.apply(this,arguments);try{
+  const cats=el.querySelector(".inv-cats");if(cats&&invObra&&!el.querySelector("#codBtn"))cats.insertAdjacentHTML("beforebegin",`<button type="button" class="cod-btn" id="codBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 8v8M10 8v8M13 8v8M17 8v8"/></svg><span><b>Escanear código de barras</b><small>Registra al instante el material que llegó</small></span></button>`);
+  const b=$("codBtn");if(b)b.onclick=abrirCodigo}catch(x){console.warn(x)}return r}})();
+document.head.insertAdjacentHTML("beforeend",`<style id="v128Css">
+  .cf-box{display:grid;gap:8px;margin:10px 0}.cf-box .btn2{display:inline-flex;align-items:center;justify-content:center;gap:8px}.cf-box .btn2 svg{width:18px;height:18px}
+  .cf-ok{display:flex;align-items:center;gap:12px;margin:10px 0;padding:10px;border:1px solid color-mix(in srgb,#4ade80 45%,var(--line));border-radius:14px;background:color-mix(in srgb,#4ade80 7%,transparent)}
+  .cf-ok img{width:110px;height:48px;object-fit:contain;background:#fff;border-radius:8px;flex:none}.cf-ok{flex-wrap:wrap}.cf-ok span{flex:1 1 150px;display:grid;min-width:0}.cf-ok .btnlink{margin-left:auto}.cf-ok small{color:var(--muted)}
+  .ctl-ch.pz{font-weight:700}.ctl-ch.pz.ok{background:color-mix(in srgb,#4ade80 18%,transparent);color:inherit}.ctl-ch.pz.pr{background:color-mix(in srgb,#facc15 18%,transparent)}
+  .pz-box{margin:0 0 12px;padding:12px 14px}.pz-cab{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+  .pz-f{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}.pz-f input{width:100%;box-sizing:border-box}
+  .cod-btn{display:flex;align-items:center;gap:12px;width:100%;margin:0 0 12px;padding:12px 14px;border:1px solid var(--line);border-radius:16px;background:var(--surface);color:inherit;text-align:left;cursor:pointer}
+  .cod-btn svg{width:30px;height:30px;flex:none;color:var(--brand-2)}.cod-btn span{display:grid}.cod-btn small{color:var(--muted)}
+  @media (hover:hover) and (pointer:fine){.cod-btn:hover{border-color:var(--brand-2)}}
+  .cod-marco{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;z-index:1}
+  .cod-marco i{width:min(78vw,420px);height:150px;border:3px solid #fff;border-radius:16px;box-shadow:0 0 0 100vmax rgba(0,0,0,.35)}
+  .cod-msg{position:relative;z-index:1;grid-row:3;align-self:end;margin:0 16px 8px;padding:8px 12px;border-radius:12px;background:rgba(0,0,0,.55);color:#fff;font-size:.9rem;text-align:center}
+  .cod-man{display:flex;gap:8px;width:100%}.cod-man input{flex:1;min-width:0;border-radius:999px;border:0;padding:12px 14px;font-size:1rem}
+  .cod-card{max-width:440px;width:calc(100% - 32px);text-align:left}.cod-card input,.cod-card select{width:100%;box-sizing:border-box}
+  .cod-card>*{width:100%;box-sizing:border-box}.cod-lista button{width:100%}.cod-lista{display:grid;justify-items:stretch;gap:6px;max-height:44vh;overflow:auto;margin:8px 0}.cod-lista button{display:grid;text-align:left;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:inherit}
+  .cod-lista small{color:var(--muted)}.cod-sel{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--brand-2) 14%,transparent);margin:8px 0;font-weight:700}
+</style>`);
 function pintarPendEquipo(){
   const ini=document.querySelector('[data-sec="inicio"]');if(!ini)return;let el=$("pendEquipo");
   const hoy=hoyISO,en=(f,d)=>{const t=new Date(hoy+"T12:00:00");t.setDate(t.getDate()+d);return f&&f<=isoDe(t)};
@@ -7468,7 +7592,8 @@ function pintarPendEquipo(){
     [(ctl.adel||[]).filter(r=>r.estado==="Pendiente").length,"adelanto(s) por aprobar","m-adel"],
     [(ctl.lic||[]).filter(r=>r.estado==="Pendiente").length,"permiso(s) por aprobar","m-lic"],
     [(ctl.epp||[]).filter(r=>r.reponer&&en(r.reponer,7)).length,"EPP por reponer","m-epp"],
-    [(ctl.docpers||[]).filter(r=>r.vence&&en(r.vence,30)).length,"SCTR o examen por vencer","m-docpers"]].filter(x=>x[0]>0);
+    [(ctl.docpers||[]).filter(r=>r.vence&&en(r.vence,30)).length,"SCTR o examen por vencer","m-docpers"],
+    [obrasAtrasadas().length,"obra(s) atrasada(s)","tablero"]].filter(x=>x[0]>0);
   if(!L.length){if(el)el.remove();return}
   if(!el){const ref=$("avisoNuevos");(ref||ini.firstChild)?(ref||ini.firstElementChild).insertAdjacentHTML("afterend",`<div class="pend-eq" id="pendEquipo"></div>`):ini.insertAdjacentHTML("afterbegin",`<div class="pend-eq" id="pendEquipo"></div>`);el=$("pendEquipo")}
   el.innerHTML=`<b>Tu equipo</b>${L.map(([n,t,k])=>`<button type="button" data-irpend="${k}"><span>${n}</span>${t}</button>`).join("")}`;
