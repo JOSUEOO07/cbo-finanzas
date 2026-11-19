@@ -397,6 +397,14 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
 #comprobante h4{font-size:3mm;font-weight:800;color:#0D5C46;letter-spacing:.04em;margin:2.6mm 0 1.4mm;padding-bottom:.8mm;border-bottom:.3mm solid #0D5C46}
 #comprobante .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.2mm}
 #comprobante .celda{background:#EEF3EF;padding:1.1mm 2.2mm}
+#comprobante .semana{display:grid;grid-template-columns:repeat(7,11mm);gap:2mm;justify-content:center}
+#comprobante .sd{text-align:center;padding:.7mm 0;border-radius:1mm;background:#EEF3EF;border:.25mm solid #e3e9e5}
+#comprobante .sd b{display:block;font-size:3.2mm;line-height:1.1}
+#comprobante .sd small{display:block;font-size:1.7mm;font-weight:600;color:#5b6b63}
+#comprobante .sd.si{background:#0D5C46;border-color:#0D5C46}#comprobante .sd.si b{color:#F4EDE0}#comprobante .sd.si small{color:#cfe0d6}
+#comprobante .sd.no b,#comprobante .sd.no small{color:#A8331F}
+#comprobante h4{margin:1.6mm 0 1mm}
+#comprobante .son{margin-top:1.2mm}#comprobante .decl{margin-top:1.8mm}#comprobante .lugar{margin-bottom:9.6mm}#comprobante .pie{margin-top:1.2mm}#comprobante .totales{margin-top:1.6mm}
 #comprobante .celda small{display:block;font-size:1.9mm;font-weight:700;letter-spacing:.08em;color:#5b6b63}
 #comprobante .celda b{display:block;font-size:2.9mm;font-weight:600;margin-top:.5mm}
 #comprobante table{width:100%;border-collapse:collapse}
@@ -5101,9 +5109,18 @@ function comprobantePDF(r,soloArmar,uno){
   const fF=iso=>iso?iso.split("-").reverse().join("/"):"";
   const periodo=r.inicio&&r.fin?`Semana del ${fF(r.inicio)} al ${fF(r.fin)}`:`Pago del ${fF(r.fecha)}`;
   // cantidad y precio unitario solo si cuadran con el sueldo (si se cambió el sueldo, no se muestran)
-  const cuadra=r.horas&&r.pagoHora&&Math.abs(r.horas*r.pagoHora-sueldo)<1;
-  const filas=`<tr><td>${esc(String(r.glosa||"JORNAL SEMANAL").toUpperCase())}</td><td class="n">${cuadra?r.horas+" h":""}</td><td class="n">${cuadra?fmt(r.pagoHora):""}</td><td class="n">${fmt(sueldo)}</td></tr>`
-    +[["BONIFICACIÓN",bono],["HORAS EXTRA",hex]].filter(([,v])=>v>0).map(([k,v])=>`<tr><td>${k}</td><td class="n"></td><td class="n"></td><td class="n">${fmt(v)}</td></tr>`).join("")
+  // días marcados al registrar (L a D): asistencia de la semana y glosa del jornal (formato aprobado del comprobante)
+  const dias=/^[01]{7}$/.test(r.dias||"")?r.dias:"", DL=["LUN","MAR","MIÉ","JUE","VIE","SÁB","DOM"], HD=[8,8,8,8,8,5,8];
+  const idx=[...dias].map((c,i)=>c==="1"?i:-1).filter(i=>i>=0), hDias=idx.reduce((a,i)=>a+HD[i],0);
+  const seguidos=idx.length>2&&idx[idx.length-1]-idx[0]===idx.length-1;
+  const glosa=idx.length?`JORNAL — ${idx.length} ${idx.length===1?"DÍA":"DÍAS"} (${seguidos?DL[idx[0]]+" A "+DL[idx[idx.length-1]]:idx.map(i=>DL[i]).join(", ")})`:String(r.glosa||"JORNAL SEMANAL").toUpperCase();
+  // Monto fijo (semana completa): solo el importe. Por horas (faltó o jornal por día): horas × precio por hora
+  const hs=Number(r.horasSem)||Number(t.horas)||45, hrs=hDias||Number(r.horasTrab)||0, fijo=!hrs||hrs===hs;
+  const ph=r.pagoHora||(Number(t.jornal)&&Math.abs(r2(Number(t.jornal)/hs)*hrs-sueldo)<1?r2(Number(t.jornal)/hs):hrs?r2(sueldo/hrs):0);
+  const cuadra=!fijo&&hrs&&ph&&Math.abs(hrs*ph-sueldo)<1;
+  const hexH=Number(r.hexH)||0;
+  const filas=`<tr><td>${esc(glosa)}</td><td class="n">${cuadra?hrs+" h":""}</td><td class="n">${cuadra?fmt(ph):""}</td><td class="n">${fmt(sueldo)}</td></tr>`
+    +[["HORAS EXTRA",hex,hexH?hexH+" h":"",hexH?fmt(r2(hex/hexH)):""],["BONIFICACIÓN",bono,"",""]].filter(([,v])=>v>0).map(([k,v,c,p])=>`<tr><td>${k}</td><td class="n">${c}</td><td class="n">${p}</td><td class="n">${fmt(v)}</td></tr>`).join("")
     +(desc>0?`<tr><td>(−) ADELANTOS / DESCUENTOS</td><td class="n"></td><td class="n"></td><td class="n menos">− ${fmt(desc)}</td></tr>`:"");
   const totales=desc>0
     ?`<div class="totales tres"><div class="tot"><small>TOTAL INGRESOS</small><b>${fmt(sueldo+bono+hex)}</b></div><div class="tot"><small>TOTAL DESCUENTOS</small><b style="color:#A8331F">${fmt(desc)}</b></div><div class="tot neto"><small>NETO A RECIBIR</small><b>${fmt(neto)}</b></div></div>`
@@ -5119,7 +5136,8 @@ function comprobantePDF(r,soloArmar,uno){
     ${nombre?`<span class="ejemplar">${nombre}</span>`:""}
     <h4>DATOS DEL TRABAJADOR</h4>
     <div class="grid2"><div class="celda"><small>APELLIDOS Y NOMBRES</small><b>${esc(String(r.desc||"").toUpperCase())}</b></div><div class="celda"><small>PERIODO PAGADO</small><b>${periodo}</b></div>
-      <div class="celda"><small>DNI</small><b>${esc(r.ruc||"")}</b></div><div class="celda"><small>CARGO</small><b>${esc(String(r.cargo||t.cargo||"").toUpperCase())}</b></div></div>
+      <div class="celda"><small>DNI</small><b>${esc(r.ruc||"")}</b></div><div class="celda"><small>CARGO</small><b>${esc(String(r.cargo||t.cargo||"").toUpperCase().replace(/^AYUDANTE\b.*$/,"AYUDANTE"))}</b></div></div>
+    ${dias?`<h4>ASISTENCIA DE LA SEMANA</h4><div class="semana">${[...dias].map((c,i)=>`<div class="sd ${c==="1"?"si":i<6?"no":""}"><b>${DL[i][0]}</b><small>${c==="1"?HD[i]+" h":i<6?"falta":"—"}</small></div>`).join("")}</div>`:""}
     <h4>DETALLE DEL PAGO</h4>
     <table><thead><tr><th>CONCEPTO</th><th class="n">CANTIDAD</th><th class="n">PRECIO UNIT.</th><th class="n">IMPORTE</th></tr></thead><tbody>${filas}</tbody></table>
     ${totales}<div class="son">SON: ${enLetrasMay(neto)}</div>
