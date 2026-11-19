@@ -7639,6 +7639,7 @@ function pptoHTML(x){
   const fl=(t,v,cl,sub)=>`<div class="tl"><span>${t}${sub?`<small>${sub}</small>`:""}</span><b class="${cl||""}">${fmt(v)}</b></div>`;
   return `<div class="pp-box"><div class="pp-cab"><b>Presupuesto de la obra</b>${ad?`<span><button type="button" class="btnlink" data-ppadic="${escA(x.n)}">+ Adicional</button><button type="button" class="btnlink" data-ppedit="${escA(x.n)}">Editar</button></span>`:""}</div>
     <div class="pp-hero"><div><small>Utilidad neta exacta</small><b class="${u.ut<0?"out":"in"}" data-contar>${fmt(u.ut)}</b><small>Margen ${mg} % del total contratado</small></div>${pptoDona(u)}</div>
+    ${cobrosHTML(x,u)}
     <div class="mini-l">
       ${fl("Presupuesto inicial",u.base,"",u.pp.moneda==="USD"?`US$ ${(+u.pp.monto).toLocaleString("en-US",{minimumFractionDigits:2})} × tipo de cambio ${u.tc}`:"")}
       ${u.adicL.map(a=>`<div class="tl pp-ad"><span>+ ${esc(a.desc)}<small>${fCorta(a.fecha)}</small></span><b>${fmt(a.monto)}${ad&&!a.oc?` <button type="button" class="btnlink" data-ppadx="${escA(x.n)}" data-id="${escA(a.id)}" aria-label="Quitar adicional">✕</button>`:""}</b></div>`).join("")}
@@ -7883,11 +7884,11 @@ function datosObraMsj(o){const U=ctlU(o),pr=(ctl.presup||[]).find(r=>ctlU(r.obra
   let av=null;try{av=resumenObra(o).prom}catch(e){}
   let cobrar=0;try{const x=calcObras(rows.filter(r=>ctlU(r.obra)===U)).find(y=>ctlU(y.n)===U);if(x&&pptoDe(o)&&av!=null){const u=utilidadObra(x);cobrar=r2(Math.max(0,u.cont*av/100-x.i))}}catch(e){}
   return {o,cli,tel:pr.tel||oc.tel||cr.tel||"",ini:p.ini,fin:p.fin,av,cobrar}}
-const MSJ=[["Bienvenida al cliente",d=>`Hola ${d.cli||""}, gracias por confiar en Casa Bonita Oregón. Desde hoy te mantendremos al tanto de tu obra ${d.o}. Cualquier consulta, escríbenos por aquí.`],
-  ["Inicio de obra",d=>`Hola ${d.cli||""}, te confirmamos que la obra ${d.o} ${d.ini?"inicia el "+fCorta(d.ini):"inicia esta semana"}.${d.fin?" La entrega está prevista para el "+fCorta(d.fin)+".":""} Nuestro equipo llegará con su equipo de seguridad completo.`],
-  ["Avance de la semana",d=>`Hola ${d.cli||""}, te contamos cómo va tu obra ${d.o}: ${d.av!=null?"llevamos un "+d.av+" % de avance":"seguimos avanzando según lo previsto"}.${d.fin?" La entrega sigue prevista para el "+fCorta(d.fin)+".":""} En un momento te enviamos las fotos.`],
-  ["Pago por avance",d=>`Hola ${d.cli||""}, según el avance de la obra ${d.o}${d.av!=null?" ("+d.av+" %)":""}, corresponde el pago de ${d.cobrar?fmt(d.cobrar):"la siguiente parte acordada"}. Te enviamos nuestros datos para el depósito. ¡Gracias!`],
-  ["Aviso de entrega",d=>`Hola ${d.cli||""}, ¡terminamos tu obra ${d.o}! Coordinemos el día de la entrega para revisar todo juntos y firmar la conformidad.`],
+const MSJ=[["Bienvenida al cliente",d=>`Hola${d.cli?" "+d.cli:""}, gracias por confiar en Casa Bonita Oregón. Desde hoy te mantendremos al tanto de tu obra ${d.o}. Cualquier consulta, escríbenos por aquí.`],
+  ["Inicio de obra",d=>`Hola${d.cli?" "+d.cli:""}, te confirmamos que la obra ${d.o} ${d.ini?"inicia el "+fCorta(d.ini):"inicia esta semana"}.${d.fin?" La entrega está prevista para el "+fCorta(d.fin)+".":""} Nuestro equipo llegará con su equipo de seguridad completo.`],
+  ["Avance de la semana",d=>`Hola${d.cli?" "+d.cli:""}, te contamos cómo va tu obra ${d.o}: ${d.av!=null?"llevamos un "+d.av+" % de avance":"seguimos avanzando según lo previsto"}.${d.fin?" La entrega sigue prevista para el "+fCorta(d.fin)+".":""} En un momento te enviamos las fotos.`],
+  ["Pago por avance",d=>`Hola${d.cli?" "+d.cli:""}, según el avance de la obra ${d.o}${d.av!=null?" ("+d.av+" %)":""}, corresponde el pago de ${d.cobrar?fmt(d.cobrar):"la siguiente parte acordada"}. Te enviamos nuestros datos para el depósito. ¡Gracias!`],
+  ["Aviso de entrega",d=>`Hola${d.cli?" "+d.cli:""}, ¡terminamos tu obra ${d.o}! Coordinemos el día de la entrega para revisar todo juntos y firmar la conformidad.`],
   ["Aviso al equipo (pago del sábado)",d=>`Equipo: el pago de la semana es este sábado. Revisen que su asistencia esté marcada en la app CBO. ¡Gracias por el buen trabajo en ${d.o}!`]];
 function abrirMensajes(o){const d=datosObraMsj(o);
   hojaCB(`<b>Mensajes listos · ${esc(o)}</b><small>Toca uno, revísalo y se abre WhatsApp con el texto lleno.</small><div class="ms-l">${MSJ.map((m,i)=>`<button type="button" data-msj="${i}"><b>${m[0]}</b><small>${esc(m[1](d).slice(0,80))}…</small></button>`).join("")}</div><div class="line"><button type="button" class="btnlink" data-cbx>Cerrar</button></div>`);
@@ -8077,7 +8078,7 @@ function actualizarBadge(){try{if(!("setAppBadge" in navigator)||!sesion)return;
 (function(){const cp=ctlPintar;ctlPintar=function(){const r=cp.apply(this,arguments);actualizarBadge();return r};
   const ap=aplicarPermisos;aplicarPermisos=function(){const r=ap.apply(this,arguments);actualizarBadge();return r};setTimeout(actualizarBadge,3500)})();
 (function(){try{if(typeof rows!=="undefined"&&!rows.length&&!esDemo()){document.body.classList.add("cbo-cargando");const t0=Date.now(),iv=setInterval(()=>{if((typeof rows!=="undefined"&&rows.length)||Date.now()-t0>12000){document.body.classList.remove("cbo-cargando");clearInterval(iv)}},300)}}catch(e){}})();
-(function(){const SEL=".pp-hero b,.kp .grande b,.obra .ut,.mdl-kpi b,.cj-kp b,.dn-g b";let pend=false;
+(function(){const SEL=".pp-hero b,.kp .grande b,.obra .ut,.mdl-kpi b,.cj-kp b,.cb-kp b,.dn-g b";let pend=false;
   const run=()=>{pend=false;document.querySelectorAll(SEL).forEach(el=>{if(el.querySelector(".cts")||el.children.length)return;const t=el.textContent,m=t.match(/^(.*\d)(\.\d{2})$/);if(!m)return;el.innerHTML=`${esc(m[1])}<small class="cts">${m[2]}</small>`})};
   new MutationObserver(()=>{if(!pend){pend=true;requestAnimationFrame(run)}}).observe(document.body,{childList:true,subtree:true,characterData:true});run()})();
 document.head.insertAdjacentHTML("beforeend",`<style id="v131Css">
@@ -8098,6 +8099,51 @@ document.head.insertAdjacentHTML("beforeend",`<style id="v131Css">
   @media (prefers-reduced-motion:reduce){body.cbo-cargando *:empty{animation:none!important}}
   .cts{font-size:.62em;opacity:.65;font-weight:600;margin-left:1px}
   #reporte .cab.memb{border-bottom:2px solid #14305f}#reporte .memb-logo{width:40px;filter:invert(1);float:left;margin:2px 10px 0 0}#reporte .cab.memb h1{color:#14305f}
+</style>`);
+/* ===== v132: cobro por avance dentro del presupuesto de la obra ===== */
+function cobrosHTML(x,u){
+  const cob=r2(x.i||0),cont=u.cont||0;if(!cont)return "";
+  let av=null;try{av=resumenObra(x.n).prom}catch(e){}
+  const pc=Math.round(cob/cont*100),falta=r2(Math.max(0,cont-cob)),deb=av!=null?r2(cont*av/100):null,puede=deb!=null?r2(Math.max(0,deb-cob)):0;
+  const gast=r2((x.g||0)+cajaSaldo(x.n).g),hoy=r2(cob-gast);
+  const barra=(t,p,cl)=>`<div class="cb-b"><div class="tl"><span>${t}</span><b>${p==null?"—":p+" %"}</b></div><div class="track"><i class="${cl}" style="width:${p==null?0:Math.min(100,p)}%"></i></div></div>`;
+  return `<div class="cb-box"><div class="cb-kp"><div><small>Cobrado</small><b class="in">${fmt(cob)}</b></div><div><small>Falta cobrar</small><b>${fmt(falta)}</b></div><div><small>Dinero de la obra hoy</small><b class="${hoy<0?"out":"in"}">${fmt(hoy)}</b></div></div>
+    ${barra("Avance de la obra",av,"cb-av")}${barra("Cobrado del total",pc,"cb-co")}
+    ${pc>100?`<p class="cb-al">Cobraste más que el total contratado. Revisa si falta registrar algún adicional.</p>`
+      :av==null?`<p class="cb-al neutro">Registra el avance de la obra (Control de obra → Avance) para saber cuánto te toca cobrar.</p>`
+      :puede>0?`<div class="cb-al"><span>Por el avance (${av} %) puedes cobrar <b>${fmt(puede)}</b>.</span>${esAdmin()?`<button type="button" class="btn2" data-ppcobra="${escA(x.n)}">Pedir el pago por WhatsApp</button>`:""}</div>`
+      :`<p class="cb-al ok">Vas al día: lo cobrado cubre el avance de la obra.</p>`}
+    <small class="hint">«Dinero de la obra hoy» es lo cobrado menos lo gastado hasta hoy (comprobantes y caja chica). Si sale en rojo, estás poniendo de tu bolsillo.</small></div>`}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-ppcobra]");if(!b)return;abrirMensajes(b.dataset.ppcobra);setTimeout(()=>{const m=document.querySelector('#ovPpto [data-msj="3"]');if(m)m.click()},30)});
+document.head.insertAdjacentHTML("beforeend",`<style id="v132Css">
+  .cb-box{display:grid;gap:8px;margin:0 0 12px;padding:12px;border-radius:14px;background:color-mix(in srgb,var(--ink) 4%,transparent)}
+  .cb-kp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.cb-kp div{display:grid;gap:2px}.cb-kp small{color:var(--muted);font-size:.72rem}.cb-kp b{font-variant-numeric:tabular-nums;font-size:.95rem}
+  .cb-b{display:grid;gap:4px}.cb-b .tl{padding:0}.cb-av{background:var(--brand-2)}.cb-co{background:#4ade80}
+  .cb-al{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin:0;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,#facc15 16%,transparent);font-size:.88rem}
+  .cb-al.ok{background:color-mix(in srgb,#4ade80 14%,transparent)}.cb-al.neutro{background:color-mix(in srgb,var(--ink) 6%,transparent)}
+  .cb-box>.hint{font-size:.74rem}
+</style>`);
+/* ===== v133: «Más» del celular ordenado por grupos de color ===== */
+const GRUPOS_MAS=[["Finanzas","fin",["finanzas","sunat","planilla","terceros","anual"]],["Obras","obr",["obras","control","asist","inventario"]],["Comercial","com",["m-presup","m-crm","m-compras","m-ocambio"]],["Personal","per",["m-emp","m-gastos","m-adel","m-lic","m-epp","m-docpers","m-subc","m-tareas"]],["Servicios","ser",["m-serv","m-agenda","m-flota","m-alq"]],["Documentos","doc",["documentos"]]];
+const obsMas=new MutationObserver(()=>{clearTimeout(obsMas.t);obsMas.t=setTimeout(ordenarMas,40)});
+function ordenarMas(){const ov=$("ovMas"),c=$("cboModsMas");if(!ov||!c)return;obsMas.disconnect();
+  try{const bs=[...c.querySelectorAll(":scope>[data-mod]")],usados=new Set();c.querySelectorAll(":scope>.mas-g").forEach(x=>x.remove());
+    const vis=b=>!b.hidden&&getComputedStyle(b).display!=="none";
+    GRUPOS_MAS.forEach(([t,k,L])=>{const g=L.map(m=>bs.find(b=>b.dataset.mod===m)).filter(Boolean);if(!g.length)return;
+      const h=document.createElement("p");h.className="mas-g";h.style.setProperty("--gc",`var(--sc-${k})`);h.textContent=t;h.hidden=!g.some(vis);c.append(h);g.forEach(b=>{c.append(b);usados.add(b)})});
+    const resto=bs.filter(b=>!usados.has(b));if(resto.length){const h=document.createElement("p");h.className="mas-g";h.textContent="Otros";h.hidden=!resto.some(vis);c.append(h);resto.forEach(b=>c.append(b))}}
+  catch(e){console.warn(e)}
+  obsMas.observe(ov,{childList:true,subtree:true,attributes:true,attributeFilter:["hidden"]})}
+setTimeout(ordenarMas,0);
+/* Tocar fuera de una ventana la cierra (buzón, caja chica, buscador, etc.). Los formularios no, para no perder lo escrito */
+document.addEventListener("click",e=>{const ov=e.target;if(!(ov instanceof HTMLElement)||ov.hidden)return;
+  if(ov.classList.contains("overlay")&&!ov.querySelector(":scope>form")){const x=ov.querySelector("[data-cerrar-inv],[data-cerrar],.x");if(x)x.click();else ov.hidden=true;return}
+  if(ov.id==="ovPpto"||ov.id==="ovCod")ov.hidden=true});
+document.head.insertAdjacentHTML("beforeend",`<style id="v133Css">
+  #cboModsMas .mas-g{grid-column:1/-1;display:flex;align-items:center;gap:8px;margin:12px 2px 2px;font:700 .72rem var(--display,inherit);text-transform:uppercase;letter-spacing:.07em;color:var(--gc,var(--muted))}
+  #cboModsMas .mas-g:first-child{margin-top:0}#cboModsMas .mas-g::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--gc,var(--muted));flex:none}
+  #cboModsMas .mas-g::after{content:"";flex:1;height:1px;background:color-mix(in srgb,var(--gc,var(--muted)) 30%,transparent)}
+  #cboModsMas .mas-g[hidden]{display:none}
 </style>`);
 function pintarPendEquipo(){
   const ini=document.querySelector('[data-sec="inicio"]');if(!ini)return;let el=$("pendEquipo");
