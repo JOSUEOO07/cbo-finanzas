@@ -397,6 +397,7 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
 #comprobante h4{font-size:3mm;font-weight:800;color:#0D5C46;letter-spacing:.04em;margin:2.6mm 0 1.4mm;padding-bottom:.8mm;border-bottom:.3mm solid #0D5C46}
 #comprobante .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1.2mm}
 #comprobante .celda{background:#EEF3EF;padding:1.1mm 2.2mm}
+#comprobante .cp{margin:4mm;padding:3.2mm 6mm 1.6mm;border:.5mm solid #0D5C46;outline:.25mm solid #0D5C46;outline-offset:-1.3mm;box-sizing:border-box;height:calc(100% - 8mm)}
 #comprobante .semana{display:grid;grid-template-columns:repeat(7,11mm);gap:2mm;justify-content:center}
 #comprobante .sd{text-align:center;padding:.7mm 0;border-radius:1mm;background:#EEF3EF;border:.25mm solid #e3e9e5}
 #comprobante .sd b{display:block;font-size:3.2mm;line-height:1.1}
@@ -4505,13 +4506,14 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
 })();
 // --- Ventanas propias en vez de las grises del navegador (prompt / confirm), con el diseño de la app ---
 const confNativo=window.confirm;
-function cboVentana(titulo,{texto="",campo=false,valor="",ejemplo="",si="Aceptar",no="Cancelar",peligro=false}={}){
+function cboVentana(titulo,{texto="",campo=false,valor="",ejemplo="",si="Aceptar",no="Cancelar",peligro=false,html="",seguro=false}={}){
   const at=v=>String(v).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;");
   return new Promise(ok=>{
     const o=document.createElement("div");o.className="overlay cbo-dlg";o.style.zIndex="99970";
-    o.innerHTML=`<div class="sheet" role="dialog" aria-modal="true"><h3>${esc(titulo)}</h3>${texto?`<p class="cbo-dlg-t">${esc(texto).replace(/\n/g,"<br>")}</p>`:""}
+    // html: bloque armado por la app (con esc en los datos). seguro: el botón destacado es "No"
+    o.innerHTML=`<div class="sheet" role="dialog" aria-modal="true"><h3>${esc(titulo)}</h3>${html||""}${texto?`<p class="cbo-dlg-t">${esc(texto).replace(/\n/g,"<br>")}</p>`:""}
       ${campo?`<input class="cbo-dlg-in" type="text" maxlength="120" autocomplete="off" value="${at(valor)}" placeholder="${at(ejemplo)}">`:""}
-      <div class="line cbo-dlg-b"><button type="button" class="btn2" data-no>${esc(no)}</button><button type="button" class="btn${peligro?" peligro":""}" data-si>${esc(si)}</button></div></div>`;
+      <div class="line cbo-dlg-b"><button type="button" class="${seguro?"btn":"btn2"}" data-no>${esc(no)}</button><button type="button" class="${seguro?"btn2":"btn"}${peligro?" peligro":""}" data-si>${esc(si)}</button></div></div>`;
     document.body.append(o);
     const inp=o.querySelector(".cbo-dlg-in"),fin=v=>{if(inp)inp.blur();document.querySelectorAll(".tecl.on").forEach(x=>x.classList.remove("on"));document.body.classList.remove("tecl-abierto");o.remove();ok(v)};
     o.querySelector("[data-si]").onclick=()=>fin(campo?(inp.value.trim()||null):true);
@@ -4520,7 +4522,7 @@ function cboVentana(titulo,{texto="",campo=false,valor="",ejemplo="",si="Aceptar
     if(inp){inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();o.querySelector("[data-si]").click()}});setTimeout(()=>inp.focus(),60)}
   });
 }
-document.head.insertAdjacentHTML("beforeend",`<style id="cboDlgCss">.cbo-dlg{display:flex!important;align-items:flex-start!important;justify-content:center;padding:calc(16vh + env(safe-area-inset-top,0px)) 14px 0!important}.cbo-dlg .sheet{border-radius:22px!important;max-width:460px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.45)}body.tecl-abierto .overlay.cbo-dlg .sheet{padding-bottom:20px!important}.cbo-dlg .sheet{display:grid;gap:12px;animation:pinEntra .28s cubic-bezier(.23,1,.32,1)}.cbo-dlg h3{margin:0}.cbo-dlg-t{margin:0;opacity:.85;line-height:1.4}.cbo-dlg-in{width:100%;box-sizing:border-box}.cbo-dlg-b{justify-content:flex-end;gap:10px}.cbo-dlg-b .btn,.cbo-dlg-b .btn2{flex:1}.cbo-dlg .btn.peligro{background:#C0392B;color:#fff}</style>`);
+document.head.insertAdjacentHTML("beforeend",`<style id="cboDlgCss">.cbo-dlg{display:flex!important;align-items:flex-start!important;justify-content:center;padding:calc(16vh + env(safe-area-inset-top,0px)) 14px 0!important}.cbo-dlg .sheet{border-radius:22px!important;max-width:460px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.45)}body.tecl-abierto .overlay.cbo-dlg .sheet{padding-bottom:20px!important}.cbo-dlg .sheet{display:grid;gap:12px;animation:pinEntra .28s cubic-bezier(.23,1,.32,1)}.cbo-dlg h3{margin:0}.cbo-dlg-t{margin:0;opacity:.85;line-height:1.4}.cbo-dlg-in{width:100%;box-sizing:border-box}.cbo-dlg-b{display:flex!important;justify-content:flex-end;gap:10px;margin-top:2px}.cbo-dlg-b .btn,.cbo-dlg-b .btn2{flex:1 1 0!important;min-height:48px;justify-content:center}.dup-card{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.35)}.dup-ic{flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:#f59e0b;color:#1a1200;font-weight:800;font-size:1.1rem}.dup-card div{display:grid;gap:2px;min-width:0}.dup-card b{font-size:1rem;overflow-wrap:anywhere}.dup-card span{font-variant-numeric:tabular-nums;opacity:.9}.dup-card small{opacity:.7}.cbo-dlg .btn.peligro{background:#C0392B;color:#fff}</style>`);
 // La revisión automática reemplaza confirm: si está reemplazado, se respeta
 const cboConfirmar=(t,o)=>window.confirm!==confNativo?Promise.resolve(window.confirm(t)):cboVentana(o&&o.titulo||"Confirma",Object.assign({texto:t,si:"Sí",no:"No"},o||{}));
 const cboPedir=(t,o)=>cboVentana(t,Object.assign({campo:true},o||{}));
@@ -4666,7 +4668,9 @@ async function revisarDup(r){
   const txt=`${d.desc||d.categoria} · ${fmt(d.monto)} del ${dd}/${m}/${y}`;
   // Factura o boleta repetida: nunca se registra dos veces
   if(!esPlanilla(r)&&(r.comprobante||"ninguno")!=="ninguno") throw Object.assign(new Error(`este comprobante ya está registrado${por} (${txt}). No se guardó de nuevo.`),{code:"dup"});
-  if(!await cboConfirmar(`Ojo: ya hay un ${esPlanilla(r)?"pago a este trabajador":"movimiento igual"} registrado${por}:\n${txt}\n\n¿Registrarlo de todas formas?`)) throw Object.assign(new Error(`ya estaba registrado${por}. No se guardó de nuevo.`),{code:"dup"});
+  const pla=esPlanilla(r),card=`<div class="dup-card"><span class="dup-ic" aria-hidden="true">!</span><div><b>${esc(titulo(d.desc||d.categoria||""))}</b><span>${fmt(d.monto)} · ${dd}/${m}/${y}</span>${por?`<small>Registrado${esc(por)}</small>`:""}</div></div>`;
+  if(!await cboConfirmar(`Ojo: ya hay un ${pla?"pago a este trabajador":"movimiento igual"} registrado${por}:\n${txt}\n\n¿Registrarlo de todas formas?`,
+    {titulo:pla?"Este trabajador ya tiene un pago":"Este movimiento ya está registrado",html:card,texto:pla?"¿Es otro pago distinto? Solo regístralo si no es el mismo.":"¿Es otro movimiento distinto? Solo regístralo si no es el mismo.",si:"Registrar igual",no:"No registrar",seguro:true})) throw Object.assign(new Error(`ya estaba registrado${por}. No se guardó de nuevo.`),{code:"dup"});
   r.forzar=true;
 }
 store={add:async r=>{await revisarDup(r);if(quien&&!r.por)r.por=quien;return (esDemo()?storeDemo:storeGoogle).add(r).then(id=>{try{celebrarRegistro(r)}catch{}return id})},remove:id=>(esDemo()?storeDemo:storeGoogle).remove(id),edit:(id,r)=>(esDemo()?storeDemo:storeGoogle).edit(id,r)};
