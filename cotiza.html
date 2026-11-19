@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Pide tu cotización · Casa Bonita Oregón</title>
+<meta name="description" content="Pide tu cotización de gasfitería o electricidad a Casa Bonita Oregón S.A.C.">
+<meta name="theme-color" content="#0d0f14">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{--bg:#0d0f14;--surface:#161a22;--line:#262c38;--ink:#f3f4f6;--muted:#9aa3b2;--brand:#9591df;--brand-deep:#1a1740;--ok:#4ade80;--mal:#f87171}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f6f7fb;--surface:#ffffff;--line:#e3e6ee;--ink:#12141a;--muted:#5d6676;--brand:#5b54c9;--brand-deep:#ffffff}}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh;padding:0 16px calc(24px + env(safe-area-inset-bottom))}
+main{max-width:520px;margin:0 auto}
+header{display:flex;align-items:center;gap:12px;padding:22px 0 8px}
+header img{width:46px;height:46px;object-fit:contain}
+@media (prefers-color-scheme:light){header img{filter:invert(1)}}
+header b{display:block;font-size:1.05rem}header small{color:var(--muted)}
+h1{font-size:1.7rem;line-height:1.15;margin:18px 0 6px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0 0 18px}
+form{display:grid;gap:14px}
+label{display:grid;gap:6px;font-weight:600;font-size:.92rem}
+input,textarea{width:100%;font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:13px 14px;outline:none}
+input:focus,textarea:focus{border-color:var(--brand)}
+textarea{min-height:110px;resize:vertical}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{font:600 .92rem system-ui,sans-serif;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:10px 16px;cursor:pointer}
+.chips button[aria-pressed="true"]{background:var(--brand);border-color:transparent;color:var(--brand-deep)}
+.fotos{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.fotos img{width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.btn-f{display:inline-flex;align-items:center;gap:8px;border:1px dashed var(--line);border-radius:12px;padding:12px 14px;color:var(--muted);cursor:pointer;font-weight:600}
+.enviar{font:700 1.05rem system-ui,sans-serif;background:var(--brand);color:var(--brand-deep);border:0;border-radius:14px;padding:16px;cursor:pointer;transition:transform .12s cubic-bezier(.23,1,.32,1)}
+.enviar:active{transform:scale(.98)}.enviar:disabled{opacity:.6}
+.err{color:var(--mal);margin:0;font-size:.9rem}
+.ok{text-align:center;padding:40px 8px}
+.ok svg{width:72px;height:72px;stroke:var(--ok);fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.ok h2{margin:14px 0 6px}.ok p{color:var(--muted);margin:0 0 6px}
+.pie{color:var(--muted);font-size:.8rem;text-align:center;margin:26px 0 0}
+@media (prefers-reduced-motion:no-preference){.ok{animation:sube .35s cubic-bezier(.23,1,.32,1) both}@keyframes sube{from{opacity:0;transform:translateY(10px)}}}
+</style>
+</head>
+<body>
+<main>
+  <header><img src="logo-blanco.png" alt=""><div><b>Casa Bonita Oregón S.A.C.</b><small>Gasfitería y electricidad</small></div></header>
+  <section id="paso1">
+    <h1>Pide tu cotización</h1>
+    <p class="sub">Cuéntanos qué necesitas. Te escribimos por WhatsApp con el presupuesto.</p>
+    <form id="f" novalidate>
+      <label>Tu nombre<input id="nom" maxlength="60" autocomplete="name" placeholder="Nombre y apellido"></label>
+      <label>Tu celular (WhatsApp)<input id="tel" inputmode="numeric" maxlength="12" autocomplete="tel" placeholder="9 dígitos"></label>
+      <label>Distrito<input id="dis" maxlength="40" placeholder="Ej.: Surco"></label>
+      <div><label style="margin-bottom:6px">¿Qué necesitas?</label><div class="chips" id="tipo"><button type="button" data-t="Gasfitería" aria-pressed="false">Gasfitería</button><button type="button" data-t="Electricidad" aria-pressed="false">Electricidad</button><button type="button" data-t="Gasfitería y electricidad" aria-pressed="false">Las dos</button></div></div>
+      <label>Cuéntanos el trabajo<textarea id="det" maxlength="800" placeholder="Ej.: cambiar las tuberías del baño y poner una terma eléctrica"></textarea></label>
+      <div class="fotos" id="fotos"><label class="btn-f">📷 Agregar fotos (hasta 3)<input type="file" accept="image/*" id="fin" multiple hidden></label></div>
+      <p class="err" id="err" hidden></p>
+      <button class="enviar" id="env" type="submit">Enviar mi pedido</button>
+    </form>
+  </section>
+  <section class="ok" id="paso2" hidden>
+    <svg viewBox="0 0 80 80"><circle cx="40" cy="40" r="34"/><path d="M25 41l10 10 20-22"/></svg>
+    <h2>¡Recibimos tu pedido!</h2>
+    <p>Te escribiremos por WhatsApp muy pronto con tu cotización.</p>
+    <p id="demoNota" hidden>(Vista previa: el pedido no se envió de verdad.)</p>
+  </section>
+  <p class="pie">Casa Bonita Oregón S.A.C. · RUC 20614484153</p>
+</main>
+<script>
+const SERVIDOR="https://script.google.com/macros/s/AKfycbyndqmhkr3uSefQEr0do8mu_Nqfha8hxvf58GDVvef2jlNgsG9zzE2pNgAfJ24M41MO/exec";
+const $=id=>document.getElementById(id);
+const DEMO=!/github\.io$/.test(location.hostname)||/[?&]demo/.test(location.search);
+let tipo="",fotos=[];
+document.querySelectorAll("#tipo button").forEach(b=>b.onclick=()=>{tipo=b.dataset.t;document.querySelectorAll("#tipo button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)))});
+async function liviana(f){const u=URL.createObjectURL(f);try{const im=await new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=u});const k=Math.min(1,900/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement("canvas");c.width=Math.round(im.naturalWidth*k);c.height=Math.round(im.naturalHeight*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);return c.toDataURL("image/jpeg",.6)}finally{URL.revokeObjectURL(u)}}
+$("fin").onchange=async()=>{for(const f of [...$("fin").files]){if(fotos.length>=3)break;try{fotos.push(await liviana(f))}catch(e){}}$("fin").value="";
+  document.querySelectorAll("#fotos img").forEach(i=>i.remove());fotos.forEach(u=>{const i=new Image();i.src=u;i.alt="";$("fotos").insertBefore(i,$("fotos").lastElementChild)})};
+const mal=t=>{$("err").textContent=t;$("err").hidden=false};
+$("f").onsubmit=async e=>{e.preventDefault();$("err").hidden=true;
+  const nom=$("nom").value.trim(),tel=$("tel").value.replace(/\D/g,""),dis=$("dis").value.trim(),det=$("det").value.trim();
+  if(nom.length<3)return mal("Escribe tu nombre.");if(tel.length<9)return mal("Escribe tu celular de 9 dígitos.");if(det.length<5)return mal("Cuéntanos qué trabajo necesitas.");
+  $("env").disabled=true;$("env").textContent="Enviando…";
+  try{
+    if(!DEMO){const r=await fetch(SERVIDOR,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({accion:"pedirCotizacion",nombre:nom,tel,distrito:dis,tipo,detalle:det,fotos})});
+      const j=await r.json();if(!j.ok)throw new Error(j.error||"No se pudo enviar")}
+    else await new Promise(r=>setTimeout(r,600));
+    $("paso1").hidden=true;$("paso2").hidden=false;$("demoNota").hidden=!DEMO;window.scrollTo(0,0)
+  }catch(x){mal((x&&x.message)||"No se pudo enviar. Revisa tu internet e intenta otra vez.");$("env").disabled=false;$("env").textContent="Enviar mi pedido"}};
+</script>
+</body>
+</html>
