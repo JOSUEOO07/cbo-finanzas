@@ -8145,6 +8145,15 @@ document.head.insertAdjacentHTML("beforeend",`<style id="v133Css">
   #cboModsMas .mas-g::after{content:"";flex:1;height:1px;background:color-mix(in srgb,var(--gc,var(--muted)) 30%,transparent)}
   #cboModsMas .mas-g[hidden]{display:none}
 </style>`);
+/* ===== v135: barra de abajo simétrica aunque el usuario tenga pocas secciones ===== */
+function ajustarTab(){const tb=$("tabbar");if(!tb)return;const B=[...tb.querySelectorAll(":scope>button")],vis=b=>!b.hidden&&getComputedStyle(b).display!=="none";
+  const V=B.filter(vis);tb.classList.toggle("tb-3",V.length===3);
+  B.forEach((b,i)=>{b.style.gridColumn=V.length===4&&vis(b)?String(i+1):""});
+  try{window.dispatchEvent(new Event("resize"))}catch(e){}}
+(function(){const ap=aplicarPermisos;aplicarPermisos=function(){const r=ap.apply(this,arguments);try{ajustarTab()}catch(x){}return r};
+  const tb=$("tabbar");if(tb)new MutationObserver(()=>{clearTimeout(ajustarTab.t);ajustarTab.t=setTimeout(ajustarTab,30)}).observe(tb,{attributes:true,subtree:true,attributeFilter:["hidden"]});
+  setTimeout(ajustarTab,0)})();
+document.head.insertAdjacentHTML("beforeend",`<style id="v135Css">.tabbar.tb-3{grid-template-columns:repeat(3,1fr)!important}.tabbar.tb-3>button{justify-self:center;width:76px}</style>`);
 function pintarPendEquipo(){
   const ini=document.querySelector('[data-sec="inicio"]');if(!ini)return;let el=$("pendEquipo");
   const hoy=hoyISO,en=(f,d)=>{const t=new Date(hoy+"T12:00:00");t.setDate(t.getDate()+d);return f&&f<=isoDe(t)};
