@@ -1081,6 +1081,15 @@ button.ud-card{cursor:pointer;width:100%}
 .inv-obra-sel select,.inv-obra-sel input{font:inherit;font-weight:700;font-size:1.05rem;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0;width:100%}
 .inv-obra-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .inv-mod{font-size:.75rem;font-weight:700;padding:5px 10px;border-radius:99px}
+.inv-stk{display:grid;gap:6px}
+.inv-stk-f{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;background:color-mix(in srgb,var(--ink) 4%,transparent)}
+.inv-stk-f span{min-width:0;line-height:1.25;overflow-wrap:anywhere}
+.inv-stk-todo{width:100%;margin-top:10px}
+.inv-stk-img{width:46px;height:46px;border-radius:10px;background:#fff;display:grid;place-items:center;overflow:hidden;color:#334;font-size:1.1rem}.inv-stk-img img{width:100%;height:100%;object-fit:contain}.inv-stk-f small{color:var(--muted)}
+.inv-stk-f em{font-style:normal;font-weight:800;color:#4ade80}
+.inv-stk-f.al{background:color-mix(in srgb,#ef4444 14%,transparent);border:1px solid color-mix(in srgb,#ef4444 40%,transparent)}
+.inv-stk-f.al em{color:#f87171}.inv-stk-f i{font-style:normal;font-size:.72rem;font-weight:800;color:#fff;background:#ef4444;padding:3px 8px;border-radius:99px}
+@media (min-width:981px){.inv-stk{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .inv-mod.tc{background:var(--in-bg);color:var(--in)}.inv-mod.cl{background:var(--warn-bg);color:var(--warn)}
 .inv-pis{font-size:.8rem;color:var(--muted);font-weight:600}
 .inv-cats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -1602,6 +1611,7 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
       <!-- PLANILLA -->
       <section data-sec="planilla" hidden>
         <div class="kpis" id="plaKpis"></div>
+        <section class="panel pla-sem" id="plaSemana" style="margin-top:16px"></section>
         <section class="panel" style="margin-top:16px"><div class="ph"><h2>Pagos del mes</h2><button class="btn" type="button" id="plaNuevo">+ Registrar pago</button></div><div id="plaList"></div></section>
       </section>
 
@@ -4956,6 +4966,7 @@ function calcHoras(){
 const fmtN=n=>Number(n).toLocaleString("es-PE",{minimumFractionDigits:2,maximumFractionDigits:2});
 function calcPla(){const n=r2(numIn("pSueldo")+numIn("pBono")+numIn("pHex")-numIn("pDesc"));$("pNeto").textContent=fmt(Math.max(0,n));return n}
 function abrirPagoPla(r){
+  $("pGuardar").textContent="Guardar pago";window.__plaAuto=false;
   closeF(); cerrarOv("ovMov"); plaEditId=r?r.id:null;
   const ts=listaTrab();
   $("pTrab").innerHTML=ts.length?ts.map(t=>`<option value="${esc(t.dni)}">${esc(titulo(t.nombre))}</option>`).join("")
@@ -4998,7 +5009,8 @@ $("fPla").addEventListener("submit",async e=>{
   const editando=!!plaEditId;
   try{
     if(editando) await store.edit(plaEditId,r); else await store.add(r);
-    $("ovPla").hidden=true; mes=r.fecha.slice(0,7); render(); toast(editando?"Pago actualizado":"Pago registrado");
+    $("ovPla").hidden=true; mes=r.fecha.slice(0,7); render(); toast(editando?"Pago actualizado":(window.__plaAuto?"Pago registrado y comprobante listo":"Pago registrado"));
+    if(window.__plaAuto&&!editando){window.__plaAuto=false;const nr=[...rows].reverse().find(x=>esPlanilla(x)&&String(x.ruc)===String(t.dni)&&x.inicio===r.inicio);if(nr)setTimeout(()=>{try{abrirMov(nr.id)}catch(e){}},250)}
   }catch(err){$("pMsg").textContent=err&&err.code==="dup"?err.message.charAt(0).toUpperCase()+err.message.slice(1):"No se pudo guardar. Revisa tu internet e intenta de nuevo."}
   finally{$("pGuardar").disabled=false}
 });
@@ -6106,6 +6118,7 @@ function invRender(){
   const el=$("invApp"); if(!el) return;
   if(invVista.startsWith("cat:")) return invRenderCat(el, invVista.slice(4));
   if(invVista==="obra") return invRenderObra(el);
+  if(invVista==="stock") return invRenderStock(el);
   invRenderHome(el);
 }
 const IC={
@@ -6169,6 +6182,7 @@ function invRenderHome(el){
       <button type="button" class="btnlink" id="invObraCfg">${c?"Editar obra":invObra?"Configurar obra":"+ Nueva obra"}</button>${invObra?'<button type="button" class="btnlink" id="invObraNueva">+ Nueva</button>':""}</div>
   </div>
   <div class="inv-cats">${INV_CAT.filter(c=>!secOculta("inv-"+c.id)).map(tarjeta).join("")||'<p class="hint">El administrador no te asignó ningún inventario.</p>'}</div>
+  ${invObra?invStockHTML():""}
   ${invObra?`<section class="panel inv-res" id="invRes">
     <div class="ph"><h2>Material usado en la obra</h2><button type="button" class="btnlink" id="invVerObra">Ver por piso y material ›</button></div>
     <p class="inv-big">${invNum(usados.reduce((s,m)=>s+m.cant,0))} piezas</p>
@@ -6182,6 +6196,7 @@ function invRenderHome(el){
   const cf=$("invObraCfg"); if(cf) cf.onclick=()=>invAbrirObra(invObra?invObra:"");
   const nv=$("invObraNueva"); if(nv) nv.onclick=()=>invAbrirObra("");
   const vo=$("invVerObra"); if(vo) vo.onclick=()=>{invVista="obra";invRender();window.scrollTo(0,0)};
+  const vs=$("invVerStock"); if(vs) vs.onclick=()=>{invVista="stock";invStkQ="";invStkF="";el.innerHTML="";invRender();window.scrollTo(0,0)};
   invEventosMov(el);
 }
 const invOrden=(a,b)=>String(b.fecha||"").localeCompare(String(a.fecha||""))||(b.ts||0)-(a.ts||0);
@@ -6215,6 +6230,39 @@ function invRenderCat(el,catId){
   const qi=$("invQ"); qi.oninput=()=>{invQ=qi.value;const p=qi.selectionStart;invRender();const n=$("invQ");n.focus();try{n.setSelectionRange(p,p)}catch{}};
   el.querySelectorAll("[data-invg]").forEach(b=>b.onclick=()=>{invGrupo=b.dataset.invg;invRender()});
   el.querySelectorAll("[data-invit]").forEach(b=>b.onclick=()=>invAbrirItem(b.dataset.invit));
+}
+// Stock en la obra: lo que queda de cada material (entra − usa − sale). Rojo si llegó al mínimo de Alertas de stock
+let invStkQ="",invStkF="";
+function invStockLista(){
+  const mv=movsDe(invObra),mins=(ctl.minimos||{})[ctlU(invObra)]||{};
+  return itemsObra(invObra).map(it=>{const info=INV_IDX[it.k]||{n:it.k,u:"und"},s=invSaldo(mv,it.k,it.med),mn=+mins[it.k+"|"+it.med]||0;let foto="";try{foto=invFoto(Object.assign({k:it.k},info))}catch(e){}
+    return {k:it.k,cat:String(it.k).split(".")[0],n:info.n,u:info.u,med:it.med||"",s,mn,al:mn>0&&s<=mn,foto}}).sort((a,b)=>(b.al-a.al)||(a.s-b.s));
+}
+const invStkFila=x=>`<div class="inv-stk-f${x.al?" al":""}"><b class="inv-stk-img">${x.foto?`<img src="${escA(x.foto)}" alt="" loading="lazy">`:esc((x.n||"?").trim()[0]||"?")}</b><span><b>${esc(x.n)}</b>${x.med?` <small>${esc(x.med)}</small>`:""}</span><em>${invNum(x.s)}${invU(x.u,x.s)}</em>${x.al?'<i>Se acaba</i>':""}</div>`;
+function invStockHTML(){
+  try{
+    const L=invStockLista(),al=L.filter(x=>x.al).length;
+    return `<section class="panel inv-stock"><div class="ph"><h2>Stock en la obra</h2><span class="hint">${L.length?(al?al+" por acabarse":L.length+" materiales"):"Lo que queda de cada material"}</span></div>
+      ${L.length?`<div class="inv-stk">${L.slice(0,5).map(invStkFila).join("")}</div>${L.length>5?`<button type="button" class="btn2 inv-stk-todo" id="invVerStock">Ver todo el stock (${L.length}) ›</button>`:""}`:`<p class="hint inv-vacio">Cuando registres material que llega a esta obra, aquí verás cuánto queda de cada uno.</p>`}
+      </section>`;
+  }catch(e){return ""}
+}
+function invRenderStock(el){
+  const L=invStockLista(),q=sinTildes(invStkQ.trim());
+  const cats=[["","Todos"],["al","Se acaban"]].concat(INV_CAT.filter(c=>!secOculta("inv-"+c.id)&&L.some(x=>x.cat===c.id)).map(c=>[c.id,c.n]));
+  const V=L.filter(x=>(!invStkF||(invStkF==="al"?x.al:x.cat===invStkF))&&(!q||sinTildes(x.n+" "+x.med).includes(q)));
+  if(!$("invStkLista")){
+    el.innerHTML=`<div class="inv-top"><button type="button" class="btnlink" id="invStkVolver">‹ Inventario</button></div>
+      <section class="panel inv-stock"><div class="ph"><h2>Stock en la obra</h2><span class="hint">${esc(invObra)}</span></div>
+      <div class="mdl-fil"><input class="mdl-q" id="invStkQ" placeholder="Buscar material…" maxlength="40"><div class="mdl-chips" id="invStkChips"></div></div>
+      <div class="inv-stk" id="invStkLista"></div>
+      <p class="hint" style="margin:10px 0 0">Para que avise cuando algo se acaba, pon su mínimo en Control de obra → Alertas de stock.</p></section>`;
+    $("invStkVolver").onclick=()=>{invVista="home";invRender();window.scrollTo(0,0)};
+    $("invStkQ").addEventListener("input",e=>{invStkQ=e.target.value;invRenderStock(el)});
+  }
+  $("invStkChips").innerHTML=cats.map(([k,t])=>`<button type="button" data-stkf="${k}" aria-pressed="${invStkF===k}">${esc(t)}${k==="al"?` (${L.filter(x=>x.al).length})`:""}</button>`).join("");
+  $("invStkChips").querySelectorAll("[data-stkf]").forEach(b=>b.onclick=()=>{invStkF=b.dataset.stkf;invRenderStock(el)});
+  $("invStkLista").innerHTML=V.length?V.map(invStkFila).join(""):`<p class="hint">No hay materiales con ese filtro.</p>`;
 }
 function invRenderObra(el){
   const movs=invMovsObra(), tc=invTodoCosto(), pisos=invPisos(invObra), usados=movs.filter(m=>m.tipo==="usa");
@@ -7083,7 +7131,7 @@ function docsPintar(){
   let L=DOCS_CBO.filter(d=>docsF==="fav"?fav.includes(d.id):!docsF||d.seccion===docsF);
   if(q)L=L.filter(d=>q.split(/\s+/).every(p=>sinTildes(`${d.titulo} ${d.id} ${d.grupo} ${DOCS_SEC[d.seccion]||""}`).includes(p)));
   const grupos=[];L.forEach(d=>{const g=(DOCS_SEC[d.seccion]||"")+" · "+d.grupo;let x=grupos.find(y=>y[0]===g);if(!x)grupos.push(x=[g,[]]);x[1].push(d)});
-  $("docsLista").innerHTML=grupos.length?grupos.map(([g,ds])=>`<p class="pal-t docs-g">${esc(g)}</p><div class="mdl-lista">${ds.map(d=>`<article class="panel mdl-it docs-it" data-docid="${escA(d.id)}"><span class="docs-ic docs-c-${d.seccion}" aria-hidden="true">${DOCS_IC.doc}</span><div class="mdl-tx"><b>${esc(d.titulo)}</b><small>${esc(d.id)} · ${d.paginas} pág${d.paginas>1?"s":""}.</small></div><button type="button" class="docs-fav${fav.includes(d.id)?" on":""}" data-docfav aria-label="Favorito">★</button>
+  $("docsLista").innerHTML=grupos.length?grupos.map(([g,ds])=>`<p class="pal-t docs-g">${esc(g)}</p><div class="mdl-lista">${ds.map(d=>`<article class="panel mdl-it docs-it" data-docid="${escA(d.id)}"><span class="docs-ic docs-c-${d.seccion}" aria-hidden="true">${DOCS_IC[d.seccion]||DOCS_IC.doc}</span><div class="mdl-tx"><b>${esc(d.titulo)}</b><small>${esc(d.id)} · ${d.paginas} pág${d.paginas>1?"s":""}.</small></div><button type="button" class="docs-fav${fav.includes(d.id)?" on":""}" data-docfav aria-label="Favorito">★</button>
       <div class="mdl-acc"><button type="button" class="btn2 docs-b docs-b-pdf" data-docacc="ver">${DOCS_IC.pdf}Ver PDF</button><button type="button" class="btn2 docs-b docs-b-wa" data-docacc="enviar">${DOCS_IC.wa}Enviar</button><button type="button" class="btn2 docs-b docs-b-word" data-docacc="word">${DOCS_IC.word}Word</button></div></article>`).join("")}</div>`).join(""):`<p class="hint" style="margin:18px 4px">${docsF==="fav"?"Aún no tienes favoritos. Toca ★ en un documento.":"No hay documentos con esa búsqueda."}</p>`;
 }
 const docsBlob=new Map();
@@ -7126,6 +7174,101 @@ document.head.insertAdjacentHTML("beforeend",`<style id="docsCboCss">
   .docs-it{position:relative}.docs-it .mdl-tx{padding-right:34px}
   .docs-fav{position:absolute;top:10px;right:10px;width:32px;height:32px;border:0;border-radius:50%;background:none;color:inherit;opacity:.35;font-size:1.1rem;cursor:pointer}
   .docs-fav.on{opacity:1;color:#f5c542}
+</style>`);
+/* ===== Barra lateral compacta: grupos plegables y sub-opciones de Control de obra solo dentro de Control de obra ===== */
+(function(){
+  const nav=$("nav");if(!nav)return;
+  const K="cbo-nav-cerrados",SOLOS=["General","Documentos"];
+  let cerr=new Set(leerLS(K,null)||["Finanzas","Obras","Comercial","Personal","Servicios"]);
+  const aplicar=()=>{
+    let g="";[...nav.children].forEach(e=>{if(e.classList.contains("nav-g")){g=e.textContent.trim();e.dataset.g=g}else e.dataset.g=g});
+    const act=typeof seccion!=="undefined"?seccion:"",ab=nav.querySelector(`button[data-s="${act}"]`),gAct=ab?ab.dataset.g:"";
+    [...nav.children].forEach(e=>{
+      const gr=e.dataset.g,plegable=!SOLOS.includes(gr),cerrado=plegable&&cerr.has(gr)&&gr!==gAct;
+      if(e.classList.contains("nav-g")){e.classList.toggle("plegable",plegable);e.classList.toggle("cerrado",cerrado);if(plegable){e.setAttribute("role","button");e.setAttribute("aria-expanded",String(!cerrado))}return}
+      if(e.dataset.s==="config"){e.classList.remove("nav-plegado");return}
+      e.classList.toggle("nav-plegado",cerrado||(e.classList.contains("nav-sub")&&act!=="control"));
+    });
+    const c=nav.querySelector('button[data-s="control"]');if(c)c.classList.toggle("con-sub",act==="control");
+  };
+  nav.addEventListener("click",e=>{const h=e.target.closest(".nav-g.plegable");if(!h)return;const g=h.dataset.g;cerr.has(g)?cerr.delete(g):cerr.add(g);guardarLS(K,[...cerr]);aplicar()});
+  const irN=ir;ir=function(){const r=irN.apply(this,arguments);try{aplicar()}catch(x){}return r};
+  const apP=aplicarPermisos;aplicarPermisos=function(){const r=apP.apply(this,arguments);try{aplicar()}catch(x){}return r};
+  setTimeout(aplicar,80);
+  document.head.insertAdjacentHTML("beforeend",`<style id="navCompacta">
+  #nav .nav-plegado{display:none!important}
+  #nav .nav-g.plegable{cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;border-radius:8px}
+  #nav .nav-g.plegable::after{content:"";width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg);margin:0 6px 3px 0;opacity:.6;transition:transform .18s cubic-bezier(.23,1,.32,1)}
+  #nav .nav-g.plegable.cerrado::after{transform:rotate(-45deg);margin-bottom:0}
+  @media (hover:hover){#nav .nav-g.plegable:hover{color:var(--ink)}}
+  </style>`);
+})();
+/* ===== Planilla: cada trabajador con su semana de asistencia y "Generar comprobante" (registra el pago y deja el comprobante) ===== */
+let plaSem=0;
+const TRAB_USR_K="cbo-trab-usuario";
+const plaNormNom=x=>sinTildes(String(x||"")).replace(/[^a-z ]/g," ").split(/\s+/).filter(Boolean).sort().join(" ");
+function usuarioDeTrab(t){
+  const m=leerLS(TRAB_USR_K,{});if(m[t.dni])return m[t.dni];
+  const n=plaNormNom(t.nombre);const p=(PERSONAS||[]).find(x=>plaNormNom(x.n)===n);
+  if(p)return p.n;
+  // también si el usuario está contenido en el nombre completo (ej. "VILLAR QUISPE JESUS" ↔ "JESUS VILLAR")
+  const ws=new Set(n.split(" "));const q=(PERSONAS||[]).find(x=>{const a=plaNormNom(x.n).split(" ");return a.length>=2&&a.every(w=>ws.has(w))});
+  return q?q.n:"";
+}
+function semanaTrab(u,dias){
+  let hrs=0,dsi=0;const obras={};
+  dias.slice(0,6).forEach(f=>{const m=marcasDe(u,f),ent=m.find(x=>x.tipo==="entrada"),sal=[...m].reverse().find(x=>x.tipo==="salida");
+    if(ent){dsi++;obras[ent.obra]=(obras[ent.obra]||0)+1}if(ent&&sal)hrs+=Math.max(0,minDe(sal)-minDe(ent))/60});
+  const obra=Object.entries(obras).sort((a,b)=>b[1]-a[1])[0];
+  return {hrs:Math.round(hrs*10)/10,dias:dsi,obra:obra?obra[0]:""};
+}
+function pintarPlaSemana(){
+  const el=$("plaSemana");if(!el)return;
+  const adm=!sesion||sesion.admin;if(!adm){el.hidden=true;return}el.hidden=false;
+  const dias=diasSemana(plaSem),ini=dias[0],fin=dias[5],ts=listaTrab();
+  const usuarios=(PERSONAS||[]).filter(p=>!p.admin||true);
+  const filas=ts.map(t=>{
+    const u=usuarioDeTrab(t),st=u?semanaTrab(u,dias):null,j=+t.jornal||0,hs=+t.horas||45;
+    const pagado=rows.find(r=>esPlanilla(r)&&String(r.ruc)===String(t.dni)&&(r.inicio===ini||(r.fecha>=ini&&r.fecha<=dias[6])));
+    const monto=st&&j?(st.hrs>=hs||st.hrs===0&&st.dias>=6?j:r2(j*st.hrs/hs)):0;
+    let info,btn;
+    if(pagado){info=`Pagado: S/ ${fmtN(pagado.monto)}`;btn=`<button type="button" class="btn2" data-plaver="${escA(pagado.id)}">Ver comprobante</button>`}
+    else if(!j){info="Falta su jornal semanal";btn=`<button type="button" class="btn2" data-plajornal="${escA(t.dni)}">Poner jornal</button>`}
+    else if(!u){info="Elige su usuario de CBO para leer su asistencia";btn=`<select class="selbar" data-plavinc="${escA(t.dni)}" aria-label="Usuario de ${escA(titulo(t.nombre))}"><option value="">Elegir usuario…</option>${(PERSONAS||[]).map(p=>`<option value="${escA(p.n)}">${esc(titulo(p.n))}</option>`).join("")}</select>`}
+    else if(!st.dias){info="Sin asistencia esta semana";btn=`<button type="button" class="btn2" data-plagen="${escA(t.dni)}">Pago manual</button>`}
+    else{info=`${st.dias} ${st.dias===1?"día":"días"} · ${st.hrs.toFixed(1)} h · <b>S/ ${fmtN(monto)}</b>`;btn=`<button type="button" class="btn" data-plagen="${escA(t.dni)}">Generar comprobante</button>`}
+    return `<div class="pla-t${pagado?" ok":""}"><span class="usr-av" aria-hidden="true">${esc((titulo(t.nombre).trim()[0]||"?").toUpperCase())}</span><div class="pla-tx"><b>${esc(titulo(t.nombre))}</b><small>${esc(t.cargo?titulo(t.cargo):"Trabajador")}${u?" · "+esc(titulo(u)):""}</small><small class="pla-inf">${info}</small></div><div class="pla-b">${btn}</div></div>`}).join("");
+  el.innerHTML=`<div class="ph"><h2>Trabajadores · semana</h2><div class="pla-nav"><button type="button" class="btn2" data-plasem="-1" aria-label="Semana anterior">‹</button><span>${fCorta(ini)} – ${fCorta(fin)}${plaSem===0?" · esta semana":""}</span><button type="button" class="btn2" data-plasem="1" aria-label="Semana siguiente"${plaSem>=0?" disabled":""}>›</button></div></div>
+    <p class="hint" style="margin:0 0 10px">Lunes a sábado. Las horas salen de la asistencia y el monto del jornal de cada trabajador. Al generar el comprobante se registra el pago.</p>
+    ${ts.length?`<div class="pla-ts">${filas}</div>`:`<p class="hint">Aún no hay trabajadores. Toca “+ Registrar pago” y luego “+ Nuevo trabajador”.</p>`}`;
+}
+function generarDesdeAsistencia(dni){
+  const t=listaTrab().find(x=>String(x.dni)===String(dni));if(!t)return;
+  const dias=diasSemana(plaSem),u=usuarioDeTrab(t),st=u?semanaTrab(u,dias):{hrs:0,dias:0,obra:""};
+  abrirPagoPla();
+  $("pTrab").value=String(t.dni);pintarTrab();
+  $("pIni").value=dias[0];$("pFin").value=dias[5];$("pFecha").value=dias[5]<hoyISO?dias[5]:hoyISO;
+  $("pHSem").value=t.horas||45;$("pSueldo").value=t.jornal?Number(t.jornal).toFixed(2):"";
+  $("pHoras").value=st.hrs?String(st.hrs):"";if(st.obra)$("pObra").value=st.obra;
+  calcHoras();calcPla();$("plaTit").textContent="Generar comprobante";$("pGuardar").textContent="Generar comprobante";
+  window.__plaAuto=!!st.dias;
+}
+document.addEventListener("click",e=>{
+  const s=e.target.closest("[data-plasem]");if(s){plaSem=Math.min(0,plaSem+(+s.dataset.plasem));pintarPlaSemana();return}
+  const g=e.target.closest("[data-plagen]");if(g){generarDesdeAsistencia(g.dataset.plagen);return}
+  const v=e.target.closest("[data-plaver]");if(v){abrirMov(v.dataset.plaver);return}
+  const j=e.target.closest("[data-plajornal]");if(j){const t=listaTrab().find(x=>String(x.dni)===j.dataset.plajornal);if(t)abrirTrab(t);return}
+});
+document.addEventListener("change",e=>{const v=e.target.closest("[data-plavinc]");if(!v||!v.value)return;const m=leerLS(TRAB_USR_K,{});m[v.dataset.plavinc]=v.value;guardarLS(TRAB_USR_K,m);toast("Listo: se recordará para las próximas semanas");pintarPlaSemana()});
+(function(){const rp=renderPlanilla;renderPlanilla=function(){const r=rp.apply(this,arguments);try{pintarPlaSemana()}catch(e){console.error(e)}return r}})();
+document.head.insertAdjacentHTML("beforeend",`<style id="plaSemCss">
+  .pla-sem .ph{flex-wrap:wrap;gap:8px}.pla-nav{display:flex;align-items:center;gap:8px;font-weight:700;font-size:.86rem}.pla-nav .btn2{padding:6px 12px;min-height:0}
+  .pla-ts{display:grid;gap:8px}@media (min-width:981px){.pla-ts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .pla-t{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;align-items:center;padding:12px;border-radius:14px;border:1px solid var(--line);background:color-mix(in srgb,var(--ink) 3%,transparent)}
+  .pla-t.ok{border-color:color-mix(in srgb,#22c55e 45%,var(--line))}
+  .pla-tx{min-width:0;display:grid;gap:2px}.pla-tx small{color:var(--muted);font-size:.78rem}.pla-tx .pla-inf{color:var(--ink);font-size:.84rem}.pla-t.ok .pla-inf{color:#4ade80}
+  .pla-b{grid-column:1/-1;display:flex;justify-content:flex-end}.pla-b .btn,.pla-b .btn2,.pla-b select{width:100%}
+  @media (min-width:600px){.pla-t{grid-template-columns:auto 1fr auto}.pla-b{grid-column:auto}.pla-b .btn,.pla-b .btn2,.pla-b select{width:auto}}
 </style>`);
 /* ===== CBO: sala de espera para quien recién creó su cuenta y aún no tiene permisos ===== */
 function salaEspera(){
@@ -7233,7 +7376,15 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-vernuevo]"
   // El administrador revisa si hay alguien nuevo al abrir la app y al volver a ella
   let ult=0;const revisar=()=>{if(esAdmin()&&Date.now()-ult>90000){ult=Date.now();cargarUsuarios()}};
   setTimeout(revisar,1500);document.addEventListener("visibilitychange",()=>{if(!document.hidden)revisar()});
-  document.head.insertAdjacentHTML("beforeend",`<style id="avisoNuevoCss">
+  document.head.insertAdjacentHTML("beforeend",`<style id="masCompacto">
+  @media (max-width:980px){
+    #cboModsMas{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important}
+    #cboModsMas .cbo-mod{padding:12px 6px!important;min-height:0!important;display:grid!important;justify-items:center;text-align:center;gap:6px!important}
+    #cboModsMas .cbo-mod small{display:none!important}
+    #cboModsMas .cbo-mod b{font-size:.78rem!important;line-height:1.15;overflow-wrap:anywhere}
+    #cboModsMas .cbo-mod i{margin:0!important}
+  }
+  </style><style id="avisoNuevoCss">
   .aviso-nuevo{display:grid;gap:8px;margin:0 0 14px}
   .aviso-ic{flex:none;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--brand-2) 25%,transparent)}
   .aviso-ic svg,.buzon-btn svg,.buzon-vacio svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
