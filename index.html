@@ -352,6 +352,12 @@ input,select{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);b
 .pla-masbtn{justify-self:start}
 .pla-mas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 @media (max-width:520px){.pla-mas{grid-template-columns:minmax(0,1fr)}}
+.pdias-cab{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.pdias-cab small{font-size:.75rem;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:500}
+.pdias{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-bottom:4px}
+.pdias button{display:grid;place-items:center;min-height:48px;padding:6px 0;border-radius:12px;border:1.5px solid var(--line);background:transparent;color:var(--muted);font:inherit;font-weight:700;font-size:.85rem;touch-action:manipulation;transition:background-color .15s ease,border-color .15s ease,color .15s ease}
+.pdias button[aria-pressed="true"]{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+@media (hover:hover) and (pointer:fine){.pdias button:hover{border-color:var(--brand-2)}}
 .pla-neto{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--brand);color:var(--brand-ink);border-radius:14px;padding:12px 16px;font-weight:600}
 .pla-neto b{font-family:var(--mono);font-size:1.45rem}
 .cp-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:4px 0 10px}
@@ -1918,10 +1924,9 @@ body.fiesta .usuario i{background:var(--fi-g);background-size:var(--fi-s);color:
       <label>Periodo del<input id="pIni" type="date"></label>
       <label>al<input id="pFin" type="date"></label>
     </div>
-    <div class="row2">
-      <label>Horas trabajadas<input id="pHoras" type="text" inputmode="decimal" maxlength="5" autocomplete="off" placeholder="Ej. 45"></label>
-      <label>De una semana de<input id="pHSem" type="text" inputmode="decimal" maxlength="5" autocomplete="off" placeholder="45"></label>
-    </div>
+    <label class="pdias-cab" id="pDiasL">Días trabajados <small>Toca los días que vino</small></label>
+    <div class="pdias" id="pDias" role="group" aria-labelledby="pDiasL"><button type="button" aria-pressed="false">Lun</button><button type="button" aria-pressed="false">Mar</button><button type="button" aria-pressed="false">Mié</button><button type="button" aria-pressed="false">Jue</button><button type="button" aria-pressed="false">Vie</button><button type="button" aria-pressed="false">Sáb</button><button type="button" aria-pressed="false">Dom</button></div>
+    <div hidden><input id="pHoras" type="text" inputmode="decimal" maxlength="5" autocomplete="off"><input id="pHSem" type="text" inputmode="decimal" maxlength="5" autocomplete="off"></div>
     <p class="hint" id="pHorasInfo" style="margin:-4px 0 0"></p>
     <label for="pSueldo">Sueldo / jornal a pagar (S/)</label>
     <div class="monto-big"><span>S/</span><input id="pSueldo" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></div>
@@ -2851,8 +2856,9 @@ function cargarEnForm(r,conFecha){
   $("fecha").value=conFecha?r.fecha:(mes===hoyISO.slice(0,7)?hoyISO:mes+"-01");
   if(fComp!=="ninguno"&&typeof r.igv==="number") qrIgv={total:r.monto,igv:r.igv};
 }
+let fTrasGuardar=null; // se ejecuta solo si el movimiento se guardó (ej.: marcar un alquiler como pagado)
 function openF(op){
-  op=op||{}; fModo=op.modo||"nuevo"; fEditId=fModo==="editar"?op.r.id:null; fEditOrig=fModo==="editar"?op.r:null;
+  op=op||{}; fTrasGuardar=typeof op.alGuardar==="function"?op.alGuardar:null; fModo=op.modo||"nuevo"; fEditId=fModo==="editar"?op.r.id:null; fEditOrig=fModo==="editar"?op.r:null;
   limpiarForm(); paso=1;
   $("fecha").value=mes===hoyISO.slice(0,7)?hoyISO:mes+"-01";
   if(op.r) cargarEnForm(op.r,fModo==="editar");
@@ -2892,7 +2898,8 @@ $("f").addEventListener("submit",async e=>{
     let id=fEditId;
     if(fModo==="editar") await store.edit(fEditId,r); else id=await store.add(r);
     if(foto&&id){$("msg").textContent="Subiendo foto…";try{await subirFoto(id,foto,r)}catch(e){toast("Se guardó, pero la foto no se pudo subir")}}
-    const modo=fModo; limpiarForm(); mes=r.fecha.slice(0,7); closeF(); render();
+    const modo=fModo,tras=fTrasGuardar; fTrasGuardar=null; limpiarForm(); mes=r.fecha.slice(0,7); closeF(); render();
+    if(tras)try{tras(r)}catch(e){console.warn(e)}
     toast(modo==="editar"?"Cambios guardados":"Movimiento registrado");
   }catch(err){$("msg").textContent="No se pudo guardar"+(err&&err.message&&err.code!=="clave"?": "+err.message:". Revisa tu internet e intenta de nuevo.")}
   finally{$("btnSig").disabled=false}
@@ -4956,13 +4963,24 @@ function pintarTrab(){
 }
 // Pago por horas: semana completa = jornal exacto (700, 1100…); si faltó, jornal × horas trabajadas ÷ horas de la semana
 function jornalTrab(){const t=listaTrab().find(x=>String(x.dni)===$("pTrab").value);return t&&t.jornal?Number(t.jornal):0}
-function calcHoras(){
-  const j=jornalTrab(), h=numIn("pHoras"), hs=numIn("pHSem")||45;
-  if(!(h>0)||!j){$("pHorasInfo").textContent=j?`Semana completa (${hs} h): S/ ${fmtN(j)}. Escribe las horas si faltó.`:"";return}
-  const pago=h===hs?j:r2(j*h/hs);
-  $("pSueldo").value=pago.toFixed(2);
-  $("pHorasInfo").textContent=h===hs?`Semana completa: S/ ${fmtN(j)}`:`S/ ${fmtN(j)} × ${h} h ÷ ${hs} h = S/ ${fmtN(pago)}`;
+// Días trabajados (Lun a Dom): lunes a viernes 8 h, sábado 5 h, domingo 8 h. Semana normal = 45 h = jornal completo
+const HDIA=[8,8,8,8,8,5,8];
+const horasMask=m=>[...String(m||"")].reduce((a,c,i)=>a+(c==="1"?HDIA[i]||0:0),0);
+// Semana completa = jornal exacto; si faltó: precio por hora (redondeado a céntimos) × horas trabajadas
+function pagoMask(j,hs,m){const h=horasMask(m);return !h?0:h===hs?j:r2(r2(j/hs)*h)}
+const diasSel=()=>[...$("pDias").children].map(b=>b.getAttribute("aria-pressed")==="true"?"1":"0").join("");
+const ponerDias=m=>[...$("pDias").children].forEach((b,i)=>b.setAttribute("aria-pressed",String(m[i]==="1")));
+function calcHoras(sinTocar){
+  const j=jornalTrab(), hs=numIn("pHSem")||45, m=diasSel(), nd=m.replace(/0/g,"").length, h=horasMask(m);
+  $("pHoras").value=h&&h!==hs?String(h):"";
+  if(!nd){if(!sinTocar)$("pSueldo").value="";$("pHorasInfo").textContent="Toca los días que vino.";return}
+  const dt=`${nd} ${nd===1?"día":"días"} · ${h} h`;
+  if(!j){$("pHorasInfo").textContent=dt;return}
+  const pago=pagoMask(j,hs,m);
+  if(!sinTocar)$("pSueldo").value=pago.toFixed(2);
+  $("pHorasInfo").textContent=h===hs?`${dt} · semana completa S/ ${fmtN(j)}`:`${dt} × S/ ${fmtN(r2(j/hs))} por hora = S/ ${fmtN(pago)}`;
 }
+$("pDias").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;b.setAttribute("aria-pressed",String(b.getAttribute("aria-pressed")!=="true"));calcHoras();calcPla()});
 const fmtN=n=>Number(n).toLocaleString("es-PE",{minimumFractionDigits:2,maximumFractionDigits:2});
 function calcPla(){const n=r2(numIn("pSueldo")+numIn("pBono")+numIn("pHex")-numIn("pDesc"));$("pNeto").textContent=fmt(Math.max(0,n));return n}
 function abrirPagoPla(r){
@@ -4976,13 +4994,16 @@ function abrirPagoPla(r){
     $("pSueldo").value=String(r.sueldo||r.monto); $("pBono").value=r.bono||""; $("pHex").value=r.horasExtra||""; $("pDesc").value=r.descuento||"";
     $("pOper").value=r.operacion||""; $("pObra").value=r.obra||"";
     const tt=pintarTrab(), hs0=(tt&&tt.horas)||45; $("pHSem").value=hs0; $("pHoras").value=r.horasTrab||(r.horas&&r.horas!==hs0?r.horas:"");
+    // Pagos guardados con días: se marcan tal cual; los antiguos (solo horas) se aproximan a días de la semana
+    // Antiguos sin días: se marcan lunes a sábado; el sueldo guardado no se toca
+    ponerDias(/^[01]{7}$/.test(r.dias||"")?r.dias:"1111110");
   }else{
     $("pFecha").value=hoyISO; $("pIni").value=isoMas(hoyISO,-6); $("pFin").value=hoyISO;
     ["pBono","pHex","pDesc","pOper","pObra"].forEach(k=>$(k).value="");
     const t=pintarTrab(); $("pSueldo").value=t&&t.jornal?Number(t.jornal).toFixed(2):"";
-    $("pHSem").value=t&&t.horas?t.horas:45; $("pHoras").value="";
+    $("pHSem").value=t&&t.horas?t.horas:45; $("pHoras").value=""; ponerDias("1111110");
   }
-  calcHoras();
+  calcHoras(!!r);
   const extras=numIn("pBono")||numIn("pHex")||numIn("pDesc");
   $("pMas").hidden=!extras; $("pMasBtn").hidden=!!extras;
   $("plaTit").textContent=r?"Editar pago":"Pago a trabajador"; $("pMsg").textContent="";
@@ -4997,13 +5018,14 @@ $("fPla").addEventListener("submit",async e=>{
   e.preventDefault();
   const t=listaTrab().find(x=>String(x.dni)===$("pTrab").value);
   if(!t){$("pMsg").textContent="Elige un trabajador.";return}
+  if(!diasSel().includes("1")){$("pMsg").textContent="Toca los días que vino.";return}
   if(!(numIn("pSueldo")>0)){$("pMsg").textContent="Escribe el sueldo o jornal.";return}
   const neto=calcPla();
   if(!(neto>0)){$("pMsg").textContent="El neto a pagar debe ser mayor a 0.";return}
   if(!$("pFecha").value){$("pMsg").textContent="Elige la fecha de pago.";return}
   const r={tipo:"gasto",categoria:"Planilla / jornales",comprobante:"ninguno",monto:neto,base:0,igv:0,noGravado:neto,
     ruc:String(t.dni),desc:t.nombre,cargo:t.cargo||"",fecha:$("pFecha").value,inicio:$("pIni").value,fin:$("pFin").value,
-    sueldo:numIn("pSueldo"),bono:numIn("pBono"),horasExtra:numIn("pHex"),descuento:numIn("pDesc"),horasTrab:numIn("pHoras")||0,horasSem:numIn("pHSem")||45,
+    sueldo:numIn("pSueldo"),bono:numIn("pBono"),horasExtra:numIn("pHex"),descuento:numIn("pDesc"),horasTrab:numIn("pHoras")||0,horasSem:numIn("pHSem")||45,dias:diasSel(),
     operacion:$("pOper").value.trim(),obra:$("pObra").value.trim(),medio:t.metodo||"",estado:"PAGADO",detraccion:false,detPct:0,detMonto:0};
   $("pMsg").textContent="Guardando…"; $("pGuardar").disabled=true;
   const editando=!!plaEditId;
@@ -7223,13 +7245,14 @@ function usuarioDeTrab(t){
   const ws=new Set(n.split(" "));const q=(PERSONAS||[]).find(x=>{const a=plaNormNom(x.n).split(" ");return a.length>=2&&a.every(w=>ws.has(w))});
   return q?q.n:"";
 }
-// El pago va por DÍA trabajado (lunes a sábado): la tardanza nunca se descuenta, solo la falta
+// El pago va por día trabajado (lun-vie 8 h, sáb 5 h): la tardanza nunca se descuenta, solo la falta
 function semanaTrab(u,dias){
-  let hrs=0,dsi=0,just=0;const obras={};
+  let hrs=0,dsi=0,just=0,mask="";const obras={};
   dias.slice(0,6).forEach(f=>{const m=marcasDe(u,f),ent=m.find(x=>x.tipo==="entrada"),sal=[...m].reverse().find(x=>x.tipo==="salida");
+    mask+=ent?"1":"0";
     if(ent){dsi++;obras[ent.obra]=(obras[ent.obra]||0)+1}else if(licDe(u,f))just++;if(ent&&sal)hrs+=Math.max(0,minDe(sal)-minDe(ent))/60});
   const obra=Object.entries(obras).sort((a,b)=>b[1]-a[1])[0];
-  return {hrs:Math.round(hrs*10)/10,dias:dsi,just,obra:obra?obra[0]:""};
+  return {hrs:Math.round(hrs*10)/10,dias:dsi,just,obra:obra?obra[0]:"",mask:mask+"0"};
 }
 const pagoDias=(j,d)=>d>=6?j:r2(j*d/6);
 function adelantosDe(u){return (ctl.adel||[]).filter(r=>r.estado==="Aprobado"&&nomIgualAs(r.quien,u))}
@@ -7241,7 +7264,7 @@ function pintarPlaSemana(){
   const filas=ts.map(t=>{
     const u=usuarioDeTrab(t),st=u?semanaTrab(u,dias):null,j=+t.jornal||0,hs=+t.horas||45;
     const pagado=rows.find(r=>esPlanilla(r)&&String(r.ruc)===String(t.dni)&&(r.inicio===ini||(r.fecha>=ini&&r.fecha<=dias[6])));
-    const monto=st&&j?pagoDias(j,st.dias):0,adel=u?adelantosDe(u).reduce((a,r)=>a+(+r.monto||0),0):0;
+    const monto=st&&j?pagoMask(j,hs,st.mask):0,adel=u?adelantosDe(u).reduce((a,r)=>a+(+r.monto||0),0):0;
     let info,btn;
     if(pagado){info=`Pagado: S/ ${fmtN(pagado.monto)}`;btn=`<button type="button" class="btn2" data-plaver="${escA(pagado.id)}">Ver comprobante</button>`}
     else if(!j){info="Falta su jornal semanal";btn=`<button type="button" class="btn2" data-plajornal="${escA(t.dni)}">Poner jornal</button>`}
@@ -7250,7 +7273,7 @@ function pintarPlaSemana(){
     else{info=`${st.dias} de 6 días${st.just?` · ${st.just} justificado${st.just>1?"s":""}`:""} · <b>S/ ${fmtN(monto)}</b>${adel?` · adelanto −S/ ${fmtN(adel)}`:""}`;btn=`<button type="button" class="btn" data-plagen="${escA(t.dni)}">Generar comprobante</button>`}
     return `<div class="pla-t${pagado?" ok":""}"><span class="usr-av" aria-hidden="true">${esc((titulo(t.nombre).trim()[0]||"?").toUpperCase())}</span><div class="pla-tx"><b>${esc(titulo(t.nombre))}</b><small>${esc(t.cargo?titulo(t.cargo):"Trabajador")}${u?" · "+esc(titulo(u)):""}</small><small class="pla-inf">${info}</small></div><div class="pla-b">${btn}</div></div>`}).join("");
   el.innerHTML=`<div class="ph"><h2>Trabajadores · semana</h2><div class="pla-nav"><button type="button" class="btn2" data-plasem="-1" aria-label="Semana anterior">‹</button><span>${fCorta(ini)} – ${fCorta(fin)}${plaSem===0?" · esta semana":""}</span><button type="button" class="btn2" data-plasem="1" aria-label="Semana siguiente"${plaSem>=0?" disabled":""}>›</button></div></div>
-    <p class="hint" style="margin:0 0 10px">Lunes a sábado. Se paga por día trabajado según la asistencia (la tardanza no se descuenta, solo la falta). Los adelantos aprobados se descuentan solos. Al generar el comprobante se registra el pago.</p>
+    <p class="hint" style="margin:0 0 10px">Lunes a viernes 8 h y sábado 5 h. Se paga por día trabajado según la asistencia (la tardanza no se descuenta, solo la falta). Los adelantos aprobados se descuentan solos. Al generar el comprobante se registra el pago.</p>
     ${ts.length?`<div class="pla-ts">${filas}</div>`:`<p class="hint">Aún no hay trabajadores. Toca “+ Registrar pago” y luego “+ Nuevo trabajador”.</p>`}`;
 }
 function generarDesdeAsistencia(dni){
@@ -7260,12 +7283,13 @@ function generarDesdeAsistencia(dni){
   $("pTrab").value=String(t.dni);pintarTrab();
   $("pIni").value=dias[0];$("pFin").value=dias[5];$("pFecha").value=dias[5]<hoyISO?dias[5]:hoyISO;
   const hs=+t.horas||45;$("pHSem").value=hs;$("pSueldo").value=t.jornal?Number(t.jornal).toFixed(2):"";
-  // Por días: cada día trabajado vale la sexta parte del jornal semanal
-  $("pHoras").value=st.dias>=6||!st.dias?"":String(r2(hs*st.dias/6));if(st.obra)$("pObra").value=st.obra;
+  // Los días con entrada marcada salen ya tocados (lun-vie 8 h, sáb 5 h); se pueden corregir
+  if(u&&st.dias)ponerDias(st.mask);
+  if(st.obra)$("pObra").value=st.obra;
   const A=u?adelantosDe(u):[],adel=A.reduce((a,r)=>a+(+r.monto||0),0);window.__plaAdel=A.map(r=>r.id);
   if(adel){$("pDesc").value=adel.toFixed(2);$("pMas").hidden=false;$("pMasBtn").hidden=true}
   calcHoras();calcPla();
-  if(st.dias&&t.jornal)$("pHorasInfo").textContent=st.dias>=6?`Semana completa (6 días): S/ ${fmtN(+t.jornal)}`:`S/ ${fmtN(+t.jornal)} × ${st.dias} días ÷ 6 = S/ ${fmtN(pagoDias(+t.jornal,st.dias))}`+(adel?` · se descuenta adelanto S/ ${fmtN(adel)}`:"");$("plaTit").textContent="Generar comprobante";$("pGuardar").textContent="Generar comprobante";
+  if(st.dias&&t.jornal&&adel)$("pHorasInfo").textContent+=` · se descuenta adelanto S/ ${fmtN(adel)}`;$("plaTit").textContent="Generar comprobante";$("pGuardar").textContent="Generar comprobante";
   window.__plaAuto=!!st.dias;
 }
 document.addEventListener("click",e=>{
@@ -7619,8 +7643,13 @@ function cajaDe(o){return (ctl.caja||[]).filter(r=>ctlU(r.obra)===ctlU(o)).sort(
 function cajaSaldo(o){const L=cajaDe(o),e=L.filter(r=>r.tipo==="entrega").reduce((s,r)=>s+(+r.monto||0),0),g=L.filter(r=>r.tipo==="gasto").reduce((s,r)=>s+(+r.monto||0),0);return {e,g,saldo:r2(e-g)}}
 function manoObraDe(o){
   const dias=new Map();(ctl.asist||[]).filter(r=>r.tipo==="entrada"&&ctlU(r.obra)===ctlU(o)).forEach(r=>dias.set(r.usuario+"|"+r.fecha,r.usuario));
+  // Si el mismo día marcó entrada en varias obras, ese jornal se reparte entre ellas (no se cobra entero en cada una)
+  const nObras=new Map();(ctl.asist||[]).filter(r=>r.tipo==="entrada").forEach(r=>{const k=r.usuario+"|"+r.fecha;if(!dias.has(k))return;const s=nObras.get(k)||new Set();s.add(ctlU(r.obra));nObras.set(k,s)});
   const ts=listaTrab();let tot=0,sinJ=0;
-  dias.forEach(u=>{const t=ts.find(x=>usuarioDeTrab(x)===u),j=t?+t.jornal||0:0;if(!j){sinJ++;return}tot+=j/6});
+  // Cada día cuesta sus horas (lun-vie 8 h, sáb 5 h, dom 8 h) × jornal ÷ horas de la semana
+  dias.forEach((u,k)=>{const t=ts.find(x=>usuarioDeTrab(x)===u),j=t?+t.jornal||0:0;if(!j){sinJ++;return}
+    const f=k.split("|")[1]||"",dw=f?(new Date(f+"T12:00:00").getDay()+6)%7:0,hs=+t.horas||45;
+    tot+=j*(HDIA[dw]||8)/hs/((nObras.get(k)||{size:1}).size||1)});
   return {tot:r2(tot),dias:dias.size,sinJ};
 }
 function utilidadObra(x){
@@ -7645,7 +7674,7 @@ function pptoHTML(x){
       ${u.adicL.map(a=>`<div class="tl pp-ad"><span>+ ${esc(a.desc)}<small>${fCorta(a.fecha)}</small></span><b>${fmt(a.monto)}${ad&&!a.oc?` <button type="button" class="btnlink" data-ppadx="${escA(x.n)}" data-id="${escA(a.id)}" aria-label="Quitar adicional">✕</button>`:""}</b></div>`).join("")}
       <div class="tl" style="font-weight:700"><span style="color:var(--ink)">= Total contratado</span><b>${fmt(u.cont)}</b></div>
       ${fl("− Materiales y gastos",u.mat,"out","Comprobantes de la obra, sin planilla")}
-      ${fl("− Mano de obra",u.mo.tot,"out",`${u.mo.dias} ${u.mo.dias===1?"día":"días"} de asistencia × jornal ÷ 6${u.mo.sinJ?` · ${u.mo.sinJ} sin jornal en su ficha`:""}`)}
+      ${fl("− Mano de obra",u.mo.tot,"out",`${u.mo.dias} ${u.mo.dias===1?"día":"días"} de asistencia · lun-vie 8 h, sáb 5 h${u.mo.sinJ?` · ${u.mo.sinJ} sin jornal en su ficha`:""}`)}
       ${fl("− Caja chica",u.cj,"out","Bebidas, movilidad y gastos menores")}
       ${u.pend.tot?fl("− Por pagar",u.pend.tot,"out",u.pend.txt):""}
       ${fl("− Impuestos de la obra",u.imp,"","IGV y renta 1 %")}
@@ -8471,11 +8500,12 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-vernuevo]"
   async function accion(k,r,a){
     if(k==="subc"&&(a==="subpago"||a==="subdev")){const x=subcRes(r),dev=a==="subdev",def=dev?x.ret:x.saldo;
       hojaCB(`<b>${dev?"Devolver fondo de garantía":"Pago a "+esc(r.nombre)}</b><small>${esc(r.partida||"")} · ${esc(r.obra||"")}${dev?"":` · le falta pagar ${fmt(x.saldo)} (sin contar el fondo de garantía de ${fmt(x.ret)})`}</small><label class="lbl-s">Monto (S/)<input id="spMonto" inputmode="decimal" value="${def}"></label><div class="line"><button type="button" class="btnlink" data-cbx>Cancelar</button><button type="button" class="btn" id="spOk">Registrar pago</button></div>`);
-      $("spOk").onclick=()=>{const m=numDe("spMonto");if(!(m>0)){toast("Escribe el monto");return}r.pagos=(r.pagos||[]).concat({id:ctlId(),monto:m,fecha:hoy(),fondo:dev?1:0});if(dev)r.estado="Garantía devuelta";ctlGuardarRec(k,r);cerrarCB();pintar(k);
-        openF({r:{tipo:"gasto",monto:m,desc:r.nombre,obra:r.obra||"",comprobante:"ninguno"}});toast("Pago anotado. Revisa y guarda el movimiento")};return}
+      $("spOk").onclick=()=>{const m=numDe("spMonto");if(!(m>0)){toast("Escribe el monto");return}cerrarCB();
+        // El pago queda anotado solo cuando el gasto se guarda; si se cancela, no cambia nada
+        openF({r:{tipo:"gasto",monto:m,desc:r.nombre,obra:r.obra||"",comprobante:"ninguno"},alGuardar:mv=>{r.pagos=(r.pagos||[]).concat({id:ctlId(),monto:+mv.monto||m,fecha:mv.fecha||hoy(),fondo:dev?1:0});if(dev)r.estado="Garantía devuelta";ctlGuardarRec(k,r);pintar(k);toast("Pago anotado")}});toast("Revisa y guarda el gasto para anotar el pago")};return}
     if(k==="alq"&&a==="devolver"){r.hasta=hoy();r.estado="Devuelto";ctlGuardarRec(k,r);pintar(k);toast(`Devuelto · total ${fmt(alqTotal(r).total)}`);return}
-    if(k==="alq"&&a==="alqpago"){r.pagado=hoy();ctlGuardarRec(k,r);pintar(k);openF({r:{tipo:"gasto",monto:alqTotal(r).total,desc:r.prov||("Alquiler de "+r.equipo),obra:r.obra||"",comprobante:"ninguno"}});return}
-    if(k==="flota"&&a==="gasto"){r.pagado=hoy();ctlGuardarRec(k,r);pintar(k);openF({r:{tipo:"gasto",monto:num(r.monto),desc:r.placa||"",obra:r.obra||"",comprobante:"ninguno"}});return}
+    if(k==="alq"&&a==="alqpago"){openF({r:{tipo:"gasto",monto:alqTotal(r).total,desc:r.prov||("Alquiler de "+r.equipo),obra:r.obra||"",comprobante:"ninguno"},alGuardar:mv=>{r.pagado=mv.fecha||hoy();ctlGuardarRec(k,r);pintar(k)}});return}
+    if(k==="flota"&&a==="gasto"){openF({r:{tipo:"gasto",monto:num(r.monto),desc:r.placa||"",obra:r.obra||"",comprobante:"ninguno"},alGuardar:mv=>{r.pagado=mv.fecha||hoy();ctlGuardarRec(k,r);pintar(k)}});return}
     if(k==="tareas"&&a==="hecha"){r.estado="Hecha";r.hecha=horaAhora();ctlGuardarRec(k,r,["Tarea hecha",r.tarea]);pintar(k);try{pintarMisTareas()}catch(e){}return}
     if(k==="ocambio"&&a==="ocfirma"){const f=await pedirFirma(r.cliente||"Cliente");if(!f)return;r.firma=f;r.firmado=hoy();r.estado="Firmada";ctlGuardarRec(k,r,["Orden de cambio firmada",`${r.desc} · ${fmt(num(r.monto))}`]);
       if(num(r.dias)>0){const p=plazoDe(r.obra);if(p&&p.fin){p.fin=sumaDias(p.fin,num(r.dias));p.ts=Date.now();ctlGuardarRec("plazos",p);toast(`El plazo se movió ${num(r.dias)} días`)}}pintar(k);return}
