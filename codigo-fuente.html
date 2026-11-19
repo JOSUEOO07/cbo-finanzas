@@ -701,7 +701,7 @@ body:is(.especial,.fiesta) .acceso-marca {
 .ctl-hecho .ctl-it-t b{text-decoration:line-through;opacity:.7}
 .ctl-res{display:flex;flex-wrap:wrap;gap:12px;font-size:.85rem;color:var(--muted)}.ctl-res b{color:var(--ink)}
 .ctl-seg3{grid-template-columns:repeat(3,1fr)}
-.ctl-seg4{grid-template-columns:repeat(4,1fr)}.ctl-seg4 button{font-size:.8rem;padding:8px 2px}
+.ctl-seg4{grid-template-columns:repeat(3,1fr)}@media (min-width:700px){.ctl-seg4{grid-template-columns:repeat(6,1fr)}}.ctl-seg4 button{font-size:.8rem;padding:8px 2px}
 .ctl-asig{grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);align-items:center}.ctl-asig select{width:100%;min-width:0}
 .ctl-bts select{min-width:0;max-width:100%}
 .as-sem{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:8px;text-align:center}.as-sem .btn2{padding:8px 0;font-size:1.2rem;line-height:1}.as-sem span{display:grid}.as-sem small{color:var(--muted);font-size:.78rem}
@@ -4966,7 +4966,7 @@ function calcHoras(){
 const fmtN=n=>Number(n).toLocaleString("es-PE",{minimumFractionDigits:2,maximumFractionDigits:2});
 function calcPla(){const n=r2(numIn("pSueldo")+numIn("pBono")+numIn("pHex")-numIn("pDesc"));$("pNeto").textContent=fmt(Math.max(0,n));return n}
 function abrirPagoPla(r){
-  $("pGuardar").textContent="Guardar pago";window.__plaAuto=false;
+  $("pGuardar").textContent="Guardar pago";window.__plaAuto=false;window.__plaAdel=null;
   closeF(); cerrarOv("ovMov"); plaEditId=r?r.id:null;
   const ts=listaTrab();
   $("pTrab").innerHTML=ts.length?ts.map(t=>`<option value="${esc(t.dni)}">${esc(titulo(t.nombre))}</option>`).join("")
@@ -5010,6 +5010,7 @@ $("fPla").addEventListener("submit",async e=>{
   try{
     if(editando) await store.edit(plaEditId,r); else await store.add(r);
     $("ovPla").hidden=true; mes=r.fecha.slice(0,7); render(); toast(editando?"Pago actualizado":(window.__plaAuto?"Pago registrado y comprobante listo":"Pago registrado"));
+    if(!editando&&window.__plaAdel&&window.__plaAdel.length){window.__plaAdel.forEach(id=>{const a=(ctl.adel||[]).find(x=>x.id===id);if(a){a.estado="Descontado";a.descontadoEn=r.fin||r.fecha;ctlGuardarRec("adel",a)}});window.__plaAdel=null}
     if(window.__plaAuto&&!editando){window.__plaAuto=false;const nr=[...rows].reverse().find(x=>esPlanilla(x)&&String(x.ruc)===String(t.dni)&&x.inicio===r.inicio);if(nr)setTimeout(()=>{try{abrirMov(nr.id)}catch(e){}},250)}
   }catch(err){$("pMsg").textContent=err&&err.code==="dup"?err.message.charAt(0).toUpperCase()+err.message.slice(1):"No se pudo guardar. Revisa tu internet e intenta de nuevo."}
   finally{$("pGuardar").disabled=false}
@@ -6416,7 +6417,7 @@ const CTL_MOD=[
 // Josué (12/11/2026): se quitan Avance por partidas, Cuaderno de obra y Observaciones y pendientes (los datos guardados no se borran)
 CTL_MOD.splice(0,CTL_MOD.length,...CTL_MOD.filter(m=>!["avance","notas","pend"].includes(m[0])));
 const CTL_NOM=Object.fromEntries(CTL_MOD.map(m=>[m[0],m[1]]));
-let ctl=Object.assign({informes:[],avance:[],notas:[],fotos:[],pedidos:[],herr:[],pruebas:[],pend:[],minimos:{},presup:[],crm:[],compras:[],emp:[],gastos:[],serv:[],agenda:[],flota:[]},leerLS(CTL_K,{})||{});
+let ctl=Object.assign({adel:[],lic:[],epp:[],docpers:[],informes:[],avance:[],notas:[],fotos:[],pedidos:[],herr:[],pruebas:[],pend:[],minimos:{},presup:[],crm:[],compras:[],emp:[],gastos:[],serv:[],agenda:[],flota:[]},leerLS(CTL_K,{})||{});
 let ctlVista="menu", ctlEdit=null;
 const ctlGuardarLS=()=>guardarLS(CTL_K,ctl);
 const ctlId=()=>"k"+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
@@ -6827,13 +6828,14 @@ function tarjetaMiAsist(){
 // Mi asistencia de la semana: un circulito por día (L a D). Verde = asistió · rojo = faltó (tenía obra y no marcó) · normal = sin obra, día que no llega o domingo
 function semCirc(u){
   const DL=["L","M","M","J","V","S","D"],DN=["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
-  return `<div class="as-circ" role="list" aria-label="Mi asistencia de esta semana">${diasSemana(0).map((f,i)=>{const ent=marcasDe(u,f).some(x=>x.tipo==="entrada"),falta=!ent&&i<6&&f<hoyISO&&!!asigDe(u,f);
+  return `<div class="as-circ" role="list" aria-label="Mi asistencia de esta semana">${diasSemana(0).map((f,i)=>{const ent=marcasDe(u,f).some(x=>x.tipo==="entrada"),falta=!ent&&i<6&&f<hoyISO&&!!asigDe(u,f)&&!licDe(u,f);
     const c=ent?"ok":falta?"mal":"";return `<span role="listitem" class="${c}${f===hoyISO?" hoy":""}" aria-label="${DN[i]} ${f.slice(8)}: ${ent?"asistió":falta?"faltó":"sin marca"}"><b class="dc">${DL[i]}</b><b class="dl">${DN[i]}<small>${f.slice(8)}/${f.slice(5,7)}</small></b></span>`}).join("")}</div>`;
 }
 function filaAsist(n,f){
   const a=asigDe(n,f),m=marcasDe(n,f),ent=m.find(x=>x.tipo==="entrada"),sal=[...m].reverse().find(x=>x.tipo==="salida");
   const hrs=ent&&sal?Math.max(0,(+sal.hora.slice(0,2)*60+ +sal.hora.slice(3))-(+ent.hora.slice(0,2)*60+ +ent.hora.slice(3)))/60:0;
-  const est=!a?"":ent?`<span class="ctl-ch ok">Asistió</span>`:(f<hoyISO?`<span class="ctl-ch mal">Faltó</span>`:`<span class="ctl-ch al">Sin marcar todavía</span>`);
+  const lic=!ent&&licDe(n,f);
+  const est=!a?"":ent?`<span class="ctl-ch ok">Asistió</span>`:lic?`<span class="ctl-ch al">${esc(lic.tipo||"Permiso")}</span>`:(f<hoyISO?`<span class="ctl-ch mal">Faltó</span>`:`<span class="ctl-ch al">Sin marcar todavía</span>`);
   return `<div class="panel ctl-it"><div class="ctl-it-t"><b>${esc(titulo(n))}</b><small>${fCorta(f)} · ${a?esc(a.obra):"Sin obra asignada"}</small></div>${est}
     ${m.length?`<div class="ctl-res"><span>Entrada <b>${ent?ent.hora:"—"}</b></span><span>Salida <b>${sal?sal.hora:"—"}</b></span>${hrs?`<span>Horas <b>${hrs.toFixed(1)}</b></span>`:""}</div>
     <div class="ctl-fotos">${m.map(x=>`<figure class="as-m">${x.foto?miniFoto(x.foto):x.firma?miniFoto(x.firma):`<span class="as-hu" title="Confirmó con su huella">${IC_HUELLA}</span>`}<figcaption>${esAdmin()&&!x.pend?`<button type="button" class="btnlink as-borrar" data-asborrar="${escA(x.id)}">Borrar</button> `:""}${x.tipo==="entrada"?"Entró":"Salió"} ${x.hora}${x.pend?" · enviando…":x.verif==="huella"?" · huella":x.verif==="firma"?" · firma":""} · <a href="${mapaUrl(x.lat,x.lng)}" target="_blank" rel="noopener">mapa</a></figcaption></figure>`).join("")}</div>`:""}</div>`;
@@ -6843,14 +6845,18 @@ let asSemana=0;
 const isoDe=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
 const minDe=x=>(+String(x.hora).slice(0,2))*60+(+String(x.hora).slice(3,5));
 function diasSemana(despl){const d=new Date(hoyISO+"T12:00:00");d.setDate(d.getDate()-((d.getDay()+6)%7)+7*despl);return [...Array(7)].map((_,i)=>{const x=new Date(d);x.setDate(d.getDate()+i);return isoDe(x)})}
+// Permiso aprobado ese día (Permisos y faltas): cuenta como justificado, no como falta
+const nomIgualAs=(a,b)=>sinTildes(String(a||"")).replace(/\s+/g," ").trim()===sinTildes(String(b||"")).replace(/\s+/g," ").trim();
+function licDe(u,f){return (ctl.lic||[]).find(r=>r.estado==="Aprobado"&&nomIgualAs(r.quien,u)&&f>=r.desde&&f<=(r.hasta||r.desde))}
 function semanaHTML(personas){
   const dias=diasSemana(asSemana),DN=["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
   const nav=`<div class="as-sem"><button type="button" class="btn2" data-semana="-1" aria-label="Semana anterior">‹</button><span><b>Semana del ${fCorta(dias[0])}</b><small>al ${fCorta(dias[6])}${asSemana===0?" · esta semana":""}</small></span><button type="button" class="btn2" data-semana="1" aria-label="Semana siguiente"${asSemana>=0?" disabled":""}>›</button></div>`;
   const tarjetas=personas.map(p=>{let hrs=0,asi=0,falt=0;
     const filas=dias.map((f,i)=>{const a=asigDe(p.n,f),m=marcasDe(p.n,f),ent=m.find(x=>x.tipo==="entrada"),sal=[...m].reverse().find(x=>x.tipo==="salida");
-      const h=ent&&sal?Math.max(0,minDe(sal)-minDe(ent))/60:0;hrs+=h;if(ent)asi++;else if(a&&f<hoyISO)falt++;
-      const est=ent?"ok":(a&&f<hoyISO)?"mal":(a?"al":"");
-      const txt=ent?(h?h.toFixed(1)+" h":"Asistió"):(a&&f<hoyISO?"Faltó":a?(f===hoyISO?"Por marcar":"Asignado"):"Libre");
+      const lic=!ent&&licDe(p.n,f);
+      const h=ent&&sal?Math.max(0,minDe(sal)-minDe(ent))/60:0;hrs+=h;if(ent)asi++;else if(a&&f<hoyISO&&!lic)falt++;
+      const est=ent?"ok":lic?"al":(a&&f<hoyISO)?"mal":(a?"al":"");
+      const txt=ent?(h?h.toFixed(1)+" h":"Asistió"):lic?(lic.tipo||"Permiso"):(a&&f<hoyISO?"Faltó":a?(f===hoyISO?"Por marcar":"Asignado"):"Libre");
       return `<div class="as-dia ${est}${f===hoyISO?" hoy":""}"><span class="as-dn">${DN[i]}<small>${f.slice(8)}/${f.slice(5,7)}</small></span><span class="as-ob">${a?esc(a.obra):ent?esc(ent.obra):"—"}</span><span class="as-hr">${ent?ent.hora:"--:--"} – ${sal?sal.hora:"--:--"}</span><span class="as-es">${txt}</span></div>`}).join("");
     return `<div class="panel as-card"><div class="ctl-it-t"><b>${esc(titulo(p.n))}</b><small>${asi} ${asi===1?"día":"días"} asistió · ${falt} ${falt===1?"falta":"faltas"} · ${hrs.toFixed(1)} horas</small></div><div class="as-tabla">${filas}</div></div>`}).join("");
   return nav+`<div class="ctl-lista">${tarjetas||vacio("No hay personas.")}</div>`;
@@ -6858,7 +6864,7 @@ function semanaHTML(personas){
 function vAsist(){
   const adm=!sesion||sesion.admin;
   if(!adm)return tarjetaMiAsist()+`<h3 class="ctl-sub">Mi semana</h3>`+semanaHTML([{n:quien}]);
-  const seg=`<div class="seg ctl-seg4" role="group" aria-label="Vista">${[["hoy","Hoy"],["asignar","Asignar"],["obras","Ubicación"],["hist","Semanal"]].map(([k,t])=>`<button type="button" data-asvista="${k}" aria-pressed="${asVista===k}">${t}</button>`).join("")}</div>`;
+  const seg=`<div class="seg ctl-seg4" role="group" aria-label="Vista">${[["hoy","Hoy"],["asignar","Asignar"],["obras","Ubicación"],["hist","Semanal"],["mes","Mes"],["mapa","Mapa"]].map(([k,t])=>`<button type="button" data-asvista="${k}" aria-pressed="${asVista===k}">${t}</button>`).join("")}</div>`;
   const gente=PERSONAS.filter(p=>!p.b);
   if(asVista==="hoy"){const L=gente.filter(p=>asigDe(p.n,hoyISO)||marcasDe(p.n,hoyISO).length);
     return seg+(asigDe(quien,hoyISO)?tarjetaMiAsist():"")+`<h3 class="ctl-sub">Hoy, ${fCorta(hoyISO)}</h3><div class="ctl-lista">${L.length?L.map(p=>filaAsist(p.n,hoyISO)).join(""):vacio("Nadie tiene obra asignada hoy. Ve a Asignar.")}</div>`}
@@ -6868,6 +6874,8 @@ function vAsist(){
   if(asVista==="obras")return seg+`<p class="hint">Fija dónde está cada obra sin tener que ir: elígela en el mapa, búscala por su dirección o pega el enlace de Google Maps. El radio es la zona donde se podrá marcar.</p><div class="ctl-lista">${invObrasLista().map(o=>{const u=ubicDe(o);
       return `<div class="panel ctl-it"><div class="ctl-it-t"><b>${esc(o)}</b><small>${u?`Ubicación fijada · radio ${u.radio} m · <a href="${mapaUrl(u.lat,u.lng)}" target="_blank" rel="noopener">ver en el mapa</a>`:"Sin ubicación todavía"}</small></div>
         <div class="ctl-bts"><button type="button" class="btn" data-mapa="${escA(o)}">${u?"Cambiar en el mapa":"Elegir en el mapa"}</button><button type="button" class="btn2" data-enlace="${escA(o)}">Pegar enlace</button><button type="button" class="btn2" data-fijar="${escA(o)}">Estoy aquí</button><select data-radio="${escA(o)}" aria-label="Radio">${RADIOS.map(r=>`<option value="${r}"${(u&&+u.radio===r)||(!u&&r===30)?" selected":""}>Radio ${r} m</option>`).join("")}</select></div></div>`}).join("")||vacio("Primero crea una obra.")}</div>`;
+  if(asVista==="mes")return seg+mesAsistHTML(gente);
+  if(asVista==="mapa"){setTimeout(pintarMapaVivo,60);return seg+`<p class="hint">Tus obras y quién está en cada una hoy, según la asistencia.</p><div id="asMapa" class="as-mapa"></div><div id="asMapaLista" class="ctl-lista"></div>`}
   return seg+semanaHTML(gente);
 }
 function guardarUbic(o,lat,lng,rr){const s=document.querySelector(`[data-radio="${CSS.escape(o)}"]`),r=+rr||+(s&&s.value)||30;
@@ -7039,7 +7047,7 @@ async function buscarEnMapa(v){
 (function(){
   let q="",fil="todos";
   const GRUPOS=[["Finanzas",["movimientos","sunat","terceros","planilla","obras","anual"]],["Obras",["tablero","control","asist","fotos","pedidos","herr","stock","pruebas","entrega","avance","notas","pend"]],
-    ["Inventario",k=>k==="inventario"||k.startsWith("inv-")],["Comercial",["m-presup","m-crm","m-compras"]],["Personal",["m-emp","m-gastos"]],["Servicios",["m-serv","m-agenda","m-flota"]],["Documentos",["documentos"]]];
+    ["Inventario",k=>k==="inventario"||k.startsWith("inv-")],["Comercial",["m-presup","m-crm","m-compras"]],["Personal",["m-emp","m-gastos","m-adel","m-lic","m-epp","m-docpers"]],["Servicios",["m-serv","m-agenda","m-flota"]],["Documentos",["documentos"]]];
   const grupoDe=k=>{for(const [n,t] of GRUPOS)if(typeof t==="function"?t(k):t.includes(k))return n;return "Otros"};
   const base=pintarSesion;
   pintarSesion=function(){base.apply(this,arguments);try{mejorar()}catch(e){console.error(e)}};
@@ -7215,13 +7223,16 @@ function usuarioDeTrab(t){
   const ws=new Set(n.split(" "));const q=(PERSONAS||[]).find(x=>{const a=plaNormNom(x.n).split(" ");return a.length>=2&&a.every(w=>ws.has(w))});
   return q?q.n:"";
 }
+// El pago va por DÍA trabajado (lunes a sábado): la tardanza nunca se descuenta, solo la falta
 function semanaTrab(u,dias){
-  let hrs=0,dsi=0;const obras={};
+  let hrs=0,dsi=0,just=0;const obras={};
   dias.slice(0,6).forEach(f=>{const m=marcasDe(u,f),ent=m.find(x=>x.tipo==="entrada"),sal=[...m].reverse().find(x=>x.tipo==="salida");
-    if(ent){dsi++;obras[ent.obra]=(obras[ent.obra]||0)+1}if(ent&&sal)hrs+=Math.max(0,minDe(sal)-minDe(ent))/60});
+    if(ent){dsi++;obras[ent.obra]=(obras[ent.obra]||0)+1}else if(licDe(u,f))just++;if(ent&&sal)hrs+=Math.max(0,minDe(sal)-minDe(ent))/60});
   const obra=Object.entries(obras).sort((a,b)=>b[1]-a[1])[0];
-  return {hrs:Math.round(hrs*10)/10,dias:dsi,obra:obra?obra[0]:""};
+  return {hrs:Math.round(hrs*10)/10,dias:dsi,just,obra:obra?obra[0]:""};
 }
+const pagoDias=(j,d)=>d>=6?j:r2(j*d/6);
+function adelantosDe(u){return (ctl.adel||[]).filter(r=>r.estado==="Aprobado"&&nomIgualAs(r.quien,u))}
 function pintarPlaSemana(){
   const el=$("plaSemana");if(!el)return;
   const adm=!sesion||sesion.admin;if(!adm){el.hidden=true;return}el.hidden=false;
@@ -7230,16 +7241,16 @@ function pintarPlaSemana(){
   const filas=ts.map(t=>{
     const u=usuarioDeTrab(t),st=u?semanaTrab(u,dias):null,j=+t.jornal||0,hs=+t.horas||45;
     const pagado=rows.find(r=>esPlanilla(r)&&String(r.ruc)===String(t.dni)&&(r.inicio===ini||(r.fecha>=ini&&r.fecha<=dias[6])));
-    const monto=st&&j?(st.hrs>=hs||st.hrs===0&&st.dias>=6?j:r2(j*st.hrs/hs)):0;
+    const monto=st&&j?pagoDias(j,st.dias):0,adel=u?adelantosDe(u).reduce((a,r)=>a+(+r.monto||0),0):0;
     let info,btn;
     if(pagado){info=`Pagado: S/ ${fmtN(pagado.monto)}`;btn=`<button type="button" class="btn2" data-plaver="${escA(pagado.id)}">Ver comprobante</button>`}
     else if(!j){info="Falta su jornal semanal";btn=`<button type="button" class="btn2" data-plajornal="${escA(t.dni)}">Poner jornal</button>`}
     else if(!u){info="Elige su usuario de CBO para leer su asistencia";btn=`<select class="selbar" data-plavinc="${escA(t.dni)}" aria-label="Usuario de ${escA(titulo(t.nombre))}"><option value="">Elegir usuario…</option>${(PERSONAS||[]).map(p=>`<option value="${escA(p.n)}">${esc(titulo(p.n))}</option>`).join("")}</select>`}
     else if(!st.dias){info="Sin asistencia esta semana";btn=`<button type="button" class="btn2" data-plagen="${escA(t.dni)}">Pago manual</button>`}
-    else{info=`${st.dias} ${st.dias===1?"día":"días"} · ${st.hrs.toFixed(1)} h · <b>S/ ${fmtN(monto)}</b>`;btn=`<button type="button" class="btn" data-plagen="${escA(t.dni)}">Generar comprobante</button>`}
+    else{info=`${st.dias} de 6 días${st.just?` · ${st.just} justificado${st.just>1?"s":""}`:""} · <b>S/ ${fmtN(monto)}</b>${adel?` · adelanto −S/ ${fmtN(adel)}`:""}`;btn=`<button type="button" class="btn" data-plagen="${escA(t.dni)}">Generar comprobante</button>`}
     return `<div class="pla-t${pagado?" ok":""}"><span class="usr-av" aria-hidden="true">${esc((titulo(t.nombre).trim()[0]||"?").toUpperCase())}</span><div class="pla-tx"><b>${esc(titulo(t.nombre))}</b><small>${esc(t.cargo?titulo(t.cargo):"Trabajador")}${u?" · "+esc(titulo(u)):""}</small><small class="pla-inf">${info}</small></div><div class="pla-b">${btn}</div></div>`}).join("");
   el.innerHTML=`<div class="ph"><h2>Trabajadores · semana</h2><div class="pla-nav"><button type="button" class="btn2" data-plasem="-1" aria-label="Semana anterior">‹</button><span>${fCorta(ini)} – ${fCorta(fin)}${plaSem===0?" · esta semana":""}</span><button type="button" class="btn2" data-plasem="1" aria-label="Semana siguiente"${plaSem>=0?" disabled":""}>›</button></div></div>
-    <p class="hint" style="margin:0 0 10px">Lunes a sábado. Las horas salen de la asistencia y el monto del jornal de cada trabajador. Al generar el comprobante se registra el pago.</p>
+    <p class="hint" style="margin:0 0 10px">Lunes a sábado. Se paga por día trabajado según la asistencia (la tardanza no se descuenta, solo la falta). Los adelantos aprobados se descuentan solos. Al generar el comprobante se registra el pago.</p>
     ${ts.length?`<div class="pla-ts">${filas}</div>`:`<p class="hint">Aún no hay trabajadores. Toca “+ Registrar pago” y luego “+ Nuevo trabajador”.</p>`}`;
 }
 function generarDesdeAsistencia(dni){
@@ -7248,9 +7259,13 @@ function generarDesdeAsistencia(dni){
   abrirPagoPla();
   $("pTrab").value=String(t.dni);pintarTrab();
   $("pIni").value=dias[0];$("pFin").value=dias[5];$("pFecha").value=dias[5]<hoyISO?dias[5]:hoyISO;
-  $("pHSem").value=t.horas||45;$("pSueldo").value=t.jornal?Number(t.jornal).toFixed(2):"";
-  $("pHoras").value=st.hrs?String(st.hrs):"";if(st.obra)$("pObra").value=st.obra;
-  calcHoras();calcPla();$("plaTit").textContent="Generar comprobante";$("pGuardar").textContent="Generar comprobante";
+  const hs=+t.horas||45;$("pHSem").value=hs;$("pSueldo").value=t.jornal?Number(t.jornal).toFixed(2):"";
+  // Por días: cada día trabajado vale la sexta parte del jornal semanal
+  $("pHoras").value=st.dias>=6||!st.dias?"":String(r2(hs*st.dias/6));if(st.obra)$("pObra").value=st.obra;
+  const A=u?adelantosDe(u):[],adel=A.reduce((a,r)=>a+(+r.monto||0),0);window.__plaAdel=A.map(r=>r.id);
+  if(adel){$("pDesc").value=adel.toFixed(2);$("pMas").hidden=false;$("pMasBtn").hidden=true}
+  calcHoras();calcPla();
+  if(st.dias&&t.jornal)$("pHorasInfo").textContent=st.dias>=6?`Semana completa (6 días): S/ ${fmtN(+t.jornal)}`:`S/ ${fmtN(+t.jornal)} × ${st.dias} días ÷ 6 = S/ ${fmtN(pagoDias(+t.jornal,st.dias))}`+(adel?` · se descuenta adelanto S/ ${fmtN(adel)}`:"");$("plaTit").textContent="Generar comprobante";$("pGuardar").textContent="Generar comprobante";
   window.__plaAuto=!!st.dias;
 }
 document.addEventListener("click",e=>{
@@ -7328,7 +7343,7 @@ function pintarInforme(){
   const el=$("infCuerpo");if(!el)return;const d=diasSemana(infSem),F=infFotosSemana(),g=infGuardado();
   if(!infSel)infSel=new Set(F.slice(-8).map(r=>r.id));
   const nav=`<div class="pla-nav inf-nav"><button type="button" class="btn2" data-infsem="-1">‹</button><span>${esc(invObra||"Sin obra")} · ${fCorta(d[0])} – ${fCorta(d[6])}</span><button type="button" class="btn2" data-infsem="1"${infSem>=0?" disabled":""}>›</button></div>`;
-  if(g){el.innerHTML=nav+informeHTML(g)+`<div class="inf-acc"><button type="button" class="btn" data-infwa>Enviar por WhatsApp</button><button type="button" class="btn2" data-infpdf>PDF / imprimir</button><button type="button" class="btnlink" data-infrehacer>Volver a generar</button></div>`;return}
+  if(g){el.innerHTML=nav+informeHTML(g)+`<div class="inf-acc"><button type="button" class="btn" data-infpdfwa>Enviar PDF por WhatsApp</button><button type="button" class="btn2" data-infwa>Solo texto</button><button type="button" class="btn2" data-infpdf>Imprimir</button><button type="button" class="btnlink" data-infrehacer>Volver a generar</button></div>`;return}
   el.innerHTML=nav+(F.length?`<p class="hint">Elige hasta 8 fotos de la semana. La IA describe lo que se ve y arma un informe corto para el cliente.</p>
     <div class="inf-fotos">${F.map(r=>`<label class="inf-f${infSel.has(r.id)?" on":""}"><input type="checkbox" data-inff="${escA(r.id)}"${infSel.has(r.id)?" checked":""}><img src="${r.foto}" alt=""><small>${esc(r.ambiente||"")} · ${esc(r.momento==="antes"?"Antes":"Avance")}</small></label>`).join("")}</div>
     <p class="hint" id="infMsg"></p><button type="button" class="btn inf-gen" data-infgen>Generar informe con IA (${infSel.size})</button>`
@@ -7385,6 +7400,93 @@ document.head.insertAdjacentHTML("beforeend",`<style id="infCss">
   .inf-sig{background:#eef3fb;padding:10px 12px;border-radius:10px;font-size:.9rem}
   .inf-acc{display:flex;flex-wrap:wrap;gap:8px}.inf-acc .btn,.inf-acc .btn2{flex:1 1 160px}
   @media (max-width:420px){.inf-pasos li{grid-template-columns:1fr}.inf-pasos img{width:100%;height:160px}}
+</style>`);
+/* ===== Asistencia → Mes: puntualidad (las tardanzas se muestran pero NUNCA se descuentan) ===== */
+function mesAsistHTML(gente){
+  const he=leerLS("cbo-hora-entrada","08:00"),tol=+leerLS("cbo-tolerancia",10)||0,lim=(+he.slice(0,2))*60+(+he.slice(3,5))+tol;
+  const m0=hoyISO.slice(0,8)+"01",dias=[];for(let d=new Date(m0+"T12:00:00");isoDe(d)<=hoyISO;d.setDate(d.getDate()+1)){if(d.getDay()!==0)dias.push(isoDe(d))}
+  const filas=gente.map(p=>{let asig=0,asi=0,tar=0,fal=0,jus=0;dias.forEach(f=>{const a=asigDe(p.n,f),ent=marcasDe(p.n,f).find(x=>x.tipo==="entrada");
+      if(a)asig++;if(ent){asi++;if(minDe(ent)>lim)tar++}else if(licDe(p.n,f))jus++;else if(a&&f<hoyISO)fal++});
+    return {p,asig,asi,tar,fal,jus}}).filter(x=>x.asig||x.asi);
+  return `<div class="as-mes-cfg"><label class="lbl-s">Hora de entrada<input type="time" id="asHoraEnt" value="${he}"></label><label class="lbl-s">Tolerancia (min)<input type="text" inputmode="numeric" id="asTol" value="${tol}" maxlength="2"></label></div>
+    <p class="hint">${MESES[+hoyISO.slice(5,7)-1]} hasta hoy, lunes a sábado. Las tardanzas solo se muestran: el pago no las descuenta, solo las faltas.</p>
+    <div class="ctl-lista">${filas.length?filas.map(x=>`<div class="panel as-mes"><b>${esc(titulo(x.p.n))}</b><div class="as-mes-n"><span class="ok"><b>${x.asi}</b>asistió</span><span class="al"><b>${x.tar}</b>tardanzas</span><span class="mal"><b>${x.fal}</b>faltas</span><span><b>${x.jus}</b>justificadas</span></div></div>`).join(""):vacio("Este mes todavía no hay asistencia registrada.")}</div>`;
+}
+document.addEventListener("change",e=>{if(e.target.id==="asHoraEnt"){guardarLS("cbo-hora-entrada",e.target.value||"08:00");try{ctlRender()}catch(x){}}if(e.target.id==="asTol"){guardarLS("cbo-tolerancia",Math.max(0,Math.min(60,+e.target.value||0)));try{ctlRender()}catch(x){}}});
+
+/* ===== Asistencia → Mapa: tus obras y quién está en cada una hoy ===== */
+let mapaVivo=null;
+async function pintarMapaVivo(){
+  const el=$("asMapa"),li=$("asMapaLista");if(!el)return;
+  const obras=invObrasListaTodas().map(o=>({o,u:ubicDe(o)})),gente=PERSONAS.filter(p=>!p.b);
+  const enObra=o=>gente.map(p=>{const m=marcasDe(p.n,hoyISO).filter(x=>ctlU(x.obra)===ctlU(o)),ent=m.find(x=>x.tipo==="entrada"),sal=[...m].reverse().find(x=>x.tipo==="salida"),a=asigDe(p.n,hoyISO);
+      return ent?{n:p.n,t:sal?`salió ${sal.hora}`:`en obra desde ${ent.hora}`,c:sal?"":"ok"}:(a&&ctlU(a.obra)===ctlU(o)?{n:p.n,t:"asignado, aún no marca",c:"al"}:null)}).filter(Boolean);
+  obras.sort((x,y)=>enObra(y.o).length-enObra(x.o).length);
+  li.innerHTML=obras.map(({o,u})=>{const L=enObra(o);return `<div class="panel ctl-it"><div class="ctl-it-t"><b>${esc(o)}</b><small>${u?"":"Sin ubicación fijada · "}${L.filter(x=>x.c==="ok").length} en obra ahora</small></div>${L.length?`<div class="as-vivo">${L.map(x=>`<span class="ctl-ch ${x.c}">${esc(titulo(x.n))} · ${esc(x.t)}</span>`).join("")}</div>`:""}</div>`}).join("")||vacio("Aún no hay obras.");
+  try{await cargarLeaflet()}catch(e){el.innerHTML=`<p class="hint" style="padding:16px">${esc(e.message||"No se pudo cargar el mapa")}</p>`;return}
+  if(!$("asMapa"))return;
+  if(mapaVivo){try{mapaVivo.remove()}catch(e){}mapaVivo=null}
+  mapaVivo=L.map("asMapa",{zoomControl:true}).setView([-12.0464,-77.0428],11);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap"}).addTo(mapaVivo);
+  const pts=[];obras.forEach(({o,u})=>{if(!u)return;const L2=enObra(o),n=L2.filter(x=>x.c==="ok").length;pts.push([u.lat,u.lng]);
+    L.circleMarker([u.lat,u.lng],{radius:11,weight:3,color:n?"#22c55e":"#94a3b8",fillColor:n?"#22c55e":"#64748b",fillOpacity:.55}).addTo(mapaVivo)
+      .bindPopup(`<b>${esc(o)}</b><br>${L2.length?L2.map(x=>`${esc(titulo(x.n))}: ${esc(x.t)}`).join("<br>"):"Nadie hoy"}`)});
+  if(pts.length===1)mapaVivo.setView(pts[0],15);else if(pts.length)mapaVivo.fitBounds(pts,{padding:[30,30]});
+  setTimeout(()=>{try{mapaVivo.invalidateSize()}catch(e){}},200);
+}
+
+/* ===== Informe en PDF (archivo) para mandarlo al cliente por WhatsApp ===== */
+const cargarJS=(()=>{const c={};return u=>c[u]||(c[u]=new Promise((ok,mal)=>{const s=document.createElement("script");s.src=u;s.onload=ok;s.onerror=()=>{delete c[u];mal(new Error("No se pudo cargar (revisa tu internet)"))};document.head.append(s)}))})();
+async function informePDF(g){
+  await cargarJS("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
+  await cargarJS("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+  const box=document.createElement("div");box.style.cssText="position:fixed;left:-10000px;top:0;width:794px;background:#fff;padding:0";box.innerHTML=informeHTML(g);document.body.append(box);
+  const art=box.querySelector(".inf-doc");art.style.borderRadius="0";art.style.margin="0";art.style.padding="36px";
+  box.querySelectorAll(".inf-pasos li").forEach(li=>{li.style.gridTemplateColumns="200px 1fr"});box.querySelectorAll(".inf-pasos img").forEach(im=>{im.style.width="200px";im.style.height="150px"});
+  await Promise.all([...box.querySelectorAll("img")].map(im=>im.complete?0:new Promise(r=>{im.onload=im.onerror=r})));
+  const cv=await html2canvas(art,{scale:2,backgroundColor:"#ffffff",useCORS:true});box.remove();
+  const {jsPDF}=window.jspdf,pdf=new jsPDF({unit:"pt",format:"a4"}),W=pdf.internal.pageSize.getWidth(),H=pdf.internal.pageSize.getHeight();
+  const img=cv.toDataURL("image/jpeg",.85),h=cv.height*W/cv.width;let y=0;
+  pdf.addImage(img,"JPEG",0,0,W,h);while(h+y>H+1){y-=H;pdf.addPage();pdf.addImage(img,"JPEG",0,y,W,h)}
+  return new File([pdf.output("blob")],`Informe ${g.obra} ${g.semana}.pdf`.replace(/[\\/:*?"<>|]/g,"-"),{type:"application/pdf"});
+}
+async function enviarInformePDF(btn){
+  const g=infGuardado();if(!g)return;const t=btn.textContent;btn.disabled=true;btn.textContent="Preparando PDF…";
+  try{const f=await informePDF(g);
+    if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:"Informe de avance"})}catch(e){}}
+    else{const u=URL.createObjectURL(f),a=Object.assign(document.createElement("a"),{href:u,download:f.name});document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),20000);toast("Se descargó el PDF: adjúntalo en WhatsApp")}}
+  catch(e){toast(e.message||"No se pudo crear el PDF")}
+  finally{btn.disabled=false;btn.textContent=t}
+}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-infpdfwa]");if(b)enviarInformePDF(b)});
+
+/* ===== Inicio (administrador): lo pendiente del equipo ===== */
+function pintarPendEquipo(){
+  const ini=document.querySelector('[data-sec="inicio"]');if(!ini)return;let el=$("pendEquipo");
+  const hoy=hoyISO,en=(f,d)=>{const t=new Date(hoy+"T12:00:00");t.setDate(t.getDate()+d);return f&&f<=isoDe(t)};
+  const L=!esAdmin()?[]:[
+    [(ctl.adel||[]).filter(r=>r.estado==="Pendiente").length,"adelanto(s) por aprobar","m-adel"],
+    [(ctl.lic||[]).filter(r=>r.estado==="Pendiente").length,"permiso(s) por aprobar","m-lic"],
+    [(ctl.epp||[]).filter(r=>r.reponer&&en(r.reponer,7)).length,"EPP por reponer","m-epp"],
+    [(ctl.docpers||[]).filter(r=>r.vence&&en(r.vence,30)).length,"SCTR o examen por vencer","m-docpers"]].filter(x=>x[0]>0);
+  if(!L.length){if(el)el.remove();return}
+  if(!el){const ref=$("avisoNuevos");(ref||ini.firstChild)?(ref||ini.firstElementChild).insertAdjacentHTML("afterend",`<div class="pend-eq" id="pendEquipo"></div>`):ini.insertAdjacentHTML("afterbegin",`<div class="pend-eq" id="pendEquipo"></div>`);el=$("pendEquipo")}
+  el.innerHTML=`<b>Tu equipo</b>${L.map(([n,t,k])=>`<button type="button" data-irpend="${k}"><span>${n}</span>${t}</button>`).join("")}`;
+}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-irpend]");if(b)ir(b.dataset.irpend)});
+(function(){const ap=aplicarPermisos;aplicarPermisos=function(){const r=ap.apply(this,arguments);try{pintarPendEquipo()}catch(x){}return r};
+  const irP=ir;ir=function(s){const r=irP.apply(this,arguments);if(s==="inicio")try{pintarPendEquipo()}catch(x){}return r};setTimeout(()=>{try{pintarPendEquipo()}catch(x){}},3000)})();
+document.head.insertAdjacentHTML("beforeend",`<style id="equipoCss">
+  .as-mes-cfg{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0}.as-mes-cfg input{width:120px}
+  .as-mes{display:grid;gap:8px}.as-mes-n{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+  .as-mes-n span{display:grid;justify-items:center;padding:8px 4px;border-radius:12px;background:color-mix(in srgb,var(--ink) 5%,transparent);font-size:.72rem;color:var(--muted)}
+  .as-mes-n b{font-size:1.2rem;color:var(--ink)}.as-mes-n .ok b{color:#4ade80}.as-mes-n .al b{color:#facc15}.as-mes-n .mal b{color:#f87171}
+  .as-mapa{position:relative;z-index:0;isolation:isolate;height:380px;border-radius:16px;overflow:hidden;margin:8px 0 12px;background:var(--surface)}@media (min-width:981px){.as-mapa{height:520px}}
+  .as-vivo{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .pend-eq{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 14px;padding:10px 12px;border-radius:16px;border:1px solid var(--line);background:var(--surface)}
+  .pend-eq>b{width:100%;font-size:.8rem;color:var(--muted)}
+  .pend-eq button{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:color-mix(in srgb,var(--ink) 4%,transparent);color:inherit;border-radius:999px;padding:7px 12px;font:600 .82rem var(--display,inherit)}
+  .pend-eq button span{background:#f59e0b;color:#111;border-radius:999px;min-width:20px;padding:0 6px;text-align:center}
 </style>`);
 /* ===== CBO: sala de espera para quien recién creó su cuenta y aún no tiene permisos ===== */
 function salaEspera(){
@@ -7528,6 +7630,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-vernuevo]"
   const hoy=()=>hoyISO, sumaDias=(iso,d)=>{const t=new Date(iso+"T12:00:00");t.setDate(t.getDate()+d);return t.toISOString().slice(0,10)};
   const wa=(tel,txt)=>{const t=String(tel||"").replace(/\D/g,"");return `https://wa.me/${t.length===9?"51"+t:t}?text=${encodeURIComponent(txt||"")}`};
   const trab=()=>{try{return listaTrab().map(t=>titulo(t.nombre||""))}catch{return []}};
+  const eppLista=()=>{try{const L=[...new Set(Object.keys(INV_IDX).filter(k=>k.startsWith("epp.")).map(k=>INV_IDX[k].n))];if(L.length)return L}catch{}return ["Casco","Botines de seguridad","Guantes","Lentes de seguridad","Tapones auditivos","Arnés","Chaleco reflectivo"]};
   const obras=()=>{try{return invObrasListaTodas()}catch{return []}};
   // Campos: [id, etiqueta, tipo, opciones/sugerencias, obligatorio, solo administrador]
   const DEF={
@@ -7561,7 +7664,23 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-vernuevo]"
    flota:{n:"Flota",d:"Vehículos, combustible y vencimientos",ic:'<path d="M3 16V8h11v8M14 11h4l3 3v2h-7"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/>',grupo:"Servicios",
      campos:[["placa","Vehículo o placa","texto",()=>[...new Set((ctl.flota||[]).map(x=>x.placa))],1],["tipo","Registro","estado",["Combustible","Mantenimiento","SOAT","Revisión técnica","Otro"]],["fecha","Fecha","fecha"],["km","Kilometraje","num"],["monto","Monto (S/)","monto"],["vence","Vence (SOAT, revisión)","fecha"],["nota","Nota","area"]],
      tit:r=>`${r.placa} · ${r.tipo||""}`,sub:r=>[r.fecha?fCorta(r.fecha):"",num(r.monto)?fmt(num(r.monto)):"",r.vence?"vence "+fCorta(r.vence):""].filter(Boolean).join(" · "),
-     acc:r=>[num(r.monto)>0?["gasto","Registrar como gasto"]:null]}};
+     acc:r=>[num(r.monto)>0?["gasto","Registrar como gasto"]:null]},
+   adel:{n:"Adelantos",d:"Pide un adelanto de tu pago; se descuenta en tu próximo comprobante",ic:'<circle cx="12" cy="12" r="9"/><path d="M14.5 9.5c0-1.2-1.1-2-2.5-2s-2.5.8-2.5 2 1.1 1.7 2.5 2 2.5.8 2.5 2-1.1 2-2.5 2-2.5-.8-2.5-2M12 6v1.5M12 16.5V18"/>',grupo:"Personal",mio:1,
+     campos:[["quien","Trabajador","texto",()=>trab(),1],["monto","Monto (S/)","monto",null,1],["motivo","Motivo","texto",["Pasajes","Salud","Familiar","Otro"]],["fecha","Fecha","fecha"],["estado","Estado","estado",["Pendiente","Aprobado","Rechazado","Descontado"],0,1]],
+     tit:r=>`${r.quien||""} · ${fmt(num(r.monto))}`,sub:r=>[r.motivo||"",r.fecha?fCorta(r.fecha):"",r.estado==="Aprobado"?"se descuenta en su próximo comprobante":r.estado==="Descontado"&&r.descontadoEn?"descontado en el pago al "+fCorta(r.descontadoEn):""].filter(Boolean).join(" · "),
+     acc:r=>esAdmin()&&r.estado==="Pendiente"?[["aprobar","Aprobar"],["rechazar","Rechazar"]]:[]},
+   lic:{n:"Permisos y faltas",d:"Pide permiso o avisa una falta justificada",ic:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4M9 15l2 2 4-4"/>',grupo:"Personal",mio:1,
+     campos:[["quien","Trabajador","texto",()=>trab(),1],["tipo","Tipo","tipo",["Permiso","Descanso médico","Vacaciones","Duelo","Otro"]],["desde","Desde","fecha",null,1],["hasta","Hasta (si es más de un día)","fecha"],["motivo","Motivo","area"],["foto","Constancia (opcional)","foto"],["estado","Estado","estado",["Pendiente","Aprobado","Rechazado"],0,1]],
+     tit:r=>`${r.quien||""} · ${r.tipo||"Permiso"}`,sub:r=>`${fCorta(r.desde)}${r.hasta&&r.hasta!==r.desde?" al "+fCorta(r.hasta):""}${r.motivo?" · "+r.motivo:""}`,
+     acc:r=>esAdmin()&&r.estado==="Pendiente"?[["aprobar","Aprobar"],["rechazar","Rechazar"]]:[]},
+   epp:{n:"Entrega de EPP",d:"Qué EPP recibió cada trabajador, con su firma",ic:'<path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/>',grupo:"Personal",mio:1,
+     campos:[["quien","Trabajador","texto",()=>trab(),1],["item","EPP entregado","texto",()=>eppLista(),1],["cant","Cantidad","num"],["fecha","Fecha de entrega","fecha"],["reponer","Reponer el","fecha"],["obra","Obra","texto",()=>obras()],["nota","Nota","area"]],
+     tit:r=>`${r.quien||""} · ${r.item||""}${num(r.cant)>1?" ×"+num(r.cant):""}`,sub:r=>[r.fecha?fCorta(r.fecha):"",r.firma?"✓ firmado":"falta su firma",r.reponer?(r.reponer<=hoy()?"¡toca reponer!":"reponer el "+fCorta(r.reponer)):""].filter(Boolean).join(" · "),
+     acc:r=>[!r.firma?["firmar","Firmar entrega"]:["verfirma","Ver firma"]]},
+   docpers:{n:"SCTR y exámenes",d:"Vencimientos del SCTR y exámenes médicos de cada trabajador",ic:'<rect x="4" y="5" width="16" height="16" rx="2"/><path d="M9 3h6v4H9zM12 10v6M9 13h6"/>',grupo:"Personal",
+     campos:[["quien","Trabajador","texto",()=>trab(),1],["tipo","Documento","tipo",["SCTR salud","SCTR pensión","Examen médico","Otro"]],["vence","Vence","fecha",null,1],["foto","Constancia (opcional)","foto"],["nota","Nota","area"]],
+     tit:r=>`${r.quien||""} · ${r.tipo||""}`,sub:r=>{if(!r.vence)return "";const d=Math.round((new Date(r.vence+"T12:00:00")-new Date(hoy()+"T12:00:00"))/864e5);return d<0?`venció hace ${-d} ${-d===1?"día":"días"}`:d<=30?`vence en ${d} ${d===1?"día":"días"} (${fCorta(r.vence)})`:`vence el ${fCorta(r.vence)}`},
+     acc:r=>[]}};
   window.CBO_MOD_DEF=DEF;
   const clientes=()=>[...new Set([...(ctl.crm||[]).map(x=>x.nombre),...(ctl.presup||[]).map(x=>x.cliente),...(typeof rows!=="undefined"?rows.filter(r=>r.tipo==="ingreso").map(r=>r.desc):[])].filter(Boolean))].slice(0,60);
   const proveedores=()=>[...new Set([...(ctl.compras||[]).map(x=>x.prov),...(typeof rows!=="undefined"?rows.filter(r=>r.tipo==="gasto").map(r=>r.desc):[])].filter(Boolean))].slice(0,60);
@@ -7604,10 +7723,10 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-vernuevo]"
   document.body.insertAdjacentHTML("beforeend",`<div class="overlay" id="ovMdl" hidden><form class="sheet" id="mdlForm" novalidate></form></div>`);
   let edit=null,modK="";
   function abrir(k,r,pre){modK=k;edit=r||null;const D=DEF[k],v=Object.assign({fecha:hoy(),estado:((D.campos.find(c=>c[0]==="estado")||[])[3]||[])[0]||""},pre||{},r||{});
-    if(k==="gastos"&&!r&&!pre)v.quien=titulo(quien||"");
+    if(D.mio&&!r&&!pre)v.quien=titulo(quien||"");
     const campo=c=>{const [id,lb,t,op,ob,soloAdm]=c,val=v[id]==null?"":String(v[id]);if(soloAdm&&!esAdmin())return "";
       const lst=typeof op==="function"?op():op,dl=lst&&t!=="estado"?`<datalist id="mdlL-${id}">${lst.map(x=>`<option value="${escA(x)}">`).join("")}</datalist>`:"";
-      if(t==="estado")return `<label class="mdl-l">${lb}<select id="mdlF-${id}">${lst.map(x=>`<option${x===val?" selected":""}>${esc(x)}</option>`).join("")}</select></label>`;
+      if(t==="estado"||t==="tipo")return `<label class="mdl-l">${lb}<select id="mdlF-${id}">${lst.map(x=>`<option${x===val?" selected":""}>${esc(x)}</option>`).join("")}</select></label>`;
       if(t==="area")return `<label class="mdl-l">${lb}${ob?" *":""}<textarea id="mdlF-${id}" rows="3" maxlength="600">${esc(val)}</textarea></label>`;
       if(t==="foto")return `<div class="mdl-l">${lb}<div class="line"><input type="file" accept="image/*" id="mdlF-${id}"></div>${val?`<img class="mdl-foto" alt="" src="${val}" id="mdlFv-${id}">`:""}</div>`;
       const ty=t==="fecha"?"date":t==="hora"?"time":"text",im=t==="monto"?' inputmode="decimal"':t==="num"||t==="tel"?' inputmode="numeric"':"";
@@ -7619,7 +7738,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-vernuevo]"
       if(c[2]==="foto"){const f=el.files&&el.files[0];if(f)r[c[0]]=await fotoLiviana(f);continue}
       r[c[0]]=c[2]==="monto"?num(el.value):String(el.value||"").trim();
       if(c[4]&&!r[c[0]]){const m=$("mdlErr");m.textContent=`Falta: ${c[1].toLowerCase()}.`;m.hidden=false;el.focus();return}}
-    if(modK==="gastos"&&!edit&&!r.estado)r.estado="Pendiente";
+    if((D.campos.some(c=>c[0]==="estado"))&&D.mio&&!edit&&!r.estado)r.estado="Pendiente";
     cerrarOv("ovMdl");ctlGuardarRec(modK,r);toast(edit?"Cambios guardados":"Guardado");pintar(modK)});
   async function accion(k,r,a){
     if(a==="wa"){const t=k==="presup"?`Hola ${r.cliente||""}, te envío el presupuesto de Casa Bonita Oregón:\n${r.trabajo}\nTotal: ${fmt(num(r.monto))}${r.validez?"\nVálido hasta el "+fCorta(r.validez):""}${r.nota?"\n"+r.nota:""}`:`Hola ${r.nombre||r.cliente||""}, te escribe Casa Bonita Oregón.`;window.open(wa(r.tel,t),"_blank");if(k==="presup"&&r.estado==="Borrador"){r.estado="Enviado";ctlGuardarRec(k,r)}return}
@@ -7630,7 +7749,10 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-vernuevo]"
     if(k==="crm"&&a==="presup"){ir("m-presup");abrir("presup",null,{cliente:r.nombre,tel:r.tel});if(!["Ganado","Perdido"].includes(r.estado)){r.estado="Presupuesto";ctlGuardarRec("crm",r)}return}
     if(a==="llego"){r.estado="Llegó";ctlGuardarRec(k,r);toast("Marcado como recibido");pintar(k);return}
     if(a==="inv"){invObra=r.obra;guardarLS(INV_OBRA,invObra);ir("inventario");toast("Elige la pieza y registra que entró a la obra");return}
-    if(a==="aprobar"){r.estado="Aprobado";ctlGuardarRec(k,r);pintar(k);return}
+    if(a==="aprobar"){r.estado="Aprobado";ctlGuardarRec(k,r);pintar(k);toast("Aprobado");return}
+    if(a==="rechazar"){if(!await cboConfirmar("¿Rechazar esta solicitud?",{titulo:"Rechazar",si:"Rechazar",no:"Cancelar"}))return;r.estado="Rechazado";ctlGuardarRec(k,r);pintar(k);return}
+    if(a==="firmar"){const f=await pedirFirma(r.quien||quien);if(!f)return;r.firma=f;r.firmado=hoy();ctlGuardarRec(k,r);pintar(k);toast("Entrega firmada");return}
+    if(a==="verfirma"){const w=$("verFirmaEpp")||document.body.appendChild(Object.assign(document.createElement("div"),{id:"verFirmaEpp",className:"hu-sim"}));w.innerHTML=`<div class="hu-card"><b>Firma de ${esc(r.quien||"")}</b><small>${esc(r.item||"")} · ${fCorta(r.firmado||r.fecha)}</small><img src="${r.firma}" alt="Firma" style="width:100%;background:#fff;border-radius:10px;margin:10px 0"><button type="button" class="btn" id="verFirmaOk">Listo</button></div>`;w.hidden=false;$("verFirmaOk").onclick=()=>w.hidden=true;return}
     if(a==="gasto"||a==="cobro"){const ing=a==="cobro";
       openF({r:{tipo:ing?"ingreso":"gasto",monto:num(r.monto),desc:ing?r.cliente:(r.prov||r.quien||r.placa||""),obra:r.obra||"",comprobante:"ninguno"}});
       if(k==="gastos"||k==="compras"){r.estado="Pagado";ctlGuardarRec(k,r)}return}
