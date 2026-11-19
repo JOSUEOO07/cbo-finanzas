@@ -890,6 +890,12 @@ body.deco-mov h1.deco-h1::after{animation:flotar 3s ease-in-out infinite}
 
 /* ===== Configuración compacta (se toca y se despliega) ===== */
 .cfg-lista{display:grid;gap:8px;max-width:760px}
+/* Computadora: Configuración usa todo el ancho, en tarjetas por columnas */
+@media (min-width:981px){
+  .cfg-lista:not(.cfg-sub){max-width:none;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;align-items:stretch}
+  .cfg-lista:not(.cfg-sub)>.cfg-grupo{grid-column:1/-1;margin-top:14px}
+  .cfg-lista:not(.cfg-sub)>.cfg-item>summary{min-height:76px;height:100%}
+}
 .cfg-grupo{margin:12px 4px 2px;font-size:.7rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .cfg-grupo:first-child{margin-top:0}
 .cfg-item{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden}
@@ -3308,12 +3314,33 @@ async function recordarCorreo(correo, r, pin) {
   try { if (!r || !r.usuario || !pin) return; const sal = b64u(reto());
     accPoner(r.usuario, {correo:String(correo || "").trim().toLowerCase(), nombre:r.usuario, s:sal, h:await hashLocal(sal, pin), t:r.token || "", ses:{admin:!!r.admin, ocultas:r.ocultas || [], descargar:!!r.descargar}}); } catch (e) {}
 }
+// Respuestas de "¿este correo tiene cuenta?" pedidas por adelantado (válidas 2 minutos)
+const estadoCache = new Map();
+function estadoAnticipado(c) {
+  c = String(c || "").trim().toLowerCase();
+  const x = estadoCache.get(c);
+  if (x && Date.now() - x.t < 120000) return x.p;
+  const p = api("estadoCorreo", {correo:c});
+  estadoCache.set(c, {t:Date.now(), p});
+  p.catch(() => estadoCache.delete(c));
+  return p;
+}
 function invitacionCorreoActual() {
   const guardada = leerLS(invitacionCorreoKey, null);
   return guardada && guardada.url === cfg?.url ? guardada.token : "";
 }
 let sesion=leerLS(SES_K,null); if(!(sesion&&sesion.u&&sesion.t))sesion=null;
+// Vista previa (modo de prueba sin servidor): la entrada con correo y PIN funciona simulada en este equipo
+async function demoCorreo(a,x){
+  await new Promise(r=>setTimeout(r,120));
+  if(a==="estadoAcceso"||a==="cerrarMiSesion")return{ok:true,correo:true};
+  const c=String(x.correo||"").trim().toLowerCase(),acc=accPorCorreo(c);
+  if(a==="estadoCorreo")return{ok:true,registro:!acc,nombre:acc?acc.nombre||acc.u:""};
+  if(a==="registrarCorreo"){if(acc){const e=new Error("Este correo ya está registrado");e.code="dup";throw e}const u=String(x.nombre||"").trim().toUpperCase();return{ok:true,usuario:u,token:"correo~"+u+"~demo~x",admin:false,ocultas:[],descargar:false}}
+  if(a==="entrarCorreo"){if(acc&&acc.s&&acc.h&&await hashLocal(acc.s,x.pin)===acc.h)return{ok:true,usuario:acc.u,token:"correo~"+acc.u+"~demo~x",admin:!!(acc.ses&&acc.ses.admin),ocultas:(acc.ses&&acc.ses.ocultas)||[],descargar:false};const e=new Error(acc?"PIN incorrecto":"Revisa el PIN o crea tu cuenta si es tu primer acceso");e.code="pin";throw e}
+}
 async function api(accion,extra,conf){
+  if(!conf&&typeof esDemo==="function"&&esDemo()&&/^(estadoAcceso|estadoCorreo|registrarCorreo|entrarCorreo|cerrarMiSesion)$/.test(accion))return demoCorreo(accion,extra||{});
   const ob=null, deOb=false; // CBO: un solo servidor para todo
   const c=conf||(deOb?ob:cfg);
   if(typeof tokPend!=="undefined"&&tokPend&&accion!=="entrar"&&accion!=="entrarCorreo"&&accion!=="comoUsuario"&&!conf&&sesion&&!sesion.t){try{await tokPend}catch(e){}}   // espera la sesión que se está pidiendo por detrás
@@ -3651,6 +3678,15 @@ function abrirAccesoCorreo() {
   confirmacion.hidden = true;
   form.hidden = false;
   mostrarPaso("correo");
+  // Cada vez que se abre la entrada, el botón vuelve a estar activo (antes podía quedar trabado de un intento anterior)
+  ocupado = false; aceptar.disabled = false; cambiar.disabled = false; form.inert = false;
+  // Despierta al servidor apenas se abre la entrada (la primera consulta del día es la más lenta)
+  if (!esDemo()) api("estadoAcceso").catch(() => {});
+  correo.addEventListener("input", () => {
+    clearTimeout(correo.__pre);
+    const c = correo.value.trim().toLowerCase();
+    if (/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/.test(c) && !accPorCorreo(c)) correo.__pre = setTimeout(() => estadoAnticipado(c).catch(() => {}), 250);
+  });
 
   function datosCorreo() {
     return {correo:correo.value.trim(), confirmacion:confirmacionActual, invitacion:invitacionCorreoActual()};
@@ -3660,7 +3696,7 @@ function abrirAccesoCorreo() {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo.value.trim())) { aviso.textContent = "Escribe un correo válido, por ejemplo nombre@gmail.com"; return; }
     // CBO: sin enlace. Si el correo ya tiene cuenta pide el PIN; si no, nombres, apellidos y PIN nuevo
     const conocido = accPorCorreo(correo.value.trim());
-    const estado = conocido ? {registro:false, nombre:conocido.nombre || conocido.u} : await api("estadoCorreo", {correo:correo.value.trim()});
+    const estado = conocido ? {registro:false, nombre:conocido.nombre || conocido.u} : await estadoAnticipado(correo.value.trim());
     nombreExistente = estado.nombre || "";
     mostrarPaso(estado.registro ? "perfil" : "entrar");
     if (!estado.registro) setTimeout(() => { if (paso === "entrar" && !ocupado) form.requestSubmit(); }, 60);
@@ -3719,11 +3755,12 @@ function abrirAccesoCorreo() {
     confirmacion.hidden = false;
     ir("inicio");
     if (!medios.matches) {
-      await confirmacion.animate(
+      const tope = ms => new Promise(r => setTimeout(r, ms));
+      await Promise.race([confirmacion.animate(
         [{opacity:.12,transform:"translateY(8px)"},{opacity:1,transform:"none",offset:.5},{opacity:1,transform:"none"}],
         {duration:175,easing:"ease-out"}
-      ).finished.catch(() => {});
-      await $("ovQuien").animate([{opacity:1},{opacity:0}], {duration:105,easing:"ease-in-out"}).finished.catch(() => {});
+      ).finished.catch(() => {}), tope(260)]);
+      await Promise.race([$("ovQuien").animate([{opacity:1},{opacity:0}], {duration:105,easing:"ease-in-out"}).finished.catch(() => {}), tope(160)]);
     }
     cerrarOv("ovQuien");
     form.reset();
@@ -3787,7 +3824,7 @@ function abrirAccesoCorreo() {
         tokPend.catch(() => {});
       } else recordarCorreo(datos.correo, resultado, pinUsado);
       await mostrarInicio(resultado, nombre);
-    } catch(error) { aviso.textContent = error.message; }
+    } catch(error) { aviso.textContent = esErrorRed(error) ? "No hay conexión con el servidor. Revisa tu internet e intenta otra vez." : error.message; }
     finally { bloquear(false); }
   };
 }
@@ -7015,6 +7052,15 @@ async function buscarEnMapa(v){
 /* ===== CBO: Documentos SST como sección propia (mismo diseño que los módulos). Archivos en documentos/docs/ ===== */
 let DOCS_CBO=null,docsF="",docsQ="";
 const DOCS_SEC={gasfiteria:"Gasfitería",electricidad:"Electricidad",generales:"Generales"};
+const DOCS_IC={
+  todos:'<svg viewBox="0 0 24 24"><path d="M4 6a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg>',
+  gasfiteria:'<svg viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg>',
+  electricidad:'<svg viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>',
+  generales:'<svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>',
+  doc:'<svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h4"/></svg>',
+  pdf:'<svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></svg>',
+  wa:'<svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 1-11.8 7L4 20l1.1-4A8 8 0 1 1 20 12z"/></svg>',
+  word:'<svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M9.5 12l1.2 5 1.3-4 1.3 4 1.2-5"/></svg>'};
 function docsFav(){return leerLS("cbo-doc-fav",[])}
 function docsAbrir(){
   const el=$("docsCbo");if(!el)return;
@@ -7028,8 +7074,8 @@ function docsPintar(){
   const fav=docsFav(),n=k=>DOCS_CBO.filter(d=>d.seccion===k).length;
   // La cabecera y el buscador se arman una sola vez (así el teclado no pierde la casilla); luego solo cambia la lista
   if(!$("docsLista")){
-    el.innerHTML=`<div class="mdl-cab"><div class="mdl-res"><div class="mdl-kpi"><small>Documentos</small><b>${DOCS_CBO.length}</b></div><div class="mdl-kpi"><small>Gasfitería</small><b>${n("gasfiteria")}</b></div><div class="mdl-kpi"><small>Electricidad</small><b>${n("electricidad")}</b></div><div class="mdl-kpi"><small>Generales</small><b>${n("generales")}</b></div></div></div>
-    <div class="mdl-fil"><input class="mdl-q" id="docsQ" placeholder="Buscar documento…" maxlength="40"><div class="mdl-chips">${[["","Todos"],["gasfiteria","Gasfitería"],["electricidad","Electricidad"],["generales","Generales"],["fav","★ Favoritos"]].map(([k,t])=>`<button type="button" data-docf="${k}">${t}</button>`).join("")}</div></div>
+    el.innerHTML=`<div class="mdl-cab"><div class="mdl-res docs-res">${[["","Documentos",DOCS_CBO.length],["gasfiteria","Gasfitería",n("gasfiteria")],["electricidad","Electricidad",n("electricidad")],["generales","Generales",n("generales")]].map(([k,t,v])=>`<button type="button" class="mdl-kpi docs-kpi docs-c-${k||"todos"}" data-docf="${k}"><i>${DOCS_IC[k||"todos"]}</i><small>${t}</small><b>${v}</b></button>`).join("")}</div></div>
+    <div class="mdl-fil"><input class="mdl-q" id="docsQ" placeholder="Buscar documento…" maxlength="40"><div class="mdl-chips">${[["","Todos"],["gasfiteria","Gasfitería"],["electricidad","Electricidad"],["generales","Generales"],["fav","★ Favoritos"]].map(([k,t])=>`<button type="button" data-docf="${k}" class="docs-chip docs-c-${k||"todos"}">${t}</button>`).join("")}</div></div>
     <div id="docsLista"></div>`;
   }
   el.querySelectorAll("[data-docf]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.docf===docsF)));
@@ -7037,8 +7083,8 @@ function docsPintar(){
   let L=DOCS_CBO.filter(d=>docsF==="fav"?fav.includes(d.id):!docsF||d.seccion===docsF);
   if(q)L=L.filter(d=>q.split(/\s+/).every(p=>sinTildes(`${d.titulo} ${d.id} ${d.grupo} ${DOCS_SEC[d.seccion]||""}`).includes(p)));
   const grupos=[];L.forEach(d=>{const g=(DOCS_SEC[d.seccion]||"")+" · "+d.grupo;let x=grupos.find(y=>y[0]===g);if(!x)grupos.push(x=[g,[]]);x[1].push(d)});
-  $("docsLista").innerHTML=grupos.length?grupos.map(([g,ds])=>`<p class="pal-t docs-g">${esc(g)}</p><div class="mdl-lista">${ds.map(d=>`<article class="panel mdl-it docs-it" data-docid="${escA(d.id)}"><div class="mdl-tx"><b>${esc(d.titulo)}</b><small>${esc(d.id)} · ${d.paginas} pág${d.paginas>1?"s":""}.</small></div><button type="button" class="docs-fav${fav.includes(d.id)?" on":""}" data-docfav aria-label="Favorito">★</button>
-      <div class="mdl-acc"><button type="button" class="btn2" data-docacc="ver">Ver PDF</button><button type="button" class="btn2" data-docacc="enviar">Enviar</button><button type="button" class="btnlink" data-docacc="word">Word</button></div></article>`).join("")}</div>`).join(""):`<p class="hint" style="margin:18px 4px">${docsF==="fav"?"Aún no tienes favoritos. Toca ★ en un documento.":"No hay documentos con esa búsqueda."}</p>`;
+  $("docsLista").innerHTML=grupos.length?grupos.map(([g,ds])=>`<p class="pal-t docs-g">${esc(g)}</p><div class="mdl-lista">${ds.map(d=>`<article class="panel mdl-it docs-it" data-docid="${escA(d.id)}"><span class="docs-ic docs-c-${d.seccion}" aria-hidden="true">${DOCS_IC.doc}</span><div class="mdl-tx"><b>${esc(d.titulo)}</b><small>${esc(d.id)} · ${d.paginas} pág${d.paginas>1?"s":""}.</small></div><button type="button" class="docs-fav${fav.includes(d.id)?" on":""}" data-docfav aria-label="Favorito">★</button>
+      <div class="mdl-acc"><button type="button" class="btn2 docs-b docs-b-pdf" data-docacc="ver">${DOCS_IC.pdf}Ver PDF</button><button type="button" class="btn2 docs-b docs-b-wa" data-docacc="enviar">${DOCS_IC.wa}Enviar</button><button type="button" class="btn2 docs-b docs-b-word" data-docacc="word">${DOCS_IC.word}Word</button></div></article>`).join("")}</div>`).join(""):`<p class="hint" style="margin:18px 4px">${docsF==="fav"?"Aún no tienes favoritos. Toca ★ en un documento.":"No hay documentos con esa búsqueda."}</p>`;
 }
 const docsBlob=new Map();
 function docsTraer(id,ext){const k=id+"."+ext;if(!docsBlob.has(k))docsBlob.set(k,fetch(`documentos/docs/${encodeURIComponent(id)}.${ext}`).then(r=>{if(!r.ok)throw new Error(r.status);return r.blob()}).catch(e=>{docsBlob.delete(k);throw e}));return docsBlob.get(k)}
@@ -7061,6 +7107,22 @@ document.addEventListener("click",e=>{
 });
 document.head.insertAdjacentHTML("beforeend",`<style id="docsCboCss">
   .docs-g{margin:16px 2px 8px}
+  #docsCbo{--c-gas:#38bdf8;--c-ele:#facc15;--c-gen:#a78bfa;--c-todos:#60a5fa}
+  #docsCbo .docs-c-todos{--c:var(--c-todos)}#docsCbo .docs-c-gasfiteria{--c:var(--c-gas)}#docsCbo .docs-c-electricidad{--c:var(--c-ele)}#docsCbo .docs-c-generales{--c:var(--c-gen)}
+  #docsCbo svg{fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .docs-res{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  @media (min-width:981px){.docs-res{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+  .docs-kpi{position:relative;text-align:left;color:inherit;font:inherit;cursor:pointer;padding-left:52px!important;min-height:58px;align-content:center;
+    background:linear-gradient(135deg,color-mix(in srgb,var(--c) 16%,var(--surface)),var(--surface))!important;border-color:color-mix(in srgb,var(--c) 35%,var(--line))!important}
+  .docs-kpi i{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:30px;height:30px;border-radius:10px;display:grid;place-items:center;color:var(--c);background:color-mix(in srgb,var(--c) 20%,transparent)}
+  .docs-kpi i svg{width:18px;height:18px}.docs-kpi b{color:var(--c)}
+  .docs-chip[aria-pressed="true"]{background:var(--c)!important;color:#0b0d10!important;border-color:transparent!important}
+  .docs-chip:not([aria-pressed="true"])::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--c);margin-right:6px;vertical-align:middle}
+  .docs-ic{grid-column:1;grid-row:1;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;color:var(--c);background:color-mix(in srgb,var(--c) 18%,transparent);border:1px solid color-mix(in srgb,var(--c) 35%,transparent)}
+  .docs-ic svg{width:22px;height:22px}
+  .docs-it .mdl-tx small{color:color-mix(in srgb,var(--c-todos) 70%,var(--muted))}
+  .docs-b{display:inline-flex;align-items:center;gap:6px}.docs-b svg{width:16px;height:16px}
+  .docs-b-pdf svg{color:#f87171}.docs-b-wa svg{color:#4ade80}.docs-b-word svg{color:#60a5fa}
   .docs-it{position:relative}.docs-it .mdl-tx{padding-right:34px}
   .docs-fav{position:absolute;top:10px;right:10px;width:32px;height:32px;border:0;border-radius:50%;background:none;color:inherit;opacity:.35;font-size:1.1rem;cursor:pointer}
   .docs-fav.on{opacity:1;color:#f5c542}
