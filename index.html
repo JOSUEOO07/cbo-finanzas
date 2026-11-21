@@ -2343,7 +2343,7 @@ function filaMov(r,acc){
   const compTxt={factura:"Factura",boleta:"Boleta",ninguno:"Sin comprobante"};
   const c=r.tipo==="ingreso"?"in":"out"; const [y,m,d]=r.fecha.split("-");
   const html=`<div class="item tap" role="button" tabindex="0" data-id="${esc(r.id)}" aria-label="Ver ${esc(r.desc||r.categoria)}, ${fmt(r.monto)}"><div class="ic ${c}"><span class="${c}">${c==="in"?"+":"−"}</span></div>
-    <div class="desc"><b>${esc(r.desc||r.categoria)}</b><small><span>${esc(r.categoria)}</span><span>${d}/${m}/${y}</span>${r.por?`<span>· ${esc(nomCorto(r.por))}</span>`:""}${r.pendiente?`<span class="tag pend">${navigator.onLine?"⏳ Guardando…":"⏳ Por enviar"}</span>`:""}${esPagoSun(r)?`<span class="tag sun">Pago SUNAT${r.numero?" · orden "+esc(r.numero):""}</span>`:`<span class="tag">${compTxt[r.comprobante||"ninguno"]}${r.serie?" "+esc(r.serie)+"-"+esc(r.numero):""}</span>`}${r.detraccion?`<span class="tag det">Detracción ${fmt(r.detMonto||0)}</span>`:""}</small></div>
+    <div class="desc"><b>${esc(r.desc||r.categoria)}</b><small><span>${esc(r.categoria)}</span><span>${d}/${m}/${y}</span>${r.por?`<span>· ${esc(nomCorto(r.por))}</span>`:""}${r.pendiente&&colaVisible()?`<span class="tag pend">${navigator.onLine?"⚠️ Sin guardar":"📶 Sin internet"}</span>`:""}${esPagoSun(r)?`<span class="tag sun">Pago SUNAT${r.numero?" · orden "+esc(r.numero):""}</span>`:`<span class="tag">${compTxt[r.comprobante||"ninguno"]}${r.serie?" "+esc(r.serie)+"-"+esc(r.numero):""}</span>`}${r.detraccion?`<span class="tag det">Detracción ${fmt(r.detMonto||0)}</span>`:""}</small></div>
     <div class="amt ${c}">${c==="in"?"+":"−"} ${fmt(r.monto)}</div>
     <span class="chev" aria-hidden="true">›</span></div>`;
   return acc?`<div class="swipe" data-id="${esc(r.id)}"><div class="acc"><button type="button" data-a="editar">✎<span>Editar</span></button><button type="button" data-a="repetir">↻<span>Repetir</span></button><button type="button" data-a="borrar">🗑<span>Borrar</span></button></div>${html}</div>`:html;
@@ -3440,13 +3440,19 @@ function conCola(base){
 // Quita marcas internas de la app antes de guardar o enviar
 const limpioReg=r=>{const c=Object.assign({},r);["id","pendiente","creado"].forEach(k=>delete c[k]);return c};
 function encolar(op){if(op.registro)op.registro=limpioReg(op.registro);op.t=Date.now();try{cola=leerLS(colaDeSesion(sesion),[])}catch{}cola.push(op);guardarCola();rows=conCola(servidorRows);render()}
+// El guardado es silencioso. El aviso solo sale si algo lleva 3 minutos sin guardarse (con o sin internet),
+// para que nunca se pierda nada sin que lo sepas (pedido de Josué: antes de eso, nada).
+function colaTrabada(){return cola.some(o=>Date.now()-(+o.t||Date.now())>180000)}
+function colaVisible(){return !!cola.length&&colaTrabada()}
 function pintarCola(){
   const n=cola.length, el=$("colaAviso"); if(!el)return;
-  el.hidden=!n;
-  el.innerHTML=!n?"":(enviando&&navigator.onLine)?`⏳ Guardando en Google · <b>${n}</b> cambio${n===1?"":"s"} en camino… puedes seguir usando la app`
-    :`⏳ <b>${n}</b> cambio${n===1?"":"s"} por enviar · se enviará${n===1?"":"n"} solo${n===1?"":"s"} cuando haya internet <button type="button" class="btnlink" id="colaReintentar">Enviar ahora</button>`;
-  const b=$("colaReintentar"); if(b) b.onclick=()=>cargar();
+  const ver=colaVisible(); el.hidden=!ver;
+  el.innerHTML=!ver?"":!navigator.onLine?`📶 Sin internet · <b>${n}</b> cambio${n===1?"":"s"} guardado${n===1?"":"s"} en el celular. Se suben solos al volver la señal.`
+    :`⚠️ <b>${n}</b> cambio${n===1?"":"s"} aún no se guarda${n===1?"":"n"} en Google <button type="button" class="btnlink" id="colaReintentar">Reintentar</button>`;
+  const b=$("colaReintentar"); if(b) b.onclick=()=>{reintentos=0;cargar()};
 }
+window.addEventListener("offline",()=>{try{pintarCola();render()}catch{}});
+setInterval(()=>{if(cola.length){pintarCola();try{render()}catch{}}},30000);
 // ¿Ya está en Google? (mismo tipo, fecha, monto, comprobante, RUC y descripción)
 const mismoReg=(a,b)=>a.tipo===b.tipo&&a.fecha===b.fecha&&Math.abs((+a.monto||0)-(+b.monto||0))<=0.05
   &&String(a.serie||"")===String(b.serie||"")&&String(a.numero||"")===String(b.numero||"")
@@ -3459,11 +3465,17 @@ function quitarOp(op){const keep=cola.filter(o=>o!==op&&!mismaOp(o,op));releerCo
   // lo que se cambió en memoria (ids reales) se conserva
   cola=cola.map(o=>keep.find(k=>mismaOp(k,o))||o);guardarCola()}
 window.addEventListener("storage",e=>{if(e.key===colaDeSesion(sesion)){releerCola();rows=conCola(servidorRows);try{render()}catch{}pintarCola()}});
+// Sin candado entre ventanas: una ventana pausada en segundo plano lo dejaba tomado y nada se enviaba.
+// Los duplicados los evita el servidor con la huella única (uid) de cada registro.
+let reintentoT=null,reintentos=0;
 async function enviarCola(){
   if(enviando||!sesion||esDemo())return;
-  // Una sola ventana envía a la vez (app instalada + pestaña de Chrome no mandan lo mismo dos veces)
-  if(navigator.locks&&navigator.locks.request)return navigator.locks.request("cbo-cola-envio",{ifAvailable:true},l=>l?enviarColaYa():null);
-  return enviarColaYa();
+  await enviarColaYa();
+  releerCola();
+  clearTimeout(reintentoT);
+  // Si quedó algo y hay señal, se reintenta en segundos (3 s, 8 s, 20 s, luego cada 30 s), no al minuto
+  if(cola.length&&navigator.onLine){const d=[3000,8000,20000][reintentos]||30000;reintentos++;reintentoT=setTimeout(()=>{enviarCola().then(()=>{releerCola();if(!cola.length)cargar()})},d)}
+  else reintentos=0;
 }
 async function enviarColaYa(){
   releerCola();
@@ -5292,7 +5304,7 @@ if("serviceWorker" in navigator){
   });
   // Aviso naranja en Movimientos si hay registros por enviar
   setInterval(()=>{const m=tb.querySelector('[data-tab="movimientos"]'); if(!m) return; let bd=m.querySelector(".badge");
-    const n=(typeof cola!=="undefined"&&cola.length)||0; if(!n){if(bd)bd.remove();return}
+    const n=(typeof cola!=="undefined"&&colaVisible()&&cola.length)||0; if(!n){if(bd)bd.remove();return}
     if(!bd){bd=document.createElement("span");bd.className="badge";m.appendChild(bd)} bd.textContent=n>9?"9+":n;},1500);
 })();
 
@@ -5325,7 +5337,7 @@ function pintarUD(){
   // Saludo (con lo importante del día en una línea)
   const h=new Date().getHours(), sal=h<12?"Buenos días":h<19?"Buenas tardes":"Buenas noches", ra=racha();
   const mHoy=addMes(hoyISO.slice(0,7),-1), viHoy=vencInfo(mHoy), tHoy=impuestos(mHoy), pendHoy=r2(tHoy.tot-pagadoSun(mHoy)), fr=[];
-  if(cola.length) fr.push(`<b>${cola.length}</b> por enviar al Excel`);
+  if(colaVisible()) fr.push(`<b>${cola.length}</b> ${navigator.onLine?"sin guardar todavía":"esperando internet"}`);
   const hc=leerLS("cbo-hoy",{d:"",n:0}); if(!fr.length) fr.push(hc.d===hoyISO&&hc.n?`Hoy registraste ${hc.n} movimiento${hc.n>1?"s":""}`:"Aún no registras nada hoy");
   $("udSal").innerHTML=`<div><h2>${sal}, ${esc(nomCorto(quien)||"")}</h2><p>${fr.join(" · ")}</p></div>${ra>=2?`<span class="racha">🔥 ${ra} días seguidos</span>`:""}`;
   // Utilidad (tarjeta principal)
@@ -5378,7 +5390,7 @@ function pintarUDAct(S){
     const L=delMes(mes).slice().sort((a,b)=>b.fecha.localeCompare(a.fecha)||(b.creado||0)-(a.creado||0)).slice(0,5);
     body=L.map(r=>{const c=r.tipo==="ingreso"?"in":"out", [y,m,d]=r.fecha.split("-");
       const sub=esPagoSun(r)?"Pago a SUNAT":esPlanilla(r)?`Planilla${r.horas?" · "+r.horas+" h":""}`:`${{factura:"Factura",boleta:"Boleta",ninguno:"Sin comprobante"}[r.comprobante||"ninguno"]}${r.serie?" "+r.serie+"-"+r.numero:""}`;
-      return `<button type="button" class="ud-it" data-udmov="${esc(r.id)}"><span class="ud-ini" style="background:linear-gradient(135deg,${udCol(r.desc||r.categoria)})">${esc(udIni(r.desc||r.categoria))}</span><span class="tx"><b>${esc(titulo(r.desc||r.categoria))}</b><small>${esc(sub)}${r.por?" · "+esc(nomCorto(r.por)):""}${r.pendiente?(navigator.onLine?" · guardando…":" · por enviar"):""}</small></span><span class="m ${c}">${c==="in"?"+":"−"} ${r.monto.toLocaleString("es-PE",{minimumFractionDigits:2,maximumFractionDigits:2})}<small>${r.fecha===hoyISO?"hoy":+d+" "+MESES[+m-1].slice(0,3)}</small></span></button>`}).join("");
+      return `<button type="button" class="ud-it" data-udmov="${esc(r.id)}"><span class="ud-ini" style="background:linear-gradient(135deg,${udCol(r.desc||r.categoria)})">${esc(udIni(r.desc||r.categoria))}</span><span class="tx"><b>${esc(titulo(r.desc||r.categoria))}</b><small>${esc(sub)}${r.por?" · "+esc(nomCorto(r.por)):""}${r.pendiente&&colaVisible()?(navigator.onLine?" · sin guardar":" · sin internet"):""}</small></span><span class="m ${c}">${c==="in"?"+":"−"} ${r.monto.toLocaleString("es-PE",{minimumFractionDigits:2,maximumFractionDigits:2})}<small>${r.fecha===hoyISO?"hoy":+d+" "+MESES[+m-1].slice(0,3)}</small></span></button>`}).join("");
     if(L.length) body+=`<button type="button" class="ud-mas" data-udver="todos">Ver todos los movimientos ›</button>`;
   }else if(udTab==="gas"){
     const pc={}; S.gas.forEach(r=>pc[r.categoria]=(pc[r.categoria]||0)+r.monto);
@@ -6259,7 +6271,7 @@ const invOrden=(a,b)=>String(b.fecha||"").localeCompare(String(a.fecha||""))||(b
 function invFilasMov(L){
   return L.map(m=>{const it=INV_IDX[m.item]||{n:m.item,u:"und",g:{n:"",c:"#999"}},f=it.k?invFotoMed(it,m.medida):"";
     return `<div class="inv-mov"><span class="inv-th">${f?`<img alt="" src="${f}">`:""}</span>
-      <span class="inv-mtx"><b>${esc(it.n)} ${esc(m.medida||"")}</b><small><span class="inv-t ${m.tipo}">${INV_VERBO[m.tipo]||m.tipo} ${invNum(m.cant)}${invU(it.u,m.cant)}</span>${m.tipo==="usa"&&m.piso?" · "+esc(pisoLbl(m.piso)):""} · ${esc(String(m.fecha||"").split("-").reverse().slice(0,2).join("/"))}${m.por?" · "+esc(nomCorto(m.por)):""}${m.pend?(navigator.onLine?" · guardando…":" · por enviar"):""}</small></span>
+      <span class="inv-mtx"><b>${esc(it.n)} ${esc(m.medida||"")}</b><small><span class="inv-t ${m.tipo}">${INV_VERBO[m.tipo]||m.tipo} ${invNum(m.cant)}${invU(it.u,m.cant)}</span>${m.tipo==="usa"&&m.piso?" · "+esc(pisoLbl(m.piso)):""} · ${esc(String(m.fecha||"").split("-").reverse().slice(0,2).join("/"))}${m.por?" · "+esc(nomCorto(m.por)):""}${m.pend&&colaVisible()?(navigator.onLine?" · sin guardar":" · sin internet"):""}</small></span>
       <button type="button" class="inv-del" data-invdel="${escA(m.id)}" aria-label="Borrar este movimiento">✕</button></div>`}).join("");
 }
 function invEventosMov(el){
