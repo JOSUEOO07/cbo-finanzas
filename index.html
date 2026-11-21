@@ -3390,9 +3390,12 @@ async function cargar(){
   if(CBO_UNIDA){try{ctlPintar()}catch{};if(!esDemo())Promise.all([invCargar().catch(()=>{}),ctlCargar().catch(()=>{})]).then(()=>{try{ctlPintar()}catch{}})}
   if(MODO_OBRAS){try{$("cargando").hidden=true}catch{};ctlPintar();if(!esDemo()){await Promise.all([invCargar().catch(()=>{}),ctlCargar().catch(()=>{})])}ctlPintar();return}
   if(esDemo()){$("status").textContent="Modo de prueba (simulador): los cambios se guardan solo en este equipo.";$("cfgEstado").textContent="Modo de prueba";return}
-  cargando=true; $("cargando").hidden=false;
+  // "Actualizando…" solo la primera vez (cuando aún no hay nada guardado en el celular); después todo se actualiza por detrás sin avisos
+  cargando=true; $("cargando").hidden=!!servidorRows.length;
   try{
-    await enviarCola();
+    // Lo pendiente se envía por detrás: ya no bloquea la carga (antes, con Google lento, "Actualizando…" quedaba minutos)
+    releerCola();const habiaCola=cola.length;
+    enviarCola().then(()=>{releerCola();if(habiaCola&&!cola.length)setTimeout(()=>{cargar()},400)}).catch(()=>{});
     // Carga rápida: si nada cambió en Google desde la última vez, no se vuelve a descargar todo
     const verAnt=leerLS("cbo-ver",""), j=await api("datos",servidorRows.length&&verAnt?{ver:verAnt}:{});
     versionServidor=+j.version||1;
