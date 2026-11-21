@@ -3370,7 +3370,8 @@ async function api(accion,extra,conf){
   const c=conf||(deOb?ob:cfg);
   if(typeof tokPend!=="undefined"&&tokPend&&accion!=="entrar"&&accion!=="entrarCorreo"&&accion!=="comoUsuario"&&!conf&&sesion&&!sesion.t){try{await tokPend}catch(e){}}   // espera la sesión que se está pidiendo por detrás
   // Con señal débil la petición puede quedarse colgada: se corta a los 30 s y cuenta como "sin internet"
-  const ctl=new AbortController(), to=setTimeout(()=>ctl.abort(),45000);
+  // Las escrituras pueden tardar (Google recalcula la hoja y atiende de a una): se espera hasta 2 minutos; las lecturas, 45 s
+  const ctl=new AbortController(), to=setTimeout(()=>ctl.abort(),/^(agregar|editar|borrar|subirFoto|trabajador|firma|borrarFirma|ctlGuardar|ctlBorrar)$/.test(accion)||/^inv(Guardar|Borrar|Mov)/.test(accion)?120000:45000);
   let res;
   try{res=await fetch(c.url,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({clave:c.clave,accion,token:sesion?sesion.t:""},extra||{})),redirect:"follow",signal:ctl.signal})}
   finally{clearTimeout(to)}
@@ -3441,7 +3442,10 @@ const limpioReg=r=>{const c=Object.assign({},r);["id","pendiente","creado"].forE
 function encolar(op){if(op.registro)op.registro=limpioReg(op.registro);op.t=Date.now();try{cola=leerLS(colaDeSesion(sesion),[])}catch{}cola.push(op);guardarCola();rows=conCola(servidorRows);render()}
 // El guardado es silencioso. El aviso solo sale si algo lleva 3 minutos sin guardarse (con o sin internet),
 // para que nunca se pierda nada sin que lo sepas (pedido de Josué: antes de eso, nada).
-function colaTrabada(){return cola.some(o=>Date.now()-(+o.t||Date.now())>180000)}
+// Los 3 minutos se cuentan desde que se registró Y desde que se abrió la app: al abrir, lo que esperaba se envía primero sin alarmar
+const APP_INICIO=Date.now();
+const colaVieja=o=>Date.now()-Math.max(+o.t||Date.now(),APP_INICIO)>180000;
+function colaTrabada(){return cola.some(colaVieja)}
 function colaVisible(){return !!cola.length&&colaTrabada()}
 function pintarCola(){
   const n=cola.length, el=$("colaAviso"); if(!el)return;
@@ -3501,10 +3505,14 @@ async function enviarColaYa(){
         else if(op.op==="borrar") await api("borrar",{id:op.id});
         else if(op.op==="foto"&&op.id&&!String(op.id).startsWith("tmp")) await api("subirFoto",{id:op.id,nombre:op.nombre,tipo:"image/jpeg",base64:op.base64});
       }catch(e){
+        // Se guarda el motivo real del fallo para mostrarlo en Avisos (así se sabe por qué no sube)
+        try{releerCola();const o=cola.find(x=>mismaOp(x,op));if(o){o.intentos=(+o.intentos||0)+1;o.err=esErrorRed(e)?"Sin conexión con Google (se cortó la señal o tardó demasiado)":e.code==="sesion"?"Tu sesión venció: vuelve a entrar con tu PIN":/lock|bloqueo|too long|tiempo|timeout|service|servicio/i.test(String(e.message||""))?"Google estaba ocupado guardando otra cosa; se reintenta solo":String(e.message||"error").slice(0,140);guardarCola()}}catch{}
         if(e.code==="sesion" || esErrorRed(e)) break; // conserva el cambio hasta que pueda enviarse
         if(e.code==="clave") throw e;
         if(e.code==="duplicado"){toast(`Ya estaba registrado${e.por?" por "+nomCorto(e.por):""}: no se guardó dos veces.`);quitarOp(op);continue}
-        toast("No se pudo enviar un cambio pendiente: "+(e.message||"error"));  // dato rechazado: se descarta para no bloquear la cola
+        // Solo se descarta lo que de verdad es inválido. Si Google estaba ocupado (turno, tiempo, servicio), NUNCA se pierde: se reintenta
+        if(!/faltan datos|está llena|no encontrado|desconocid|no tienes permiso|solo el administrador|inválid|falta el id|solo puedes/i.test(String(e.message||"")))break;
+        toast("No se pudo guardar un cambio: "+(e.message||"error"));  // dato rechazado por el servidor: se descarta para no bloquear la cola
       }
       quitarOp(op);
     }
@@ -8238,7 +8246,10 @@ const avDia=iso=>{try{return new Date(iso+"T08:00:00").getTime()}catch{return Da
 function avisosLista(){
   const L=[],ad=esAdmin(),ahora=Date.now(),siete=ahora-7*864e5;
   // Registros que llevan 3 minutos sin guardarse en Google
-  try{cola.filter(o=>ahora-(+o.t||ahora)>180000).forEach(o=>{const r=o.registro||{};L.push({k:"cola"+o.t,n:"u",ic:"nube",t:o.op==="agregar"?"Un registro no se guardó":"Un cambio no se guardó",d:[r.desc||r.categoria||"",r.monto?fmt(+r.monto):""].filter(Boolean).join(" · ")||"Sigue en el celular, sin subir",ts:+o.t,acc:"reint"})})}catch{}
+  // Un solo aviso para todo lo que no se guardó, con el motivo real del último intento
+  try{const V=cola.filter(colaVieja);if(V.length){const ult=V[V.length-1],r=ult.registro||{},mot=(V.find(o=>o.err)||{}).err;
+    L.push({k:"cola"+V.length+"-"+ult.t,n:"u",ic:"nube",t:V.length===1?"Un registro no se guardó":`${V.length} registros no se guardaron`,
+      d:(V.length===1?[r.desc||r.categoria||"",r.monto?fmt(+r.monto):""].filter(Boolean).join(" · ")+" · ":"Siguen guardados en el celular · ")+(mot?"Motivo: "+mot:navigator.onLine?"Google no responde":"Sin internet"),ts:+ult.t,acc:"reint"})}}catch{}
   if(ad){
     // SUNAT del mes anterior
     try{const m=addMes(hoyISO.slice(0,7),-1),vi=vencInfo(m),pend=r2(impuestos(m).tot-pagadoSun(m));
@@ -8252,10 +8263,17 @@ function avisosLista(){
     try{(ctl.conform||[]).filter(r=>r.firma&&(+r.ts||0)>=siete).forEach(r=>L.push({k:"cf"+r.id,n:"l",ic:"firma",t:"El cliente firmó la entrega",d:`Obra ${r.obra||""}`,ts:+r.ts,ir:"obras"}))}catch{}
   }
   // Obras que pasaron su plazo y material agotado o bajo
-  try{invObrasLista().forEach(o=>{const e=estadoPlazo(o);if(e&&e.d!==null&&e.d<0){const p=plazoDe(o);L.push({k:"pz"+o,n:"u",ic:"obra",t:`Obra atrasada: ${o}`,d:`${-e.d} ${e.d===-1?"día":"días"} después del plazo`,ts:avDia(isoMas(p.fin,1)),ir:"obras"})}
+  try{invObrasLista().forEach(o=>{const e=estadoPlazo(o);if(e&&e.d!==null&&e.d<0){const p=plazoDe(o);L.push({k:"pz"+o,n:"u",ic:"obra",t:`Obra atrasada: ${o}`,d:`${-e.d} ${e.d===-1?"día":"días"} después del plazo`,ts:avDia(p.fin),ir:"obras"})}
     alertasStock(o).forEach(a=>{const it=(typeof INV_IDX!=="undefined"&&INV_IDX[a.k])||{n:a.k,u:""},ago=a.saldo<=0;L.push({k:"st"+o+a.k+a.med,n:ago?"u":"p",ic:"caja",t:`${ago?"Se agotó":"Stock bajo"}: ${it.n}${a.med?" "+a.med:""}`,d:`Quedan ${Math.max(0,a.saldo)} ${it.u||""} · obra ${o}`,ts:avDia(hoyISO),ir:"inventario",obra:o})})})}catch{}
-  return L.sort((a,b)=>b.ts-a.ts);
+  const oc=avOcultos();
+  return L.filter(a=>!oc[a.k]).sort((a,b)=>b.ts-a.ts);
 }
+// Avisos quitados (deslizando a la derecha o con ✕): se ocultan en este equipo; si la situación cambia, sale un aviso nuevo
+const AV_OCULTOS_K="cbo-avisos-ocultos";
+function avOcultos(){const o=leerLS(AV_OCULTOS_K,{})||{},lim=Date.now()-30*864e5;let c=false;Object.keys(o).forEach(k=>{if(o[k]<lim){delete o[k];c=true}});if(c)guardarLS(AV_OCULTOS_K,o);return o}
+function avQuitar(k,el){const o=avOcultos();o[k]=Date.now();guardarLS(AV_OCULTOS_K,o);
+  const fin=()=>{try{pintarAvisos()}catch{}};
+  if(el&&!matchMedia("(prefers-reduced-motion: reduce)").matches){el.style.transition="transform .2s cubic-bezier(.23,1,.32,1),opacity .2s ease-out";el.style.transform="translateX(110%)";el.style.opacity="0";setTimeout(fin,190)}else fin()}
 function pintarAvisos(lata){
   const L=avisosLista(),n={u:0,p:0,l:0};L.forEach(a=>n[a.n]++);
   // Campanita: urgentes + pendientes; en rojo si hay algo urgente
@@ -8265,12 +8283,12 @@ function pintarAvisos(lata){
   const V=avFiltro==="todos"?L:L.filter(a=>a.n===avFiltro);
   const chip=(k,t,c)=>`<button type="button" class="avs-chip${k===avFiltro?" on":""}${k==="u"&&n.u?" urg"+(lata?" late":""):""}" data-avf="${k}">${t}${c!==null?` <b>${c}</b>`:""}</button>`;
   el.innerHTML=`<div class="avs-chips">${chip("todos","Todos",L.length)}${chip("u","Urgente",n.u)}${chip("p","Pendiente",n.p)}${chip("l","Listo",n.l)}</div>`
-    +(V.length?`<div class="avs-lista">${V.map(a=>{const [nom,cl]=AV_NIV[a.n];return `<div class="avs-f ${cl}" role="button" tabindex="0" ${a.ir?`data-avir="${escA(a.ir)}"`:""} ${a.obra?`data-avobra="${escA(a.obra)}"`:""}>
+    +(V.length?`<div class="avs-lista">${V.map(a=>{const [nom,cl]=AV_NIV[a.n];return `<div class="avs-f ${cl}" role="button" tabindex="0" data-avk="${escA(a.k)}" ${a.ir?`data-avir="${escA(a.ir)}"`:""} ${a.obra?`data-avobra="${escA(a.obra)}"`:""}>
       <span class="avs-ic" aria-hidden="true"><svg viewBox="0 0 24 24">${AV_IC[a.ic]||AV_IC.cal}</svg></span>
       <div class="avs-tx"><span class="avs-niv">${nom}</span><b>${esc(a.t)}</b><small>${esc(a.d)}</small>
       ${a.acc==="reint"?`<div class="buzon-acc"><button class="btn" type="button" data-avreint>Reintentar</button></div>`:""}
       ${a.nuevo?`<div class="buzon-acc"><button class="btn" type="button" data-vernuevo="${escA(a.nuevo)}">Elegir qué ve</button><button class="btn2" type="button" data-rechazar="${escA(a.nuevo)}">Rechazar</button></div>`:""}</div>
-      <span class="avs-h">${avHace(a.ts)}</span></div>`}).join("")}</div>`
+      <span class="avs-h">${avHace(a.ts)}<button type="button" class="avs-x" data-avx aria-label="Quitar este aviso">✕</button></span></div>`}).join("")}</div><p class="avs-pista">Desliza un aviso a la derecha para quitarlo.</p>`
       :`<div class="buzon-vacio"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l4 4 10-10"/></svg><p>${avFiltro==="todos"?"Todo en orden. No hay avisos.":"No hay avisos de este tipo."}</p></div>`);
 }
 (function(){
@@ -8279,11 +8297,23 @@ function pintarAvisos(lata){
     if(t.closest("#buzonBtn,[data-abrir-buzon]")){avFiltro="todos";setTimeout(()=>{try{pintarAvisos(true)}catch{}},0);return}
     if((b=t.closest("[data-avf]"))){avFiltro=b.dataset.avf;pintarAvisos(false);return}
     if(t.closest("[data-avreint]")){e.stopPropagation();reintentos=0;cargar();toast("Reintentando…");return}
+    if((b=t.closest("[data-avx]"))){e.stopPropagation();const f=b.closest(".avs-f");if(f)avQuitar(f.dataset.avk,f);return}
     if(t.closest("[data-vernuevo],[data-rechazar],button"))return;
+    if(avArrastro){avArrastro=false;return}
     if((b=t.closest(".avs-f[data-avir]"))){cerrarOv("ovBuzon");if(b.dataset.avobra){try{invObra=b.dataset.avobra;guardarLS(INV_OBRA,invObra)}catch{}}irAviso(b.dataset.avir);return}
   });
-  setInterval(()=>{try{pintarAvisos()}catch{}},30000);
+  setInterval(()=>{try{if($("ovBuzon")&&$("ovBuzon").hidden)pintarAvisos()}catch{}},30000);
+  // Deslizar a la derecha para quitar: el aviso sigue al dedo; si pasa un tercio de su ancho, se va
+  let ini=null;
+  document.addEventListener("pointerdown",e=>{const f=e.target.closest&&e.target.closest(".avs-f");if(!f||e.target.closest("button"))return;ini={f,x:e.clientX,y:e.clientY,dx:0,on:false}},{passive:true});
+  document.addEventListener("pointermove",e=>{if(!ini)return;const dx=e.clientX-ini.x,dy=e.clientY-ini.y;
+    if(!ini.on){if(Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){ini=null;return}if(dx>10&&dx>Math.abs(dy)){ini.on=true;ini.f.style.transition="none"}else return}
+    ini.dx=Math.max(0,dx);ini.f.style.transform=`translateX(${ini.dx}px)`;ini.f.style.opacity=String(Math.max(.35,1-ini.dx/ini.f.offsetWidth))},{passive:true});
+  const soltar=()=>{if(!ini)return;const {f,dx,on}=ini;ini=null;if(!on)return;avArrastro=true;setTimeout(()=>{avArrastro=false},350);
+    if(dx>f.offsetWidth*.33)avQuitar(f.dataset.avk,f);else{f.style.transition="transform .2s cubic-bezier(.23,1,.32,1),opacity .2s ease-out";f.style.transform="";f.style.opacity=""}};
+  document.addEventListener("pointerup",soltar);document.addEventListener("pointercancel",soltar);
 })();
+var avArrastro=false;
 document.head.insertAdjacentHTML("beforeend",`<style id="avisosCss">
 .avs-chips{display:flex;gap:6px;overflow-x:auto;margin:6px 0 12px;padding-bottom:2px;scrollbar-width:none}
 .avs-chip{flex:none;font:600 .82rem var(--display,inherit);padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:transparent;color:inherit;opacity:.85}
@@ -8307,6 +8337,11 @@ document.head.insertAdjacentHTML("beforeend",`<style id="avisosCss">
 .buzon-n.ambar{background:#f5a524;color:#1a1200}
 .avs-tx .buzon-acc{flex-wrap:nowrap;margin-top:8px}.avs-tx .buzon-acc button{flex:1 1 0;min-height:40px;padding:8px 10px;font-size:.86rem}
 .avs-u .avs-tx b{color:#ff8f8f}
+.avs-f{touch-action:pan-y;user-select:none;-webkit-user-select:none;will-change:transform}
+.avs-h{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.avs-x{display:none;width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:transparent;color:inherit;font-size:.8rem;opacity:.7;cursor:pointer}
+@media (hover:hover) and (pointer:fine){.avs-x{display:grid;place-items:center}.avs-x:hover{opacity:1}.avs-pista{display:none}}
+.avs-pista{text-align:center;font-size:.76rem;opacity:.55;margin:10px 0 0}
 .avs-u .buzon-acc .btn{background:#e5484d!important;color:#fff!important;border-color:transparent!important;box-shadow:none!important}
 .avs-p .buzon-acc .btn{background:#f5a524!important;color:#1a1200!important;border-color:transparent!important;box-shadow:none!important}
 .avs-u .buzon-acc .btn2,.avs-p .buzon-acc .btn2{background:transparent!important;color:inherit!important}
