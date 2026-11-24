@@ -4384,7 +4384,10 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
     t.classList.add("on");document.body.classList.add("tecl-abierto");
     requestAnimationFrame(()=>{document.documentElement.style.setProperty("--tecl-h",t.offsetHeight+"px");try{i.scrollIntoView({block:"center",behavior:"smooth"})}catch{}})};
   const cerrar=()=>{el=null;t.classList.remove("on");document.body.classList.remove("tecl-abierto")};
-  document.addEventListener("focusin",e=>{const i=e.target;if(i.matches&&i.matches(SEL2)&&i.dataset.teclOk&&!i.readOnly&&!i.disabled&&activo())abrir(i);else if(el&&!t.contains(i))setTimeout(()=>{const a=document.activeElement;if(el&&!(a&&a.dataset&&(a.dataset.teclOk||a.dataset.letOk)))cerrar()},320)});
+  document.addEventListener("focusin",e=>{const i=e.target;if(i.matches&&i.matches(SEL2)&&i.dataset.teclOk&&!i.readOnly&&!i.disabled&&activo())abrir(i);
+    // Si se pasa a un campo de letras, el teclado de números se cierra AL INSTANTE: así nunca se ven los dos teclados a la vez
+    else if(el&&!t.contains(i)&&i.matches&&i.matches("input,textarea")&&!(i.dataset.teclOk||i.dataset.letOk))cerrar();
+    else if(el&&!t.contains(i))setTimeout(()=>{const a=document.activeElement;if(el&&!(a&&a.dataset&&(a.dataset.teclOk||a.dataset.letOk)))cerrar()},320)});
   document.addEventListener("focusout",()=>setTimeout(()=>{const a=document.activeElement;if(el&&(!a||a===document.body||!(a.matches&&a.matches(SEL2))))cerrar()},320));
   // Tocar el teclado no quita el foco del campo
   t.addEventListener("pointerdown",e=>{e.preventDefault();const b=e.target.closest(".tecl-g button");if(!b)return;
@@ -4406,7 +4409,9 @@ abrirPin=function(modo,titulo,check){pinHuellaFn=null;$("pinHuella").hidden=true
 // --- Teclado de letras propio: en el celular, los campos de texto usan este teclado con la paleta. Al mantener presionada
 //     una tecla salen sus opciones (a → á, n → ñ, 1 → ½ ¼ ⅛, 3 → ¾ ⅜…). En la computadora sigue el teclado físico. ---
 (function(){
-  const activo=()=>matchMedia("(pointer:coarse)").matches||matchMedia("(max-width:600px)").matches;
+  // 24/11/2026, pedido de Josué: las letras se escriben con el teclado del propio celular (dictado, autocorrector).
+  // El teclado de letras de CBO queda apagado; el de números y el del PIN siguen siendo los de CBO.
+  const activo=()=>false;
   const SEL='input:not([type]),input[type="text"],input[type="search"],input[type="email"],textarea';
   const ES_NUM=i=>/^(decimal|numeric|tel|none)$/.test(i.getAttribute("inputmode")||"")&&!i.dataset.letOk;
   const ALT={a:"áàäâª",e:"éèëê€",i:"íìïî",o:"óòöôº",u:"úùüû",n:"ñ",c:"ç",s:"$ß",y:"ý",
